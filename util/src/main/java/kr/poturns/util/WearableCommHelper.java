@@ -68,18 +68,20 @@ public class WearableCommHelper implements GoogleApiClient.ConnectionCallbacks, 
 
     //*************** Lifecycle helper method ***************
 
-    public final void onResume() {
-        mGoogleApiClient.connect();
+    public final void connect() {
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
     }
 
-    public final void onPause() {
+    public final void disconnect() {
         if (mGoogleApiClient != null) {
             Wearable.MessageApi.removeListener(mGoogleApiClient, messageListener);
             mGoogleApiClient.disconnect();
         }
     }
 
-    public final void onDestroy() {
+    public final void release() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.unregisterConnectionCallbacks(this);
             mGoogleApiClient.unregisterConnectionFailedListener(this);

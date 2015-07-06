@@ -1,12 +1,12 @@
 package kr.poturns.util;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 
-public class WearableCommActivity extends AppCompatActivity implements MessageApi.MessageListener {
+public class WearableCommActivity extends Activity implements MessageApi.MessageListener {
     private WearableCommHelper wearableCommHelper;
 
     @Override
@@ -19,20 +19,20 @@ public class WearableCommActivity extends AppCompatActivity implements MessageAp
     @Override
     protected void onResume() {
         super.onResume();
-        wearableCommHelper.onResume();
+        wearableCommHelper.connect();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        wearableCommHelper.onPause();
+        wearableCommHelper.disconnect();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        wearableCommHelper.onDestroy();
+        wearableCommHelper.release();
 
     }
 

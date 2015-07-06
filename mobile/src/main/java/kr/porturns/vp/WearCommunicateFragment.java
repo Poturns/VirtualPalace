@@ -57,19 +57,19 @@ public class WearCommunicateFragment extends Fragment implements MessageApi.Mess
     @Override
     public void onResume() {
         super.onResume();
-        wearableCommHelper.onResume();
+        wearableCommHelper.connect();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        wearableCommHelper.onPause();
+        wearableCommHelper.disconnect();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        wearableCommHelper.onDestroy();
+        wearableCommHelper.release();
     }
 
     @Override
