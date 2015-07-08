@@ -1,10 +1,13 @@
 package kr.poturns.util;
 
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -51,6 +54,22 @@ public class DataUtil {
             } catch (IOException ignored) {
                 //ignore
             }
+        }
+    }
+
+    public static String readContentFromStream(InputStream in, String encoding) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, encoding));
+        try {
+            StringBuilder builder = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                builder.append(line).append('\n');
+            }
+            return builder.toString();
+        } finally {
+            reader.close();
+            closeStream(in);
         }
     }
 
