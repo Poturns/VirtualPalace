@@ -3,22 +3,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <Button
-        android:id="@+id/speech_button"
+    <LinearLayout
+        android:id="@+id/btn_layout"
         android:layout_width="fill_parent"
-        android:layout_height="120dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:text="START"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/speech_button"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="START"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/play_button"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Play Audio"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <include
         layout="@layout/fragment_wear"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@id/speech_button"
+        android:layout_above="@id/btn_layout"
         android:layout_alignParentTop="true" />
 
 </RelativeLayout>

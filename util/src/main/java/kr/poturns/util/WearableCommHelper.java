@@ -14,6 +14,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
@@ -21,67 +22,96 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-public class WearableCommHelper implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelper implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "WearableCommHelper";
     //public static final String DATA_TRANSFER_CAPABILITY_NAME = "data_transfer";
     public static final String DATA_TRANSFER_MESSAGE_PATH = "/data_transfer";
     //public static final String SEND_STRING_CAPABILITY_NAME = "send_string";
     public static final String SEND_STRING_MESSAGE_PATH = "/send_string";
 
+    public interface MessageListener{
+        void onMessageReceived(String path, Object data);
+    }
 
     private GoogleApiClient mGoogleApiClient;
 
     //private String dataTransferNodeId = null, sendStringNodeId = null;
 
-    private final Context context;
     private final Handler mHandler;
     private final String[] CAPABILITY_NAMES;
     private final ArrayMap<String, String> NODE_ID_MAP;
-    private MessageApi.MessageListener messageListener;
     private GoogleApiClient.ConnectionCallbacks connectionCallbacks;
+    private InternalMessageListener internalMessageListener;
 
     public WearableCommHelper(Context context, GoogleApiClient.ConnectionCallbacks connectionCallbacks) {
-        this.context = context;
+        super(context);
         this.connectionCallbacks = connectionCallbacks;
         mHandler = new Handler(Looper.getMainLooper());
 
         CAPABILITY_NAMES = context.getResources().getStringArray(R.array.android_wear_capabilities);
         NODE_ID_MAP = new ArrayMap<>(CAPABILITY_NAMES.length);
 
+        internalMessageListener = new InternalMessageListener(null);
+
         initGoogleApiClient();
 
+    }
+
+    static class InternalMessageListener implements MessageApi.MessageListener{
+        MessageListener messageListener;
+
+        public InternalMessageListener(MessageListener listener){
+            this.messageListener = listener;
+        }
+
+        @Override
+        public void onMessageReceived(MessageEvent messageEvent) {
+            if(messageListener != null){
+                try {
+                    messageListener.onMessageReceived(messageEvent.getPath(), IOUtils.fromByteArray(messageEvent.getData()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
     }
 
     public WearableCommHelper(Context context) {
         this(context, null);
     }
 
-    public void setMessageListener(MessageApi.MessageListener messageListener) {
+    public void setMessageListener(MessageListener messageListener) {
+        internalMessageListener.messageListener = messageListener;
         if (mGoogleApiClient != null && messageListener != null)
-            Wearable.MessageApi.removeListener(mGoogleApiClient, messageListener);
 
-        this.messageListener = messageListener;
+            Wearable.MessageApi.removeListener(mGoogleApiClient, internalMessageListener);
+
+
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
-            Wearable.MessageApi.addListener(mGoogleApiClient, messageListener);
+            Wearable.MessageApi.addListener(mGoogleApiClient, internalMessageListener);
     }
 
     //*************** Lifecycle helper method ***************
 
-    public final void connect() {
+    @Override
+    public final void resume() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
     }
 
-    public final void disconnect() {
+    @Override
+    public final void pause() {
         if (mGoogleApiClient != null) {
-            Wearable.MessageApi.removeListener(mGoogleApiClient, messageListener);
+            Wearable.MessageApi.removeListener(mGoogleApiClient, internalMessageListener);
             mGoogleApiClient.disconnect();
         }
     }
 
-    public final void release() {
+    @Override
+    public final void destroy() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.unregisterConnectionCallbacks(this);
             mGoogleApiClient.unregisterConnectionFailedListener(this);
@@ -114,8 +144,8 @@ public class WearableCommHelper implements GoogleApiClient.ConnectionCallbacks, 
         if (connectionCallbacks != null)
             connectionCallbacks.onConnected(connectionHint);
 
-        if (messageListener != null)
-            Wearable.MessageApi.addListener(mGoogleApiClient, messageListener);
+        if (internalMessageListener != null)
+            Wearable.MessageApi.addListener(mGoogleApiClient, internalMessageListener);
 
         setupDataTransfer();
     }
@@ -189,7 +219,7 @@ public class WearableCommHelper implements GoogleApiClient.ConnectionCallbacks, 
                         @Override
                         public void run() {
                             try {
-                                byte[] data = object instanceof String ? ((String) object).getBytes() : DataUtil.toByteArray(object);
+                                byte[] data = object instanceof String ? ((String) object).getBytes() : IOUtils.toByteArray(object);
 
                                 Wearable.MessageApi
                                         .sendMessage(mGoogleApiClient, nodeId, path, data)
@@ -306,7 +336,7 @@ public class WearableCommHelper implements GoogleApiClient.ConnectionCallbacks, 
 
             AsyncTask.execute(() -> {
                 try {
-                    byte[] data = object instanceof String ? ((String)object).getBytes() : DataUtil.toByteArray(object);
+                    byte[] data = object instanceof String ? ((String)object).getBytes() : IOUtils.toByteArray(object);
 
                     Wearable.MessageApi
                             .sendMessage(mGoogleApiClient, dataTransferNodeId, DATA_TRANSFER_MESSAGE_PATH, data)

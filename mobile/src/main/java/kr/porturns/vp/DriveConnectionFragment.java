@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import kr.poturns.util.DataUtil;
 import kr.poturns.util.DriveConnectionHelper;
+import kr.poturns.util.IOUtils;
+
 /*
     문제점 1. 초기 사용시 사용자가 Google Drive 사용에 관한 dialog를 보고, 이를 수락해야 함.
 
@@ -96,7 +97,7 @@ public class DriveConnectionFragment extends Fragment {
                                                 FileInputStream fs = new FileInputStream(fileDescriptor);
                                                 String content;
                                                 try {
-                                                    content = DataUtil.readContentFromStream(fs, "utf-8");
+                                                    content = IOUtils.readContentFromStream(fs, "utf-8");
                                                 } catch (final IOException e) {
                                                     getActivity().runOnUiThread(new Runnable() {
                                                         @Override
@@ -176,20 +177,20 @@ public class DriveConnectionFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        mDriveConnectionHelper.connect();
+        mDriveConnectionHelper.resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        mDriveConnectionHelper.disconnect();
+        mDriveConnectionHelper.pause();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        mDriveConnectionHelper.release();
+        mDriveConnectionHelper.destroy();
     }
 }

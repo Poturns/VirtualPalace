@@ -25,10 +25,9 @@ import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 
-public class DriveConnectionHelper implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class DriveConnectionHelper extends InputHandleHelper.ContextInputHandleHelper implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "DriveConnectionHelper";
     private GoogleApiClient mGoogleApiClient;
-    private final Context context;
 
     public interface OnFileResultListener {
         void onReceiveFileContent(DriveContents contents);
@@ -38,7 +37,7 @@ public class DriveConnectionHelper implements GoogleApiClient.ConnectionCallback
     }
 
     public DriveConnectionHelper(Context context) {
-        this.context = context;
+        super(context);
 
         initApiClient();
     }
@@ -53,17 +52,20 @@ public class DriveConnectionHelper implements GoogleApiClient.ConnectionCallback
                 .build();
     }
 
-    public final void connect() {
+    @Override
+    public final void resume() {
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
     }
 
-    public final void disconnect() {
+    @Override
+    public final void pause() {
         if (mGoogleApiClient != null)
             mGoogleApiClient.disconnect();
     }
 
-    public final void release() {
+    @Override
+    public final void destroy() {
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
             mGoogleApiClient = null;

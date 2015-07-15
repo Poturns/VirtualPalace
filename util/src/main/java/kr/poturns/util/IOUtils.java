@@ -12,7 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class DataUtil {
+public class IOUtils {
 
     public static byte[] toByteArray(Object obj) throws IOException {
         if (!(obj instanceof Serializable))

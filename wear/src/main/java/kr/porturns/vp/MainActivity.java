@@ -38,13 +38,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        wearableCommHelper.connect();
+        wearableCommHelper.resume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        wearableCommHelper.disconnect();
+        wearableCommHelper.pause();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
 
         sensorFragment = null;
-        wearableCommHelper.release();
+        wearableCommHelper.destroy();
     }
 
     public void sendMessage(String path, Object object){

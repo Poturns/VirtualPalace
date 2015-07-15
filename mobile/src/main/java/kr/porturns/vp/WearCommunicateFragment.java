@@ -9,16 +9,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
 
-import java.io.IOException;
-
-import kr.poturns.util.DataUtil;
-import kr.poturns.util.MovementData;
 import kr.poturns.util.WearableCommHelper;
 
-public class WearCommunicateFragment extends Fragment implements MessageApi.MessageListener {
+public class WearCommunicateFragment extends Fragment implements WearableCommHelper.MessageListener {
 
     private WearableCommHelper wearableCommHelper;
 
@@ -57,40 +51,43 @@ public class WearCommunicateFragment extends Fragment implements MessageApi.Mess
     @Override
     public void onResume() {
         super.onResume();
-        wearableCommHelper.connect();
+        wearableCommHelper.resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        wearableCommHelper.disconnect();
+        wearableCommHelper.pause();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        wearableCommHelper.release();
+        wearableCommHelper.destroy();
+    }
+
+    void printText() {
+        textView.setText(sb.toString());
     }
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        switch (messageEvent.getPath()) {
-            case WearableCommHelper.DATA_TRANSFER_MESSAGE_PATH:
-                try {
-                    MovementData data = DataUtil.fromByteArray(messageEvent.getData());
-                    String s = data.toString();
-                    sb.append("Movement Data : \n").append(s).append('\n');
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return;
-                }
-                break;
-
-            case WearableCommHelper.SEND_STRING_MESSAGE_PATH: {
-                String s = new String(messageEvent.getData());
-                sb.append(s).append('\n');
+    public void onMessageReceived(String path, Object data) {
+        switch (path) {
+            case WearableCommHelper.DATA_TRANSFER_MESSAGE_PATH: {
+                //MovementData movementData = (MovementData) data;
+                //String s = data.toString();
+                //sb.append("Movement Data : \n").append(s).append('\n');
+                sb.append("Movement Data : \n").append(data).append('\n');
                 break;
             }
+
+            case WearableCommHelper.SEND_STRING_MESSAGE_PATH: {
+                //String s = (String) data;
+                //sb.append(s).append('\n');
+                sb.append(data).append('\n');
+                break;
+            }
+
             default:
                 return;
         }
@@ -101,11 +98,5 @@ public class WearCommunicateFragment extends Fragment implements MessageApi.Mess
                 printText();
             }
         });
-
-    }
-
-
-    void printText(){
-        textView.setText(sb.toString());
     }
 }
