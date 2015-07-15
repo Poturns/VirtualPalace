@@ -13,8 +13,9 @@ namespace AndroidApi
 		internal InputHandleHelperProxy (AndroidJavaObject activity)
 		{
 			this.activity = activity;
+			//Debug.Log (activity.Call<string>("toString"));
 			inputHandlerProxy = activity.Call<AndroidJavaObject>("getInputHandleHelperProxy");
-
+			inputHandlerProxy.Call ("createInputHandleHelperAll");
 		}
 
 		/*
@@ -26,12 +27,12 @@ namespace AndroidApi
 
 		public STTInputHandler GetSTTInputHandler()
 		{
-			return new STTInputHandler(inputHandlerProxy.Call<AndroidJavaObject>("createInputHandleHelper", activity, INPUT_HELPER_STT));
+			return new STTInputHandler(inputHandlerProxy.Call<AndroidJavaObject>("getInputHandleHelper", INPUT_HELPER_STT));
 		}
 
 		public WearableInputHandler GetWearableInputHandler()
 		{
-			return new WearableInputHandler (inputHandlerProxy.Call<AndroidJavaObject> ("createInputHandleHelper", activity, INPUT_HELPER_WEARABLE));
+			return new WearableInputHandler (inputHandlerProxy.Call<AndroidJavaObject> ("getInputHandleHelper", INPUT_HELPER_WEARABLE));
 		}
 
 		public void Dispose()

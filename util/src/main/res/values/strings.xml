@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">util</string>
+
+    <!--<integer name="vp_google_play_services_version">@integer/google_play_services_version</integer>-->
+    <integer name="vp_google_play_services_version">7571000</integer>
+
 </resources>

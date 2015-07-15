@@ -7,8 +7,8 @@ namespace AndroidApi
 	{
 		public const string UnityActivityClassName = "com.unity3d.player.UnityPlayer";
 
-		public const string SpeechToTextListenerClassName = "kr.poturns.util.SpeechToTextHelper.STTListener";
-		public const string MessageListenerClassName = "kr.poturns.util.WearableCommHelper.MessageListener";
+		public const string SpeechToTextListenerClassName = "kr.poturns.util.SpeechToTextHelper$STTListener";
+		public const string MessageListenerClassName = "kr.poturns.util.WearableCommHelper$MessageListener";
 
 
 		public static AndroidJavaObject GetActivityObject()

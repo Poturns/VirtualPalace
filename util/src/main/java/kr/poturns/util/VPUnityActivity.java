@@ -12,7 +12,8 @@ public class VPUnityActivity extends UnityPlayerActivity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
 
-        inputHandleHelperProxy = new InputHandleHelperProxy();
+        inputHandleHelperProxy = new InputHandleHelperProxy(this);
+
     }
 
     @Override

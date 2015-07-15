@@ -1,5 +1,6 @@
 package kr.poturns.util;
 
+import android.app.Activity;
 import android.content.Context;
 
 public class InputHandleHelperProxy {
@@ -9,57 +10,83 @@ public class InputHandleHelperProxy {
     public static final int HELPER_STT = 1;
     public static final int HELPER_DRIVE = 2;
 
+    private Activity activity;
+
+    InputHandleHelperProxy(Activity activity){
+        this.activity = activity;
+    }
+
     public void onResume() {
 
-        for (InputHandleHelper helper : mInputHandleHelpers) {
-            if (helper != null) helper.resume();
-        }
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (InputHandleHelper helper : mInputHandleHelpers) {
+                    if (helper != null) helper.resume();
+                }
+            }
+        });
 
     }
 
     public void onPause() {
 
-        for (InputHandleHelper helper : mInputHandleHelpers) {
-            if (helper != null) helper.pause();
-        }
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (InputHandleHelper helper : mInputHandleHelpers) {
+                    if (helper != null) helper.pause();
+                }
+            }
+        });
 
     }
 
     public void onDestroy() {
-        int i = 0;
-        for (InputHandleHelper helper : mInputHandleHelpers) {
-            if (helper != null) {
-                helper.destroy();
-                mInputHandleHelpers[i++] = null;
-            }
-        }
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int i = 0;
+                for (InputHandleHelper helper : mInputHandleHelpers) {
+                    if (helper != null) {
+                        helper.destroy();
+                        mInputHandleHelpers[i++] = null;
+                    }
+                }
 
-        mInputHandleHelpers = null;
+                mInputHandleHelpers = null;
+            }
+        });
+
     }
 
     public InputHandleHelper getInputHandleHelper(int which) {
         return mInputHandleHelpers[which];
     }
 
-    public void startInputHandleHelper(InputHandleHelper inputHandleHelper) {
-        inputHandleHelper.resume();
+    public void createInputHandleHelperAll(){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 2; i > -1; i--) {
+                    createInputHandleHelper(i);
+                }
+            }
+        });
+
     }
 
-    public void stopInputHandleHelper(InputHandleHelper inputHandleHelper) {
-        inputHandleHelper.pause();
-    }
-
-    public InputHandleHelper createInputHandleHelper(Context context, int which) {
+    public InputHandleHelper createInputHandleHelper(int which) {
         InputHandleHelper helper = mInputHandleHelpers[which];
         if (helper == null) {
-            helper = create(context, which);
+            helper = create(activity, which);
             mInputHandleHelpers[which] = helper;
         }
 
         return helper;
     }
 
-    private static InputHandleHelper create(Context context, int which) {
+    private InputHandleHelper create(Context context, int which) {
         switch (which) {
             case HELPER_WEARABLE:
                 return new WearableCommHelper(context);

@@ -49,7 +49,7 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
         mHandler = new Handler(Looper.getMainLooper());
 
         CAPABILITY_NAMES = context.getResources().getStringArray(R.array.android_wear_capabilities);
-        NODE_ID_MAP = new ArrayMap<>(CAPABILITY_NAMES.length);
+        NODE_ID_MAP = new ArrayMap<String, String>(CAPABILITY_NAMES.length);
 
         internalMessageListener = new InternalMessageListener(null);
 

@@ -16,15 +16,25 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 	#region Unity Lifecycle method
 	// Use this for initialization
 	void Start () {
-		logText = GetComponent<Text> ();
-		button = GetComponent<Button> ();
-		buttonText = button.GetComponent<Text> ();
+		//Debug.Log ("onStart");
+
+		logText = GameObject.Find ("Text").GetComponent<Text>();
+		//Debug.Log (logText);
+
+		button = GameObject.Find ("Button").GetComponent<Button>();
+		//Debug.Log (button);
+
+		buttonText = button.GetComponentInChildren<Text> ();
+		//Debug.Log (buttonText);
 		buttonText.text = "Start";
 
 		button.onClick .AddListener (OnStartButtonClick);
 
 		inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
+		//Debug.Log (inputHandleHelperProxy);
+
 		sttHandler = inputHandleHelperProxy.GetSTTInputHandler ();
+		//Debug.Log (sttHandler);
 		sttHandler.SetListener (this);
 
 		//wearableHandler = inputHandleHelperProxy.GetWearableInputHandler ();
@@ -46,6 +56,7 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 
 	public void OnStartButtonClick()
 	{
+		Debug.Log ("clicked");
 		if (sttHandler.IsInVoiceRecognition ()) {
 			buttonText.text = "Start";
 			sttHandler.Stop();
