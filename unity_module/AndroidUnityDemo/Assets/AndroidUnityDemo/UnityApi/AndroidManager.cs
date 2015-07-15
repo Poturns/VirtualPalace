@@ -1,19 +1,29 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using AndroidApi;
 
 public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableMessageListener
 {
-	public STTInputHandler sttHandler;
-	private string log = "";
+	InputHandleHelperProxy inputHandleHelperProxy;
+	STTInputHandler sttHandler;
+	string log = "";
 	//public WearableInputHandler wearableHandler;
-	//public GUIText mLogText;
-	//public GUIText mButton;
+
+	Text logText, buttonText;
+	Button button;
 
 	#region Unity Lifecycle method
 	// Use this for initialization
 	void Start () {
-		InputHandleHelperProxy inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
+		logText = GetComponent<Text> ();
+		button = GetComponent<Button> ();
+		buttonText = button.GetComponent<Text> ();
+		buttonText.text = "Start";
+
+		button.onClick .AddListener (OnStartButtonClick);
+
+		inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
 		sttHandler = inputHandleHelperProxy.GetSTTInputHandler ();
 		sttHandler.SetListener (this);
 
@@ -36,7 +46,14 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 
 	public void OnStartButtonClick()
 	{
-		sttHandler.StartOrStop ();
+		if (sttHandler.IsInVoiceRecognition ()) {
+			buttonText.text = "Start";
+			sttHandler.Stop();
+		} else {
+			buttonText.text = "Stop";
+			sttHandler.Start();
+		}
+
 	}
 
 	#endregion UI component callback
@@ -47,6 +64,7 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 		log += text;
 
 		//TODO Text Component 에 log 표시
+		logText.text = log;
 	}
 
 	#region ISpeechToTextListener

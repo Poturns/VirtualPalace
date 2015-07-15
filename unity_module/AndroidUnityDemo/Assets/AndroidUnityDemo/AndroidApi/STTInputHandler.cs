@@ -5,7 +5,7 @@ namespace AndroidApi
 {
 	public class STTInputHandler : IInputHandleHelper<ISpeechToTextListener>
 	{
-		public STTInputHandler (AndroidJavaObject inputHandleHelper) : base(inputHandleHelper)
+		internal STTInputHandler (AndroidJavaObject inputHandleHelper) : base(inputHandleHelper)
 		{
 		}
 

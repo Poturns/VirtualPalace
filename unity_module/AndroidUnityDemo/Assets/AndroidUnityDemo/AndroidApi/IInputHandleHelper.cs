@@ -21,7 +21,13 @@ namespace AndroidApi
 			inputHandleHelper.Call ("stop");
 		}
 
+		public void Dispose()
+		{
+			inputHandleHelper.Dispose ();
+		}
+
 		public abstract void SetListener(Listener listener);
+
 
 	}
 }

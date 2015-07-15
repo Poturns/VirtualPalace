@@ -19,6 +19,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    provided files('libs/unity.jar')
     compile 'com.google.android.gms:play-services:7.5.0'
 }
