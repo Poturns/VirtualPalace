@@ -5,20 +5,22 @@ namespace AndroidApi
 {
 	public abstract class IInputHandleHelper<Listener>
 	{
-		internal AndroidJavaObject inputHandleHelper;
-		internal IInputHandleHelper (AndroidJavaObject inputHandleHelper)
+		internal AndroidJavaObject activity, inputHandleHelper;
+
+		internal IInputHandleHelper (AndroidJavaObject activity, AndroidJavaObject inputHandleHelper)
 		{
+			this.activity = activity;
 			this.inputHandleHelper = inputHandleHelper;
 		}
 
 		public void Start()
 		{
-			inputHandleHelper.Call ("start");
+			activity.Call(Utils.RunOnUiThreadMethodName, new AndroidJavaRunnable( () => inputHandleHelper.Call ("start") ));
 		}
 
 		public void Stop()
 		{
-			inputHandleHelper.Call ("stop");
+			activity.Call (Utils.RunOnUiThreadMethodName, new AndroidJavaRunnable ( () => inputHandleHelper.Call ("stop") ));
 		}
 
 		public void Dispose()

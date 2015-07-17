@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import kr.poturns.util.SpeechToTextHelper;
@@ -60,7 +61,7 @@ public class SpeechToTextFragment extends Fragment implements SpeechToTextHelper
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1010 && resultCode == Activity.RESULT_OK){
             Bundle bundle = data.getExtras();
-            onResults(false, (String[]) bundle.getStringArrayList(RecognizerIntent.EXTRA_RESULTS).toArray(), bundle.getFloatArray(RecognizerIntent.EXTRA_CONFIDENCE_SCORES));
+            onResults(false, bundle.getStringArrayList(RecognizerIntent.EXTRA_RESULTS), bundle.getFloatArray(RecognizerIntent.EXTRA_CONFIDENCE_SCORES));
             Uri audioUri = data.getData();
 
             Log.d("STT", "" + audioUri);
@@ -112,9 +113,14 @@ public class SpeechToTextFragment extends Fragment implements SpeechToTextHelper
     }
 
     @Override
-    public void onResults(boolean isPartial, String[] resultList, float[] confidences) {
-        printText((isPartial ? "partial result" : "result") + " : \n" + Arrays.toString(resultList) + "\n");
+    public void onResults(boolean isPartial, ArrayList<String> resultList, float[] confidences) {
+        printText((isPartial ? "partial result" : "result") + " : \n" + resultList.toString() + "\n");
         printText("confidences : " + Arrays.toString(confidences) + "\n\n");
+    }
+
+    @Override
+    public void onResults(boolean isPartial, String resultJSON) {
+
     }
 
     //에러가 발생하면

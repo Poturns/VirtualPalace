@@ -12,8 +12,9 @@ public class InputHandleHelperProxy {
 
     private Activity activity;
 
-    InputHandleHelperProxy(Activity activity){
+    public InputHandleHelperProxy(Activity activity) {
         this.activity = activity;
+        createInputHandleHelperAll();
     }
 
     public void onResume() {
@@ -64,16 +65,10 @@ public class InputHandleHelperProxy {
         return mInputHandleHelpers[which];
     }
 
-    public void createInputHandleHelperAll(){
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 2; i > -1; i--) {
-                    createInputHandleHelper(i);
-                }
-            }
-        });
-
+    public void createInputHandleHelperAll() {
+        for (int i = 2; i > -1; i--) {
+            createInputHandleHelper(i);
+        }
     }
 
     public InputHandleHelper createInputHandleHelper(int which) {

@@ -48,7 +48,7 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
         this.connectionCallbacks = connectionCallbacks;
         mHandler = new Handler(Looper.getMainLooper());
 
-        CAPABILITY_NAMES = context.getResources().getStringArray(R.array.android_wear_capabilities);
+        CAPABILITY_NAMES = ResourcesUtils.get(context, "android_wear_capabilities");
         NODE_ID_MAP = new ArrayMap<String, String>(CAPABILITY_NAMES.length);
 
         internalMessageListener = new InternalMessageListener(null);
@@ -86,8 +86,6 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
         if (mGoogleApiClient != null && messageListener != null)
 
             Wearable.MessageApi.removeListener(mGoogleApiClient, internalMessageListener);
-
-
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
             Wearable.MessageApi.addListener(mGoogleApiClient, internalMessageListener);

@@ -5,7 +5,7 @@ namespace AndroidApi
 {
 	public class WearableInputHandler : IInputHandleHelper<IWearableMessageListener>
 	{
-		internal WearableInputHandler (AndroidJavaObject inputHandleHelper) : base(inputHandleHelper)
+		internal WearableInputHandler (AndroidJavaObject activity, AndroidJavaObject inputHandleHelper) : base(activity, inputHandleHelper)
 		{
 		}
 

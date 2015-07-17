@@ -8,6 +8,12 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 public class SpeechToTextHelper extends InputHandleHelper.ContextInputHandleHelper {
     static final String TAG = "SpeechToTextHelper";
 
@@ -22,8 +28,9 @@ public class SpeechToTextHelper extends InputHandleHelper.ContextInputHandleHelp
 
         void onBufferReceived(byte[] buffer);
 
-        void onResults(boolean isPartial, String[] resultList, float[] confidences);
+        void onResults(boolean isPartial, String resultJSON);
 
+        void onResults(boolean isPartial, ArrayList<String> results, float[] confidences);
     }
 
 
@@ -63,8 +70,8 @@ public class SpeechToTextHelper extends InputHandleHelper.ContextInputHandleHelp
         mRecognizer.setRecognitionListener(recognitionListener);
     }
 
-    public static String[] getRecognitionResult(Bundle result) {
-        return (String[]) result.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).toArray();
+    public static ArrayList<String> getRecognitionResult(Bundle result) {
+        return result.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
     }
 
     public static float[] getConfidenceResult(Bundle result) {
@@ -136,17 +143,37 @@ public class SpeechToTextHelper extends InputHandleHelper.ContextInputHandleHelp
 
         @Override
         public void onResults(Bundle results) {
-            mListener.onResults(false, getRecognitionResult(results), getConfidenceResult(results));
+
+            try {
+                formatResult(false, getRecognitionResult(results), getConfidenceResult(results));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onPartialResults(Bundle partialResults) {
-            mListener.onResults(true, getRecognitionResult(partialResults), getConfidenceResult(partialResults));
+            try {
+                formatResult(true, getRecognitionResult(partialResults), getConfidenceResult(partialResults));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onEvent(int eventType, Bundle params) {
             //mListener.onEvent(eventType, params);
+        }
+
+        private void formatResult(boolean isPartial, ArrayList<String> results, float[] confidences) throws JSONException {
+            mListener.onResults(isPartial, results, confidences);
+
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < confidences.length; i++) {
+                jsonArray.put(new JSONObject().put("result", results.get(i)).put("confidence", Float.toString(confidences[i])));
+            }
+
+            mListener.onResults(isPartial, jsonArray.toString());
         }
     };
 }

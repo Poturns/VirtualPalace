@@ -11,6 +11,7 @@ namespace AndroidApi
 		}
 
 		public void onMessageReceived(string path, AndroidJavaObject obj){
+			Debug.Log (obj);
 			listener.OnMessageReceived (path, obj);
 		}
 	}

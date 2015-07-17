@@ -23,19 +23,18 @@ android {
 }
 
 dependencies {
-    provided files('libs/unity.jar')
     compile 'com.google.android.gms:play-services:7.5.0'
 }
 
 task clearJar(type: Delete) {
-    delete 'build/libs/unity-plugin-library.jar'
+    delete 'build/libs/util.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/libs/')
     include('classes.jar')
-    rename ('classes.jar', 'unity-plugin-library.jar')
+    rename ('classes.jar', 'util.jar')
 }
 
 makeJar.dependsOn(clearJar, build)

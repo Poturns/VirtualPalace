@@ -1,1 +1,1 @@
-include ':mobile', ':wear', ':util'
+include ':mobile', ':wear', ':util', ':unity_activity'

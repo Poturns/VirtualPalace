@@ -27,12 +27,12 @@ namespace AndroidApi
 
 		public STTInputHandler GetSTTInputHandler()
 		{
-			return new STTInputHandler(inputHandlerProxy.Call<AndroidJavaObject>("getInputHandleHelper", INPUT_HELPER_STT));
+			return new STTInputHandler(activity, inputHandlerProxy.Call<AndroidJavaObject>("getInputHandleHelper", INPUT_HELPER_STT));
 		}
 
 		public WearableInputHandler GetWearableInputHandler()
 		{
-			return new WearableInputHandler (inputHandlerProxy.Call<AndroidJavaObject> ("getInputHandleHelper", INPUT_HELPER_WEARABLE));
+			return new WearableInputHandler (activity, inputHandlerProxy.Call<AndroidJavaObject> ("getInputHandleHelper", INPUT_HELPER_WEARABLE));
 		}
 
 		public void Dispose()

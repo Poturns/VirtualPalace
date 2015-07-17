@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using LitJson;
+using System;
 
 namespace AndroidApi 
 {
@@ -36,9 +38,29 @@ namespace AndroidApi
 			listener.OnBufferReceived (buffer);
 		}
 		
-		public void onResults(bool isPartial, string[] resultList, float[] confidences)
+		public void onResults(bool isPartial, AndroidJavaObject resultList, AndroidJavaObject confidences)
+		{	
+		}
+
+		public void onResults(bool isPartial, string resultJSON)
 		{
-			listener.OnResults (isPartial, resultList, confidences);
+			Debug.Log (resultJSON);
+
+			JsonData jData = JsonMapper.ToObject(resultJSON);
+			int count = jData.Count;
+
+			string[] results = new string[count];
+			float[] confidences = new float[count];
+
+			for (int i = 0 ; i < count ; i++)
+			{
+				string result = (string)jData[i]["result"];
+				float confidence = float.Parse((string)jData[i]["confidence"]);
+				results[i] = result;
+				confidences[i] = confidence;
+			}
+
+			listener.OnResults (isPartial, results, confidences);
 		}
 
 	}
