@@ -12,8 +12,10 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 
 	InputHandleHelperProxy inputHandleHelperProxy;
 	STTInputHandler sttHandler;
-	string log = "";
 	WearableInputHandler wearableHandler;
+
+	string log = "";
+	bool isLoggingAboutStt = true;
 
 	Text logText, buttonText;
 	Button button;
@@ -24,32 +26,12 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 	void Start () {
 		asyncTasker = new AsyncTasker ();
 
-		//Debug.Log ("onStart");
-		logText = GameObject.FindWithTag ("log").GetComponent<Text>();
-		//Debug.Log (logText);
+		initUI ();
 
-		button = GameObject.Find ("Button").GetComponent<Button>();
-		//Debug.Log (button);
-
-		buttonText = button.transform.Find("Text").GetComponent<Text>();
-		//Debug.Log (buttonText);
-		buttonText.text = "Start";
-
-		button.onClick .AddListener (OnStartButtonClick);
-
-		inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
-		//Debug.Log (inputHandleHelperProxy);
-
-		sttHandler = inputHandleHelperProxy.GetSTTInputHandler ();
-		//Debug.Log (sttHandler);
-		sttHandler.SetListener (this);
-
-		wearableHandler = inputHandleHelperProxy.GetWearableInputHandler ();
-		wearableHandler.SetListener (this);
+		initInputHandler();
 	}
 
 	void OnGUI() {
-	
 	}
 	
 	// Update is called once per frame
@@ -59,27 +41,47 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 
 	#endregion Unity Lifecycle method
 
-	#region UI component callback
-
-	public void OnStartButtonClick()
+	private void initUI()
 	{
-		//Debug.Log ("clicked");
-		if (sttHandler.IsInVoiceRecognition ()) {
-			buttonText.text = "Start";
-			sttHandler.Stop();
-		} else {
-			buttonText.text = "Stop";
-			sttHandler.Start();
-		}
+		//Debug.Log ("onStart");
+		logText = GameObject.FindWithTag ("log").GetComponent<Text>();
+		//Debug.Log (logText);
+		
+		button = GameObject.Find ("Button").GetComponent<Button>();
+		//Debug.Log (button);
+		
+		buttonText = button.transform.Find("Text").GetComponent<Text>();
+		//Debug.Log (buttonText);
+		buttonText.text = "Start";
+		
+		button.onClick .AddListener (() => {
+			//Debug.Log ("clicked");
+			if (sttHandler.IsInVoiceRecognition ()) {
+				buttonText.text = "Start";
+				sttHandler.Stop ();
+			} else {
+				buttonText.text = "Stop";
+				sttHandler.Start ();
+			}
+		});
 
 	}
 
-	#endregion UI component callback
-
+	private void initInputHandler()
+	{
+		inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
+		//Debug.Log (inputHandleHelperProxy);
+		
+		sttHandler = inputHandleHelperProxy.GetSTTInputHandler ();
+		//Debug.Log (sttHandler);
+		sttHandler.SetListener (this);
+		
+		wearableHandler = inputHandleHelperProxy.GetWearableInputHandler ();
+		wearableHandler.SetListener (this);
+	}
 
 	public void PrintText(string text)
 	{
-
 		//TODO Text Component 에 log 표시
 		asyncTasker.QueueOnMainThread (() => {
 				log += text;
@@ -94,6 +96,7 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 	public void OnReadyForSpeech()
 	{
 		log = "";
+		isLoggingAboutStt = true;
 		PrintText ("\n==OnReadyForSpeech==\n");
 
 	}
@@ -134,17 +137,30 @@ public class AndroidManager : MonoBehaviour , ISpeechToTextListener , IWearableM
 	}
 
 	#endregion ISpeechToTextListener
-
-
 	#region IWearableMessageListener
-		
+	
 	public void OnMessageReceived(string path, AndroidJavaObject data){
-		asyncTasker.QueueOnMainThread (() => {
-				log = data.Call<string>("toString");
-				logText.text = log;
-			}
-		);
+		ProcessingMessage (data.Call<string> ("toString"));
 	}
 
+	public void OnMessageReceived(string path, string str){
+		ProcessingMessage (str);
+	}
+
+	private void ProcessingMessage(String str)
+	{
+		asyncTasker.QueueOnMainThread (() => {
+			if(isLoggingAboutStt){
+				isLoggingAboutStt = false;
+				log = "===Message from Wearable===\n" + str;
+			} else {
+				log += "\n" + str;
+			}
+			
+			logText.text = log;
+		});
+	}
+	
 	#endregion IWearableMessageListener
+
 }

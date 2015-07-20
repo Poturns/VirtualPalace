@@ -5,7 +5,7 @@ namespace AndroidApi
 {
 	public class Utils
 	{
-		public const string UnityActivityClassName = "com.unity3d.player.UnityPlayer";
+		public const string UnityPlayerClassName = "com.unity3d.player.UnityPlayer";
 
 		public const string SpeechToTextListenerClassName = "kr.poturns.util.SpeechToTextHelper$STTListener";
 		public const string MessageListenerClassName = "kr.poturns.util.WearableCommHelper$MessageListener";
@@ -14,7 +14,7 @@ namespace AndroidApi
 
 		public static AndroidJavaObject GetActivityObject()
 		{
-			AndroidJavaClass playerClass = new AndroidJavaClass(UnityActivityClassName);
+			AndroidJavaClass playerClass = new AndroidJavaClass(UnityPlayerClassName);
 			AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
 
 			playerClass.Dispose ();

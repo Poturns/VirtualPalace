@@ -29,8 +29,10 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
     //public static final String SEND_STRING_CAPABILITY_NAME = "send_string";
     public static final String SEND_STRING_MESSAGE_PATH = "/send_string";
 
-    public interface MessageListener{
+    public interface MessageListener {
         void onMessageReceived(String path, Object data);
+
+        void onMessageReceived(String path, String data);
     }
 
     private GoogleApiClient mGoogleApiClient;
@@ -41,14 +43,15 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
     private final String[] CAPABILITY_NAMES;
     private final ArrayMap<String, String> NODE_ID_MAP;
     private GoogleApiClient.ConnectionCallbacks connectionCallbacks;
-    private InternalMessageListener internalMessageListener;
+    private final InternalMessageListener internalMessageListener;
 
     public WearableCommHelper(Context context, GoogleApiClient.ConnectionCallbacks connectionCallbacks) {
         super(context);
         this.connectionCallbacks = connectionCallbacks;
         mHandler = new Handler(Looper.getMainLooper());
 
-        CAPABILITY_NAMES = ResourcesUtils.get(context, "android_wear_capabilities");
+        CAPABILITY_NAMES = context.getResources().getStringArray(R.array.android_wear_capabilities);
+        //ResourcesUtils.get(context, "android_wear_capabilities", "kr.poturns.util");
         NODE_ID_MAP = new ArrayMap<String, String>(CAPABILITY_NAMES.length);
 
         internalMessageListener = new InternalMessageListener(null);
@@ -57,18 +60,29 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
 
     }
 
-    static class InternalMessageListener implements MessageApi.MessageListener{
+    static class InternalMessageListener implements MessageApi.MessageListener {
         MessageListener messageListener;
 
-        public InternalMessageListener(MessageListener listener){
+        public InternalMessageListener(MessageListener listener) {
             this.messageListener = listener;
         }
 
         @Override
         public void onMessageReceived(MessageEvent messageEvent) {
-            if(messageListener != null){
+            if (messageListener != null) {
                 try {
-                    messageListener.onMessageReceived(messageEvent.getPath(), IOUtils.fromByteArray(messageEvent.getData()));
+                    String path = messageEvent.getPath();
+
+                    if (path.equals(WearableCommHelper.DATA_TRANSFER_MESSAGE_PATH)) {
+                        messageListener.onMessageReceived(path, IOUtils.<MovementData>fromByteArray(messageEvent.getData()));
+                        return;
+                    }
+                    else if (path.equals(WearableCommHelper.SEND_STRING_MESSAGE_PATH)) {
+                        messageListener.onMessageReceived(path, new String(messageEvent.getData()));
+                        return;
+                    }
+
+                    messageListener.onMessageReceived(path, messageEvent.getData());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -83,12 +97,13 @@ public class WearableCommHelper extends InputHandleHelper.ContextInputHandleHelp
 
     public void setMessageListener(MessageListener messageListener) {
         internalMessageListener.messageListener = messageListener;
+        /*
         if (mGoogleApiClient != null && messageListener != null)
-
             Wearable.MessageApi.removeListener(mGoogleApiClient, internalMessageListener);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
             Wearable.MessageApi.addListener(mGoogleApiClient, internalMessageListener);
+        */
     }
 
     //*************** Lifecycle helper method ***************
