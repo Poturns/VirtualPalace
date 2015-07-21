@@ -9,7 +9,7 @@ namespace UnityApi
 	{
 		//public const int maxThreads = Environment.ProcessorCount + 1;
 
-		private Queue<Action> queue = new Queue<Action>();
+		private Queue<Action> actionQueue = new Queue<Action>();
 
 		public AsyncTasker ()
 		{
@@ -17,19 +17,19 @@ namespace UnityApi
 
 		public void QueueOnMainThread(Action a)
 		{
-			lock (queue) {
-				queue.Enqueue(a);
+			lock (actionQueue) {
+				actionQueue.Enqueue(a);
 			}
 		}
 
 		public void OnUpdate()
 		{
-			lock (queue) {
-				foreach(Action action in queue)
+			lock (actionQueue) {
+				foreach(Action action in actionQueue)
 				{
 					action();
 				}
-				queue.Clear();
+				actionQueue.Clear();
 			}
 		}
 

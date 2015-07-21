@@ -35,6 +35,11 @@ namespace AndroidApi
 			return new WearableInputHandler (activity, inputHandlerProxy.Call<AndroidJavaObject> ("getInputHandleHelper", INPUT_HELPER_WEARABLE));
 		}
 
+		public DriveHandler GetDriveHandler()
+		{
+			return new DriveHandler(activity, inputHandlerProxy.Call<AndroidJavaObject> ("getInputHandleHelper", INPUT_HELPER_DRIVE));
+		}
+
 		public void Dispose()
 		{
 			activity.Dispose ();

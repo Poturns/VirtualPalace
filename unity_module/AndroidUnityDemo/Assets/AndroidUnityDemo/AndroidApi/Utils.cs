@@ -10,20 +10,27 @@ namespace AndroidApi
 		public const string SpeechToTextListenerClassName = "kr.poturns.util.SpeechToTextHelper$STTListener";
 		public const string MessageListenerClassName = "kr.poturns.util.WearableCommHelper$MessageListener";
 
+		public const string OnBackPressListenerClassName = "kr.poturns.vp.VPUnityActivity$OnBackPressListener";
+
 		public const string RunOnUiThreadMethodName = "runOnUiThread";
 
 		public static AndroidJavaObject GetActivityObject()
 		{
-			AndroidJavaClass playerClass = new AndroidJavaClass(UnityPlayerClassName);
-			AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
-
-			playerClass.Dispose ();
-
-			return activity;
+			using (AndroidJavaClass playerClass = new AndroidJavaClass(UnityPlayerClassName)) {
+				AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject> ("currentActivity");
+				return activity;
+			}
 		}
 
-		public static InputHandleHelperProxy GetInputHandleHelperProxy(){
+		public static InputHandleHelperProxy GetInputHandleHelperProxy()
+		{
 			return new InputHandleHelperProxy (GetActivityObject());
+		}
+
+		public static void SetOnBackPressListener(Func<bool> func)
+		{
+			OnBackPressListener l = new OnBackPressListener (func);
+			GetActivityObject ().Call ("setOnBackPressListener", l);
 		}
 	}
 }

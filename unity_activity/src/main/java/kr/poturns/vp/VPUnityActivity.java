@@ -10,6 +10,11 @@ import kr.poturns.util.InputHandleHelperProxy;
 
 public class VPUnityActivity extends UnityPlayerActivity {
     InputHandleHelperProxy inputHandleHelperProxy;
+    OnBackPressListener onBackPressListener;
+
+    public interface OnBackPressListener{
+        public boolean onBackPressed();
+    }
 
     Toast exitToast;
     long backPressTime;
@@ -57,6 +62,9 @@ public class VPUnityActivity extends UnityPlayerActivity {
     public void onBackPressed() {
         long backTime = System.currentTimeMillis();
 
+        if(onBackPressListener != null && onBackPressListener.onBackPressed())
+            return;
+
         if (backTime - backPressTime > 2000) {
             exitToast.show();
             backPressTime = backTime;
@@ -71,4 +79,7 @@ public class VPUnityActivity extends UnityPlayerActivity {
         return inputHandleHelperProxy;
     }
 
+    public void setOnBackPressListener(OnBackPressListener l){
+        this.onBackPressListener = l;
+    }
 }
