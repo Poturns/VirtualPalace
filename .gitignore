@@ -5,3 +5,6 @@
 .DS_Store
 /build
 /captures
+
+.idea/checkstyle-idea.xml
+.idea/findbugs-idea.xml

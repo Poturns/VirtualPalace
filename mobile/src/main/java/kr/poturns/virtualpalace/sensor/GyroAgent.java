@@ -13,23 +13,21 @@ import android.os.Build;
  */
 public class GyroAgent extends BaseAgent implements SensorEventListener2 {
 
-    private final Context mContextF;
-    private final SensorManager mSensorManagerF;
 
-    private Sensor mSensor;
+    private final SensorManager mSensorManagerF;
+    private final Sensor mSensorF;
+
     private float axisX;
     private float axisY;
     private float axisZ;
 
     public GyroAgent(Context context) {
-        mContextF = context;
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-
-        mSensor = mSensorManagerF.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
     public void startListening() {
-        mSensorManagerF.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void stopListening() {
@@ -37,23 +35,17 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
     }
 
     @Override
-    public AgentType getAgentType() {
-        return AgentType.GYROSCOPE;
+    public int getAgentType() {
+        return TYPE_AGENT_GYROSCOPE;
     }
 
+    /**
+     * @return
+     */
     @Override
-    protected void handleForCollectingChannels(AgentType type, float[] changed) {
-        switch (type) {
-
-        }
-    }
-
-    @Override
-    protected float[] updateForListeningChannels() {
-        return new float[]{
-                axisX,
-                axisY,
-                axisZ
+    public double[] getLatestData() {
+        return new double[]{
+            mLatestMeasuredTimestamp
         };
     }
 
@@ -91,6 +83,8 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
+        mLatestMeasuredTimestamp = event.timestamp;
+
         // Angular speed around the x-axis
         axisX = event.values[0];
         // Angular speed around the y-axis
@@ -98,8 +92,7 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
         // Angular speed around the z-axis
         axisZ = event.values[2];
 
-        handle();
-        update();
+        //TODO: 의문점 1. 움직이는 물체에 '가만히' 있을 때에도 값이 변하는가?
     }
 
     /**

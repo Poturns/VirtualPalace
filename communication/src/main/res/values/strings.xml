@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Communication</string>
+
+    <array name="android_wear_capabilities">
+        send_data
+    </array>
+</resources>

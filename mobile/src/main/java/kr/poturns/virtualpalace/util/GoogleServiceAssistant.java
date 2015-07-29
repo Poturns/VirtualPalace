@@ -48,7 +48,7 @@ public class GoogleServiceAssistant {
     }
 
     public void requestGoogleAccountSelection() {
-        // Google Account ¡¢±Ÿ π◊ º≥¡§
+        // Google Account Ï†ëÍ∑º Î∞è ÏÑ§Ï†ï
         AccountManager accountManager = (AccountManager) mContextF.getSystemService(Context.ACCOUNT_SERVICE);
         Account[] googleAccounts = accountManager.getAccountsByType("com.google");
 

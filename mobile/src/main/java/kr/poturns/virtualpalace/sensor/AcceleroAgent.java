@@ -12,49 +12,46 @@ import android.os.Build;
  */
 public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
 
-    private final Context mContextF;
     private final SensorManager mSensorManagerF;
+    private final Sensor mSensorF;
 
-    private Sensor mSensor;
     private float axisX;
     private float axisY;
     private float axisZ;
 
     public AcceleroAgent(Context context) {
-        mContextF = context;
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-
-        mSensor = mSensorManagerF.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     public void startListening() {
-        mSensorManagerF.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void stopListening() {
         mSensorManagerF.unregisterListener(this);
     }
 
+    /**
+     * @return
+     */
     @Override
-    public AgentType getAgentType() {
-        return AgentType.ACCELEROMETER;
-    }
-
-    @Override
-    protected void handleForCollectingChannels(AgentType type, float[] changed) {
-        switch(type) {
-
-        }
-    }
-
-    @Override
-    protected float[] updateForListeningChannels() {
-        return new float[]{
-                axisX,
-                axisY,
-                axisZ
+    public double[] getLatestData() {
+        return new double[]{
+            mLatestMeasuredTimestamp
         };
     }
+
+    /**
+     * Agent Type ¹ÝÈ¯
+     *
+     * @return
+     */
+    @Override
+    public int getAgentType() {
+        return TYPE_AGENT_ACCELEROMETER;
+    }
+
     /**
      * Called after flush() is completed. All the events in the batch at the point when the flush
      * was called have been delivered to the applications registered for those sensor events. In
@@ -89,12 +86,13 @@ public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
+        mLatestMeasuredTimestamp = event.timestamp;
+
         axisX = event.values[0];
         axisY = event.values[1];
         axisZ = event.values[2];
 
-        handle();
-        update();
+        onDataMeasured();
     }
 
     /**

@@ -13,14 +13,12 @@ import android.net.wifi.WifiManager;
 public class NetworkAgent extends BaseAgent {
 
     private final Context mContextF;
-
     private final ConnectivityManager mConnectivityManagerF;
     private final WifiManager mWifiManagerF;
 
 
     public NetworkAgent(Context context) {
         mContextF = context;
-
         mConnectivityManagerF = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManagerF = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
@@ -39,26 +37,25 @@ public class NetworkAgent extends BaseAgent {
     }
 
     @Override
-    public AgentType getAgentType() {
-        return AgentType.NETWORK;
+    public int getAgentType() {
+        return TYPE_AGENT_NETWORK;
     }
 
+    /**
+     * @return
+     */
     @Override
-    protected void handleForCollectingChannels(AgentType type, float[] changed) {
-
+    public double[] getLatestData() {
+        return new double[] {
+            mLatestMeasuredTimestamp
+        };
     }
-
-    @Override
-    protected float[] updateForListeningChannels() {
-        return new float[0];
-    }
-
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            mLatestMeasuredTimestamp = System.currentTimeMillis();
         }
     };
 }

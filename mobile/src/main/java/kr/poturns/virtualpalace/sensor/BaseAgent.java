@@ -1,64 +1,75 @@
 package kr.poturns.virtualpalace.sensor;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import android.util.Pair;
 
 /**
+ * 백그라운드에서 연산에 필요한 기반 센서 데이터를 수집하기 위한 모듈을 구현한다.
  *
  * @author YeonhoKim
  */
 abstract class BaseAgent implements IAgent {
 
-    protected final Channel mChannelF = new Channel();
+    public static final int DATA_INDEX_TIMESTAMP = 0;
 
-    protected final ConcurrentHashMap<AgentType, Channel> mListeningChannels = new ConcurrentHashMap<AgentType, Channel>();
-
-    public Channel getChannel() {
-        return mChannelF;
+    public interface OnDataCollaborationListener {
+        /**
+         *
+         * @param thisType
+         * @param targetType
+         * @param thisData
+         * @param targetData
+         */
+        void onCollaboration(int thisType, int targetType, double[] thisData, double[] targetData);
     }
 
-    public synchronized void addListeningChannel(AgentType type, Channel channel) {
-        mListeningChannels.put(type, channel);
+    protected Pair<BaseAgent, OnDataCollaborationListener>[] mCollaborationArray;
+
+    protected long mLatestMeasuredTimestamp;
+
+    public BaseAgent() {
+        final int countAgent = 5;
+
+        // AgentType 값이 1부터 시작함.
+        mCollaborationArray = new Pair[countAgent + 1];
     }
-
-    public synchronized Map<AgentType, Channel> getAllListeningChannel() {
-        return mListeningChannels;
-    }
-
-    public synchronized void removeListeningChannel(AgentType type) {
-        mListeningChannels.remove(type);
-    }
-
-    protected abstract void handleForCollectingChannels(AgentType type, float[] changed);
-
-    protected final void handle() {
-        for(AgentType type : mChannelF.mChannelValues.keySet())
-            handleForCollectingChannels(type, mChannelF.getValues(type));
-    }
-
-    protected abstract float[] updateForListeningChannels();
-
-    protected final void update() {
-        for(Channel channel : mListeningChannels.values())
-            channel.update(getAgentType(), updateForListeningChannels());
-    }
-
 
     /**
      *
-     * @author YeonhoKim
+     * @param agent
+     * @param listener
      */
-    public class Channel {
-        private ConcurrentHashMap<AgentType, float[]> mChannelValues = new ConcurrentHashMap<>(5);
+    public void setCollaborationWith(BaseAgent agent, OnDataCollaborationListener listener) {
+        int agentType = agent.getAgentType();
 
-        public void update(AgentType type, float[] changed) {
-            mChannelValues.put(type, changed);
-        }
+        // 동일한 Type의 값은 처리하지 않는다.
+        if (getAgentType() == agentType)
+            return;
 
-        public float[] getValues(IAgent.AgentType type) {
-            return mChannelValues.get(type);
-        }
+        mCollaborationArray[agentType] = new Pair<>(agent, listener);
     }
 
+    /**
+     *
+     */
+    protected void onDataMeasured() {
+        for (Pair<BaseAgent, OnDataCollaborationListener> pair : mCollaborationArray) {
+            BaseAgent agent = pair.first;
+            OnDataCollaborationListener listener = pair.second;
+
+            listener.onCollaboration(getAgentType(), agent.getAgentType(), getLatestData(), agent.getLatestData());
+        }
+
+        onCollaborationDone();
+    }
+
+    /**
+     *
+     */
+    protected void onCollaborationDone() {  }
+
+    /**
+     *
+     * @return
+     */
+    public abstract double[] getLatestData();
 }

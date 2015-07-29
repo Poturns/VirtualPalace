@@ -1,10 +1,9 @@
 package kr.poturns.virtualpalace.input;
 
 import android.content.Context;
+import android.util.Pair;
 
 import java.util.LinkedList;
-
-import kr.poturns.virtualpalace.util.Pair;
 
 /**
  * Created by YeonhoKim on 2015-07-06.
@@ -13,13 +12,13 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
 
     private final Context mContextF;
 
-    private IOperationInputFilter mInputFilter;
+    private IOperationInputFilter<InputUnit> mInputFilter;
 
     private OperationInputConnector mConnector;
 
     private boolean isOnAutoCommunication;
 
-    private final LinkedList<Pair<Operation, Object>> mOperationQueue;
+    private final LinkedList<Pair<Integer, Object>> mOperationQueue;
 
     public OperationInputDetector(Context context) {
         this(context, null);
@@ -29,7 +28,11 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
         mContextF = context;
         mInputFilter = filter;
 
-        mOperationQueue = new LinkedList<Pair<Operation, Object>>();
+        mOperationQueue = new LinkedList<Pair<Integer, Object>>();
+    }
+
+    protected Context getContext() {
+        return mContextF;
     }
 
     public void setOperationInputFilter(IOperationInputFilter<InputUnit> filter) {
@@ -56,7 +59,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
         if (mConnector == null)
             return false;
 
-        Pair<Operation, Object>[] operations = new Pair[mOperationQueue.size()];
+        Pair<Integer, Object>[] operations = new Pair[mOperationQueue.size()];
         mOperationQueue.toArray(operations);
         mOperationQueue.clear();
 
@@ -69,16 +72,16 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     }
 
     /**
-     * Return ¹æÇâÀ¸·Î ÀÌµ¿ÇÑ´Ù.
+     * Return ë°©í–¥ìœ¼ë¡œ ì´ë™í•œë‹¤.
      *
-     * @param inputUnit
-     * @exception {@link IOperationInputFilter}°¡ µî·ÏµÇÁö ¾Ê¾ÒÀ» °æ¿ì, {@link NullPointerException}ÀÌ ¹ß»ýÇÑ´Ù.
-     * @return
+     * @param inputUnit input
+     * @return ë°©í–¥
+     * @throws NullPointerException {@link IOperationInputFilter}ê°€ ë“±ë¡ë˜ì§€ ì•Šì•˜ì„ ê²½ìš°
      */
     @Override
-    public Direction isGoingTo(InputUnit inputUnit) {
-        Direction d = mInputFilter.isGoingTo(inputUnit);
-        mOperationQueue.push(new Pair<Operation, Object>(Operation.GO, d));
+    public int isGoingTo(InputUnit inputUnit) {
+        int d = mInputFilter.isGoingTo(inputUnit);
+        mOperationQueue.push(new Pair<Integer, Object>(OPERATION_GO, d));
 
         if (isOnAutoCommunication) {
 
@@ -87,16 +90,16 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     }
 
     /**
-     * Return ¹æÇâÀ¸·Î È¸ÀüÇÑ´Ù.
+     * Return ë°©í–¥ìœ¼ë¡œ íšŒì „í•œë‹¤.
      *
-     * @param inputUnit
-     * @exception {@link IOperationInputFilter}°¡ µî·ÏµÇÁö ¾Ê¾ÒÀ» °æ¿ì, {@link NullPointerException}ÀÌ ¹ß»ýÇÑ´Ù.
-     * @return
+     * @param inputUnit input
+     * @return ë°©í–¥
+     * @throws NullPointerException {@link IOperationInputFilter}ê°€ ë“±ë¡ë˜ì§€ ì•Šì•˜ì„ ê²½ìš°
      */
     @Override
-    public Direction isTurningTo(InputUnit inputUnit) {
-        Direction d = mInputFilter.isTurningTo(inputUnit);
-        mOperationQueue.push(new Pair<Operation, Object>(Operation.TURN, d));
+    public int isTurningTo(InputUnit inputUnit) {
+        int d = mInputFilter.isTurningTo(inputUnit);
+        mOperationQueue.push(new Pair<Integer, Object>(OPERATION_TURN, d));
 
         if (isOnAutoCommunication) {
 
@@ -105,16 +108,16 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     }
 
     /**
-     * Return ¹æÇâÀ¸·Î Æ÷Ä¿½Ì(Focusing)ÇÑ´Ù.
+     * Return ë°©í–¥ìœ¼ë¡œ í¬ì»¤ì‹±(Focusing)í•œë‹¤.
      *
-     * @param inputUnit
-     * @exception {@link IOperationInputFilter}°¡ µî·ÏµÇÁö ¾Ê¾ÒÀ» °æ¿ì, {@link NullPointerException}ÀÌ ¹ß»ýÇÑ´Ù.
-     * @return
+     * @param inputUnit input
+     * @return ë°©í–¥
+     * @throws NullPointerException {@link IOperationInputFilter}ê°€ ë“±ë¡ë˜ì§€ ì•Šì•˜ì„ ê²½ìš°
      */
     @Override
-    public Direction isFocusingTo(InputUnit inputUnit) {
-        Direction d = mInputFilter.isFocusingTo(inputUnit);
-        mOperationQueue.push(new Pair<Operation, Object>(Operation.FOCUS, d));
+    public int isFocusingTo(InputUnit inputUnit) {
+        int d = mInputFilter.isFocusingTo(inputUnit);
+        mOperationQueue.push(new Pair<Integer, Object>(OPERATION_FOCUS, d));
 
         if (isOnAutoCommunication) {
 
@@ -123,16 +126,16 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     }
 
     /**
-     * Return ¹æÇâÀ¸·Î È­¸éÁ¶Á¤(Zooming)ÇÑ´Ù.
+     * Return ë°©í–¥ìœ¼ë¡œ í™”ë©´ì¡°ì •(Zooming)í•œë‹¤.
      *
-     * @param inputUnit
-     * @exception {@link IOperationInputFilter}°¡ µî·ÏµÇÁö ¾Ê¾ÒÀ» °æ¿ì, {@link NullPointerException}ÀÌ ¹ß»ýÇÑ´Ù.
-     * @return
+     * @param inputUnit input
+     * @return ë°©í–¥
+     * @throws NullPointerException {@link IOperationInputFilter}ê°€ ë“±ë¡ë˜ì§€ ì•Šì•˜ì„ ê²½ìš°
      */
     @Override
-    public Direction isZoomingTo(InputUnit inputUnit) {
-        Direction d = mInputFilter.isZoomingTo(inputUnit);
-        mOperationQueue.push(new Pair<Operation, Object>(Operation.ZOOM, d));
+    public int isZoomingTo(InputUnit inputUnit) {
+        int d = mInputFilter.isZoomingTo(inputUnit);
+        mOperationQueue.push(new Pair<Integer, Object>(OPERATION_ZOOM, d));
 
         if (isOnAutoCommunication) {
 
@@ -141,16 +144,16 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     }
 
     /**
-     * ¼±ÅÃ ÀÌº¥Æ®¸¦ ¹ß»ýÇÑ´Ù.
+     * ì„ íƒ ì´ë²¤íŠ¸ë¥¼ ë°œìƒí•œë‹¤.
      *
-     * @param inputUnit
-     * @exception {@link IOperationInputFilter}°¡ µî·ÏµÇÁö ¾Ê¾ÒÀ» °æ¿ì, {@link NullPointerException}ÀÌ ¹ß»ýÇÑ´Ù.
-     * @return
+     * @param inputUnit input
+     * @return ì„ íƒ ì—¬ë¶€
+     * @throws NullPointerException {@link IOperationInputFilter}ê°€ ë“±ë¡ë˜ì§€ ì•Šì•˜ì„ ê²½ìš°
      */
     @Override
     public boolean isSelecting(InputUnit inputUnit) {
         boolean result = mInputFilter.isSelecting(inputUnit);
-        mOperationQueue.push(new Pair<Operation, Object>(Operation.SELECT, result));
+        mOperationQueue.push(new Pair<Integer, Object>(OPERATION_SELECT, result));
 
         if (isOnAutoCommunication) {
 
