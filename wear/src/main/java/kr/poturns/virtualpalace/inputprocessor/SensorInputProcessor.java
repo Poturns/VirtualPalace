@@ -8,7 +8,7 @@ import android.hardware.SensorManager;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- *
+ * <p/>
  * 센서 입력을 감지하여 {@link SensorMovementData}형태로 반환하는 클래스
  */
 public class SensorInputProcessor extends InputProcessor.Base<SensorMovementData> implements SensorEventListener {
@@ -40,14 +40,16 @@ public class SensorInputProcessor extends InputProcessor.Base<SensorMovementData
     /**
      * 센서 측정을 시작한다.
      */
-    public void startSensing() {
+    @Override
+    public void startListening() {
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     /**
      * 센서 측정을 종료한다.
      */
-    public void stopSensing() {
+    @Override
+    public void stopListening() {
         mSensorManager.unregisterListener(this);
     }
 

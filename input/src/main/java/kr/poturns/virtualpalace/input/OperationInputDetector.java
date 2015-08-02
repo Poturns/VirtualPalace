@@ -33,7 +33,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
         mContextF = context;
         mInputFilter = filter;
 
-        mOperationBatchQueue = new LinkedList<>();
+        mOperationBatchQueue = new LinkedList<int[]>();
     }
 
     /**

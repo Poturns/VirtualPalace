@@ -38,8 +38,12 @@ public class SpeechInputDetector extends OperationInputDetector<ArrayList<String
     }
 
     @Override
-    public void onResult(ArrayList<String> sttObject) {
-        detect(sttObject);
+    public void onResult(SpeechResults speechResults) {
+        if (speechResults.results.isEmpty())
+            return;
+
+        detect(speechResults.results);
     }
+
 
 }

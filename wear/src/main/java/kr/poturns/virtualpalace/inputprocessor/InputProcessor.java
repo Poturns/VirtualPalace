@@ -2,7 +2,7 @@ package kr.poturns.virtualpalace.inputprocessor;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p>
+ * <p/>
  * 입력을 받아 적절한 데이터로 변환하여 알려주는 클래스
  */
 public interface InputProcessor<Output extends IOutputData> {
@@ -13,7 +13,17 @@ public interface InputProcessor<Output extends IOutputData> {
         void onInputResult(Output output);
     }
 
-    class Base<T extends IOutputData> implements InputProcessor<T> {
+    /**
+     * 입력 변환을 시작한다.
+     */
+    void startListening();
+
+    /**
+     * 입력 변환을 종료한다.
+     */
+    void stopListening();
+
+    abstract class Base<T extends IOutputData> implements InputProcessor<T> {
         protected OnInputResultListener<T> listener;
 
         @Override
