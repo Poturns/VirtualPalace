@@ -11,24 +11,30 @@ public class BaseScene : MonoBehaviour
 	AsyncTasker asyncTasker = new AsyncTasker ();
 	protected InputHandleHelperProxy inputHandleHelperProxy;
 
-	protected void Init () 
+	protected void Init ()
 	{
 		Utils.SetOnBackPressListener (() => {
-			QueueOnMainThread(() => {Application.LoadLevel ("main_scene");});
+			QueueOnMainThread (() => {
+				Application.LoadLevel ("main_scene");});
 			return true;
 		});
 
 		inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
 	}
 
-	protected void OnUpdate () 
+	protected void OnUpdate ()
 	{
 		asyncTasker.OnUpdate ();
 	}
 
-	protected void QueueOnMainThread(Action action)
+	protected void QueueOnMainThread (Action action)
 	{
 		asyncTasker.QueueOnMainThread (action);
+	}
+
+	protected void RunAsync (Action action)
+	{
+		asyncTasker.RunAsync (action);
 	}
 
 }

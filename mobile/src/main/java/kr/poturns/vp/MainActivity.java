@@ -9,8 +9,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import kr.poturns.vp.gallery.GalleryContainerFragment;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     //private static final String TAG = "MainActivity";
+
+    enum FragmentInfo {
+        Wear(R.id.wear, WearCommunicateFragment.class.getName()),
+        Speech(R.id.speech, SpeechToTextFragment.class.getName()),
+        Drive(R.id.drive, DriveConnectionFragment.class.getName()),
+        Gallery(R.id.gallery, GalleryContainerFragment.class.getName());
+
+        final int id;
+        final String fname;
+
+        FragmentInfo(int id, String fname) {
+            this.id = id;
+            this.fname = fname;
+        }
+    }
 
     SparseArray<Fragment> fragmentSparseArray = new SparseArray<>();
 
@@ -19,9 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fragmentSparseArray.put(R.id.wear, new WearCommunicateFragment());
-        fragmentSparseArray.put(R.id.speech, new SpeechToTextFragment());
-        fragmentSparseArray.put(R.id.drive, new DriveConnectionFragment());
+        for (FragmentInfo info : FragmentInfo.values())
+            fragmentSparseArray.put(info.id, Fragment.instantiate(this, info.fname));
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, mainFragment)
@@ -47,9 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_main, container, false);
-            final int[] ids = {R.id.wear, R.id.speech, R.id.drive};
-            for (int id : ids)
-                view.findViewById(id).setOnClickListener(MainActivity.this);
+            for (FragmentInfo info : FragmentInfo.values())
+                view.findViewById(info.id).setOnClickListener(MainActivity.this);
 
             return view;
         }

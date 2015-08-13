@@ -9,7 +9,7 @@ public class MainScene : MonoBehaviour
 	{
 		Utils.SetOnBackPressListener (() => false);
 
-		foreach (string scene in new String[]{"wear", "stt", "drive"}) {
+		foreach (string scene in new String[]{"wear", "stt", "drive", "gallery"}) {
 			string str = scene;
 			GameObject.FindWithTag (scene).GetComponent<Button> ().onClick.AddListener (new UnityEngine.Events.UnityAction(() => {
 				Application.LoadLevel (str + "_scene"); 

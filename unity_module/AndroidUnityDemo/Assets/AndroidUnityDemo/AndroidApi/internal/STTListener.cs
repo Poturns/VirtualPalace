@@ -38,8 +38,9 @@ namespace AndroidApi
 			listener.OnBufferReceived (buffer);
 		}
 		
-		public void onResults(bool isPartial, AndroidJavaObject resultList, AndroidJavaObject confidences)
+		public void onResults(bool isPartial, AndroidJavaObject resultList, float[] confidences)
 		{	
+			Debug.Log (resultList.Call<string>("toString") + " / " + confidences.ToString());
 		}
 
 		public void onResults(bool isPartial, string resultJSON)

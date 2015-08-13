@@ -10,14 +10,12 @@ public class STTScene : BaseScene , ISpeechToTextListener
 {
 
 	STTInputHandler sttHandler;
-
 	string log = "";
-
 	Text logText, buttonText;
 	Button button;
-
 	
-	void Start () {
+	void Start ()
+	{
 		base.Init ();
 
 		sttHandler = inputHandleHelperProxy.GetSTTInputHandler ();
@@ -27,18 +25,18 @@ public class STTScene : BaseScene , ISpeechToTextListener
 
 	}
 	
-	void Update()
+	void Update ()
 	{
 		base.OnUpdate ();
 	}
 
-	private void initUI()
+	private void initUI ()
 	{
-		logText = GameObject.FindWithTag ("log").GetComponent<Text>();
+		logText = GameObject.FindWithTag ("log").GetComponent<Text> ();
 
-		button = GameObject.Find ("Button").GetComponent<Button>();
+		button = GameObject.Find ("Button").GetComponent<Button> ();
 
-		buttonText = button.transform.Find("Text").GetComponent<Text>();
+		buttonText = button.transform.Find ("Text").GetComponent<Text> ();
 		buttonText.text = "Start";
 		
 		button.onClick .AddListener (() => {
@@ -53,56 +51,55 @@ public class STTScene : BaseScene , ISpeechToTextListener
 
 	}
 
-
-	public void PrintText(string text)
+	public void PrintText (string text)
 	{
 		QueueOnMainThread (() => {
-				log += text;
-				logText.text = log;
-			}
+			log += text;
+			logText.text = log;
+		}
 		);
 
 	}
 
 	#region ISpeechToTextListener
 
-	public void OnReadyForSpeech()
+	public void OnReadyForSpeech ()
 	{
 		log = "";
 		PrintText ("\n==OnReadyForSpeech==\n");
 
 	}
 	
-	public void OnBeginningOfSpeech()
+	public void OnBeginningOfSpeech ()
 	{
 		PrintText ("==OnBeginningOfSpeech==\n");
 	}
 	
-	public void OnEndOfSpeech()
+	public void OnEndOfSpeech ()
 	{
 		PrintText ("==OnEndOfSpeech==\n\n");
 
 		QueueOnMainThread (() => buttonText.text = "Start");
 	}
 	
-	public void OnError(int error)
+	public void OnError (int error)
 	{
-		PrintText ("==OnError : [" + STTInputHandler.GetErrorMessage(error) + "] ==\n\n");
+		PrintText ("==OnError : [" + STTInputHandler.GetErrorMessage (error) + "] ==\n\n");
 
 
 	}
 	
-	public void OnBufferReceived(byte[] buffer)
+	public void OnBufferReceived (byte[] buffer)
 	{
 		
 	}
 	
-	public void OnResults(bool isPartial, string[] results, float[] confidences)
+	public void OnResults (bool isPartial, string[] results, float[] confidences)
 	{
 		string s = "==result==\n";
 
-		for(int i = 0; i < results.Length; i++){
-			s += results[i] + " , confidence : " + confidences[i] + "\n";
+		for (int i = 0; i < results.Length; i++) {
+			s += results [i] + " , confidence : " + confidences [i] + "\n";
 		}
 
 		PrintText (s + "\n====\n");
