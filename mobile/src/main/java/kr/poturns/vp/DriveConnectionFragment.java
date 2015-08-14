@@ -11,10 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.MetadataBuffer;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -61,109 +60,16 @@ public class DriveConnectionFragment extends Fragment {
         v.findViewById(R.id.drive_create_dummy_in_appfolder).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.show();
-                textViewLog("\n+Create Dummy File in App Folder\n");
-                mDriveConnectionHelper.createDummyFileInAppFolder(new ResultCallback<DriveFolder.DriveFileResult>() {
-                    @Override
-                    public void onResult(DriveFolder.DriveFileResult driveFileResult) {
-                        dialog.dismiss();
-                        if (!driveFileResult.getStatus().isSuccess()) {
-                            textViewLog("+Error while trying to create the file\n");
-                            return;
-                        }
-                        textViewLog("+Created a file in App Folder : " + driveFileResult.getDriveFile().getDriveId() + "\n");
-                    }
-                });
+                processCreateDummyFileInAppFolder();
             }
         });
 
-        v.findViewById(R.id.drive_query_dummy_file).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        textViewLog("\n+query Dummy File in App Folder\n");
-                        dialog.show();
-                        mDriveConnectionHelper.queryFileDummyFileInAppFolder(
-                                new DriveConnectionHelper.OnFileResultListener() {
-                                    @Override
-                                    public void onReceiveFileContent(final DriveContents contents) {
-                                        textViewLog("+Operation : query Dummy File in App Folder success\n");
-
-                                        textViewLog("+trying to open Dummy File\n");
-                                        AsyncTask.execute(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                FileDescriptor fileDescriptor = contents.getParcelFileDescriptor().getFileDescriptor();
-                                                FileInputStream fs = new FileInputStream(fileDescriptor);
-                                                String content;
-                                                try {
-                                                    content = IOUtils.readContentFromStream(fs, "utf-8");
-                                                } catch (final IOException e) {
-                                                    getActivity().runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            textViewLog("+reading a dummy file has failed\ncause:" + e.toString() + "\n");
-                                                            dialog.dismiss();
-                                                        }
-                                                    });
-                                                    e.printStackTrace();
-                                                    return;
-                                                }
-
-                                                final String fileContents = content;
-                                                getActivity().runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        textViewLog("+Dummy File Contents : \n----------- Contents ---------\n" + fileContents
-                                                                + "\n------------------------------------\n");
-                                                        textViewLog("+appending \'hello world\' to Dummy File\n");
-                                                    }
-                                                });
-
-                                                try {
-                                                    FileOutputStream fileOutputStream = new FileOutputStream(fileDescriptor);
-                                                    Writer writer = new OutputStreamWriter(fileOutputStream);
-                                                    writer.write("hello world\n");
-
-                                                    writer.close();
-                                                    fileOutputStream.close();
-                                                    fs.close();
-
-                                                    mDriveConnectionHelper.commitFile(contents, new ResultCallback<Status>() {
-                                                        @Override
-                                                        public void onResult(Status status) {
-                                                            textViewLog("+appending success\n");
-                                                            dialog.dismiss();
-                                                        }
-                                                    });
-                                                } catch (final IOException e) {
-                                                    getActivity().runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            textViewLog("+appending has failed\ncause:" + e.toString() + "\n");
-                                                            dialog.dismiss();
-                                                        }
-                                                    });
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
-
-                                    }
-
-
-                                    @Override
-                                    public void onError(Status status) {
-                                        dialog.dismiss();
-                                        textViewLog("Error while trying to read a dummy file\n");
-                                    }
-                                }
-
-                        );
-                    }
-                }
-
-        );
+        v.findViewById(R.id.drive_query_dummy_file).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                processQueryFileDummyFileInAppFolder();
+            }
+        });
 
         return v;
     }
@@ -193,4 +99,118 @@ public class DriveConnectionFragment extends Fragment {
 
         mDriveConnectionHelper.destroy();
     }
+
+
+    private DriveFile createDummyFileInAppFolder() {
+        return mDriveConnectionHelper.createFile(mDriveConnectionHelper.getAppFolder(), "appconfig.txt", "text/plain", mDriveConnectionHelper.newDriveContents());
+    }
+
+    private MetadataBuffer queryFileDummyFileInAppFolder() {
+        return mDriveConnectionHelper.queryChildrenByTitle(mDriveConnectionHelper.getAppFolder(), "appconfig.txt");
+    }
+
+    private void processCreateDummyFileInAppFolder() {
+        dialog.show();
+        textViewLog("\n+Create Dummy File in App Folder\n");
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                final DriveFile file = createDummyFileInAppFolder();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        if (file == null) {
+                            textViewLog("+Error while trying to create the file\n");
+                        } else {
+                            textViewLog("+Created a file in App Folder : " + file.getDriveId() + "\n");
+
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    private void processQueryFileDummyFileInAppFolder() {
+        textViewLog("\n+query Dummy File in App Folder\n");
+        dialog.show();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                MetadataBuffer metadataBuffer = queryFileDummyFileInAppFolder();
+
+                if (metadataBuffer == null) {
+                    logOnUiThread("Error while trying to read a dummy file\n", true);
+                    return;
+                }
+
+
+                final DriveContents contents = mDriveConnectionHelper.openFile(metadataBuffer.get(0).getDriveId(), DriveFile.MODE_READ_WRITE);
+
+                logOnUiThread("+Operation : query Dummy File in App Folder success\n"
+                        + "+trying to open Dummy File\n", false);
+
+                if (contents == null) {
+                    metadataBuffer.release();
+                    logOnUiThread("Error while trying to read a dummy file\n", true);
+                    return;
+                }
+
+                FileDescriptor fileDescriptor = contents.getParcelFileDescriptor().getFileDescriptor();
+                FileInputStream fs = new FileInputStream(fileDescriptor);
+                String content;
+                try {
+                    content = IOUtils.readContentFromStream(fs, "utf-8");
+                } catch (final IOException e) {
+                    logOnUiThread("+reading a dummy file has failed\ncause:" + e.toString() + "\n", true);
+                    e.printStackTrace();
+                    return;
+                }
+
+                logOnUiThread(
+                        "+Dummy File Contents : \n----------- Contents ---------\n" + content
+                                + "\n------------------------------------\n" +
+                                "+appending \'hello world\' to Dummy File\n"
+                        , false);
+
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream(fileDescriptor);
+                    Writer writer = new OutputStreamWriter(fileOutputStream);
+                    writer.write("hello world\n");
+
+                    writer.close();
+                    fileOutputStream.close();
+                    fs.close();
+
+                    if (mDriveConnectionHelper.commit(contents).isSuccess()) {
+                        logOnUiThread("+appending success\n", true);
+                    } else {
+                        logOnUiThread("+appending has failed\n", true);
+                    }
+
+                } catch (final IOException e) {
+                    logOnUiThread("+appending has failed\ncause:" + e.toString() + "\n", true);
+                    e.printStackTrace();
+                } finally {
+                    metadataBuffer.release();
+                }
+            }
+        });
+
+    }
+
+    private void logOnUiThread(final String msg, final boolean dismissDialog) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textViewLog(msg);
+                if (dismissDialog) dialog.dismiss();
+            }
+        });
+    }
+
 }

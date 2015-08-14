@@ -60,20 +60,22 @@ public class ImageBucketInfo {
         List<ImageBucketInfo> infoList = new ArrayList<ImageBucketInfo>();
 
         if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                int bucketNameIdx = cursor.getColumnIndex(ImageBucketInfo.PROJECTION[0]);
+            try {
+                if (cursor.moveToFirst()) {
+                    int bucketNameIdx = cursor.getColumnIndex(ImageBucketInfo.PROJECTION[0]);
 
-                do {
-                    String bucketName = cursor.getString(bucketNameIdx);
-                    if (bucketName != null) {
+                    do {
+                        String bucketName = cursor.getString(bucketNameIdx);
+                        if (bucketName != null) {
 
-                        ImageBucketInfo info = new ImageBucketInfo(bucketName);
-                        info.firstImageInfo = getImageBucketFirstItem(resolver, bucketName);
-                        infoList.add(info);
+                            ImageBucketInfo info = new ImageBucketInfo(bucketName);
+                            info.firstImageInfo = getImageBucketFirstItem(resolver, bucketName);
+                            infoList.add(info);
+                        }
                     }
+                    while (cursor.moveToNext());
                 }
-                while (cursor.moveToNext());
-
+            } finally {
                 cursor.close();
             }
         }
@@ -91,13 +93,14 @@ public class ImageBucketInfo {
                 MediaStore.Images.Media.DISPLAY_NAME + " ASC  LIMIT 1"
         );
 
-
         if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                return ImageInfo.getImageInfoFromCursor(cursor, bucketName);
+            try {
+                if (cursor.moveToFirst()) {
+                    return ImageInfo.getImageInfoFromCursor(cursor, bucketName);
+                }
+            } finally {
+                cursor.close();
             }
-            cursor.close();
-
         }
 
         return null;

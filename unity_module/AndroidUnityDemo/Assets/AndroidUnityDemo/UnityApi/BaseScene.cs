@@ -13,13 +13,13 @@ public class BaseScene : MonoBehaviour
 
 	protected void Init ()
 	{
-		Utils.SetOnBackPressListener (() => {
+		AndroidUtils.SetOnBackPressListener (() => {
 			QueueOnMainThread (() => {
 				Application.LoadLevel ("main_scene");});
 			return true;
 		});
 
-		inputHandleHelperProxy = Utils.GetInputHandleHelperProxy ();
+		inputHandleHelperProxy = AndroidUtils.GetInputHandleHelperProxy ();
 	}
 
 	protected void OnUpdate ()

@@ -1,7 +1,10 @@
 package kr.poturns.util;
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -10,6 +13,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 
 public class IOUtils {
@@ -54,6 +59,47 @@ public class IOUtils {
             } catch (IOException ignored) {
                 //ignore
             }
+        }
+    }
+
+    public static void writeContentToStream(OutputStream out, String str) throws IOException {
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(out);
+        BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+        try {
+            bufferedWriter.write(str);
+        } finally {
+            closeStream(bufferedWriter);
+            closeStream(outputStreamWriter);
+            closeStream(out);
+        }
+    }
+
+    public static void writeContentToStream(OutputStream out, byte[] buffer) throws IOException {
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(out);
+
+        try {
+            bufferedOutputStream.write(buffer);
+        } finally {
+            closeStream(bufferedOutputStream);
+            closeStream(out);
+        }
+    }
+
+    public static byte[] readContentFromStream(InputStream in) throws IOException {
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try {
+            byte[] readByte = new byte[1024];
+            int readLen;
+            while ((readLen = in.read(readByte)) != -1) {
+                outputStream.write(readByte, 0, readLen);
+            }
+            return outputStream.toByteArray();
+        } finally {
+            closeStream(outputStream);
+            closeStream(bufferedInputStream);
+            closeStream(in);
         }
     }
 

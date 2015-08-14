@@ -5,7 +5,7 @@ namespace AndroidApi
 	internal class MessageListener : AndroidJavaProxy
 	{
 		private IWearableMessageListener listener;
-		internal MessageListener (IWearableMessageListener listener) : base(Utils.MessageListenerClassName)
+		internal MessageListener (IWearableMessageListener listener) : base(AndroidUtils.MessageListenerClassName)
 		{
 			this.listener = listener;
 		}

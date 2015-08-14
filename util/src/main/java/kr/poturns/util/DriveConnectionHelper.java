@@ -5,12 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
@@ -18,23 +18,22 @@ import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+
 public class DriveConnectionHelper extends InputHandleHelper.ContextInputHandleHelper implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "DriveConnectionHelper";
     private GoogleApiClient mGoogleApiClient;
-
-    public interface OnFileResultListener {
-        void onReceiveFileContent(DriveContents contents);
-
-        void onError(Status status);
-
-    }
 
     public DriveConnectionHelper(Context context) {
         super(context);
@@ -72,120 +71,6 @@ public class DriveConnectionHelper extends InputHandleHelper.ContextInputHandleH
         }
     }
 
-    public void createDummyFileInAppFolder(final ResultCallback<DriveFolder.DriveFileResult> callback) {
-        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-                    @Override
-                    public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
-                        if (!driveContentsResult.getStatus().isSuccess()) {
-                            Log.e(TAG, "Error while trying to create new file contents");
-                            return;
-                        }
-
-                        createDummyFile(driveContentsResult, callback);
-                    }
-                });
-    }
-
-    void createDummyFile(DriveApi.DriveContentsResult driveContentsResult, ResultCallback<DriveFolder.DriveFileResult> callback) {
-        //TODO create file with right mineType
-        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                .setTitle("appconfig.txt")
-                .setMimeType("text/plain")
-                .build();
-
-        Drive.DriveApi.getAppFolder(mGoogleApiClient)
-                .createFile(mGoogleApiClient, changeSet, driveContentsResult.getDriveContents())
-                .setResultCallback(callback);
-    }
-
-    public final void queryFiles(final OnFileResultListener onFileResultListener) {
-        //TODO set file filter
-        Query query = new Query.Builder()
-                .addFilter(Filters.eq(SearchableField.MIME_TYPE, "text/plain"))
-                .build();
-
-        Drive.DriveApi.query(mGoogleApiClient, query)
-                .setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
-
-                    @Override
-                    public void onResult(DriveApi.MetadataBufferResult metadataBufferResult) {
-                        if (!metadataBufferResult.getStatus().isSuccess()) {
-                            onFileResultListener.onError(metadataBufferResult.getStatus());
-                            Log.e(TAG, "Problem while retrieving results");
-                            return;
-                        }
-
-                        openFile(metadataBufferResult.getMetadataBuffer(), onFileResultListener);
-                    }
-                });
-    }
-
-    public final void queryFileDummyFileInAppFolder(final OnFileResultListener onFileResultListener) {
-        DriveFolder folder = Drive.DriveApi.getAppFolder(mGoogleApiClient);
-
-        //TODO set file filter
-        Query query = new Query.Builder()
-                .addFilter(Filters.eq(SearchableField.MIME_TYPE, "text/plain"))
-                        //.addFilter(Filters.contains(SearchableField.TITLE, "a"))
-                .build();
-
-        folder.queryChildren(mGoogleApiClient, query)
-                .setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
-
-                    @Override
-                    public void onResult(DriveApi.MetadataBufferResult metadataBufferResult) {
-                        if (!metadataBufferResult.getStatus().isSuccess()) {
-                            onFileResultListener.onError(metadataBufferResult.getStatus());
-                            Log.e(TAG, "Problem while retrieving results");
-                            return;
-                        }
-
-                        openFile(metadataBufferResult.getMetadataBuffer(), onFileResultListener);
-                    }
-                });
-    }
-
-
-    private void openFile(MetadataBuffer metadataBuffer, final OnFileResultListener onFileResultListener) {
-        DriveId id = null;
-        // TODO get file ID
-        for (Metadata metadata : metadataBuffer) {
-            id = metadata.getDriveId();
-            if (id != null)
-                break;
-        }
-        metadataBuffer.release();
-
-        DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, id);
-        driveFile.open(mGoogleApiClient, DriveFile.MODE_READ_WRITE, new DriveFile.DownloadProgressListener() {
-            @Override
-            public void onProgress(long bytesDownloaded, long bytesExpected) {
-                Log.d(TAG, bytesDownloaded + " / " + bytesExpected);
-            }
-        }).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-            @Override
-            public void onResult(DriveApi.DriveContentsResult result) {
-                if (!result.getStatus().isSuccess()) {
-                    // display an error saying file can't be opened
-                    onFileResultListener.onError(result.getStatus());
-                    return;
-                }
-
-                //TODO open file or send fileDescriptor information
-                DriveContents contents = result.getDriveContents();
-                onFileResultListener.onReceiveFileContent(contents);
-
-
-            }
-        });
-    }
-
-
-    public final void commitFile(DriveContents driveContents, ResultCallback<Status> resultCallback) {
-        driveContents.commit(mGoogleApiClient, null).setResultCallback(resultCallback);
-    }
-
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected : " + bundle);
@@ -211,6 +96,218 @@ public class DriveConnectionHelper extends InputHandleHelper.ContextInputHandleH
         }
     }
 
+    public DriveContents openFile(DriveId id, int mode) {
+        return openFile(getFile(id), mode);
+    }
 
+
+    public DriveFile getFile(DriveId id) {
+        return Drive.DriveApi.getFile(mGoogleApiClient, id);
+    }
+
+
+    public DriveFolder getRootFolder() {
+        return Drive.DriveApi.getRootFolder(mGoogleApiClient);
+    }
+
+    public DriveFolder getFolder(DriveId id) {
+        return Drive.DriveApi.getFolder(mGoogleApiClient, id);
+    }
+
+    public DriveFolder getAppFolder() {
+        return Drive.DriveApi.getAppFolder(mGoogleApiClient);
+    }
+
+    public DriveContents newDriveContents() {
+        return get(Drive.DriveApi.newDriveContents(mGoogleApiClient).await());
+    }
+
+
+    public DriveApi.MetadataBufferResult queryByTitle(String title) {
+        return query(
+                new Query.Builder()
+                        .addFilter(Filters.eq(SearchableField.TITLE, title))
+                        .build()
+        );
+
+    }
+
+    public DriveApi.MetadataBufferResult queryByMimeType(String mimeType) {
+        return query(
+                new Query.Builder()
+                        .addFilter(Filters.eq(SearchableField.MIME_TYPE, mimeType))
+                        .build()
+        );
+    }
+
+    private DriveApi.MetadataBufferResult query(Query query) {
+        return Drive.DriveApi.query(mGoogleApiClient, query).await();
+    }
+
+
+    //**** DriveFile API
+
+    public DriveContents openFile(DriveFile driveFile, int mode) {
+        return get(driveFile.open(mGoogleApiClient, mode, null).await());
+    }
+
+    public Status deleteFile(DriveFile driveFile) {
+        return driveFile.delete(mGoogleApiClient).await();
+    }
+
+    //*****
+
+    //**** DriveFolder API
+
+    public DriveFile createFile(DriveFolder folder, String title, String mimeType, DriveContents contents) {
+        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setTitle(title)
+                .setMimeType(mimeType)
+                .build();
+
+        return get(folder.createFile(mGoogleApiClient, changeSet, contents).await());
+    }
+
+    public DriveFolder createFolder(DriveFolder folder, String title) {
+        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setTitle(title)
+                .build();
+
+        return get(folder.createFolder(mGoogleApiClient, changeSet).await());
+    }
+
+
+    public MetadataBuffer listChildren(DriveFolder folder) {
+        return get(folder.listChildren(mGoogleApiClient).await());
+    }
+
+    public MetadataBuffer queryChildrenByTitle(DriveFolder folder, String title) {
+        return get(folder.queryChildren(mGoogleApiClient,
+                new Query.Builder()
+                        .addFilter(Filters.eq(SearchableField.TITLE, title))
+                        .build()
+        ).await());
+    }
+
+    public MetadataBuffer queryChildrenByMimeType(DriveFolder folder, String mimeType) {
+        return get(folder.queryChildren(mGoogleApiClient,
+                new Query.Builder()
+                        .addFilter(Filters.eq(SearchableField.MIME_TYPE, mimeType))
+                        .build()
+        ).await());
+    }
+
+    //*****
+
+
+    //***** DriveContents API
+
+    public Status commit(DriveContents contents) {
+        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setLastViewedByMeDate(new Date())
+                .build();
+
+        return contents.commit(mGoogleApiClient, changeSet).await();
+    }
+
+    public Status commit(DriveContents contents, String title) {
+        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setTitle(title)
+                .setLastViewedByMeDate(new Date())
+                .build();
+
+        return contents.commit(mGoogleApiClient, changeSet).await();
+    }
+
+    public void discard(DriveContents contents) {
+        contents.discard(mGoogleApiClient);
+    }
+
+
+    public static String openContents(DriveContents contents) {
+        InputStream in;
+        switch (contents.getMode()) {
+            case DriveFile.MODE_READ_ONLY:
+                in = contents.getInputStream();
+                break;
+            case DriveFile.MODE_READ_WRITE:
+                in = new FileInputStream(contents.getParcelFileDescriptor().getFileDescriptor());
+                break;
+
+            default:
+                return null;
+        }
+
+        try {
+            return Base64.encodeToString(IOUtils.readContentFromStream(in), 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String openContents(DriveContents contents, String encoding) {
+        InputStream in;
+        switch (contents.getMode()) {
+            case DriveFile.MODE_READ_ONLY:
+                in = contents.getInputStream();
+                break;
+            case DriveFile.MODE_READ_WRITE:
+                in = new FileInputStream(contents.getParcelFileDescriptor().getFileDescriptor());
+                break;
+
+            default:
+                return null;
+        }
+
+        try {
+            return IOUtils.readContentFromStream(in, encoding);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static boolean writeContents(DriveContents contents, String byteBuffer) {
+        OutputStream out;
+        switch (contents.getMode()) {
+            case DriveFile.MODE_WRITE_ONLY:
+                out = contents.getOutputStream();
+                break;
+            case DriveFile.MODE_READ_WRITE:
+                out = new FileOutputStream(contents.getParcelFileDescriptor().getFileDescriptor());
+                break;
+
+            default:
+                return false;
+        }
+
+        try {
+            IOUtils.writeContentToStream(out, byteBuffer);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //*****
+
+
+    private static DriveContents get(DriveApi.DriveContentsResult result) {
+        return result.getStatus().isSuccess() ? result.getDriveContents() : null;
+    }
+
+    private static DriveFile get(DriveFolder.DriveFileResult result) {
+        return result.getStatus().isSuccess() ? result.getDriveFile() : null;
+    }
+
+    private static DriveFolder get(DriveFolder.DriveFolderResult result) {
+        return result.getStatus().isSuccess() ? result.getDriveFolder() : null;
+    }
+
+    private static MetadataBuffer get(DriveApi.MetadataBufferResult result) {
+        return result.getStatus().isSuccess() ? result.getMetadataBuffer() : null;
+    }
 
 }

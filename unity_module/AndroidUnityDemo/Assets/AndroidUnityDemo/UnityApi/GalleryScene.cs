@@ -23,10 +23,10 @@ public class GalleryScene : BaseScene
 		text = GameObject.FindWithTag ("2").GetComponent<Text> ();
 
 		Button btn = GameObject.Find ("Button").GetComponent<Button> ();
-		btn.onClick.AddListener (showNextImage);
+		btn.onClick.AddListener (ShowNextImage);
 
-		imageDirInfoList = ImageDirInfo.GetImageDirInfoList (AndroidApi.Utils.GetActivityObject ());
-		showNextImage ();
+		imageDirInfoList = ImageDirInfo.GetImageDirInfoList (AndroidApi.AndroidUtils.GetActivityObject ());
+		ShowNextImage ();
 	
 	}
 
@@ -42,7 +42,7 @@ public class GalleryScene : BaseScene
 		return Sprite.Create (texture, rect, vector2);
 	}
 
-	private void showNextImage ()
+	private void ShowNextImage ()
 	{
 		text.text = "loading";
 

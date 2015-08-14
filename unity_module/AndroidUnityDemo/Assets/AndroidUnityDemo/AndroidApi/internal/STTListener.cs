@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using LitJson;
 using System;
 
@@ -8,7 +8,7 @@ namespace AndroidApi
 	{
 		private ISpeechToTextListener listener;
 
-		internal STTListener(ISpeechToTextListener listener) : base(Utils.SpeechToTextListenerClassName)
+		internal STTListener(ISpeechToTextListener listener) : base(AndroidUtils.SpeechToTextListenerClassName)
 		{
 			this.listener = listener;
 		}
