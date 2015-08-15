@@ -13,7 +13,6 @@ public class Util
 	{
 		public static Texture2D Load (string filePath)
 		{
-		
 			Texture2D tex = null;
 			byte[] fileData;
 		

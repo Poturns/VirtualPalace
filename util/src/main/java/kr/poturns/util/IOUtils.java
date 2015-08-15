@@ -1,6 +1,8 @@
 package kr.poturns.util;
 
 
+import android.graphics.Bitmap;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -8,6 +10,8 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -61,6 +65,18 @@ public class IOUtils {
             }
         }
     }
+
+    public static String bitmapToFile(String name, Bitmap bitmap) throws IOException {
+        File f = File.createTempFile(name, null);
+        FileOutputStream fileOutputStream = new FileOutputStream(f);
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+            return f.getAbsolutePath();
+        } finally {
+            closeStream(fileOutputStream);
+        }
+    }
+
 
     public static void writeContentToStream(OutputStream out, String str) throws IOException {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(out);

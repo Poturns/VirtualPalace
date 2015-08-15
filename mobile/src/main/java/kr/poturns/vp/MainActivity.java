@@ -9,7 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import kr.poturns.vp.gallery.GalleryContainerFragment;
+import kr.poturns.vp.media.GalleryContainerFragment;
+import kr.poturns.vp.media.VideoContainerFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     //private static final String TAG = "MainActivity";
@@ -18,7 +19,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Wear(R.id.wear, WearCommunicateFragment.class.getName()),
         Speech(R.id.speech, SpeechToTextFragment.class.getName()),
         Drive(R.id.drive, DriveConnectionFragment.class.getName()),
-        Gallery(R.id.gallery, GalleryContainerFragment.class.getName());
+        Gallery(R.id.gallery, GalleryContainerFragment.class.getName()),
+        Video(R.id.video, VideoContainerFragment.class.getName()),;
 
         final int id;
         final String fname;

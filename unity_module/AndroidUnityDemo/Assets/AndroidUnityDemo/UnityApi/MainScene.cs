@@ -9,7 +9,7 @@ public class MainScene : MonoBehaviour
 	{
 		AndroidUtils.SetOnBackPressListener (() => false);
 
-		foreach (string scene in new String[]{"wear", "stt", "drive", "gallery"}) {
+		foreach (string scene in new String[]{"wear", "stt", "drive", "gallery", "video"}) {
 			string str = scene;
 			GameObject.FindWithTag (scene).GetComponent<Button> ().onClick.AddListener (new UnityEngine.Events.UnityAction(() => {
 				Application.LoadLevel (str + "_scene"); 

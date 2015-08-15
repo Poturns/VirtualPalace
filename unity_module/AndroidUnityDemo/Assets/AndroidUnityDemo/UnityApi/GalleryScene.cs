@@ -3,13 +3,13 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AndroidApi.Gallery;
+using AndroidApi.Media;
 using UnityApi;
 
 public class GalleryScene : BaseScene
 {
 
-	List<ImageDirInfo> imageDirInfoList = null;
+	List<ImageDirInfo> imageDirInfoList;
 	Image im;
 	Text text;
 	int count;
@@ -25,7 +25,7 @@ public class GalleryScene : BaseScene
 		Button btn = GameObject.Find ("Button").GetComponent<Button> ();
 		btn.onClick.AddListener (ShowNextImage);
 
-		imageDirInfoList = ImageDirInfo.GetImageDirInfoList (AndroidApi.AndroidUtils.GetActivityObject ());
+		imageDirInfoList = ImageDirInfo.GetDirInfoList (AndroidApi.AndroidUtils.GetActivityObject ());
 		ShowNextImage ();
 	
 	}
@@ -51,9 +51,9 @@ public class GalleryScene : BaseScene
 		}
 
 		try {
-			ImageInfo imageInfo = imageDirInfoList [count].FirstImageInfo;
+			ImageInfo imageInfo = imageDirInfoList [count].FirstInfo;
 
-			Sprite sprite = CreateSprite (imageInfo.ImagePath);
+			Sprite sprite = CreateSprite (imageInfo.Path);
 			im.sprite = sprite;
 
 			text.text = imageInfo.DisplayName;
