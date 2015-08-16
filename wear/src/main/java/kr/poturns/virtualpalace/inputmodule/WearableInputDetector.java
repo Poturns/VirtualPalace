@@ -30,8 +30,8 @@ public class WearableInputDetector<Input extends IOutputData> extends OperationI
 
         this.mInputProcessor = inputProcessor;
 
-        if (mInputProcessor != null)
-            mInputProcessor.setResultListener(this);
+        if (inputProcessor != null)
+            inputProcessor.setResultListener(this);
     }
 
     @Override

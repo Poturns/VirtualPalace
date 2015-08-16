@@ -43,7 +43,7 @@ public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
     }
 
     /**
-     * Agent Type ¹ÝÈ¯
+     * Agent Type ë°˜í™˜
      *
      * @return
      */

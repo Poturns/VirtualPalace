@@ -45,7 +45,7 @@ abstract class BaseAgent implements IAgent {
         if (getAgentType() == agentType)
             return;
 
-        mCollaborationArray[agentType] = new Pair<>(agent, listener);
+        mCollaborationArray[agentType] = new Pair<BaseAgent, OnDataCollaborationListener>(agent, listener);
     }
 
     /**

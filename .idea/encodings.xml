@@ -6,6 +6,8 @@
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/controller/PalaceApplication.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/controller/PalaceCore.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/controller/PalaceMaster.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/AcceleroAgent.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/GyroAgent.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/IAgent.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/LocationAgent.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/util/GoogleServiceAssistant.java" charset="UTF-8" />

@@ -92,7 +92,7 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
         // Angular speed around the z-axis
         axisZ = event.values[2];
 
-        //TODO: ÀÇ¹®Á¡ 1. ¿òÁ÷ÀÌ´Â ¹°Ã¼¿¡ '°¡¸¸È÷' ÀÖÀ» ¶§¿¡µµ °ªÀÌ º¯ÇÏ´Â°¡?
+        //TODO: ì˜ë¬¸ì  1. ì›€ì§ì´ëŠ” ë¬¼ì²´ì— 'ê°€ë§Œíˆ' ìˆì„ ë•Œì—ë„ ê°’ì´ ë³€í•˜ëŠ”ê°€?
     }
 
     /**

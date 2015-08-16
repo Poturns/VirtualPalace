@@ -31,36 +31,36 @@ public interface IOperationInputFilter<InputUnit> {
 
     /**
      * Return 방향으로 이동한다.
-     * @param unit
-     * @return
+     * @param unit 입력
+     * @return 이동 할 방향
      */
     int isGoingTo(InputUnit unit);
 
     /**
      * Return 방향으로 회전한다.
-     * @param unit
-     * @return
+     * @param unit 입력
+     * @return 회전 할 방향
      */
     int isTurningTo(InputUnit unit);
 
     /**
      * Return 방향으로 포커싱(Focusing)한다.
-     * @param unit
-     * @return
+     * @param unit 입력
+     * @return 포커싱 할 방향
      */
     int isFocusingTo(InputUnit unit);
 
     /**
      * Return 방향으로 화면조정(Zooming)한다.
-     * @param unit
-     * @return
+     * @param unit 입력
+     * @return 화면 조정 할 방향
      */
     int isZoomingTo(InputUnit unit);
 
     /**
      * 선택 이벤트를 발생한다.
-     * @param unit
-     * @return
+     * @param unit 입력
+     * @return 선택 이벤트의 발생 여부
      */
     boolean isSelecting(InputUnit unit);
 
