@@ -33,7 +33,7 @@ public class SpeechInputHelper implements RecognitionListener {
     }
 
     public static interface OnSpeechDataListener {
-        void onResult(ArrayList<String> results);
+        void onResult(SpeechResults speechResults);
     }
 
     public void setSpeechListener(OnSpeechDataListener listener) {
@@ -106,7 +106,8 @@ public class SpeechInputHelper implements RecognitionListener {
 
 
     /**
-     * {@link #startActivityForResult(Activity)} 로 부터 시작된 음성 입력 Activity 가 종료 된 후, 음성입력 결과를 해석한다.
+     * {@link #startActivityForResult(Activity)} 로 부터 시작된 음성 입력 Activity 가 종료 된 후,
+     * {@link Activity#onActivityResult(int, int, Intent)}를 통해 전달되는 결과에서 음성인식 데이터를 가져온다.
      *
      * @return 음성인식 결과 데이터들이 담겨져 있는 객체
      */
@@ -131,7 +132,7 @@ public class SpeechInputHelper implements RecognitionListener {
      */
     private void deliverSttResult(Bundle results) {
         if (listener != null)
-            listener.onResult(getRecognitionResult(results));
+            listener.onResult(new SpeechResults(getRecognitionResult(results), getConfidenceResult(results), null));
     }
 
 

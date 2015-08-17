@@ -49,7 +49,7 @@ public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventL
     }
 
     /**
-     * Agent Type ��ȯ
+     * Agent Type 반환
      *
      * @return
      */

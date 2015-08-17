@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p>
+ * <p/>
  * 모션 이벤트 (터치)를 입력받아 {@link GestureData}로 변환하는 클래스
  */
 public class GestureInputProcessor extends InputProcessor.Base<GestureData> implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
@@ -15,6 +15,7 @@ public class GestureInputProcessor extends InputProcessor.Base<GestureData> impl
     private static final int THRESHOLD_DETECT_SWIPE = 100;
 
     private GestureDetector mGestureDetector;
+    private boolean isListening = false;
 
     public GestureInputProcessor(Context context) {
         mGestureDetector = new GestureDetector(context, this);
@@ -22,12 +23,24 @@ public class GestureInputProcessor extends InputProcessor.Base<GestureData> impl
 
     /**
      * 모션 이벤트를 입력받는다.
+     * <p/>
+     * {@link #startListening()}을 먼저 호출해야 모션 이벤트가 처리된다.
      *
      * @param ev 발생한 모션이벤트
      * @return 처리 결과
      */
     public boolean onTouchEvent(MotionEvent ev) {
-        return mGestureDetector.onTouchEvent(ev);
+        return isListening && mGestureDetector.onTouchEvent(ev);
+    }
+
+    @Override
+    public void startListening() {
+        isListening = true;
+    }
+
+    @Override
+    public void stopListening() {
+        isListening = false;
     }
 
     //*************** Gesture Listener ***************
@@ -110,4 +123,6 @@ public class GestureInputProcessor extends InputProcessor.Base<GestureData> impl
             listener.onInputResult(new GestureData(GestureData.TYPE_TOUCH_TAP, 0));
         return true;
     }
+
+
 }

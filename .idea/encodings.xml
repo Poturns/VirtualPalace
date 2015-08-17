@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/input/src/main/java/kr/poturns/virtualpalace/input/IOperationInputFilter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/input/src/main/java/kr/poturns/virtualpalace/input/OperationInputDetector.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/controller/PalaceApplication.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/controller/PalaceCore.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/controller/PalaceMaster.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/AcceleroAgent.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/GyroAgent.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/IAgent.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/sensor/LocationAgent.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile/src/main/java/kr/poturns/virtualpalace/util/GoogleServiceAssistant.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

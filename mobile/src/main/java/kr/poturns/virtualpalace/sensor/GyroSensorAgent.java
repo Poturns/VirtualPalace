@@ -98,7 +98,7 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
         // Angular speed around the z-axis
         axisZ = event.values[2];
 
-        //TODO: �ǹ��� 1. �����̴� ��ü�� '������' ���� ������ ���� ���ϴ°�?
+        //TODO: 의문점 1. 움직이는 물체에 '가만히' 있을 때에도 값이 변하는가?
     }
 
     /**
