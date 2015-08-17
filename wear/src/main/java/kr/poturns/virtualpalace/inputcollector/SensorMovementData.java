@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.inputprocessor;
+package kr.poturns.virtualpalace.inputcollector;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +24,7 @@ public class SensorMovementData implements IOutputData {
     }
 
     @Override
-    public JSONObject toJsonObject() {
+    public JSONObject toJSONObject() {
         try {
             return new JSONObject().put("x", x).put("y", y).put("z", z).put("speed", speed);
         } catch (JSONException e) {

@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.inputprocessor;
+package kr.poturns.virtualpalace.inputcollector;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -11,7 +11,7 @@ import android.hardware.SensorManager;
  * <p/>
  * 센서 입력을 감지하여 {@link SensorMovementData}형태로 반환하는 클래스
  */
-public class SensorInputProcessor extends InputProcessor.Base<SensorMovementData> implements SensorEventListener {
+public class SensorInputCollector extends InputCollector.Base<SensorMovementData> implements SensorEventListener {
 
     /**
      * 센서가 움직임을 감지할 최소한의 속도
@@ -32,7 +32,7 @@ public class SensorInputProcessor extends InputProcessor.Base<SensorMovementData
      */
     private float mSensorLastX, mSensorLastY, mSensorLastZ;
 
-    public SensorInputProcessor(Context context) {
+    public SensorInputCollector(Context context) {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }

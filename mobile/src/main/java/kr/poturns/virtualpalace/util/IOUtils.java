@@ -32,6 +32,13 @@ public final class IOUtils {
     private IOUtils() {
     }
 
+    /**
+     * 주어진 객체를 바이트 배열로 변환한다.
+     *
+     * @param obj 변환할 객체
+     * @return 변환된 바이트 배열
+     * @throws IOException 변환할 객체가 {@link Serializable}객체가 아닌 경우, 또는 변환 과정에서 IO Error가 발생한 경우
+     */
     public static byte[] toByteArray(Object obj) throws IOException {
         if (!(obj instanceof Serializable))
             throw new IOException("'" + obj.getClass().getSimpleName() + "' instance is not implement Serializable interface!");
@@ -49,6 +56,15 @@ public final class IOUtils {
         }
     }
 
+    /**
+     * 주어진 바이트 배열을 적절한 객체로 변환한다.
+     *
+     * @param array 변환할 바이트 배열
+     * @return 변환된 객체
+     * @throws IOException 변환 과정에서 IO Error가 발생한 경우
+     *                     ClassNotFoundException  변환될 클래스가 존재하지 않은 경우
+     *                     OptionalDataException 변환할 데이터가 객체가 아닌 기본 자료형인 경우
+     */
     public static <T extends Serializable> T fromByteArray(byte[] array) throws IOException, ClassNotFoundException {
         ObjectInputStream objectInputStream = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(array);
@@ -65,6 +81,14 @@ public final class IOUtils {
 
     }
 
+    /**
+     * 비트맵을 파일에 저장한다.
+     *
+     * @param context  임시 디렉토리를 불러올 Context
+     * @param fileName 저장될 파일의 이름
+     * @param bitmap   저장될 비트맵
+     * @return 저장된 파일의 경로
+     */
     public static String bitmapToFile(Context context, String fileName, Bitmap bitmap) throws IOException {
         File f = File.createTempFile(fileName, null, context.getCacheDir());
         FileOutputStream fileOutputStream = new FileOutputStream(f);

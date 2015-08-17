@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.inputprocessor;
+package kr.poturns.virtualpalace.inputcollector;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -9,7 +9,7 @@ import android.view.MotionEvent;
  * <p/>
  * 모션 이벤트 (터치)를 입력받아 {@link GestureData}로 변환하는 클래스
  */
-public class GestureInputProcessor extends InputProcessor.Base<GestureData> implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+public class GestureInputCollector extends InputCollector.Base<GestureData> implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
     private static final int THRESHOLD_NOT_DETECT_SWIPE = 20;
     private static final int THRESHOLD_DETECT_SWIPE = 100;
@@ -17,7 +17,7 @@ public class GestureInputProcessor extends InputProcessor.Base<GestureData> impl
     private GestureDetector mGestureDetector;
     private boolean isListening = false;
 
-    public GestureInputProcessor(Context context) {
+    public GestureInputCollector(Context context) {
         mGestureDetector = new GestureDetector(context, this);
     }
 
@@ -67,12 +67,12 @@ public class GestureInputProcessor extends InputProcessor.Base<GestureData> impl
             if (diffY > THRESHOLD_NOT_DETECT_SWIPE) {
                 // down to up
                 if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_TOWARD_UP, (int) absDiffY));
+                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_UP, (int) absDiffY));
 
             } else if (-diffY > THRESHOLD_NOT_DETECT_SWIPE) {
                 // up to down
                 if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_TOWARD_DOWN, (int) absDiffY));
+                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_DOWN, (int) absDiffY));
 
             }
 
@@ -82,13 +82,13 @@ public class GestureInputProcessor extends InputProcessor.Base<GestureData> impl
             if (diffX > THRESHOLD_NOT_DETECT_SWIPE) {
                 // right to left
                 if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_TOWARD_LEFT, (int) absDiffX));
+                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_LEFT, (int) absDiffX));
 
             } else if (-diffX > THRESHOLD_NOT_DETECT_SWIPE) {
 
                 // left to right
                 if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_TOWARD_RIGHT, (int) absDiffX));
+                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_RIGHT, (int) absDiffX));
 
             }
         }

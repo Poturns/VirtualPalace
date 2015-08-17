@@ -5,20 +5,20 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
+import kr.poturns.virtualpalace.inputcollector.GestureData;
+import kr.poturns.virtualpalace.inputcollector.GestureInputCollector;
+import kr.poturns.virtualpalace.inputcollector.SensorInputCollector;
+import kr.poturns.virtualpalace.inputcollector.SensorMovementData;
 import kr.poturns.virtualpalace.inputmodule.WearInputConnector;
 import kr.poturns.virtualpalace.inputmodule.WearableInputDetector;
-import kr.poturns.virtualpalace.inputprocessor.GestureData;
-import kr.poturns.virtualpalace.inputprocessor.GestureInputProcessor;
-import kr.poturns.virtualpalace.inputprocessor.SensorInputProcessor;
-import kr.poturns.virtualpalace.inputprocessor.SensorMovementData;
 
 
 public class WearableMainActivity extends Activity {
     private WearableInputDetector<GestureData> gestureInputDetector;
-    private GestureInputProcessor gestureInputProcessor;
+    private GestureInputCollector gestureInputProcessor;
 
     private WearableInputDetector<SensorMovementData> sensorInputDetector;
-    private SensorInputProcessor sensorInputProcessor;
+    private SensorInputCollector sensorInputProcessor;
 
     private WearInputConnector wearInputConnector;
     @Override
@@ -34,7 +34,7 @@ public class WearableMainActivity extends Activity {
     }
 
     private void initGestureInputDetector(){
-        gestureInputProcessor = new GestureInputProcessor(this);
+        gestureInputProcessor = new GestureInputCollector(this);
         gestureInputDetector = new WearableInputDetector<>(this);
         gestureInputDetector.setInputProcessor(gestureInputProcessor);
         gestureInputDetector.setOperationInputConnector(wearInputConnector);
@@ -42,7 +42,7 @@ public class WearableMainActivity extends Activity {
     }
 
     private void initSensorInputDetector(){
-        sensorInputProcessor = new SensorInputProcessor(this);
+        sensorInputProcessor = new SensorInputCollector(this);
         sensorInputDetector = new WearableInputDetector<>(this);
         sensorInputDetector.setInputProcessor(sensorInputProcessor);
         sensorInputDetector.setOperationInputConnector(wearInputConnector);
@@ -57,7 +57,7 @@ public class WearableMainActivity extends Activity {
         return gestureInputDetector;
     }
 
-    public GestureInputProcessor getGestureInputProcessor() {
+    public GestureInputCollector getGestureInputProcessor() {
         return gestureInputProcessor;
     }
 
@@ -65,7 +65,7 @@ public class WearableMainActivity extends Activity {
         return sensorInputDetector;
     }
 
-    public SensorInputProcessor getSensorInputProcessor() {
+    public SensorInputCollector getSensorInputProcessor() {
         return sensorInputProcessor;
     }
 
