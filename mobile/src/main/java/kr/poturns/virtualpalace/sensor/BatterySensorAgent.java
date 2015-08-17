@@ -10,7 +10,7 @@ import android.util.Log;
 /**
  * Created by YeonhoKim on 2015-07-20.
  */
-public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollaborationListener{
+public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAgent.OnDataCollaborationListener{
 
     public static final int DATA_INDEX_PLUGGED = 1;
     public static final int DATA_INDEX_LEVEL = 2;
@@ -23,13 +23,15 @@ public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollabora
     private int mBatteryLevel;
     private int mBatteryPercent;
 
-    public BatteryAgent(Context context) {
+    public BatterySensorAgent(Context context) {
         mContextF = context;
         mBatteryManagerF = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
     }
 
     @Override
     public void startListening() {
+        super.startListening();
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         intentFilter.addAction(Intent.ACTION_BATTERY_LOW);
@@ -39,6 +41,8 @@ public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollabora
 
     @Override
     public void stopListening() {
+        super.stopListening();
+
         mContextF.unregisterReceiver(mReceiver);
     }
 
@@ -88,7 +92,7 @@ public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollabora
             int health = intent.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
             String tech = intent.getStringExtra("technology");
 
-            Log.d("BatteryAgent", intent.getExtras().toString());
+            Log.d("BatterySensorAgent", intent.getExtras().toString());
 
             onDataMeasured();
         }

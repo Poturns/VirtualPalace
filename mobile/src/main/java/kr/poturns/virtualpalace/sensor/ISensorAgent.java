@@ -5,7 +5,7 @@ package kr.poturns.virtualpalace.sensor;
  *
  * Created by YeonhoKim on 2015-07-20.
  */
-public interface IAgent {
+public interface ISensorAgent {
     /**
      * Agent Type : 가속도
      */
@@ -34,12 +34,12 @@ public interface IAgent {
     /**
      * Agent Listening 시작
      */
-    public void startListening();
+    void startListening();
 
     /**
      * Agent Listening 중지
      */
-    public void stopListening();
+    void stopListening();
 
     /**
      * Agent Type 반환

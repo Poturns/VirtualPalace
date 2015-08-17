@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import kr.poturns.virtualpalace.sensor.AcceleroAgent;
-import kr.poturns.virtualpalace.sensor.BatteryAgent;
-import kr.poturns.virtualpalace.sensor.GyroAgent;
-import kr.poturns.virtualpalace.sensor.LocationAgent;
-import kr.poturns.virtualpalace.sensor.NetworkAgent;
+import kr.poturns.virtualpalace.sensor.AcceleroSensorAgent;
+import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
+import kr.poturns.virtualpalace.sensor.BatterySensorAgent;
+import kr.poturns.virtualpalace.sensor.GyroSensorAgent;
+import kr.poturns.virtualpalace.sensor.ISensorAgent;
+import kr.poturns.virtualpalace.sensor.LocationSensorAgent;
+import kr.poturns.virtualpalace.sensor.NetworkSensorAgent;
 
 /**
  *
@@ -17,18 +19,18 @@ import kr.poturns.virtualpalace.sensor.NetworkAgent;
  */
 public class InfraDataService extends Service {
 
-    private final AcceleroAgent mAcceleroAgentF;
-    private final BatteryAgent mBatteryAgentF;
-    private final GyroAgent mGyroAgentF;
-    private final LocationAgent mLocationAgentF;
-    private final NetworkAgent mNetworkAgentF;
+    private final AcceleroSensorAgent mAcceleroAgentF;
+    private final BatterySensorAgent mBatteryAgentF;
+    private final GyroSensorAgent mGyroAgentF;
+    private final LocationSensorAgent mLocationAgentF;
+    private final NetworkSensorAgent mNetworkAgentF;
 
     public InfraDataService() {
-        mAcceleroAgentF = new AcceleroAgent(this);
-        mBatteryAgentF = new BatteryAgent(this);
-        mGyroAgentF = new GyroAgent(this);
-        mLocationAgentF = new LocationAgent(this);
-        mNetworkAgentF = new NetworkAgent(this);
+        mAcceleroAgentF = new AcceleroSensorAgent(this);
+        mBatteryAgentF = new BatterySensorAgent(this);
+        mGyroAgentF = new GyroSensorAgent(this);
+        mLocationAgentF = new LocationSensorAgent(this);
+        mNetworkAgentF = new NetworkSensorAgent(this);
     }
 
 
@@ -43,11 +45,11 @@ public class InfraDataService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mAcceleroAgentF.startListening();
-        mBatteryAgentF.startListening();
-        mGyroAgentF.startListening();
-        mLocationAgentF.startListening();
-        mNetworkAgentF.startListening();
+        mAcceleroAgentF.start();
+        mBatteryAgentF.start();
+        mGyroAgentF.start();
+        mLocationAgentF.start();
+        mNetworkAgentF.start();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -55,11 +57,11 @@ public class InfraDataService extends Service {
 
     @Override
     public void onDestroy() {
-        mAcceleroAgentF.stopListening();
-        mBatteryAgentF.stopListening();
-        mGyroAgentF.stopListening();
-        mLocationAgentF.stopListening();
-        mNetworkAgentF.stopListening();
+        mAcceleroAgentF.stop();
+        mBatteryAgentF.stop();
+        mGyroAgentF.stop();
+        mLocationAgentF.stop();
+        mNetworkAgentF.stop();
 
         super.onDestroy();
     }
@@ -75,6 +77,33 @@ public class InfraDataService extends Service {
     public class LocalBinder extends Binder {
         public InfraDataService getService() {
             return InfraDataService.this;
+        }
+    }
+
+    /**
+     *
+     * @param {@link ISensorAgent} agentType
+     * @return
+     */
+    public BaseSensorAgent getSensorAgent(int agentType) {
+        switch (agentType) {
+            case ISensorAgent.TYPE_AGENT_ACCELEROMETER:
+                return mAcceleroAgentF;
+
+            case ISensorAgent.TYPE_AGENT_BATTERY:
+                return mBatteryAgentF;
+
+            case ISensorAgent.TYPE_AGENT_GYROSCOPE:
+                return mGyroAgentF;
+
+            case ISensorAgent.TYPE_AGENT_LOCATION:
+                return mLocationAgentF;
+
+            case ISensorAgent.TYPE_AGENT_NETWORK:
+                return mNetworkAgentF;
+
+            default:
+                return null;
         }
     }
 }

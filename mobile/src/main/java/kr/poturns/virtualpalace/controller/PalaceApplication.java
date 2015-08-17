@@ -1,42 +1,28 @@
 package kr.poturns.virtualpalace.controller;
 
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 
 import kr.poturns.virtualpalace.InfraDataService;
+import kr.poturns.virtualpalace.input.GlobalApplication;
+import kr.poturns.virtualpalace.input.OperationInputConnector;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> "Virtual Palace" Application 전역객체 </b>
+ * <p>
+ *
+ * </p>
+ *
+ * @author Yeonho.Kim
  */
-public class PalaceApplication extends Application {
+public class PalaceApplication extends GlobalApplication {
 
-    InfraDataService mInfraService;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        bindService(
-                new Intent(this, InfraDataService.class),
-                mConnection,
-                Context.BIND_AUTO_CREATE    // TODO : Bind 옵션 살펴보기
-        );
-    }
-
-    @Override
-    public void onTerminate() {
-
-        unbindService(mConnection);
-
-        super.onTerminate();
-    }
-
-
-    private ServiceConnection mConnection = new ServiceConnection() {
+    // * * * C O N S T A N T S * * * //
+    private final ServiceConnection mConnectionF = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -51,4 +37,57 @@ public class PalaceApplication extends Application {
             mInfraService = null;
         }
     };
+
+
+
+    // * * * F I E L D S * * * //
+    private InfraDataService mInfraService;
+
+    private Intent mInfraServiceIntent;
+
+
+    // * * * L I F E C Y C L E * * * //
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        startService(mInfraServiceIntent = new Intent(this, InfraDataService.class));
+        bindService(mInfraServiceIntent, mConnectionF, Context.BIND_AUTO_CREATE );
+    }
+
+    @Override
+    public void onTerminate() {
+
+        unbindService(mConnectionF);
+        stopService(mInfraServiceIntent);
+
+        super.onTerminate();
+    }
+
+
+    // * * * I N H E R I T S * * * //
+    @Override
+    public Handler getControlHandler() {
+        PalaceMaster master = PalaceMaster.getInstance(this);
+        if (master != null)
+            return master.getInputHandler();
+
+        return null;
+    }
+
+    @Override
+    public void setInputConnector(OperationInputConnector connector, String name) {
+        if (name == null)
+            return;
+
+        PalaceMaster master = PalaceMaster.getInstance(this);
+        if (master != null)
+            master.addInputConnector(connector, name);
+    }
+
+
+    // * * * G E T T E R S & S E T T E R S * * * //
+    InfraDataService getInfraDataService() {
+        return mInfraService;
+    }
 }

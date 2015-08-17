@@ -3,6 +3,7 @@ package kr.poturns.virtualpalace.sensor;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Build;
@@ -10,7 +11,8 @@ import android.os.Build;
 /**
  * Created by YeonhoKim on 2015-07-20.
  */
-public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
+public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListener2 {
+
 
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
@@ -19,17 +21,28 @@ public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
     private float axisY;
     private float axisZ;
 
-    public AcceleroAgent(Context context) {
+    public GyroSensorAgent(Context context) {
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
+    @Override
     public void startListening() {
+        super.startListening();
+
         mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    @Override
     public void stopListening() {
+        super.stopListening();
+
         mSensorManagerF.unregisterListener(this);
+    }
+
+    @Override
+    public int getAgentType() {
+        return TYPE_AGENT_GYROSCOPE;
     }
 
     /**
@@ -40,16 +53,6 @@ public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
         return new double[]{
             mLatestMeasuredTimestamp
         };
-    }
-
-    /**
-     * Agent Type ��ȯ
-     *
-     * @return
-     */
-    @Override
-    public int getAgentType() {
-        return TYPE_AGENT_ACCELEROMETER;
     }
 
     /**
@@ -88,11 +91,14 @@ public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
     public void onSensorChanged(SensorEvent event) {
         mLatestMeasuredTimestamp = event.timestamp;
 
+        // Angular speed around the x-axis
         axisX = event.values[0];
+        // Angular speed around the y-axis
         axisY = event.values[1];
+        // Angular speed around the z-axis
         axisZ = event.values[2];
 
-        onDataMeasured();
+        //TODO: �ǹ��� 1. �����̴� ��ü�� '������' ���� ������ ���� ���ϴ°�?
     }
 
     /**

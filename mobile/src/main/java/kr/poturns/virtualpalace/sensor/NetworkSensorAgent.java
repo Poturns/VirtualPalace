@@ -10,14 +10,14 @@ import android.net.wifi.WifiManager;
 /**
  * Created by YeonhoKim on 2015-07-20.
  */
-public class NetworkAgent extends BaseAgent {
+public class NetworkSensorAgent extends BaseSensorAgent {
 
     private final Context mContextF;
     private final ConnectivityManager mConnectivityManagerF;
     private final WifiManager mWifiManagerF;
 
 
-    public NetworkAgent(Context context) {
+    public NetworkSensorAgent(Context context) {
         mContextF = context;
         mConnectivityManagerF = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManagerF = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -25,6 +25,8 @@ public class NetworkAgent extends BaseAgent {
 
     @Override
     public void startListening() {
+        super.startListening();
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
@@ -33,6 +35,8 @@ public class NetworkAgent extends BaseAgent {
 
     @Override
     public void stopListening() {
+        super.stopListening();
+
         mContextF.unregisterReceiver(mReceiver);
     }
 

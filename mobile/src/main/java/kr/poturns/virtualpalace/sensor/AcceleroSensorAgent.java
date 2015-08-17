@@ -3,7 +3,6 @@ package kr.poturns.virtualpalace.sensor;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Build;
@@ -11,8 +10,7 @@ import android.os.Build;
 /**
  * Created by YeonhoKim on 2015-07-20.
  */
-public class GyroAgent extends BaseAgent implements SensorEventListener2 {
-
+public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventListener2 {
 
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
@@ -21,22 +19,23 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
     private float axisY;
     private float axisZ;
 
-    public GyroAgent(Context context) {
+    public AcceleroSensorAgent(Context context) {
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-    }
-
-    public void startListening() {
-        mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_FASTEST);
-    }
-
-    public void stopListening() {
-        mSensorManagerF.unregisterListener(this);
+        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
-    public int getAgentType() {
-        return TYPE_AGENT_GYROSCOPE;
+    public void startListening() {
+        super.startListening();
+
+        mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_FASTEST);
+    }
+
+    @Override
+    public void stopListening() {
+        super.stopListening();
+
+        mSensorManagerF.unregisterListener(this);
     }
 
     /**
@@ -47,6 +46,16 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
         return new double[]{
             mLatestMeasuredTimestamp
         };
+    }
+
+    /**
+     * Agent Type 占쏙옙환
+     *
+     * @return
+     */
+    @Override
+    public int getAgentType() {
+        return TYPE_AGENT_ACCELEROMETER;
     }
 
     /**
@@ -85,14 +94,11 @@ public class GyroAgent extends BaseAgent implements SensorEventListener2 {
     public void onSensorChanged(SensorEvent event) {
         mLatestMeasuredTimestamp = event.timestamp;
 
-        // Angular speed around the x-axis
         axisX = event.values[0];
-        // Angular speed around the y-axis
         axisY = event.values[1];
-        // Angular speed around the z-axis
         axisZ = event.values[2];
 
-        //TODO: 의문점 1. 움직이는 물체에 '가만히' 있을 때에도 값이 변하는가?
+        onDataMeasured();
     }
 
     /**

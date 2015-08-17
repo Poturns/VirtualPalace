@@ -16,7 +16,7 @@ public class SpeechInputDetector extends OperationInputDetector<ArrayList<String
     private SpeechInputHelper mSpeechInputHelper;
 
     public SpeechInputDetector(Context context) {
-        super(context, new SpeechInputFilter());
+        super(new SpeechInputFilter());
         this.mSpeechInputHelper = new SpeechInputHelper(context);
         mSpeechInputHelper.setSpeechListener(this);
     }

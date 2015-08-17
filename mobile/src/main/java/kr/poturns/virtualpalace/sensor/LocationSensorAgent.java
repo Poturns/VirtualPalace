@@ -14,7 +14,7 @@ import android.provider.Settings;
 /**
  * Created by YeonhoKim on 2015-07-20.
  */
-public class LocationAgent extends BaseAgent implements LocationListener {
+public class LocationSensorAgent extends BaseSensorAgent implements LocationListener {
 
     public static final int DATA_INDEX_LATITUDE = 1;
     public static final int DATA_INDEX_LONGITUDE = 2;
@@ -34,7 +34,7 @@ public class LocationAgent extends BaseAgent implements LocationListener {
         public void onCollaboration(int thisType, int targetType, double[] thisData, double[] targetData) {
             switch (targetType) {
                 case TYPE_AGENT_BATTERY:
-                    int percentage = (int) targetData[BatteryAgent.DATA_INDEX_LEVEL];
+                    int percentage = (int) targetData[BatterySensorAgent.DATA_INDEX_LEVEL];
 
                     break;
 
@@ -42,7 +42,7 @@ public class LocationAgent extends BaseAgent implements LocationListener {
         }
     };
 
-    public LocationAgent(Context context) {
+    public LocationSensorAgent(Context context) {
         mContextF = context;
         mLocationManagerF = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
@@ -50,6 +50,8 @@ public class LocationAgent extends BaseAgent implements LocationListener {
 
     @Override
     public void startListening() {
+        super.startListening();
+
         Location gpsLocation = mLocationManagerF.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location networkLocation = mLocationManagerF.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
@@ -63,7 +65,7 @@ public class LocationAgent extends BaseAgent implements LocationListener {
 
     @Override
     public void stopListening() {
-
+        super.stopListening();
     }
 
     @Override
@@ -87,7 +89,7 @@ public class LocationAgent extends BaseAgent implements LocationListener {
         };
     }
 
-    public void setCollaborationWith(BaseAgent agent) {
+    public void setCollaborationWith(BaseSensorAgent agent) {
         setCollaborationWith(agent, mCollaborationListenerF);
     }
 
