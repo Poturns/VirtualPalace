@@ -15,12 +15,12 @@ import kr.poturns.virtualpalace.inputprocessor.InputProcessor;
 public class WearableInputDetector<Input extends IOutputData> extends OperationInputDetector<Input> implements InputProcessor.OnInputResultListener<Input> {
     protected InputProcessor<Input> mInputProcessor;
 
-    public WearableInputDetector(Context context) {
-        this(context, null, null);
+    public WearableInputDetector() {
+        this(null, null);
     }
 
-    public WearableInputDetector(Context context, IOperationInputFilter<Input> filter, InputProcessor<Input> inputProcessor) {
-        super(context, filter);
+    public WearableInputDetector(IOperationInputFilter<Input> filter, InputProcessor<Input> inputProcessor) {
+        super(filter);
         setInputProcessor(inputProcessor);
     }
 

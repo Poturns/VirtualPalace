@@ -3,12 +3,13 @@ package kr.poturns.virtualpalace.sensor;
 import android.util.Pair;
 
 /**
- * 백그라운드에서 연산에 필요한 기반 센서 데이터를 수집하기 위한 모듈을 구현한다.
+ * <b> 백그라운드에서 연산에 필요한 기반 센서 데이터를 수집하기 위한 모듈을 구현한다. </b>
  *
  * @author YeonhoKim
  */
 public abstract class BaseSensorAgent implements ISensorAgent {
 
+    // * * * C O N S T A N T S * * * //
     public static final int DATA_INDEX_TIMESTAMP = 0;
 
     public interface OnDataCollaborationListener {
@@ -22,12 +23,15 @@ public abstract class BaseSensorAgent implements ISensorAgent {
         void onCollaboration(int thisType, int targetType, double[] thisData, double[] targetData);
     }
 
+    // * * * F I E L D S * * * //
     protected Pair<BaseSensorAgent, OnDataCollaborationListener>[] mCollaborationArray;
 
     protected long mLatestMeasuredTimestamp;
 
     protected boolean isListening;
 
+
+    // * * * C O N S T R U C T O R S * * * //
     public BaseSensorAgent() {
         final int countAgent = 5;
 
@@ -35,16 +39,8 @@ public abstract class BaseSensorAgent implements ISensorAgent {
         mCollaborationArray = new Pair[countAgent + 1];
     }
 
-    public synchronized final void start() {
-        if (!isListening)
-            startListening();
-    }
 
-    public synchronized final void stop() {
-        if (isListening)
-            stopListening();
-    }
-
+    // * * * I N H E R I T S * * * //
     @Override
     public void startListening() {
         isListening = true;
@@ -53,6 +49,18 @@ public abstract class BaseSensorAgent implements ISensorAgent {
     @Override
     public void stopListening() {
         isListening = false;
+    }
+
+
+    // * * * M E T H O D S * * * //
+    public synchronized final void start() {
+        if (!isListening)
+            startListening();
+    }
+
+    public synchronized final void stop() {
+        if (isListening)
+            stopListening();
     }
 
     public final boolean isListening() {
@@ -98,4 +106,5 @@ public abstract class BaseSensorAgent implements ISensorAgent {
      * @return
      */
     public abstract double[] getLatestData();
+
 }

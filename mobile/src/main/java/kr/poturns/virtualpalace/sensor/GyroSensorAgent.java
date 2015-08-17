@@ -9,23 +9,31 @@ import android.hardware.SensorManager;
 import android.os.Build;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> 자이로 센서 AGENT </b>
+ *
+ * @author Yeonho.Kim
  */
 public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListener2 {
 
-
+    // * * * C O N S T A N T S * * * //
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
 
+
+    // * * * F I E L D S * * * //
     private float axisX;
     private float axisY;
     private float axisZ;
 
+
+    // * * * C O N S T R U C T O R S * * * //
     public GyroSensorAgent(Context context) {
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
+
+    // * * * I N H E R I T S * * * //
     @Override
     public void startListening() {
         super.startListening();

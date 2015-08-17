@@ -3,12 +3,8 @@ package kr.poturns.virtualpalace.controller;
 import android.os.Handler;
 import android.os.Message;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 import kr.poturns.virtualpalace.db.LocalArchive;
 import kr.poturns.virtualpalace.input.IControllerCommands;
-import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.util.GoogleServiceAssistant;
 
 /**

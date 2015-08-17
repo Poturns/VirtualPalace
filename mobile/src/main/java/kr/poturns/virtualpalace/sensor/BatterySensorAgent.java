@@ -8,10 +8,13 @@ import android.os.BatteryManager;
 import android.util.Log;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> 배터리 센서 AGENT </b>
+ *
+ * @author Yeonho.Kim
  */
 public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAgent.OnDataCollaborationListener{
 
+    // * * * C O N S T A N T S * * * //
     public static final int DATA_INDEX_PLUGGED = 1;
     public static final int DATA_INDEX_LEVEL = 2;
     public static final int DATA_INDEX_PERCENTAGE = 3;
@@ -19,15 +22,21 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
     private final Context mContextF;
     private final BatteryManager mBatteryManagerF;
 
+
+    // * * * F I E L D S * * * //
     private int mPlugType;
     private int mBatteryLevel;
     private int mBatteryPercent;
 
+
+    // * * * C O N S T R U C T O R S * * * //
     public BatterySensorAgent(Context context) {
         mContextF = context;
         mBatteryManagerF = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
     }
 
+
+    // * * * I N H E R I T S * * * //
     @Override
     public void startListening() {
         super.startListening();

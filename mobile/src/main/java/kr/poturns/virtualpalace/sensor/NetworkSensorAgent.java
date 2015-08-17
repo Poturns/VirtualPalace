@@ -8,21 +8,37 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> 네트워크 센서 AGENT </b>
+ *
+ * @author Yeonho.Kim
  */
 public class NetworkSensorAgent extends BaseSensorAgent {
 
+    // * * * C O N S T A N T S * * * //
     private final Context mContextF;
     private final ConnectivityManager mConnectivityManagerF;
     private final WifiManager mWifiManagerF;
 
 
+    // * * * F I E L D S * * * //
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mLatestMeasuredTimestamp = System.currentTimeMillis();
+        }
+    };
+
+
+    // * * * C O N S T R U C T O R S * * * //
     public NetworkSensorAgent(Context context) {
         mContextF = context;
         mConnectivityManagerF = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManagerF = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
+
+    // * * * I N H E R I T S * * * //
     @Override
     public void startListening() {
         super.startListening();
@@ -55,11 +71,4 @@ public class NetworkSensorAgent extends BaseSensorAgent {
         };
     }
 
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mLatestMeasuredTimestamp = System.currentTimeMillis();
-        }
-    };
 }
