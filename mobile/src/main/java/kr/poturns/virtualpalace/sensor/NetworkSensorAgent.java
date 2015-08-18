@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 /**
  * <b> 네트워크 센서 AGENT </b>
@@ -26,6 +27,7 @@ public class NetworkSensorAgent extends BaseSensorAgent {
         @Override
         public void onReceive(Context context, Intent intent) {
             mLatestMeasuredTimestamp = System.currentTimeMillis();
+
         }
     };
 
@@ -45,6 +47,7 @@ public class NetworkSensorAgent extends BaseSensorAgent {
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 
         mContextF.registerReceiver(mReceiver, intentFilter);
     }

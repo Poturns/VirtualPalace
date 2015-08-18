@@ -150,12 +150,12 @@ public class SpeechInputHelper implements RecognitionListener {
 
     @Override
     public void onRmsChanged(float rmsdB) {
-        //Log.i(TAG, "=onRmsChanged : " + rmsdB + "=");
+        //LogShard.i(TAG, "=onRmsChanged : " + rmsdB + "=");
     }
 
     @Override
     public void onBufferReceived(byte[] buffer) {
-        //Log.i(TAG, "=onBufferReceived : " + Arrays.toString(buffer) + "=");
+        //LogShard.i(TAG, "=onBufferReceived : " + Arrays.toString(buffer) + "=");
     }
 
     @Override

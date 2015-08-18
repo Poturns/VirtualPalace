@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
-import android.util.Log;
 
 /**
  * <b> 배터리 센서 AGENT </b>
@@ -17,16 +16,39 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
     // * * * C O N S T A N T S * * * //
     public static final int DATA_INDEX_PLUGGED = 1;
     public static final int DATA_INDEX_LEVEL = 2;
-    public static final int DATA_INDEX_PERCENTAGE = 3;
+    public static final int DATA_INDEX_TEMPERATURE = 3;
 
     private final Context mContextF;
     private final BatteryManager mBatteryManagerF;
+    /**
+     *
+     */
+    private final BroadcastReceiver mReceiverF = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (Intent.ACTION_BATTERY_CHANGED.equals(action)) {
+                mLatestMeasuredTimestamp = System.currentTimeMillis();
+                mPlugType = intent.getIntExtra("plugged", 0);
+                mBatteryLevel = intent.getIntExtra("level", 0);
+                mTemperature = intent.getIntExtra("temperature", 0) / 10.0;
+
+            } else
+            if(Intent.ACTION_BATTERY_LOW.equals(action)) {
+
+            }
+
+            onDataMeasured();
+        }
+    };
 
 
     // * * * F I E L D S * * * //
     private int mPlugType;
     private int mBatteryLevel;
-    private int mBatteryPercent;
+    private double mTemperature;
 
 
     // * * * C O N S T R U C T O R S * * * //
@@ -45,14 +67,14 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         intentFilter.addAction(Intent.ACTION_BATTERY_LOW);
 
-        mContextF.registerReceiver(mReceiver, intentFilter);
+        mContextF.registerReceiver(mReceiverF, intentFilter);
     }
 
     @Override
     public void stopListening() {
         super.stopListening();
 
-        mContextF.unregisterReceiver(mReceiver);
+        mContextF.unregisterReceiver(mReceiverF);
     }
 
     @Override
@@ -69,7 +91,7 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
                 mLatestMeasuredTimestamp,
                 mPlugType,
                 mBatteryLevel,
-                mBatteryPercent
+                mTemperature
         };
     }
 
@@ -86,24 +108,5 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
         }
     }
 
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            mLatestMeasuredTimestamp = System.currentTimeMillis();
-            mPlugType = intent.getIntExtra("plugged", 0);
-            int level = intent.getIntExtra("level", 0);
-            int scale = intent.getIntExtra("scale", 100);
-            int voltage = intent.getIntExtra("voltage", 0);
-            int temperature = intent.getIntExtra("temperature", 0);
-            int health = intent.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
-            String tech = intent.getStringExtra("technology");
-
-            Log.d("BatterySensorAgent", intent.getExtras().toString());
-
-            onDataMeasured();
-        }
-    };
 }

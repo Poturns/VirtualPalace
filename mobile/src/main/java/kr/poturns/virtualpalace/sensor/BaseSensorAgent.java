@@ -33,10 +33,8 @@ public abstract class BaseSensorAgent implements ISensorAgent {
 
     // * * * C O N S T R U C T O R S * * * //
     public BaseSensorAgent() {
-        final int countAgent = 5;
-
         // AgentType 값이 1부터 시작함.
-        mCollaborationArray = new Pair[countAgent + 1];
+        mCollaborationArray = new Pair[TYPE_TOTAL_COUNT + 1];
     }
 
 
@@ -73,12 +71,11 @@ public abstract class BaseSensorAgent implements ISensorAgent {
      * @param listener
      */
     public void setCollaborationWith(BaseSensorAgent agent, OnDataCollaborationListener listener) {
-        int agentType = agent.getAgentType();
-
-        // 동일한 Type의 값은 처리하지 않는다.
-        if (getAgentType() == agentType)
+        // 동일한 Agent Type 의 값은 처리하지 않는다.
+        if (agent == null || agent.getAgentType() == getAgentType())
             return;
 
+        int agentType = agent.getAgentType();
         mCollaborationArray[agentType] = new Pair<BaseSensorAgent, OnDataCollaborationListener>(agent, listener);
     }
 
@@ -87,6 +84,9 @@ public abstract class BaseSensorAgent implements ISensorAgent {
      */
     protected void onDataMeasured() {
         for (Pair<BaseSensorAgent, OnDataCollaborationListener> pair : mCollaborationArray) {
+            if (pair == null || pair.second == null)
+                continue;
+
             BaseSensorAgent agent = pair.first;
             OnDataCollaborationListener listener = pair.second;
 

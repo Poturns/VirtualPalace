@@ -1,17 +1,104 @@
 package kr.poturns.virtualpalace;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import kr.poturns.virtualpalace.controller.PalaceApplication;
+import kr.poturns.virtualpalace.sensor.ISensorAgent;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    Intent mInfraServiceIntent;
+
+    TextView accel, gyro, orientation, location, network, battery;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+
+
+        mInfraServiceIntent = new Intent(this, InfraDataService.class);
+        startService(mInfraServiceIntent);
+
+        accel = (TextView) findViewById(R.id.accelero);
+        gyro = (TextView) findViewById(R.id.gyro);
+        orientation = (TextView) findViewById(R.id.orientation);
+        location = (TextView) findViewById(R.id.location);
+        network = (TextView) findViewById(R.id.network);
+        battery = (TextView) findViewById(R.id.battery);
+    }
+
+    Timer timer;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        InfraDataService service = ((PalaceApplication) getApplication()).getInfraDataService();
+        if (service != null)
+            service.startListening();
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        InfraDataService service = ((PalaceApplication) getApplication()).getInfraDataService();
+                        if (service == null) {
+                            return;
+                        }
+
+                        double[] data;
+
+                        data = service.getSensorAgent(ISensorAgent.TYPE_AGENT_ACCELEROMETER).getLatestData();
+                        accel.setText( "X : " + String.format("%.5f", data[1]) + "\nY : " + String.format("%.5f", data[2]) + "\nZ : " + String.format("%.5f", data[3]));
+
+                        data = service.getSensorAgent(ISensorAgent.TYPE_AGENT_GYROSCOPE).getLatestData();
+                        gyro.setText( "X : " + String.format("%.5f", data[1]) + "\nY : " + String.format("%.5f", data[2]) + "\nZ : " + String.format("%.5f", data[3]));
+
+                        //orientation.setText(service.getSensorAgent(ISensorAgent.TYPE_AGENT_ACCELEROMETER).getLatestData().toString());
+
+                        data = service.getSensorAgent(ISensorAgent.TYPE_AGENT_LOCATION).getLatestData();
+                        location.setText("LAT : " + data[1] + "\nLNG : " + data[2] + "\nALT : " + data[3]);
+
+                        data = service.getSensorAgent(ISensorAgent.TYPE_AGENT_NETWORK).getLatestData();
+                        network.setText("");
+
+                        data = service.getSensorAgent(ISensorAgent.TYPE_AGENT_BATTERY).getLatestData();
+                        battery.setText("TYPE : " + data[1] + "\nLEVEL : " + data[2] + "\nTEMPERATURE : " + data[3]);
+                    }
+                });
+            }
+        }, 1000, 100);
+
+    }
+
+    @Override
+    protected void onPause() {
+        timer.cancel();
+
+        InfraDataService service = ((PalaceApplication) getApplication()).getInfraDataService();
+        if (service != null)
+            service.stopListening();
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(mInfraServiceIntent);
+        super.onDestroy();
     }
 
     @Override

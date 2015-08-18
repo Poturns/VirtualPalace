@@ -46,7 +46,7 @@ public class PalaceMaster extends PalaceCore {
         mRequestHandlerF = new RequestHandler();
         mBridgeF = AndroidUnityBridge.getInstance(app);
 
-        mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.System.ACCOUNT));
+        mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
     }
 
 

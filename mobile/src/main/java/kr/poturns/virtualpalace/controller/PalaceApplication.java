@@ -26,7 +26,7 @@ public class PalaceApplication extends GlobalApplication {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if (service == null) {
+            if (service != null) {
                 mInfraService = ((InfraDataService.LocalBinder) service).getService();
             }
         }
@@ -51,7 +51,7 @@ public class PalaceApplication extends GlobalApplication {
     public void onCreate() {
         super.onCreate();
 
-        startService(mInfraServiceIntent = new Intent(this, InfraDataService.class));
+        mInfraServiceIntent = new Intent(this, InfraDataService.class);
         bindService(mInfraServiceIntent, mConnectionF, Context.BIND_AUTO_CREATE );
     }
 
@@ -59,7 +59,6 @@ public class PalaceApplication extends GlobalApplication {
     public void onTerminate() {
 
         unbindService(mConnectionF);
-        stopService(mInfraServiceIntent);
 
         super.onTerminate();
     }
@@ -87,7 +86,7 @@ public class PalaceApplication extends GlobalApplication {
 
 
     // * * * G E T T E R S & S E T T E R S * * * //
-    InfraDataService getInfraDataService() {
+    public InfraDataService getInfraDataService() {
         return mInfraService;
     }
 }
