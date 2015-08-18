@@ -124,7 +124,7 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
                 return DIRECTION_3D_DOWNWARD;
 
             else if (WORD_DIRECTION_3D_CENTER.equals(s))
-                return DIRECTION__3D_CENTER;
+                return DIRECTION_3D_CENTER;
         }
         return DIRECTION_NONE;
     }

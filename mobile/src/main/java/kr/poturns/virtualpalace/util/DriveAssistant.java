@@ -38,13 +38,13 @@ import kr.poturns.virtualpalace.annotation.UnityApi;
  * 구글 드라이브와의 작업을 처리하는 클래스
  */
 @UnityApi
-public class DriveHelper implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "DriveHelper";
+public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private static final String TAG = "DriveAssistant";
 
     private GoogleApiClient mGoogleApiClient;
     private final Context context;
 
-    public DriveHelper(Context context) {
+    public DriveAssistant(Context context) {
         this.context = context;
 
         initApiClient();

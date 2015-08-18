@@ -8,10 +8,13 @@ import android.os.BatteryManager;
 import android.util.Log;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> 배터리 센서 AGENT </b>
+ *
+ * @author Yeonho.Kim
  */
-public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollaborationListener{
+public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAgent.OnDataCollaborationListener{
 
+    // * * * C O N S T A N T S * * * //
     public static final int DATA_INDEX_PLUGGED = 1;
     public static final int DATA_INDEX_LEVEL = 2;
     public static final int DATA_INDEX_PERCENTAGE = 3;
@@ -19,17 +22,25 @@ public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollabora
     private final Context mContextF;
     private final BatteryManager mBatteryManagerF;
 
+
+    // * * * F I E L D S * * * //
     private int mPlugType;
     private int mBatteryLevel;
     private int mBatteryPercent;
 
-    public BatteryAgent(Context context) {
+
+    // * * * C O N S T R U C T O R S * * * //
+    public BatterySensorAgent(Context context) {
         mContextF = context;
         mBatteryManagerF = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
     }
 
+
+    // * * * I N H E R I T S * * * //
     @Override
     public void startListening() {
+        super.startListening();
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         intentFilter.addAction(Intent.ACTION_BATTERY_LOW);
@@ -39,6 +50,8 @@ public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollabora
 
     @Override
     public void stopListening() {
+        super.stopListening();
+
         mContextF.unregisterReceiver(mReceiver);
     }
 
@@ -88,7 +101,7 @@ public class BatteryAgent extends BaseAgent implements BaseAgent.OnDataCollabora
             int health = intent.getIntExtra("health", BatteryManager.BATTERY_HEALTH_UNKNOWN);
             String tech = intent.getStringExtra("technology");
 
-            Log.d("BatteryAgent", intent.getExtras().toString());
+            Log.d("BatterySensorAgent", intent.getExtras().toString());
 
             onDataMeasured();
         }

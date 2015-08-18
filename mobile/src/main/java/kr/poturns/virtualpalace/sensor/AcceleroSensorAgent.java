@@ -8,27 +8,42 @@ import android.hardware.SensorManager;
 import android.os.Build;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> 가속도 센서 AGENT </b>
+ *
+ * @author Yeonho.Kim
  */
-public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
+public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventListener2 {
 
+    // * * * C O N S T A N T S * * * //
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
 
+
+    // * * * F I E L D S * * * //
     private float axisX;
     private float axisY;
     private float axisZ;
 
-    public AcceleroAgent(Context context) {
+
+    // * * * C O N S T R U C T O R S * * * //
+    public AcceleroSensorAgent(Context context) {
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
+
+    // * * * I N H E R I T S * * * //
+    @Override
     public void startListening() {
+        super.startListening();
+
         mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    @Override
     public void stopListening() {
+        super.stopListening();
+
         mSensorManagerF.unregisterListener(this);
     }
 
@@ -63,7 +78,6 @@ public class AcceleroAgent extends BaseAgent implements SensorEventListener2 {
      * <p/>
      *
      * @param sensor The {@link Sensor Sensor} on which flush was called.
-     * @see SensorManager#flush(SensorEventListener)
      */
     @Override
     public void onFlushCompleted(Sensor sensor) {

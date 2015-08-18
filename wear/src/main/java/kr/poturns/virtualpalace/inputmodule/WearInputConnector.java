@@ -15,6 +15,7 @@ public class WearInputConnector extends OperationInputConnector {
     private WearableCommunicator mWearableCommunicator;
 
     public WearInputConnector(Context context) {
+        super(context, "Wear");
         mWearableCommunicator = new WearableCommunicator(context);
     }
 

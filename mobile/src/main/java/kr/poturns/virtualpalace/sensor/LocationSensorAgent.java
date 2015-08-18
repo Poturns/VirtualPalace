@@ -12,10 +12,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 
 /**
- * Created by YeonhoKim on 2015-07-20.
+ * <b> 위치 센서 AGENT </b>
+ *
+ * @author Yeonho.Kim
  */
-public class LocationAgent extends BaseAgent implements LocationListener {
+public class LocationSensorAgent extends BaseSensorAgent implements LocationListener {
 
+    // * * * C O N S T A N T S * * * //
     public static final int DATA_INDEX_LATITUDE = 1;
     public static final int DATA_INDEX_LONGITUDE = 2;
     public static final int DATA_INDEX_ALTITUDE = 3;
@@ -27,14 +30,12 @@ public class LocationAgent extends BaseAgent implements LocationListener {
     private final Context mContextF;
     private final LocationManager mLocationManagerF;
 
-    private Location mLatestLocation;
-
     private final OnDataCollaborationListener mCollaborationListenerF = new OnDataCollaborationListener() {
         @Override
         public void onCollaboration(int thisType, int targetType, double[] thisData, double[] targetData) {
             switch (targetType) {
                 case TYPE_AGENT_BATTERY:
-                    int percentage = (int) targetData[BatteryAgent.DATA_INDEX_LEVEL];
+                    int percentage = (int) targetData[BatterySensorAgent.DATA_INDEX_LEVEL];
 
                     break;
 
@@ -42,14 +43,23 @@ public class LocationAgent extends BaseAgent implements LocationListener {
         }
     };
 
-    public LocationAgent(Context context) {
+
+    // * * * F I E L D S * * * //
+    private Location mLatestLocation;
+
+
+    // * * * C O N S T R U C T O R S * * * //
+    public LocationSensorAgent(Context context) {
         mContextF = context;
         mLocationManagerF = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
 
 
+    // * * * I N H E R I T S * * * //
     @Override
     public void startListening() {
+        super.startListening();
+
         Location gpsLocation = mLocationManagerF.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location networkLocation = mLocationManagerF.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
@@ -63,7 +73,7 @@ public class LocationAgent extends BaseAgent implements LocationListener {
 
     @Override
     public void stopListening() {
-
+        super.stopListening();
     }
 
     @Override
@@ -87,7 +97,7 @@ public class LocationAgent extends BaseAgent implements LocationListener {
         };
     }
 
-    public void setCollaborationWith(BaseAgent agent) {
+    public void setCollaborationWith(BaseSensorAgent agent) {
         setCollaborationWith(agent, mCollaborationListenerF);
     }
 
@@ -106,29 +116,6 @@ public class LocationAgent extends BaseAgent implements LocationListener {
         onDataMeasured();
     }
 
-    /**
-     * Called when the provider status changes. This method is called when
-     * a provider is unable to fetch a location or if the provider has recently
-     * become available after a period of unavailability.
-     *
-     * @param provider the name of the location provider associated with this
-     *                 update.
-     * @param status   {@link LocationProvider#OUT_OF_SERVICE} if the
-     *                 provider is out of service, and this is not expected to change in the
-     *                 near future; {@link LocationProvider#TEMPORARILY_UNAVAILABLE} if
-     *                 the provider is temporarily unavailable but is expected to be available
-     *                 shortly; and {@link LocationProvider#AVAILABLE} if the
-     *                 provider is currently available.
-     * @param extras   an optional Bundle which will contain provider specific
-     *                 status variables.
-     *                 <p/>
-     *                 <p> A number of common key/value pairs for the extras Bundle are listed
-     *                 below. Providers that use any of the keys on this list must
-     *                 provide the corresponding value as described below.
-     *                 <p/>
-     *                 <ul>
-     *                 <li> satellites - the number of satellites used to derive the fix
-     */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
