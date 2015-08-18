@@ -215,7 +215,26 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      * @param message 보낼 메시지
      */
     public final void sendMessage(String path, String message) {
-        sendMessage(NODE_ID_MAP.get(path), path, message);
+        sendMessage(NODE_ID_MAP.get(path), path, message.getBytes());
+    }
+
+    /**
+     * 상대 Device 에 메시지를 보낸다.
+     *
+     * @param message 보낼 메시지
+     */
+    public final void sendMessage(byte[] message) {
+        sendMessage(NODE_ID_MAP.get(NODE_ID_MAP.keyAt(0)), message);
+    }
+
+    /**
+     * 상대 Device 에 메시지를 보낸다.
+     *
+     * @param path    메시지를 보낼 노드 path
+     * @param message 보낼 메시지
+     */
+    public final void sendMessage(String path, byte[] message) {
+        sendMessage(NODE_ID_MAP.get(NODE_ID_MAP.keyAt(0)), path, message);
     }
 
 
@@ -226,10 +245,10 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      * @param path    메시지를 보낼 노드 path
      * @param message 보낼 메시지
      */
-    private void sendMessage(final String nodeId, final String path, final String message) {
+    private void sendMessage(final String nodeId, final String path, final byte[] message) {
         if (nodeId != null) {
             Wearable.MessageApi
-                    .sendMessage(mGoogleApiClient, nodeId, path, message.getBytes())
+                    .sendMessage(mGoogleApiClient, nodeId, path, message)
                     .setResultCallback(this);
         }
 
