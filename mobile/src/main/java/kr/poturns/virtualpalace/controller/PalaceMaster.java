@@ -105,6 +105,11 @@ public class PalaceMaster extends PalaceCore {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                case REQUEST_MESSAGE_FROM_UNITY:
+                    break;
+
+                case REQUEST_CALLBACK_FROM_UNITY:
+                    break;
 
             }
         }
