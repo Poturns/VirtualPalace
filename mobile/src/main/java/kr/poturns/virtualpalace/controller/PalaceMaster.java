@@ -46,7 +46,7 @@ public class PalaceMaster extends PalaceCore {
         mRequestHandlerF = new RequestHandler();
         mBridgeF = AndroidUnityBridge.getInstance(app);
 
-        mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.System.ACCOUNT));
+        mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
     }
 
 
@@ -105,6 +105,11 @@ public class PalaceMaster extends PalaceCore {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                case REQUEST_MESSAGE_FROM_UNITY:
+                    break;
+
+                case REQUEST_CALLBACK_FROM_UNITY:
+                    break;
 
             }
         }

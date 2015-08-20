@@ -60,7 +60,7 @@ public class GoogleServiceAssistant {
             mGoogleAccount = account;
 
             LocalArchive.getInstance(mContextF)
-                        .putSystemStringValue(LocalArchive.System.ACCOUNT, account.name);
+                        .putSystemStringValue(LocalArchive.ISystem.ACCOUNT, account.name);
         }
     }
 

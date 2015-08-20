@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 /**
  * <b> 위치 센서 AGENT </b>
@@ -87,7 +88,7 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
     @Override
     public double[] getLatestData() {
         if (mLatestLocation == null)
-            return new double[0];
+            return new double[4];
 
         return new double[]{
                 mLatestLocation.getElapsedRealtimeNanos(),
@@ -101,17 +102,12 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
         setCollaborationWith(agent, mCollaborationListenerF);
     }
 
-    /**
-     * Called when the location has changed.
-     * <p/>
-     * <p> There are no restrictions on the use of the supplied Location object.
-     *
-     * @param location The new location, as a Location object.
-     */
     @Override
     public void onLocationChanged(Location location) {
         analyseBestLocation(location);
+
         mLatestMeasuredTimestamp = System.currentTimeMillis();
+        mLatestLocation = compareBestLocation(mLatestLocation, location);
 
         onDataMeasured();
     }
@@ -121,31 +117,29 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
 
     }
 
-    /**
-     * Called when the provider is enabled by the user.
-     *
-     * @param provider the name of the location provider associated with this
-     *                 update.
-     */
     @Override
     public void onProviderEnabled(String provider) {
 
     }
 
-    /**
-     * Called when the provider is disabled by the user. If requestLocationUpdates
-     * is called on an already disabled provider, this method is called
-     * immediately.
-     *
-     * @param provider the name of the location provider associated with this
-     *                 update.
-     */
     @Override
     public void onProviderDisabled(String provider) {
 
     }
 
+
+
+    // * * * M E T H O D S * * * //
     private Location compareBestLocation(Location locationA, Location locationB) {
+        if (locationA == null && locationB == null)
+            return null;
+        else
+        if (locationA == null)
+            return locationB;
+        else
+        if (locationB == null)
+            return locationA;
+
         long timeA = locationA.getElapsedRealtimeNanos();
         long timeB = locationB.getElapsedRealtimeNanos();
 

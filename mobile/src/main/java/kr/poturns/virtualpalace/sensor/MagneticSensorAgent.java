@@ -3,18 +3,15 @@ package kr.poturns.virtualpalace.sensor;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
-import android.os.Build;
-import android.util.Log;
 
 /**
- * <b> 자이로 센서 AGENT </b>
+ * <b> 자기장 센서 AGENT </b>
  *
  * @author Yeonho.Kim
  */
-public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListener2 {
+public class MagneticSensorAgent extends BaseSensorAgent implements SensorEventListener2 {
 
     // * * * C O N S T A N T S * * * //
     public static final int DATA_INDEX_AXIS_X = 1;
@@ -31,12 +28,14 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
     private float axisZ;
 
 
+
     // * * * C O N S T R U C T O R S * * * //
-    public GyroSensorAgent(Context context) {
+    public MagneticSensorAgent(Context context) {
         mSensorManagerF = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        mSensorF = mSensorManagerF.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
     }
+
 
 
     // * * * I N H E R I T S * * * //
@@ -54,22 +53,27 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
         mSensorManagerF.unregisterListener(this);
     }
 
-    @Override
-    public int getAgentType() {
-        return TYPE_AGENT_GYROSCOPE;
-    }
-
     /**
      * @return
      */
     @Override
     public double[] getLatestData() {
-        return new double[]{
+        return new double[] {
                 mLatestMeasuredTimestamp,
                 axisX,
                 axisY,
-                axisZ,
+                axisZ
         };
+    }
+
+    /**
+     * Agent Type 반환
+     *
+     * @return Agent Type
+     */
+    @Override
+    public int getAgentType() {
+        return TYPE_AGENT_MAGNETIC;
     }
 
     @Override
@@ -77,33 +81,19 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
 
     }
 
-
     @Override
     public void onSensorChanged(SensorEvent event) {
         mLatestMeasuredTimestamp = event.timestamp;
 
-        // Angular speed around the x-axis
         axisX = event.values[DATA_INDEX_AXIS_X -1];
-        // Angular speed around the y-axis
         axisY = event.values[DATA_INDEX_AXIS_Y -1];
-        // Angular speed around the z-axis
         axisZ = event.values[DATA_INDEX_AXIS_Z -1];
 
+        onDataMeasured();
     }
 
-    /**
-     * Called when the accuracy of the registered sensor has changed.
-     * <p/>
-     * <p>See the SENSOR_STATUS_* constants in
-     * {@link SensorManager SensorManager} for details.
-     *
-     * @param sensor
-     * @param accuracy The new accuracy of this sensor, one of
-     *                 {@code SensorManager.SENSOR_STATUS_*}
-     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-
 }

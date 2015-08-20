@@ -9,6 +9,10 @@ public interface ISensorAgent {
 
     // * * * C O N S T A N T S * * * //
     /**
+     * Agent Type 개수.
+     */
+    public static final int TYPE_TOTAL_COUNT = 6;
+    /**
      * Agent Type : 가속도
      */
     public static final int TYPE_AGENT_ACCELEROMETER = 1;
@@ -25,11 +29,13 @@ public interface ISensorAgent {
      */
     public static final int TYPE_AGENT_LOCATION = 4;
     /**
+     * Agent Type : 자기장
+     */
+    public static final int TYPE_AGENT_MAGNETIC = 5;
+    /**
      * Agent Type : 네트워크
      */
-    public static final int TYPE_AGENT_NETWORK = 5;
-
-
+    public static final int TYPE_AGENT_NETWORK = 6;
 
     // * * * M E T H O D S * * * //
     // TODO:
