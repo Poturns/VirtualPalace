@@ -1,12 +1,10 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 
 namespace AndroidApi.Media
 {
-	public class VideoDirInfo : BaseDirInfo<VideoInfo>
+    public class VideoDirInfo : BaseDirInfo<VideoInfo>
 	{
 		private VideoDirInfo ()
 		{

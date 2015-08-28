@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi.Drive
 {
-	public class DriveFile: DriveResource
+    public class DriveFile: DriveResource
 	{
 		public const int MODE_READ_ONLY = 268435456;
 		public const int MODE_READ_WRITE = 805306368;

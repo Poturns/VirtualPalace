@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi
 {
-	public abstract class IInputHandleHelper<Listener>
+    public abstract class IInputHandleHelper<Listener>
 	{
 		protected AndroidJavaObject activity, inputHandleHelper;
 

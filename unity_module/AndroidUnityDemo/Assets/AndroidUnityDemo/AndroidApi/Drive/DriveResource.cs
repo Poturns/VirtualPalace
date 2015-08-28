@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi.Drive
 {
-	public class DriveResource : IAndroidObject
+    public class DriveResource : IAndroidObject
 	{
 		internal DriveResource (AndroidJavaObject androidObject) : base(androidObject)
 		{

@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using AndroidApi;
-using UnityApi;
 
 public class WearScene : BaseScene, IWearableMessageListener
 {
@@ -13,7 +10,7 @@ public class WearScene : BaseScene, IWearableMessageListener
 
 	void Start ()
 	{
-		base.Init ();
+        Init();
 
 		WearableInputHandler wearableHandler = inputHandleHelperProxy.GetWearableInputHandler ();
 		wearableHandler.SetListener (this);
@@ -29,7 +26,7 @@ public class WearScene : BaseScene, IWearableMessageListener
 
 	void Update()
 	{
-		base.OnUpdate ();
+        OnUpdate();
 	}
 
 	#region IWearableMessageListener
@@ -45,7 +42,7 @@ public class WearScene : BaseScene, IWearableMessageListener
 	#endregion IWearableMessageListener
 
 	
-	private void ProcessingMessage(String str)
+	private void ProcessingMessage(string str)
 	{
 		QueueOnMainThread (() => {
 			log += str + "\n";

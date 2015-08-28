@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace AndroidApi.Drive
 {
-	public class DriveContents : AndroidApi.IAndroidObject
-	{
+	public class DriveContents : IAndroidObject
+    {
 		internal DriveContents (AndroidJavaObject androidObject) : base(androidObject)
 		{
 		}
@@ -36,12 +36,12 @@ namespace AndroidApi.Drive
 
 		public byte[] OpenContents (DriveHandler handler)
 		{
-			String str = OpenContentsToString (handler);
+			string str = OpenContentsToString (handler);
 			if (str == null)
 				return null;
 
 			byte[] bytes = new byte[str.Length * sizeof(char)];
-			System.Buffer.BlockCopy (str.ToCharArray (), 0, bytes, 0, bytes.Length);
+            Buffer.BlockCopy (str.ToCharArray (), 0, bytes, 0, bytes.Length);
 			return bytes;
 		}
 
@@ -63,7 +63,7 @@ namespace AndroidApi.Drive
 		public bool WriteContents (DriveHandler handler, byte[] bytes)
 		{
 			char[] chars = new char[bytes.Length / sizeof(char)];
-			System.Buffer.BlockCopy (bytes, 0, chars, 0, bytes.Length);
+            Buffer.BlockCopy (bytes, 0, chars, 0, bytes.Length);
 			return WriteContents (handler, new string (chars));
 		}
 	}

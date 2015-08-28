@@ -74,18 +74,17 @@ public class VideoInfo extends BaseInfo {
         long size = cursor.getLong(sizeIdx);
         long duration = cursor.getLong(durationIdx);
 
-        if (displayName != null) {
-            VideoInfo info = new VideoInfo();
-            info.id = id;
-            info.path = imagePath;
-            info.displayName = displayName;
-            info.dirName = dirName;
-            info.size = size;
-            info.duration = duration;
-            return info;
-        }
+        if (displayName == null)
+            displayName = imagePath.substring(imagePath.lastIndexOf('/') + 1);
 
-        return null;
+        VideoInfo info = new VideoInfo();
+        info.id = id;
+        info.path = imagePath;
+        info.displayName = displayName;
+        info.dirName = dirName;
+        info.size = size;
+        info.duration = duration;
+        return info;
     }
 
     public static List<VideoInfo> getInfoList(Context context, String dirName) {

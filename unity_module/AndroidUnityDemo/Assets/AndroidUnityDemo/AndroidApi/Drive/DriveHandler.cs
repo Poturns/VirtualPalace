@@ -1,16 +1,14 @@
-using System;
 using UnityEngine;
-using AndroidApi;
 
 namespace AndroidApi.Drive
 {
-	public class DriveHandler : IInputHandleHelper<Int16>
+    public class DriveHandler : IInputHandleHelper<short>
 	{
 		internal DriveHandler (AndroidJavaObject activity, AndroidJavaObject inputHandleHelper) : base(activity, inputHandleHelper)
 		{
 		}
 
-		public override void SetListener (Int16 listener)
+		public override void SetListener (short listener)
 		{
 		}
 

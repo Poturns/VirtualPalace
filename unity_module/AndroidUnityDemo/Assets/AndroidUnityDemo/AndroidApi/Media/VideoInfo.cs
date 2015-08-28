@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 
 namespace AndroidApi.Media
 {
-	public class VideoInfo : BaseInfo
+    public class VideoInfo : BaseInfo
 	{
 		internal VideoInfo ()
 		{

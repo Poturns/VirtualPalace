@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi
 {
-	public class InputHandleHelperProxy
+    public class InputHandleHelperProxy
 	{
 		public const int INPUT_HELPER_WEARABLE = 0;
 		public const int INPUT_HELPER_STT = 1;

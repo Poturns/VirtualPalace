@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using AndroidApi;
-using UnityApi;
 
 public class STTScene : BaseScene , ISpeechToTextListener
 {
@@ -16,7 +12,7 @@ public class STTScene : BaseScene , ISpeechToTextListener
 	
 	void Start ()
 	{
-		base.Init ();
+        Init();
 
 		sttHandler = inputHandleHelperProxy.GetSTTInputHandler ();
 		sttHandler.SetListener (this);
@@ -27,7 +23,7 @@ public class STTScene : BaseScene , ISpeechToTextListener
 	
 	void Update ()
 	{
-		base.OnUpdate ();
+        OnUpdate();
 	}
 
 	private void initUI ()

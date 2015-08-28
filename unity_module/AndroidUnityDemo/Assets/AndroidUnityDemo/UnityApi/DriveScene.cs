@@ -1,11 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using AndroidApi.Drive;
-using UnityApi;
-using System.IO;
 
 public class DriveScene : BaseScene
 {
@@ -34,7 +29,7 @@ public class DriveScene : BaseScene
 		base.OnUpdate ();
 	}
 	
-	private void ProcessingMessage (String str)
+	private void ProcessingMessage (string str)
 	{
 		//QueueOnMainThread (() => {
 		log += str;
@@ -89,7 +84,7 @@ public class DriveScene : BaseScene
 			return;
 		}
 
-		String content = contents.OpenContentsToString (driveHandler, "utf-8");
+		string content = contents.OpenContentsToString (driveHandler, "utf-8");
 		if (content == null) {
 			ProcessingMessage ("+reading a dummy file has failed\n");
 			metadataBuffer.Release ();

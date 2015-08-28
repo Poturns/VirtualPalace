@@ -1,10 +1,9 @@
 using UnityEngine;
 using LitJson;
-using System;
 
-namespace AndroidApi 
+namespace AndroidApi
 {
-	internal class STTListener : AndroidJavaProxy
+    internal class STTListener : AndroidJavaProxy
 	{
 		private ISpeechToTextListener listener;
 

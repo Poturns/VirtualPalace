@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi
 {
-	public class IAndroidObject
+    public class IAndroidObject
 	{
 		public AndroidJavaObject androidObject;
 

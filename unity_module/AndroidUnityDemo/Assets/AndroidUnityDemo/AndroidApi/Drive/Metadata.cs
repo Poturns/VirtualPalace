@@ -59,17 +59,17 @@ namespace AndroidApi.Drive
 			return androidObject.Call<long> ("getQuotaBytesUsed");
 		}
 		
-		public String GetTitle ()
+		public string GetTitle ()
 		{
 			return androidObject.Call<string> ("getTitle");
 		}
 		
-		public String GetWebContentLink ()
+		public string GetWebContentLink ()
 		{
 			return androidObject.Call<string> ("getWebContentLink");
 		}
 		
-		public String GetWebViewLink ()
+		public string GetWebViewLink ()
 		{
 			return androidObject.Call<string> ("getWebViewLink");
 		}

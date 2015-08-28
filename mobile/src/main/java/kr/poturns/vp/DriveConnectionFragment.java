@@ -1,7 +1,9 @@
 package kr.poturns.vp;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,11 +11,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
+import com.google.android.gms.drive.widget.DataBufferAdapter;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -33,9 +40,11 @@ public class DriveConnectionFragment extends Fragment {
     private DriveConnectionHelper mDriveConnectionHelper;
 
     ProgressDialog dialog;
-
+    AlertDialog alertDialog;
     TextView textView;
+
     StringBuilder sb = new StringBuilder();
+    MetadataAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +55,14 @@ public class DriveConnectionFragment extends Fragment {
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
 
+        textView = new TextView(getActivity());
+
+        alertDialog = new AlertDialog.Builder(getActivity())
+                .setView(textView)
+                .create();
+
         mDriveConnectionHelper = new DriveConnectionHelper(getActivity());
+        mDriveConnectionHelper.resume();
 
     }
 
@@ -54,29 +70,34 @@ public class DriveConnectionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_drive, container, false);
+        ListView listView = (ListView) v.findViewById(R.id.listview);
+        listView.setAdapter(adapter = new MetadataAdapter(getActivity()));
+        adapter.setNotifyOnChange(false);
 
-        textView = (TextView) v.findViewById(R.id.log);
-
-        v.findViewById(R.id.drive_create_dummy_in_appfolder).setOnClickListener(new View.OnClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                processCreateDummyFileInAppFolder();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Metadata metadata = adapter.getItem(position);
+                if (metadata.isFolder()) {
+                    openFolder(metadata);
+                } else {
+
+                    if (metadata.getMimeType().startsWith("text")) {
+                        openTextContents(metadata);
+                    }
+
+                }
+
             }
         });
-
-        v.findViewById(R.id.drive_query_dummy_file).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                processQueryFileDummyFileInAppFolder();
-            }
-        });
+        initRoot();
 
         return v;
     }
 
     void textViewLog(String s) {
         sb.append(s);
-        textView.setText(sb.toString());
+        //textView.setText(sb.toString());
     }
 
     @Override
@@ -98,6 +119,104 @@ public class DriveConnectionFragment extends Fragment {
         super.onDestroy();
 
         mDriveConnectionHelper.destroy();
+    }
+
+
+    private void openTextContents(final Metadata metadata) {
+        dialog.show();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+                final String s = DriveConnectionHelper.openContents(mDriveConnectionHelper.openFile(metadata.getDriveId(), DriveFile.MODE_READ_ONLY), "utf-8");
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textView.setText(s);
+                        alertDialog.show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void openFolder(final Metadata metadata) {
+        if (!metadata.isFolder()) {
+            Toast.makeText(getActivity(), "폴더가 아닙니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        dialog.show();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                MetadataBuffer metadataBuffer = mDriveConnectionHelper.listChildren(mDriveConnectionHelper.getFolder(metadata.getDriveId()));
+                adapter.clear();
+                adapter.append(metadataBuffer);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
+    private void initRoot() {
+        dialog.show();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (!mDriveConnectionHelper.isConnected()) {
+                    synchronized (this) {
+                        try {
+                            wait(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                MetadataBuffer metadataBuffer = mDriveConnectionHelper.listChildren(mDriveConnectionHelper.getAppFolder());
+                adapter.append(metadataBuffer);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
+    private static class MetadataAdapter extends DataBufferAdapter<Metadata> {
+        LayoutInflater inflater;
+
+        public MetadataAdapter(Context context) {
+            super(context, R.layout.list_drive_meta);
+            inflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView type, name;
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.list_drive_meta, parent, false);
+                type = (TextView) convertView.findViewById(R.id.drive_meta_type);
+                name = (TextView) convertView.findViewById(R.id.drive_meta_name);
+                convertView.setTag(R.id.drive_meta_type, type);
+                convertView.setTag(R.id.drive_meta_name, name);
+            } else {
+                type = (TextView) convertView.getTag(R.id.drive_meta_type);
+                name = (TextView) convertView.getTag(R.id.drive_meta_name);
+            }
+            Metadata metadata = getItem(position);
+            type.setText(metadata.getMimeType());
+            name.setText(metadata.getTitle());
+            return convertView;
+        }
     }
 
 

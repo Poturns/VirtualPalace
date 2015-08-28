@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi
 {
-	public class WearableInputHandler : IInputHandleHelper<IWearableMessageListener>
+    public class WearableInputHandler : IInputHandleHelper<IWearableMessageListener>
 	{
 		internal WearableInputHandler (AndroidJavaObject activity, AndroidJavaObject inputHandleHelper) : base(activity, inputHandleHelper)
 		{

@@ -51,15 +51,19 @@ public class DriveConnectionHelper extends InputHandleHelper.ContextInputHandleH
                 .build();
     }
 
+    public boolean isConnected(){
+        return mGoogleApiClient.isConnected();
+    }
+
     @Override
     public final void resume() {
-        if (mGoogleApiClient != null)
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected())
             mGoogleApiClient.connect();
     }
 
     @Override
     public final void pause() {
-        if (mGoogleApiClient != null)
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
             mGoogleApiClient.disconnect();
     }
 

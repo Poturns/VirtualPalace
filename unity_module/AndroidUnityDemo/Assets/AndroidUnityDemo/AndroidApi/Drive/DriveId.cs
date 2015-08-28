@@ -1,10 +1,9 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi.Drive
 {
-	public class DriveId : AndroidApi.IAndroidObject
-	{
+    public class DriveId : IAndroidObject
+    {
 		internal DriveId (AndroidJavaObject androidObject) : base(androidObject)
 		{
 		}

@@ -1,12 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LitJson;
-
 namespace AndroidApi.Media
 {
-	public abstract class BaseDirInfo <T> where T : BaseInfo
+    public abstract class BaseDirInfo <T> where T : BaseInfo
 	{
 		public string DirName {
 			get;

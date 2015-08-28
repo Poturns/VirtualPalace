@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace AndroidApi.Drive
 {
-	public class MetadataBufferResult : IAndroidObject
+    public class MetadataBufferResult : IAndroidObject
 	{
 		internal MetadataBufferResult (AndroidJavaObject androidObject) : base(androidObject)
 		{

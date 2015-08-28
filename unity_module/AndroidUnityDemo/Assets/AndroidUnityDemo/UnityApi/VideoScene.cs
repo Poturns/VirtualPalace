@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using AndroidApi.Media;
-using UnityApi;
 
 public class VideoScene : BaseScene
 {
@@ -16,7 +13,7 @@ public class VideoScene : BaseScene
 	
 	void Start ()
 	{
-		base.Init ();
+        Init();
 		
 		im = GameObject.FindWithTag ("1").GetComponent<Image> ();
 		text = GameObject.FindWithTag ("2").GetComponent<Text> ();
@@ -31,7 +28,7 @@ public class VideoScene : BaseScene
 	
 	void Update ()
 	{
-		base.OnUpdate ();
+        OnUpdate();
 	}
 
 	private void ShowNextImage ()
