@@ -63,18 +63,36 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
     //**** lifecycle method ****
 
     /**
-     * GoogleApiClient 와 연결한다.
+     * GoogleApiClient와 연결 여부를 확인한다.
+     *
+     * @return 연결된 경우 true
+     */
+    public boolean isConnected() {
+        return mGoogleApiClient.isConnected();
+    }
+
+    /**
+     * GoogleApiClient와의 연결을 요청한다.
+     * <p>
+     * 연결 작업은 비동기적으로 수행된다.
      */
     public final void connect() {
-        if (mGoogleApiClient != null)
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected())
             mGoogleApiClient.connect();
+    }
+
+    /**
+     * GoogleApiClient 와 연결한다. 연결 요청은 동기적으로 수행된다.
+     */
+    public final ConnectionResult blockingConnect() {
+        return mGoogleApiClient.blockingConnect();
     }
 
     /**
      * GoogleApiClient 와 연결 해제한다.
      */
     public final void disconnect() {
-        if (mGoogleApiClient != null)
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
             mGoogleApiClient.disconnect();
     }
 
@@ -83,6 +101,8 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
      */
     public final void destroy() {
         if (mGoogleApiClient != null) {
+            mGoogleApiClient.unregisterConnectionCallbacks(this);
+            mGoogleApiClient.unregisterConnectionFailedListener(this);
             mGoogleApiClient.disconnect();
             mGoogleApiClient = null;
         }
@@ -230,6 +250,8 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
     // ****
 
 
+    //****** 아래의 API 메소드들은 Unity에서의 호출의 편의성을 위해 DriveHelper에 작성하였음. ******//
+
     //**** DriveFile API ****
 
 
@@ -261,8 +283,6 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
 
     //*****
 
-
-    //****** 아래의 API 메소드들은 Unity에서의 호출의 편의성을 위해 DriveHelper에 작성하였음. ******
 
     //**** DriveFolder API ****
 

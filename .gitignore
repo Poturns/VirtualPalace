@@ -33,3 +33,6 @@ local.properties
 *.idea
 *.iml
 */target
+
+## unity script
+*.meta
