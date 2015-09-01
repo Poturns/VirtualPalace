@@ -30,15 +30,10 @@ class AndroidUnityBridge {
     public static final String BUNDLE_KEY_ID = "id";
     public static final String BUNDLE_KEY_MESSAGE_JSON = "json";
 
-
     private final Object LOCK = new Object();
     private final PalaceMaster mMasterF;
     private final Handler mRequestHandlerF;
-
     private final HashMap<Long, IAndroidUnityCallback> mCallbackMapF;
-
-    // * * * C O N S T A N T S * * * //
-
 
 
     // * * * C O N S T R U C T O R S * * * //
