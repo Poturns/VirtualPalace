@@ -36,14 +36,17 @@ public class LocalArchive  {
     public static final String NAME = "LocalArchive";
     /**
      * 외부저장소 : 앱 기본 디렉토리
+     *      /sdcard/ VirtualPalace
      */
     public static final String BASE_DIR = "VirtualPalace";
     /**
      * 외부저장소 : 로그 디렉토리
+     *      /sdcard/ VirtualPalace/ Logs
      */
     public static final String LOG_DIR = BASE_DIR + File.pathSeparator + "Logs";
     /**
      * 내부저장소 : 다운로드 디렉토리
+     *      /sdcard/ VirtualPalace/ Downloads
      */
     public static final String DOWNLOAD_DIR = BASE_DIR + File.pathSeparator + "Downloads";
 
