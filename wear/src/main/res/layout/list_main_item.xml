@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="item"
+            type="kr.poturns.virtualpalace.MainFragment.ButtonIcon" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.wearable.view.CircledImageView
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@{item.drawableRes}"
+            android:onClick="@{item.onClickImage}"
+            bind:circle_color="@{item.colorRes}"
+            bind:circle_radius="56dp"
+            bind:circle_radius_pressed="48dp" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@{item.textRes}"
+            android:textSize="18sp"
+            android:layout_below="@id/image"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</layout>

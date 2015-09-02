@@ -211,7 +211,7 @@ public final class IOUtils {
     /**
      * 주어진 스트림을 닫는다.
      */
-    private static void closeStream(Closeable close) {
+    public static void closeStream(Closeable close) {
         if (close != null) {
             try {
                 close.close();

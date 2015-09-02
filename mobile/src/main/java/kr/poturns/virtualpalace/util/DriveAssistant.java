@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,13 +29,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
 import kr.poturns.virtualpalace.annotation.UnityApi;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p>
+ * <p/>
  * 구글 드라이브와의 작업을 처리하는 클래스
  */
 @UnityApi
@@ -73,7 +76,7 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
 
     /**
      * GoogleApiClient와의 연결을 요청한다.
-     * <p>
+     * <p/>
      * 연결 작업은 비동기적으로 수행된다.
      */
     public final void connect() {
@@ -137,6 +140,14 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
 
     //****
 
+    /**
+     * DriveFile을 여는 방식을 제한하는 Annotation
+     */
+    @IntDef(value = {DriveFile.MODE_READ_ONLY, DriveFile.MODE_WRITE_ONLY, DriveFile.MODE_READ_WRITE})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface FileMode {
+    }
+
 
     //**** Drive API ****
 
@@ -152,7 +163,7 @@ public class DriveAssistant implements GoogleApiClient.ConnectionCallbacks, Goog
      * @return 파일의 내용
      */
     @UnityApi
-    public DriveContents openFile(DriveId id, int mode) {
+    public DriveContents openFile(DriveId id, @FileMode int mode) {
         return openFile(getFile(id), mode);
     }
 

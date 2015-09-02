@@ -9,7 +9,7 @@ import android.view.MotionEvent;
  * <p/>
  * 모션 이벤트 (터치)를 입력받아 {@link GestureData}로 변환하는 클래스
  */
-public class GestureInputCollector extends InputCollector.Base<GestureData> implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+public class GestureInputCollector extends AbstractInputCollector<GestureData> implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
     private static final int THRESHOLD_NOT_DETECT_SWIPE = 20;
     private static final int THRESHOLD_DETECT_SWIPE = 100;

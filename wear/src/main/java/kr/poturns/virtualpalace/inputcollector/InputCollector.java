@@ -36,13 +36,4 @@ public interface InputCollector<Output extends IOutputData> {
      */
     void stopListening();
 
-    abstract class Base<T extends IOutputData> implements InputCollector<T> {
-        protected OnInputResultListener<T> listener;
-
-        @Override
-        public void setResultListener(OnInputResultListener<T> listener) {
-            this.listener = listener;
-        }
-
-    }
 }

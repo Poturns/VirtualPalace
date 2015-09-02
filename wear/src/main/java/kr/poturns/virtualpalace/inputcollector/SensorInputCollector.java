@@ -11,7 +11,7 @@ import android.hardware.SensorManager;
  * <p/>
  * 센서 입력을 감지하여 {@link SensorMovementData}형태로 반환하는 클래스
  */
-public class SensorInputCollector extends InputCollector.Base<SensorMovementData> implements SensorEventListener {
+public class SensorInputCollector extends AbstractInputCollector<SensorMovementData> implements SensorEventListener {
 
     /**
      * 센서가 움직임을 감지할 최소한의 속도

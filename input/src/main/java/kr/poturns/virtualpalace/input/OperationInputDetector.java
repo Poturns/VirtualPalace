@@ -9,7 +9,7 @@ import java.util.TimerTask;
  * <p>
  * {@link IOperationInputFilter}를 통해서 INPUT 데이터로부터 명령 메시지를 추출한다.
  * {@link OperationInputConnector}를 등록하여, 추출한 명령 메시지를 전송한다.
- *
+ * <p/>
  * 명령 계수를 수정하여 각 INPUT DETECTOR 마다 명령수행 수치를 변경할 수 있다.
  * 기본적으로 검출된 데이터를 일정 주기 간격으로 일괄 처리한다.
  * </p>
@@ -33,19 +33,19 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     /**
      * 회전 계수 :
      */
-    public int turningAmount = 10;  // degree
+    protected int turningAmount = 10;  // degree
     /**
      * 이동 계수 :
      */
-    public int goingAmount = 1;    // meter
+    protected int goingAmount = 1;    // meter
     /**
      * 화면조정 계수 :
      */
-    public int zoomingAmount = 2;    // scale
+    protected int zoomingAmount = 2;    // scale
     /**
      * 포커싱 계수 :
      */
-    public int focusingAmount = 1;   // meter
+    protected int focusingAmount = 1;   // meter
 
     /**
      * 입력 검출 필터
@@ -77,6 +77,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
 
 
     // * * * M E T H O D S * * * //
+
     /**
      * {@link IOperationInputFilter}를 등록한다.
      * Generic Type이 {@link OperationInputDetector}와 일치해야한다.
@@ -129,7 +130,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      * @return
      */
     public synchronized boolean flushOperationQueue() {
-        boolean able = ! (mConnector == null || mOperationBatchQueue.isEmpty());
+        boolean able = !(mConnector == null || mOperationBatchQueue.isEmpty());
         if (able) {
             int[][] operations = new int[mOperationBatchQueue.size()][];
             mOperationBatchQueue.toArray(operations);
@@ -144,22 +145,20 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      * 전달받은 입력 데이터에서 명령을 검출한다.
      *
      * @param unit
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
      */
     public final synchronized boolean detect(InputUnit unit) {
         boolean detected =
                 isSelecting(unit) ||
-                (isGoingTo(unit) > DIRECTION_NONE) ||
-                (isZoomingTo(unit) > DIRECTION_NONE) ||
-                (isTurningTo(unit) > DIRECTION_NONE) ||
-                (isFocusingTo(unit) > DIRECTION_NONE) ;
+                        (isGoingTo(unit) > DIRECTION_NONE) ||
+                        (isZoomingTo(unit) > DIRECTION_NONE) ||
+                        (isTurningTo(unit) > DIRECTION_NONE) ||
+                        (isFocusingTo(unit) > DIRECTION_NONE);
 
         if (mDetectedCommand != null) {
             if (isBatchProcessing)
                 mOperationBatchQueue.push(mDetectedCommand);
-            else
-            if (mConnector != null)
+            else if (mConnector != null)
                 mConnector.transferDataset(mDetectedCommand);
 
             mDetectedCommand = null;
@@ -173,9 +172,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isGoingTo(InputUnit inputUnit) {
@@ -195,9 +193,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isTurningTo(InputUnit inputUnit) {
@@ -217,9 +214,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isFocusingTo(InputUnit inputUnit) {
@@ -239,9 +235,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isZoomingTo(InputUnit inputUnit) {
@@ -261,18 +256,21 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 선택 여부
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public boolean isSelecting(InputUnit inputUnit) {
         boolean result = mInputFilter.isSelecting(inputUnit);
-        mDetectedCommand = new int[]{
-                OPERATION_SELECT,
-                0,
-                0
-        };
+
+        if (result) {
+            mDetectedCommand = new int[]{
+                    OPERATION_SELECT,
+                    0,
+                    0
+            };
+        }
+
         return result;
     }
 }

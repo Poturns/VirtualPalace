@@ -51,6 +51,9 @@ public class WearInputConnector extends OperationInputConnector implements Messa
 
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
+        if(!messageEvent.getPath().equals(WearableCommunicator.MESSAGE_PATH_SEND_DATA))
+            return;
+
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {

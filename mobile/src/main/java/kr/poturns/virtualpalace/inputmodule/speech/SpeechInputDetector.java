@@ -33,8 +33,13 @@ public class SpeechInputDetector extends OperationInputDetector<ArrayList<String
         mSpeechInputHelper.cancelListening();
     }
 
+    /**
+     * 음성입력을 중단하고, 관련된 자원을 모두 회수한다.
+     */
     public void destroy() {
         mSpeechInputHelper.destroy();
+        mSpeechInputHelper.setSpeechListener(null);
+        mSpeechInputHelper = null;
     }
 
     @Override

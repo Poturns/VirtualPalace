@@ -19,13 +19,16 @@ import java.util.Set;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p/>
+ * <p>
  * Wearable Device 와 Mobile Device 간 통신을 도와주는 클래스
  */
 public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
     private static final String TAG = "WearableCommunicator";
-    //public static final String SEND_DATA_CAPABILITY_NAME = "send_data";
-    //public static final String SEND_DATA_MESSAGE_PATH = "/send_data";
+    //public static final String CAPABILITY_NAME_SEND_DATA = "send_data";
+    /**
+     * 일반적으로 데이터를 전송할 때 사용하는 path
+     */
+    public static final String MESSAGE_PATH_SEND_DATA = "/send_data";
 
     private GoogleApiClient mGoogleApiClient;
     private MessageApi.MessageListener mMessageListener;
@@ -39,14 +42,13 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     /**
      * 연결된 노드의 ID map , key는 capability path이다.
      */
-    private final ArrayMap<String, String> NODE_ID_MAP;
+    private final Map<String, String> NODE_ID_MAP;
     private final Context context;
 
     public WearableCommunicator(Context context) {
         this.context = context;
 
         CAPABILITY_NAMES = context.getResources().getStringArray(R.array.android_wear_capabilities);
-        //ResourcesUtils.get(context, "android_wear_capabilities", "kr.poturns.util");
         NODE_ID_MAP = new ArrayMap<String, String>(CAPABILITY_NAMES.length);
 
         initGoogleApiClient();
@@ -200,12 +202,13 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     }
 
     /**
+     * {@link #MESSAGE_PATH_SEND_DATA} path를 이용하여
      * 상대 Device 에 메시지를 보낸다.
      *
      * @param message 보낼 메시지
      */
     public final void sendMessage(String message) {
-        sendMessage(NODE_ID_MAP.get(NODE_ID_MAP.keyAt(0)), message);
+        sendMessage(MESSAGE_PATH_SEND_DATA, message);
     }
 
     /**
@@ -219,12 +222,13 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     }
 
     /**
+     * {@link #MESSAGE_PATH_SEND_DATA} path를 이용하여
      * 상대 Device 에 메시지를 보낸다.
      *
      * @param message 보낼 메시지
      */
     public final void sendMessage(byte[] message) {
-        sendMessage(NODE_ID_MAP.get(NODE_ID_MAP.keyAt(0)), message);
+        sendMessage(MESSAGE_PATH_SEND_DATA, message);
     }
 
     /**
@@ -234,7 +238,7 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      * @param message 보낼 메시지
      */
     public final void sendMessage(String path, byte[] message) {
-        sendMessage(NODE_ID_MAP.get(NODE_ID_MAP.keyAt(0)), path, message);
+        sendMessage(NODE_ID_MAP.get(path), path, message);
     }
 
 
@@ -251,7 +255,6 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
                     .sendMessage(mGoogleApiClient, nodeId, path, message)
                     .setResultCallback(this);
         }
-
     }
 
     @Override
