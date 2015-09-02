@@ -60,27 +60,42 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
         return false;
     }
 
+    @Override
+    public boolean isCanceling(ArrayList<String> strings) {
+        return false;
+    }
+
+    @Override
+    public int isKeyPressed(ArrayList<String> strings) {
+        return 0;
+    }
+
+    @Override
+    public int isSpecialOperation(ArrayList<String> strings) {
+        return 0;
+    }
+
     private int checkOperation(ArrayList<String> strings) {
         final int N = strings.size();
         for (int i = 0; i < N; i++) {
             String s = strings.get(i);
 
             if (WORD_OPERATION_GO.equals(s))
-                return OPERATION_GO;
+                return Operation.GO;
 
             else if (WORD_OPERATION_FOCUS.equals(s))
-                return OPERATION_FOCUS;
+                return Operation.FOCUS;
 
             else if (WORD_OPERATION_SELECT.equals(s))
-                return OPERATION_SELECT;
+                return Operation.SELECT;
 
             else if (WORD_OPERATION_TURN.equals(s))
-                return OPERATION_TURN;
+                return Operation.TURN;
 
             else if (WORD_OPERATION_ZOOM.equals(s))
-                return OPERATION_ZOOM;
+                return Operation.ZOOM;
         }
-        return DIRECTION_NONE;
+        return Direction.NONE;
     }
 
     private int checkOperationForSpecial(ArrayList<String> strings) {
@@ -89,21 +104,21 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
             String s = strings.get(i);
 
             if (WORD_OPERATION_KEY_OK.equals(s))
-                return OPERATION_KEY_OK;
+                return Operation.KEY_OK;
 
             else if (WORD_OPERATION_KEY_BACK.equals(s))
-                return OPERATION_KEY_BACK;
+                return Operation.KEY_BACK;
 
             else if (WORD_OPERATION_KEY_HOME.equals(s))
-                return OPERATION_KEY_HOME;
+                return Operation.KEY_HOME;
 
             else if (WORD_OPERATION_KEY_VOLUME_UP.equals(s))
-                return OPERATION_KEY_VOLUME_UP;
+                return Operation.KEY_VOLUME_UP;
 
             else if (WORD_OPERATION_KEY_VOLUME_DOWN.equals(s))
-                return OPERATION_KEY_VOLUME_DOWN;
+                return Operation.KEY_VOLUME_DOWN;
         }
-        return DIRECTION_NONE;
+        return Direction.NONE;
     }
 
     private int checkDirectionFor3D(ArrayList<String> strings) {
@@ -112,21 +127,21 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
             String s = strings.get(i);
 
             if (WORD_DIRECTION_3D_BACKWARD.equals(s))
-                return DIRECTION_3D_BACKWARD;
+                return Direction.BACKWARD;
 
             else if (WORD_DIRECTION_3D_FORWARD.equals(s))
-                return DIRECTION_3D_FORWARD;
+                return Direction.FORWARD;
 
             else if (WORD_DIRECTION_3D_UPWARD.equals(s))
-                return DIRECTION_3D_UPWARD;
+                return Direction.UPWARD;
 
             else if (WORD_DIRECTION_3D_DOWNWARD.equals(s))
-                return DIRECTION_3D_DOWNWARD;
+                return Direction.DOWNWARD;
 
             else if (WORD_DIRECTION_3D_CENTER.equals(s))
-                return DIRECTION_3D_CENTER;
+                return Direction.CENTER;
         }
-        return DIRECTION_NONE;
+        return Direction.NONE;
     }
 
     private int checkDirectionFor2D(ArrayList<String> strings) {
@@ -135,18 +150,18 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
             String s = strings.get(i);
 
             if (WORD_DIRECTION_EAST.equals(s))
-                return DIRECTION_EAST;
+                return Direction.EAST;
 
             else if (WORD_DIRECTION_WEST.equals(s))
-                return DIRECTION_WEST;
+                return Direction.WEST;
 
             else if (WORD_DIRECTION_SOUTH.equals(s))
-                return DIRECTION_SOUTH;
+                return Direction.SOUTH;
 
             else if (WORD_DIRECTION_NORTH.equals(s))
-                return DIRECTION_NORTH;
+                return Direction.NORTH;
         }
-        return DIRECTION_NONE;
+        return Direction.NONE;
     }
 
 

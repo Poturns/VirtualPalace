@@ -33,4 +33,20 @@ public class GestureInputFilter implements IOperationInputFilter<GestureData> {
     public boolean isSelecting(GestureData gestureData) {
         return false;
     }
+
+    @Override
+    public boolean isCanceling(GestureData gestureData) {
+        return false;
+    }
+
+    @Override
+    public int isKeyPressed(GestureData gestureData) {
+        return 0;
+    }
+
+    @Override
+    public int isSpecialOperation(GestureData gestureData) {
+        return 0;
+    }
+
 }

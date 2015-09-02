@@ -33,4 +33,19 @@ public class SensorInputFilter implements IOperationInputFilter<SensorMovementDa
     public boolean isSelecting(SensorMovementData sensorMovementData) {
         return false;
     }
+
+    @Override
+    public boolean isCanceling(SensorMovementData sensorMovementData) {
+        return false;
+    }
+
+    @Override
+    public int isKeyPressed(SensorMovementData sensorMovementData) {
+        return 0;
+    }
+
+    @Override
+    public int isSpecialOperation(SensorMovementData sensorMovementData) {
+        return 0;
+    }
 }

@@ -65,6 +65,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     private boolean isBatchProcessing;
 
 
+
     // * * * C O S T R U C T O R S * * * //
     public OperationInputDetector() {
         this(null);
@@ -149,11 +150,13 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      */
     public final synchronized boolean detect(InputUnit unit) {
         boolean detected =
-                isSelecting(unit) ||
-                (isGoingTo(unit) > DIRECTION_NONE) ||
-                (isZoomingTo(unit) > DIRECTION_NONE) ||
-                (isTurningTo(unit) > DIRECTION_NONE) ||
-                (isFocusingTo(unit) > DIRECTION_NONE) ;
+                (isKeyPressed(unit) > Operation.NONE) ||
+                        isSelecting(unit) || isCanceling(unit) ||
+                        (isGoingTo(unit) > Direction.NONE) ||
+                        (isZoomingTo(unit) > Direction.NONE) ||
+                        (isTurningTo(unit) > Direction.NONE) ||
+                        (isFocusingTo(unit) > Direction.NONE) ||
+                        (isSpecialOperation(unit) > Operation.NONE);
 
         if (mDetectedCommand != null) {
             if (isBatchProcessing)
@@ -169,6 +172,19 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     }
 
     /**
+     * 호출될 것으로 예상되는 Operation 을 가장 먼저 감지한다.
+     * 감지하지 못했을 경우, {@link #detect(Object)} 메소드를 수행한다.
+     *
+     * @param unit 입력
+     * @param expectedOperation 예상 Operation
+     * @return
+     */
+    public final synchronized boolean detect(InputUnit unit, int expectedOperation) {
+
+        return detect(unit);
+    }
+
+    /**
      * Return 방향으로 이동한다.
      *
      * @param inputUnit input
@@ -180,9 +196,9 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     @Override
     public int isGoingTo(InputUnit inputUnit) {
         int direction = mInputFilter.isGoingTo(inputUnit);
-        if (direction > DIRECTION_NONE) {
+        if (direction > Direction.NONE) {
             mDetectedCommand = new int[]{
-                    OPERATION_GO,
+                    Operation.GO,
                     direction,
                     goingAmount
             };
@@ -202,9 +218,9 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     @Override
     public int isTurningTo(InputUnit inputUnit) {
         int direction = mInputFilter.isTurningTo(inputUnit);
-        if (direction > DIRECTION_NONE) {
+        if (direction > Direction.NONE) {
             mDetectedCommand = new int[]{
-                    OPERATION_TURN,
+                    Operation.TURN,
                     direction,
                     turningAmount
             };
@@ -224,9 +240,9 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     @Override
     public int isFocusingTo(InputUnit inputUnit) {
         int direction = mInputFilter.isFocusingTo(inputUnit);
-        if (direction > DIRECTION_NONE) {
+        if (direction > Direction.NONE) {
             mDetectedCommand = new int[]{
-                    OPERATION_FOCUS,
+                    Operation.FOCUS,
                     direction,
                     focusingAmount
             };
@@ -246,9 +262,9 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     @Override
     public int isZoomingTo(InputUnit inputUnit) {
         int direction = mInputFilter.isZoomingTo(inputUnit);
-        if (direction > DIRECTION_NONE) {
+        if (direction > Direction.NONE) {
             mDetectedCommand = new int[]{
-                    OPERATION_ZOOM,
+                    Operation.ZOOM,
                     direction,
                     zoomingAmount
             };
@@ -268,11 +284,79 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     @Override
     public boolean isSelecting(InputUnit inputUnit) {
         boolean result = mInputFilter.isSelecting(inputUnit);
-        mDetectedCommand = new int[]{
-                OPERATION_SELECT,
-                0,
-                0
-        };
+        if (result) {
+            mDetectedCommand = new int[]{
+                    Operation.SELECT,
+                    0,
+                    0
+            };
+        }
         return result;
+    }
+
+    /**
+     * 취소 이벤트를 발생한다.
+     *
+     * @param inputUnit 입력
+     * @return 취소 이벤트의 발생 여부
+     */
+    @Override
+    public boolean isCanceling(InputUnit inputUnit) {
+        boolean result = mInputFilter.isCanceling(inputUnit);
+        if (result) {
+            mDetectedCommand = new int[]{
+                    Operation.CANCEL,
+                    0,
+                    0
+            };
+        }
+        return result;
+    }
+
+    /**
+     * Return 에 해당하는 특수 기능 코드를 반환한다.
+     *
+     * @param inputUnit 입력
+     * @return {#Operation} 내 KEY.. OPERATIONS.
+     */
+    @Override
+    public int isKeyPressed(InputUnit inputUnit) {
+        int operation = mInputFilter.isSpecialOperation(inputUnit);
+        if (operation < Operation.GO) {
+            mDetectedCommand = new int[]{
+                    operation,
+                    0,
+                    0
+            };
+        } else
+            operation = Operation.NONE;
+
+        return operation;
+    }
+
+    /**
+     * Return 에 해당하는 특수 기능 코드를 반환한다.
+     *
+     * @param inputUnit 입력
+     * @return 특수 기능 코드
+     */
+    @Override
+    public int isSpecialOperation(InputUnit inputUnit) {
+        // blockMask에 추가된 Operation은 InputUnit을 통해 감지가 되어도, 정상적으로 전달되지 않는다.
+        int blockMask = 0;
+        int operation = mInputFilter.isSpecialOperation(inputUnit) ^ blockMask;
+
+        if (operation < Operation.DEEP)
+            operation = Operation.NONE;
+
+        else {
+            mDetectedCommand = new int[]{
+                    operation,
+                    0,
+                    0
+            };
+        }
+
+        return operation;
     }
 }
