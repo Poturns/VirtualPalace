@@ -2,15 +2,17 @@ package kr.poturns.virtualpalace.db;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 /**
@@ -38,7 +40,80 @@ public class LocalDatabaseCenter {
 
 
     // * * * C O N S T A N T S * * * //
+    /**
+     * RESOURCE TABLE 필드 상수
+     */
+    public enum RESOURCE_FIELD implements IField {
+        _ID,
+        NAME,
+        TYPE,
+        CATEGORY,
+        ARCHIVE_PATH,
+        ARCHIVE_KEY,
+        DRIVE_PATH,
+        DRIVE_KEY,
+        THUMBNAIL_PATH,
+        DESCRIPTION,
+        CTIME,
+        MTIME;
 
+        @Override
+        public String getTableName() {
+            return TABLE_RESOURCE;
+        }
+    }
+
+    /**
+     * VIRTUAL TABLE 필드 상수
+     */
+    public enum VIRTUAL_FIELD implements IField {
+        _ID,
+        RESID,
+        TYPE,
+        POS_X,
+        POS_Y,
+        POS_Z,
+        ROTATE_X,
+        ROTATE_Y,
+        ROTATE_Z,
+        CONTAINER,
+        CONT_ORDER,
+        STYLE;
+
+        @Override
+        public String getTableName() {
+            return TABLE_VIRTUAL;
+        }
+    }
+
+    /**
+     * AUGMENTED TABLE 필드 상수
+     */
+    public enum AUGMENTED_FIELD implements IField {
+        _ID,
+        RESID,
+        ALTITUDE,
+        LATITUDE,
+        LONGITUDE;
+
+        @Override
+        public String getTableName() {
+            return TABLE_AUGMENTED;
+        }
+    }
+
+    /**
+     * RESOURE TABLE 명
+     */
+    static final String TABLE_RESOURCE = "resource";
+    /**
+     * VIRTUAL TABLE 명
+     */
+    static final String TABLE_VIRTUAL = "virtual";
+    /**
+     * AUGMENTED TABLE 명
+     */
+    static final String TABLE_AUGMENTED = "augmented";
 
     /**
      * DB 저장 위치 : Local App 디렉토리에 위치하여, App 삭제시 DB도 자동으로 삭제될 수 있도록 한다.
@@ -51,6 +126,7 @@ public class LocalDatabaseCenter {
     private final Context mContextF;
 
     private final SQLiteOpenHelper mOpenHelperF;
+
 
 
     // * * * F I E L D S * * * //
@@ -205,7 +281,7 @@ public class LocalDatabaseCenter {
                 array.put(row);
 
             } catch (JSONException e) {
-                Log.e("LocalDB_Field_Exception", e.getMessage());
+                Log.e("LDB_Field_Exception", e.getMessage());
             }
         }
 
@@ -258,88 +334,301 @@ public class LocalDatabaseCenter {
         return array;
     }
 
-    public void insertNewResource() {
-
-    }
-
-    public void insertRealLocationPoint() {
-
-    }
-
-    public void insertVirtualObjectMapping() {
-
-    }
-
-    public void modifyResource() {
-
-    }
-
-    public void modifyRealLocationPoint() {
-
-    }
-
-    public void modifyVirtualObjectMapping() {
-
-    }
-
-    public void deleteNewResource() {
-
-    }
-
-    public void deleteRealLocationPoint() {
-
-    }
-
-    public void deleteVirtualObjectMapping() {
-
-    }
 
 
     // * * * I N N E R  C L A S S E S * * * //
     /**
-     *
+     * 테이블 필드 상수를 묶기 위한 인터페이스.
      */
-    public enum RESOURCE_FIELD {
-        _ID,
-        NAME,
-        TYPE,
-        CATEGORY,
-        ARCHIVE_PATH,
-        ARCHIVE_KEY,
-        DRIVE_PATH,
-        DRIVE_KEY,
-        THUMBNAIL_PATH,
-        DESCRIPTION,
-        CTIME,
-        MTIME;
+    protected interface IField {
+        /**
+         * 해당 필드가 소속되어 있는 테이블 명을 반환한다.
+         * @return
+         */
+        String getTableName();
+
+        /**
+         * 해당 필드의 DB 내 순서 값을 반환한다.
+         * @return
+         */
+        // enum 키워드 내에 이미 구현되어 있으나, 인터페이스로 호출하기 위해 선언.
+        int ordinal();
     }
 
     /**
+     * DB에 데이터를 삽입/수정/삭제하는 작업을 수행할 시,
+     * 상황에 맞게 SQL 구문을 생성하고, 호출할 수 있도록 하는 BUILDER 패턴 클래스.
      *
+     * 테이블 필드 상수 (
+     * {@link kr.poturns.virtualpalace.db.LocalDatabaseCenter.RESOURCE_FIELD},
+     * {@link kr.poturns.virtualpalace.db.LocalDatabaseCenter.VIRTUAL_FIELD},
+     * {@link kr.poturns.virtualpalace.db.LocalDatabaseCenter.AUGMENTED_FIELD})를
+     * 제네릭 변수로 입력받아, SQL 구문을 작성한다.
      */
-    public enum VIRTUAL_FIELD {
-        _ID,
-        RESID,
-        TYPE,
-        POS_X,
-        POS_Y,
-        POS_Z,
-        ROTATE_X,
-        ROTATE_Y,
-        ROTATE_Z,
-        CONTAINER,
-        CONT_ORDER,
-        STYLE;
-    }
+    public final class WriteBuilder<E extends IField> {
+        // NOTICE >  DB 내 필드 개수가 많아질 경우, 크기를 늘릴 것.
+        private final int MAX = 16;
 
-    /**
-     *
-     */
-    public enum AUGMENTED_FIELD {
-        _ID,
-        RESID,
-        ALTITUDE,
-        LATITUDE,
-        LONGITUDE;
+        private final ArrayList<Pair<String, String>> mSetClauseList = new ArrayList<Pair<String, String>>(MAX);
+        private final ArrayList<String> mWhereClauseList = new ArrayList<String>(MAX);
+        private String mTableName = null;
+
+        /**
+         * 테이블 내 유효한 필드가 맞는지 확인한다.
+         *
+         * @param field
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        private WriteBuilder check(E field) {
+            if (mTableName == null)
+                mTableName = field.getTableName();
+
+            else if (mTableName != field.getTableName())
+                throw new InvalidParameterException();
+
+            return this;
+        }
+
+        /**
+         * 다룰 SET 데이터를 추가한다.
+         *
+         * @param field
+         * @param value
+         * @return
+         */
+        public WriteBuilder set(E field, String value) {
+            mSetClauseList.set(field.ordinal(), new Pair<String, String>(field.toString(), value));
+            return check(field);
+        }
+
+        /**
+         * 추가된 SET 데이터를 초기화한다.
+         *
+         * @return
+         */
+        public WriteBuilder setClear() {
+            mSetClauseList.clear();
+
+            if (mWhereClauseList.isEmpty())
+                mTableName = null;
+            return this;
+        }
+
+        /**
+         * WHERE 구문에 NOT EQUAL 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public WriteBuilder whereNotEqual(E field, String value) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" != ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 EQUAL 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public WriteBuilder whereEqual(E field, String value) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" = ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 BETWEEN 조건을 추가한다.
+         *
+         * @param field
+         * @param min
+         * @param max
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public WriteBuilder whereBetween(E field, String min, String max) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" BETWEEN ")
+                            .append(min)
+                            .append(" AND ")
+                            .append(max)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 초과/이상 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @param allowEqual true = 이상, false = 초과
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public WriteBuilder whereGreaterThan(E field, String value, boolean allowEqual) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(allowEqual ? " >= " : " > ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 미만/이하 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @param allowEqual true = 이하, false = 미만
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public WriteBuilder whereLessThan(E field, String value, boolean allowEqual) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(allowEqual ? " <= " : " < ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * 추가된 조건들을 초기화한다.
+         *
+         * @return
+         */
+        public WriteBuilder whereClear() {
+            mWhereClauseList.clear();
+
+            if (mSetClauseList.isEmpty())
+                mTableName = null;
+
+            return this;
+        }
+
+        /**
+         * 추가된 SET 데이터를 Local DB에 삽입한다.
+         * ( WHERE 구문은 사용하지 않는다. )
+         *
+         * @return true = 성공, false = 실패
+         */
+        public boolean insert() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("INSERT INTO ")
+                    .append(mTableName)
+                    .append(" VALUES( ");
+
+            int length = (TABLE_RESOURCE.equals(mTableName))? RESOURCE_FIELD.values().length :
+                    (TABLE_VIRTUAL.equals(mTableName))? VIRTUAL_FIELD.values().length :
+                    (TABLE_AUGMENTED.equals(mTableName))? AUGMENTED_FIELD.values().length : 0;
+
+            for (int i=0; i<length; i++) {
+                Pair<String, String> element = mSetClauseList.get(i);
+                builder.append((element == null)? null : element.second).append(",");
+            }
+            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
+            builder.append(" )");
+
+            try {
+                setClear().whereClear();
+                mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+                return true;
+
+            } catch (SQLException e) {
+                Log.e("LDB_Insert_Exception", e.getMessage());
+                return false;
+            }
+        }
+
+        /**
+         * Local DB 에서 설정된 WHERE 조건에 맞는 데이터를 SET 데이터로 수정한다.
+         *
+         * @return true = 성공, false = 실패
+         */
+        public boolean modify() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("UPDATE ")
+                    .append(mTableName)
+                    .append(" SET ");
+
+            for (Pair<String, String> element : mSetClauseList) {
+                if (element == null)
+                    continue;
+
+                builder.append(element.first)
+                        .append("=")
+                        .append(element.second)
+                        .append(",");
+            }
+            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
+
+            builder.append(" WHERE ");
+            for (String clause : mWhereClauseList) {
+                builder.append("(").append(clause).append("),");
+            }
+            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
+
+            try {
+                setClear().whereClear();
+                mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+                return true;
+
+            } catch (SQLException e) {
+                Log.e("LDB_Modify_Exception", e.getMessage());
+                return false;
+            }
+        }
+
+        /**
+         * 추가된 WHERE 조건에 해당하는 데이터를 Local DB 에서 삭제한다.
+         * ( SET 구문은 사용하지 않는다. )
+         *
+         * @return true = 성공, false = 실패
+         */
+        public boolean delete() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("DELETE FROM ")
+                    .append(mTableName)
+                    .append(" WHERE ");
+
+            for (String clause : mWhereClauseList) {
+                builder.append("(").append(clause).append("),");
+            }
+            builder.deleteCharAt(builder.length()-1);   // 마지막 ' , ' 지우기
+
+            try {
+                setClear().whereClear();
+                mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+                return true;
+
+            } catch (SQLException e) {
+                Log.e("LDB_Delete_Exception", e.getMessage());
+                return false;
+            }
+        }
+
     }
 }
