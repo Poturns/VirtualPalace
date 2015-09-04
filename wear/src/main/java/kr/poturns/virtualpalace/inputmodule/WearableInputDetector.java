@@ -2,7 +2,6 @@ package kr.poturns.virtualpalace.inputmodule;
 
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.input.OperationInputDetector;
-import kr.poturns.virtualpalace.inputcollector.IOutputData;
 import kr.poturns.virtualpalace.inputcollector.InputCollector;
 
 /**
@@ -10,7 +9,7 @@ import kr.poturns.virtualpalace.inputcollector.InputCollector;
  * <p/>
  * 웨어러블에서 사용자 입력을 감지하는 InputDetector
  */
-public class WearableInputDetector<Input extends IOutputData> extends OperationInputDetector<Input> implements InputCollector.OnInputResultListener<Input> {
+public class WearableInputDetector<Input> extends OperationInputDetector<Input> implements InputCollector.OnInputResultListener<Input> {
     protected InputCollector<Input> mInputCollector;
 
     public WearableInputDetector(IOperationInputFilter<Input> filter, InputCollector<Input> inputCollector) {

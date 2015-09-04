@@ -44,6 +44,7 @@ public class PalaceMaster extends PalaceCore {
 
         mInputHandlerF = new InputHandler();
         mRequestHandlerF = new RequestHandler();
+        //FIXME infinite loop : PalaceMaster - AndroidUnityBridge
         mBridgeF = AndroidUnityBridge.getInstance(app);
 
         mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));

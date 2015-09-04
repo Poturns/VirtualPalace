@@ -2,10 +2,11 @@ package kr.poturns.virtualpalace.communication;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by Myungjin Kim on 2015-08-18.
- * <p/>
+ * <p>
  * wear - mobile 간 주고 받을 메시지
  */
 public class WearMessageObject implements Serializable {
@@ -31,5 +32,18 @@ public class WearMessageObject implements Serializable {
         return IOUtils.toByteArray(this);
     }
 
-
+    @Override
+    public String toString() {
+        String s = "WearMessageObject [\n";
+        if (dataSet == null) {
+            s += "null\n]";
+        } else {
+            int i = 0;
+            for (int[] arr : dataSet) {
+                s += i + " : {" + Arrays.toString(arr) + " }\n";
+                i++;
+            }
+        }
+        return s;
+    }
 }

@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * <p>
  * 센서의 움직임을 나타내는 클래스
  */
-public class SensorMovementData implements IOutputData {
+public class SensorMovementData {
     public final float x, y, z, speed;
 
     public SensorMovementData(float x, float y, float z, float speed) {
@@ -23,7 +23,6 @@ public class SensorMovementData implements IOutputData {
         return String.format("[ x : %.5f\ny : %.5f\nz : %.5f\nspeed : %.5f]", x, y, z, speed);
     }
 
-    @Override
     public JSONObject toJSONObject() {
         try {
             return new JSONObject().put("x", x).put("y", y).put("z", z).put("speed", speed);

@@ -1,36 +1,35 @@
 package kr.poturns.virtualpalace.inputcollector;
 
 import android.content.Context;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.Prediction;
+import android.util.Log;
+import android.view.View;
+
+import java.util.ArrayList;
+
+import kr.poturns.virtualpalace.R;
+import kr.poturns.virtualpalace.inputmodule.GestureInputFilter;
 
 /**
- * Created by Myungjin Kim on 2015-07-30.
+ * 제스쳐 입력을 수집하여 적절히 걸러내는 InputCollector
  * <p/>
- * 모션 이벤트 (터치)를 입력받아 {@link GestureData}로 변환하는 클래스
+ * Created by Myungjin Kim on 2015-09-03.
  */
-public class GestureInputCollector extends AbstractInputCollector<GestureData> implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
-
-    private static final int THRESHOLD_NOT_DETECT_SWIPE = 20;
-    private static final int THRESHOLD_DETECT_SWIPE = 100;
-
-    private GestureDetector mGestureDetector;
+public class GestureInputCollector extends AbstractInputCollector<String> implements GestureOverlayView.OnGesturePerformedListener, View.OnClickListener {
+    private final GestureLibrary gestureLibrary;
     private boolean isListening = false;
 
     public GestureInputCollector(Context context) {
-        mGestureDetector = new GestureDetector(context, this);
-    }
+        gestureLibrary = GestureLibraries.fromRawResource(context, R.raw.gestures);
 
-    /**
-     * 모션 이벤트를 입력받는다.
-     * <p/>
-     * {@link #startListening()}을 먼저 호출해야 모션 이벤트가 처리된다.
-     *
-     * @param ev 발생한 모션이벤트
-     * @return 처리 결과
-     */
-    public boolean onTouchEvent(MotionEvent ev) {
-        return isListening && mGestureDetector.onTouchEvent(ev);
+        if (!gestureLibrary.load()) {
+            Log.w("Gesture", "could not load gesture library");
+            throw new RuntimeException("could not load gesture library");
+        }
     }
 
     @Override
@@ -43,86 +42,27 @@ public class GestureInputCollector extends AbstractInputCollector<GestureData> i
         isListening = false;
     }
 
-    //*************** Gesture Listener ***************
+    @Override
+    public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+        if (listener == null || !isListening)
+            return;
 
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
+        ArrayList<Prediction> predictions = gestureLibrary.recognize(gesture);
 
-    public void onLongPress(MotionEvent e) {
-    }
-
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        final float diffX = e1.getX() - e2.getX();
-        final float diffY = e1.getY() - e2.getY();
-        // 가로로 움직인 폭이 일정 이상이면 무시
-
-        final float absDiffX = Math.abs(diffX);
-        final float absDiffY = Math.abs(diffY);
-        if (absDiffX < THRESHOLD_DETECT_SWIPE) {
-            if (diffY > THRESHOLD_NOT_DETECT_SWIPE) {
-                // down to up
-                if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_UP, (int) absDiffY));
-
-            } else if (-diffY > THRESHOLD_NOT_DETECT_SWIPE) {
-                // up to down
-                if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_DOWN, (int) absDiffY));
-
-            }
-
-        }
-        // 세로로 움직인 폭이 일정 이상이면 무시
-        else if (absDiffY < THRESHOLD_DETECT_SWIPE) {
-            if (diffX > THRESHOLD_NOT_DETECT_SWIPE) {
-                // right to left
-                if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_LEFT, (int) absDiffX));
-
-            } else if (-diffX > THRESHOLD_NOT_DETECT_SWIPE) {
-
-                // left to right
-                if (listener != null)
-                    listener.onInputResult(new GestureData(GestureData.TYPE_FLING_TOWARD_RIGHT, (int) absDiffX));
-
+        if (predictions.size() > 0) {
+            Prediction prediction = predictions.get(0);
+            if (prediction.score > 30.0) {
+                listener.onInputResult(prediction.name);
             }
         }
-        return false;
+
     }
 
-    public void onShowPress(MotionEvent e) {
-        if (listener != null)
-            listener.onInputResult(new GestureData(GestureData.TYPE_TOUCH_PRESS, GestureData.AMOUNT_NOTHING));
+    @Override
+    public void onClick(View v) {
+        if (listener == null || !isListening)
+            return;
+
+        listener.onInputResult(GestureInputFilter.OPERATION_CLICK);
     }
-
-    public boolean onDown(MotionEvent e) {
-        if (listener != null)
-            listener.onInputResult(new GestureData(GestureData.TYPE_TOUCH_DOWN, GestureData.AMOUNT_NOTHING));
-        return false;
-    }
-
-    public boolean onDoubleTap(MotionEvent e) {
-        if (listener != null)
-            listener.onInputResult(new GestureData(GestureData.TYPE_TOUCH_TAP, 2));
-        return true;
-    }
-
-    public boolean onDoubleTapEvent(MotionEvent e) {
-        if (listener != null)
-            listener.onInputResult(new GestureData(GestureData.TYPE_TOUCH_TAP, 2));
-        return false;
-    }
-
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-        if (listener != null)
-            listener.onInputResult(new GestureData(GestureData.TYPE_TOUCH_TAP, 0));
-        return true;
-    }
-
-
 }

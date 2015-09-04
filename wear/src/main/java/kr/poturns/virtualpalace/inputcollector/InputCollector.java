@@ -5,7 +5,7 @@ package kr.poturns.virtualpalace.inputcollector;
  * <p/>
  * 입력을 수집하여 적절한 데이터로 변환하여 알려주는 클래스
  */
-public interface InputCollector<Output extends IOutputData> {
+public interface InputCollector<Output> {
 
     /**
      * 변환된 입력 데이터를 전달받을 리스너를 등록한다.

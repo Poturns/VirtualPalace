@@ -108,7 +108,7 @@ public class MainFragment extends Fragment {
                 R.drawable.ic_action_action_trending_neutral,
                 R.color.material_light_blue_700,
                 R.string.icon_text_normal_input,
-                NormalInputFragment.class.getName()
+                BasicInputFragment.class.getName()
         ),
 
         /*
@@ -127,7 +127,7 @@ public class MainFragment extends Fragment {
         //터치 스트리밍 모드
         TOUCH_STREAMING(
                 R.drawable.ic_action_content_gesture,
-                R.color.material_deep_purple_700,
+                R.color.material_light_blue_700,
                 R.string.icon_text_streaming_input,
                 TouchGestureFragment.class.getName()
         ),
@@ -138,7 +138,7 @@ public class MainFragment extends Fragment {
          */
         ETC(
                 R.drawable.ic_action_action_info,
-                R.color.material_blue_700,
+                R.color.material_deep_purple_700,
                 R.string.icon_text_etc,
                 InfoFragment.class.getName()
         ),

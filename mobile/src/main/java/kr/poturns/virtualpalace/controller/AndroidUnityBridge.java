@@ -46,6 +46,7 @@ public final class AndroidUnityBridge {
 
     // * * * C O N S T R U C T O R S * * * //
     private AndroidUnityBridge(PalaceApplication app) {
+        //FIXME infinite loop : PalaceMaster - AndroidUnityBridge
         mMasterF = PalaceMaster.getInstance(app);
         mRequestHandlerF = mMasterF.getRequestHandler();
 

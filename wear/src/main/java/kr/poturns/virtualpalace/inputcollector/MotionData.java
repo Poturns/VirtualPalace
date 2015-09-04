@@ -6,9 +6,9 @@ import org.json.JSONObject;
 /**
  * Created by Myungjin Kim on 2015-07-30.
  * <p>
- * 제스쳐를 나타내는 클래스
+ * MotionEvent로 부터 해석된 제스쳐를 나타내는 클래스
  */
-public class GestureData implements IOutputData {
+public class MotionData {
     public static final int TYPE_FLING = 0xf000;
     public static final int TYPE_TOUCH = 0x0f00;
 
@@ -33,7 +33,7 @@ public class GestureData implements IOutputData {
      */
     public final int amount;
 
-    public GestureData(int type, int amount) {
+    public MotionData(int type, int amount) {
         this.type = type;
         this.amount = amount;
     }
@@ -41,14 +41,13 @@ public class GestureData implements IOutputData {
     /**
      * 제스쳐가 해당 타입인지 확인한다.
      *
-     * @param generalType {@link GestureData#TYPE_FLING} 또는 {@link GestureData#TYPE_TOUCH}
+     * @param generalType {@link MotionData#TYPE_FLING} 또는 {@link MotionData#TYPE_TOUCH}
      * @return 해당 타입인지 여부
      */
     public boolean isTypeOf(int generalType) {
         return (type & generalType) == generalType;
     }
 
-    @Override
     public JSONObject toJSONObject() {
         try {
             return new JSONObject().put("type", type).put("amount", amount);
