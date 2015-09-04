@@ -32,15 +32,18 @@ public class OperationInputConnector {
     private final String mName;
 
 
+
     // * * * F I E L D S * * * //
     /**
      * 활성화 플래그 : CONTROLLER 가 제어.
      */
     private boolean isEnabled = false;
 
+
+
     // * * * C O N S T R U C T O R S * * * //
     public OperationInputConnector(Context context, String name) {
-        mContextF = context.getApplicationContext();
+        mContextF = (context == null)? null : context.getApplicationContext();
         mName = name;
 
         GlobalApplication app = (mContextF instanceof GlobalApplication)? (GlobalApplication) mContextF : null;
@@ -48,8 +51,9 @@ public class OperationInputConnector {
             app.setInputConnector(this, name);
         }
 
-        mControlHandlerF = (app != null)? app.getControlHandler() : null;
+        mControlHandlerF = (app == null)? null : app.getControlHandler();
     }
+
 
 
     // * * * M E T H O D S * * * //
@@ -84,6 +88,10 @@ public class OperationInputConnector {
     /**
      * CONNECTOR 를 제어하기 위해 CONTROLLER 가 사용하는 메소드.
      * ( CONTROLLER 외 호출 금지 )
+     *
+     * @param app CONTROLLER에서 호출했음을 증명하기 위한 매개변수
+     * @param key 설정 기능에 대한 키
+     * @param value 설정 기능에 대한 값
      */
     public final void configureFromController(GlobalApplication app, int key, int value) {
         if (app == null)
@@ -95,6 +103,7 @@ public class OperationInputConnector {
                 break;
         }
     }
+
 
 
     // * * * G E T T E R S & S E T T E R S * * * //

@@ -33,19 +33,19 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     /**
      * 회전 계수 :
      */
-    public int turningAmount = 10;  // degree
+    protected int turningAmount = 10;  // degree
     /**
      * 이동 계수 :
      */
-    public int goingAmount = 1;    // meter
+    protected int goingAmount = 1;    // meter
     /**
      * 화면조정 계수 :
      */
-    public int zoomingAmount = 2;    // scale
+    protected int zoomingAmount = 2;    // scale
     /**
      * 포커싱 계수 :
      */
-    public int focusingAmount = 1;   // meter
+    protected int focusingAmount = 1;   // meter
 
     /**
      * 입력 검출 필터
@@ -149,15 +149,145 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *          {@link IOperationInputFilter}가 등록되지 않았을 경우
      */
     public final synchronized boolean detect(InputUnit unit) {
-        boolean detected =
-                (isKeyPressed(unit) > Operation.NONE) ||
-                        isSelecting(unit) || isCanceling(unit) ||
-                        (isGoingTo(unit) > Direction.NONE) ||
-                        (isZoomingTo(unit) > Direction.NONE) ||
-                        (isTurningTo(unit) > Direction.NONE) ||
-                        (isFocusingTo(unit) > Direction.NONE) ||
-                        (isSpecialOperation(unit) > Operation.NONE);
+        // 통계적 관점에서 파악한 후, 기본적인 우선순위를 정한다.
+        int[] priority = {
+                Operation.KEY_HOME, // 하드웨어 키 명령 대표
+                Operation.SELECT,
+                Operation.CANCEL,
+                Operation.GO,
+                Operation.TURN,
+                Operation.FOCUS,
+                Operation.ZOOM,
+                Operation.DEEP  // (3) 특수 명령 대표
+        };
 
+        return detect(unit, priority);
+    }
+
+    /**
+     * 예상되는 Operation 들의 bit 코드를 우선적으로 판별한다.
+     * 판별하지 못했을 경우, 수행되지 않았던 나머지 Operation 을 순차적으로 판별하여,
+     * 전달받은 입력 데이터에서 명령을 검출한다.
+     *
+     * @param unit 입력
+     * @param expected 예상 Operations (OR 중첩 가능)
+     * @return
+     */
+    public final synchronized boolean detect(InputUnit unit, int expected) {
+        int rest = ((Operation.TERMINATE << 2) -1) ^ expected;
+        boolean result = distinguishExpectedFirst(unit, expected) | distinguishExpectedFirst(unit, rest);
+
+        onDetected();
+        return result;
+    }
+
+    /**
+     * Operation 을 판별할 우선 순위 배열을 작성하여
+     * 전달받은 입력 데이터에서 명령을 검출한다.
+     * (※ 우선순위 배열에 추가된 Operation 에 한하여 판별작업을 수행한다.)
+     *
+     * @param unit 입력
+     * @param priority 우선순위 배열
+     * @return
+     */
+    public final synchronized boolean detect(InputUnit unit, int[] priority) {
+        boolean result = false;
+        for(int operation : priority) {
+            if (result = distinguishOnce(unit, operation))
+                break;
+        }
+
+        onDetected();
+        return result;
+    }
+
+    /**
+     * 예상되는 Operation 들을 우선적으로 판별한다.
+     *
+     * @param unit 입력
+     * @param expected 예상 Operations (OR 중첩 가능)
+     * @return
+     */
+    private final synchronized  boolean distinguishExpectedFirst(InputUnit unit, int expected) {
+        for(int picker = 1; picker <= expected; picker = picker << 1) {
+            if ((expected & picker) > 0) {
+                if (distinguishOnce(unit, picker))
+                    return true;
+
+                // 이하 Operation 들은 한 번의 메소드 호출로 판별되기 때문에,
+                // 다음 단계로 점프하도록 한다.
+                switch (picker) {
+                    case Operation.KEY_HOME:
+                    case Operation.KEY_MENU:
+                    case Operation.KEY_VOLUME_UP:
+                    case Operation.KEY_VOLUME_DOWN:
+                        picker = Operation.KEY_VOLUME_DOWN;
+                        break;
+
+                    case Operation.DEEP:
+                    case Operation.SEARCH:
+                    case Operation.CONFIG:
+                    case Operation.TERMINATE:
+                        picker = Operation.TERMINATE;
+                        break;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 대상이 되는 하나의 Operation 에 대해 판별작업을 수행한다.
+     *
+     * @param unit 입력
+     * @param checkOperation 대상 Operation
+     * @return
+     */
+    private final synchronized  boolean distinguishOnce(InputUnit unit, int checkOperation) {
+        switch(checkOperation) {
+            case Operation.SELECT:
+                return isSelecting(unit);
+
+            case Operation.CANCEL:
+                return isCanceling(unit);
+
+            case Operation.GO:
+                return isGoingTo(unit) > Direction.NONE;
+
+            case Operation.TURN:
+                return isTurningTo(unit) > Direction.NONE;
+
+            case Operation.FOCUS:
+                return isFocusingTo(unit) > Direction.NONE;
+
+            case Operation.ZOOM:
+                return isZoomingTo(unit) > Direction.NONE;
+
+            // Operation.KEY_OK:
+            // Operation.KEY_BACK :
+            case Operation.KEY_HOME:
+            case Operation.KEY_MENU:
+            case Operation.KEY_VOLUME_DOWN:
+            case Operation.KEY_VOLUME_UP:
+                return isKeyPressed(unit) > Operation.NONE;
+
+            case Operation.DEEP:
+            case Operation.SEARCH:
+            case Operation.CONFIG:
+            case Operation.TERMINATE:
+                return isSpecialOperation(unit) > Operation.NONE;
+        }
+
+        return false;
+    }
+
+    /**
+     * 명령을 검출한 이후, 수행할 기능을 정의한다.
+     * 일괄 작업이 설정되어있을 경우 검출한 데이터를 {@link #mOperationBatchQueue}에 추가하고,
+     * 그렇지 않을 경우 즉시 연결된 {@link OperationInputConnector}를 통해 데이터를 전송한다.
+     * 이때, Connector 가 연결되어 있지 않을 경우, 검출된 명령은 사라진다.
+     */
+    private void onDetected() {
         if (mDetectedCommand != null) {
             if (isBatchProcessing)
                 mOperationBatchQueue.push(mDetectedCommand);
@@ -167,21 +297,6 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
 
             mDetectedCommand = null;
         }
-
-        return detected;
-    }
-
-    /**
-     * 호출될 것으로 예상되는 Operation 을 가장 먼저 감지한다.
-     * 감지하지 못했을 경우, {@link #detect(Object)} 메소드를 수행한다.
-     *
-     * @param unit 입력
-     * @param expectedOperation 예상 Operation
-     * @return
-     */
-    public final synchronized boolean detect(InputUnit unit, int expectedOperation) {
-
-        return detect(unit);
     }
 
     /**
@@ -321,7 +436,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      */
     @Override
     public int isKeyPressed(InputUnit inputUnit) {
-        int operation = mInputFilter.isSpecialOperation(inputUnit);
+        int operation = mInputFilter.isKeyPressed(inputUnit);
         if (operation < Operation.GO) {
             mDetectedCommand = new int[]{
                     operation,

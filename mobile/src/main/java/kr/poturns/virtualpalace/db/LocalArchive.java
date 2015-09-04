@@ -46,7 +46,7 @@ public class LocalArchive  {
     public static final String LOG_DIR = BASE_DIR + File.pathSeparator + "Logs";
     /**
      * 내부저장소 : 다운로드 디렉토리
-     *      /sdcard/ VirtualPalace/ Downloads
+     *      /data/data/kr.poturns.virtualpalace/ VirtualPalace/ Downloads
      */
     public static final String DOWNLOAD_DIR = BASE_DIR + File.pathSeparator + "Downloads";
 
@@ -73,14 +73,11 @@ public class LocalArchive  {
 
     // * * * M E T H O D S * * * //
     private void ready() {
-        File baseDir = new File(Environment.getExternalStorageDirectory(), BASE_DIR);
-        baseDir.mkdir();
-
         File logDir = new File(Environment.getExternalStorageDirectory(), LOG_DIR);
-        logDir.mkdir();
+        logDir.mkdirs();
 
         File downloadDir = new File (Environment.getDataDirectory(), DOWNLOAD_DIR);
-        downloadDir.mkdir();
+        downloadDir.mkdirs();
     }
 
     public synchronized void appendLog(LogShard logShard) {
