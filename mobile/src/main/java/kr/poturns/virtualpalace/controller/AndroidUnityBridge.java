@@ -15,8 +15,19 @@ import static kr.poturns.virtualpalace.input.IControllerCommands.REQUEST_MESSAGE
 /**
  * <b> ANDROID - UNITY 간 통신 클래스 </b>
  *
- * @author Myungjin.Kim
- * @author Yeonho.Kim
+ *  * Unity -> Android 콜백 요청시,
+ *   1. [Unity] AndroidUnityBridge의 requestCallbackToAndroid (jsonMessage, callback) 호출.
+ *   2. [Android] 요청한 작업 처리 후, respondCallbackToUnity (id, jsonResult) 호출.
+ *   3. [Android] AndroidUnityBridge에서 Unity가 요청한 callback 메소드 실행 및 jsonResult 전달.
+ *   4. [Unity] jsonResult 받음.
+ *
+ *  * Android -> Unity 콜백 요청시,
+ *   1. [Android] AndroidUnityBridge의 reqeustCallbackToUnity (jsonMessage, callback) 호출.
+ *   2. [Unity] 요청한 작업 처리 후, AndroidUnityBridge의 respondCallbackToAndroid (id, jsonResult) 호출.
+ *   3. [Unity] id에 해당하는 callback 메소드 실행 및 jsonResult 전달.
+ *
+ *  @author Myungjin.Kim
+ *  @author Yeonho.Kim
  */
 public final class AndroidUnityBridge {
 
@@ -33,7 +44,6 @@ public final class AndroidUnityBridge {
     // * * * C O N S T A N T S * * * //
     public static final String BUNDLE_KEY_ID = "id";
     public static final String BUNDLE_KEY_MESSAGE_JSON = "json";
-
 
     private final Object LOCK = new Object();
     private final PalaceMaster mMasterF;

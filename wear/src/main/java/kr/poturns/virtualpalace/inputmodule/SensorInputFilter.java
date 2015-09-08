@@ -5,18 +5,18 @@ import kr.poturns.virtualpalace.inputcollector.SensorMovementData;
 
 /**
  * Created by Myungjin Kim on 2015-08-03.
- * <p>
+ * <p/>
  * 센서 입력을 처리하는 InputFilter
  */
 public class SensorInputFilter implements IOperationInputFilter<SensorMovementData> {
     @Override
     public int isGoingTo(SensorMovementData sensorMovementData) {
-        return checkDataDirection(sensorMovementData);
+        return 0;
     }
 
     @Override
     public int isTurningTo(SensorMovementData sensorMovementData) {
-        return checkDataDirection(sensorMovementData);
+        return 0;
     }
 
     @Override
@@ -34,6 +34,21 @@ public class SensorInputFilter implements IOperationInputFilter<SensorMovementDa
         return false;
     }
 
+    @Override
+    public boolean isCanceling(SensorMovementData sensorMovementData) {
+        return false;
+    }
+
+    @Override
+    public int isKeyPressed(SensorMovementData sensorMovementData) {
+        return 0;
+    }
+
+    @Override
+    public int isSpecialOperation(SensorMovementData sensorMovementData) {
+        return 0;
+    }
+    
     private static int checkDataDirection(SensorMovementData in) {
         float max = in.x > in.y ? (in.x > in.z ? in.x : in.z) : (in.y > in.z ? in.y : in.z);
 
@@ -48,5 +63,4 @@ public class SensorInputFilter implements IOperationInputFilter<SensorMovementDa
             else return DIRECTION_3D_DOWNWARD;
         }
     }
-
 }
