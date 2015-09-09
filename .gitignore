@@ -1,10 +1,38 @@
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-/captures
+# built application files
+*.apk
+*.ap_
 
-.idea/checkstyle-idea.xml
-.idea/findbugs-idea.xml
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# Gradle files
+.gradle
+
+# generated files
+bin/
+libs/libray/bin/
+gen/
+libs/library/gen/
+build/
+
+# Local configuration file (sdk path, etc)
+project.properties
+local.properties
+*.DS_Store
+
+# IDE
+
+## eclipse
+*.metadata
+*.settings
+
+## idea
+*.idea
+*.iml
+*/target
+
+## unity script
+*.meta

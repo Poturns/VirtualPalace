@@ -9,7 +9,7 @@ import java.util.TimerTask;
  * <p>
  * {@link IOperationInputFilter}를 통해서 INPUT 데이터로부터 명령 메시지를 추출한다.
  * {@link OperationInputConnector}를 등록하여, 추출한 명령 메시지를 전송한다.
- *
+ * <p/>
  * 명령 계수를 수정하여 각 INPUT DETECTOR 마다 명령수행 수치를 변경할 수 있다.
  * 기본적으로 검출된 데이터를 일정 주기 간격으로 일괄 처리한다.
  * </p>
@@ -130,7 +130,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      * @return
      */
     public synchronized boolean flushOperationQueue() {
-        boolean able = ! (mConnector == null || mOperationBatchQueue.isEmpty());
+        boolean able = !(mConnector == null || mOperationBatchQueue.isEmpty());
         if (able) {
             int[][] operations = new int[mOperationBatchQueue.size()][];
             mOperationBatchQueue.toArray(operations);
@@ -291,8 +291,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
         if (mDetectedCommand != null) {
             if (isBatchProcessing)
                 mOperationBatchQueue.push(mDetectedCommand);
-            else
-            if (mConnector != null)
+            else if (mConnector != null)
                 mConnector.transferDataset(mDetectedCommand);
 
             mDetectedCommand = null;

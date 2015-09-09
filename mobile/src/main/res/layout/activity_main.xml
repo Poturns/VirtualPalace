@@ -145,4 +145,8 @@
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/imageView"/>
 
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/content"></FrameLayout>
 </RelativeLayout>

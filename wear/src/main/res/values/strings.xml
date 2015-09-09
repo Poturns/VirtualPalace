@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">VirtualPalace</string>
-    <string name="title_activity_main">MainActivity</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="icon_text_normal_input">일반 입력</string>
+    <string name="icon_text_special_input">특별 입력</string>
+    <string name="icon_text_streaming_input">터치 제어</string>
+    <string name="icon_text_etc">기타</string>
+    <string name="icon_text_exit">종료</string>
 </resources>

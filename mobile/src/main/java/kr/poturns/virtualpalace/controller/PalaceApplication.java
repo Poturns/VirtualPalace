@@ -67,6 +67,7 @@ public class PalaceApplication extends GlobalApplication {
     // * * * I N H E R I T S * * * //
     @Override
     public Handler getControlHandler() {
+        //FIXME infinite loop
         PalaceMaster master = PalaceMaster.getInstance(this);
         if (master != null)
             return master.getInputHandler();
@@ -79,6 +80,7 @@ public class PalaceApplication extends GlobalApplication {
         if (name == null)
             return;
 
+        //FIXME infinite loop
         PalaceMaster master = PalaceMaster.getInstance(this);
         if (master != null)
             master.addInputConnector(connector, name);

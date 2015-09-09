@@ -2,25 +2,28 @@ package kr.poturns.virtualpalace;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.view.MotionEvent;
 
+import kr.poturns.virtualpalace.inputcollector.GestureInputCollector;
+import kr.poturns.virtualpalace.inputcollector.SensorInputCollector;
+import kr.poturns.virtualpalace.inputcollector.SensorMovementData;
+import kr.poturns.virtualpalace.inputmodule.GestureInputFilter;
+import kr.poturns.virtualpalace.inputmodule.SensorInputFilter;
 import kr.poturns.virtualpalace.inputmodule.WearInputConnector;
 import kr.poturns.virtualpalace.inputmodule.WearableInputDetector;
-import kr.poturns.virtualpalace.inputprocessor.GestureData;
-import kr.poturns.virtualpalace.inputprocessor.GestureInputProcessor;
-import kr.poturns.virtualpalace.inputprocessor.SensorInputProcessor;
-import kr.poturns.virtualpalace.inputprocessor.SensorMovementData;
 
 
 public class WearableMainActivity extends Activity {
-    private WearableInputDetector<GestureData> gestureInputDetector;
-    private GestureInputProcessor gestureInputProcessor;
+    //private WearableInputDetector<MotionData> motionInputDetector;
+   // private MotionInputCollector motionInputCollector;
 
     private WearableInputDetector<SensorMovementData> sensorInputDetector;
-    private SensorInputProcessor sensorInputProcessor;
+    private SensorInputCollector sensorInputCollector;
+
+    private WearableInputDetector<String> gestureInputDetector;
+    private GestureInputCollector gestureInputCollector;
 
     private WearInputConnector wearInputConnector;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,45 +31,102 @@ public class WearableMainActivity extends Activity {
 
         wearInputConnector = new WearInputConnector(this);
 
-        initGestureInputDetector();
+        //initMotionInputDetector();
         initSensorInputDetector();
+        initGestureInputDetector();
 
+        getFragmentManager().beginTransaction()
+                .replace(R.id.content, new MainFragment())
+                .commit();
     }
 
-    private void initGestureInputDetector(){
-        gestureInputProcessor = new GestureInputProcessor(this);
-        gestureInputDetector = new WearableInputDetector<>();
-        gestureInputDetector.setInputProcessor(gestureInputProcessor);
-        gestureInputDetector.setOperationInputConnector(wearInputConnector);
-
+    /*
+    private void initMotionInputDetector() {
+        motionInputCollector = new MotionInputCollector(this);
+        motionInputDetector = new WearableInputDetector<>(new MotionInputFilter(), motionInputCollector);
+        motionInputDetector.setOperationInputConnector(wearInputConnector);
     }
+    */
 
-    private void initSensorInputDetector(){
-        sensorInputProcessor = new SensorInputProcessor(this);
-        sensorInputDetector = new WearableInputDetector<>();
-        sensorInputDetector.setInputProcessor(sensorInputProcessor);
+    private void initSensorInputDetector() {
+        sensorInputCollector = new SensorInputCollector(this);
+        sensorInputDetector = new WearableInputDetector<>(new SensorInputFilter(), sensorInputCollector);
         sensorInputDetector.setOperationInputConnector(wearInputConnector);
     }
 
+    private void initGestureInputDetector() {
+        gestureInputCollector = new GestureInputCollector(this);
+        gestureInputDetector = new WearableInputDetector<>(new GestureInputFilter(), gestureInputCollector);
+    }
+
+
     @Override
-    public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
-        return gestureInputProcessor.onTouchEvent(ev) && super.dispatchTouchEvent(ev);
+    protected void onResume() {
+        super.onResume();
+        wearInputConnector.connect();
     }
 
-    public WearableInputDetector<GestureData> getGestureInputDetector() {
-        return gestureInputDetector;
+    @Override
+    protected void onPause() {
+        super.onPause();
+        wearInputConnector.disconnect();
     }
 
-    public GestureInputProcessor getGestureInputProcessor() {
-        return gestureInputProcessor;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        wearInputConnector.destroy();
     }
 
+    /*
+    /**
+     * GestureInputDetector 를 얻는다.
+
+    public WearableInputDetector<MotionData> getMotionInputDetector() {
+        return motionInputDetector;
+    }
+
+    /**
+     * MotionInputCollector 를 얻는다.
+
+    public MotionInputCollector getMotionInputCollector() {
+        return motionInputCollector;
+    }
+     */
+
+    /**
+     * SensorInputDetector 를 얻는다.
+     */
     public WearableInputDetector<SensorMovementData> getSensorInputDetector() {
         return sensorInputDetector;
     }
 
-    public SensorInputProcessor getSensorInputProcessor() {
-        return sensorInputProcessor;
+    /**
+     * SensorInputCollector 를 얻는다.
+     */
+    public SensorInputCollector getSensorInputCollector() {
+        return sensorInputCollector;
     }
+
+    /**
+     *  GestureInputCollector 를 얻는다.
+     */
+    public GestureInputCollector getGestureInputCollector() {
+        return gestureInputCollector;
+    }
+    /**
+     * GestureInputDetector 를 얻는다.
+     */
+    public WearableInputDetector<String> getGestureInputDetector() {
+        return gestureInputDetector;
+    }
+
+    /**
+     * WearInputConnector 를 얻는다.
+     */
+    public WearInputConnector getWearInputConnector() {
+        return wearInputConnector;
+    }
+
 
 }

@@ -3,11 +3,8 @@ package kr.poturns.virtualpalace.sensor;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
-import android.os.Build;
-import android.util.Log;
 
 /**
  * <b> 자이로 센서 AGENT </b>

@@ -1,7 +1,6 @@
 package kr.poturns.virtualpalace.communication;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
@@ -20,38 +19,53 @@ import java.util.Set;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p/>
+ * <p>
  * Wearable Device 와 Mobile Device 간 통신을 도와주는 클래스
  */
 public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
     private static final String TAG = "WearableCommunicator";
-    //public static final String SEND_DATA_CAPABILITY_NAME = "send_data";
-    //public static final String SEND_DATA_MESSAGE_PATH = "/send_data";
+    //public static final String CAPABILITY_NAME_SEND_DATA = "send_data";
+    /**
+     * 일반적으로 데이터를 전송할 때 사용하는 path
+     */
+    public static final String MESSAGE_PATH_SEND_DATA = "/send_data";
 
     private GoogleApiClient mGoogleApiClient;
-    private MessageApi.MessageListener messageListener;
+    private MessageApi.MessageListener mMessageListener;
 
+    /**
+     * 모듈의 전송 방식들.
+     *
+     * @see kr.poturns.virtualpalace.communication.R.array#android_wear_capabilities
+     */
     private final String[] CAPABILITY_NAMES;
-    private final ArrayMap<String, String> NODE_ID_MAP;
+    /**
+     * 연결된 노드의 ID map , key는 capability path이다.
+     */
+    private final Map<String, String> NODE_ID_MAP;
     private final Context context;
 
     public WearableCommunicator(Context context) {
         this.context = context;
 
         CAPABILITY_NAMES = context.getResources().getStringArray(R.array.android_wear_capabilities);
-        //ResourcesUtils.get(context, "android_wear_capabilities", "kr.poturns.util");
         NODE_ID_MAP = new ArrayMap<String, String>(CAPABILITY_NAMES.length);
 
         initGoogleApiClient();
 
     }
 
-
+    /**
+     * 연결된 디바이스에서 전송된 메시지를 수신할 {@link com.google.android.gms.wearable.MessageApi.MessageListener}를 등록한다.
+     *
+     * @param messageListener 메시지를 수신할 messageListener
+     */
     public void setMessageListener(MessageApi.MessageListener messageListener) {
-        this.messageListener = messageListener;
 
         if (mGoogleApiClient != null && messageListener != null)
-            Wearable.MessageApi.removeListener(mGoogleApiClient, messageListener);
+            Wearable.MessageApi.removeListener(mGoogleApiClient, this.mMessageListener);
+
+        this.mMessageListener = messageListener;
 
         if (isConnected())
             Wearable.MessageApi.addListener(mGoogleApiClient, messageListener);
@@ -74,7 +88,7 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      */
     public final void disconnect() {
         if (mGoogleApiClient != null) {
-            Wearable.MessageApi.removeListener(mGoogleApiClient, messageListener);
+            Wearable.MessageApi.removeListener(mGoogleApiClient, mMessageListener);
             mGoogleApiClient.disconnect();
         }
     }
@@ -84,6 +98,7 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      */
     public final void destroy() {
         if (mGoogleApiClient != null) {
+            Wearable.MessageApi.removeListener(mGoogleApiClient, mMessageListener);
             mGoogleApiClient.unregisterConnectionCallbacks(this);
             mGoogleApiClient.unregisterConnectionFailedListener(this);
             mGoogleApiClient.disconnect();
@@ -119,8 +134,8 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     public final void onConnected(Bundle connectionHint) {
         Log.d(TAG, "onConnected: " + connectionHint);
 
-        if (messageListener != null)
-            Wearable.MessageApi.addListener(mGoogleApiClient, messageListener);
+        if (mMessageListener != null)
+            Wearable.MessageApi.addListener(mGoogleApiClient, mMessageListener);
 
         setupCapability();
     }
@@ -140,15 +155,20 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      * GoogleApiClient 에서 연결 가능한 노드를 설정한다.
      */
     private void setupCapability() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                CapabilityApi.GetAllCapabilitiesResult result = Wearable.CapabilityApi.getAllCapabilities(mGoogleApiClient, CapabilityApi.FILTER_REACHABLE).await();
-
-                updateCapability(result.getAllCapabilities());
-            }
-        });
+        Wearable.CapabilityApi
+                .getAllCapabilities(mGoogleApiClient, CapabilityApi.FILTER_REACHABLE)
+                .setResultCallback(mCapabilityResultCallback);
     }
+
+    private final ResultCallback<CapabilityApi.GetAllCapabilitiesResult> mCapabilityResultCallback = new ResultCallback<CapabilityApi.GetAllCapabilitiesResult>() {
+        @Override
+        public void onResult(CapabilityApi.GetAllCapabilitiesResult allCapabilitiesResult) {
+            if (allCapabilitiesResult.getStatus().isSuccess())
+                updateCapability(allCapabilitiesResult.getAllCapabilities());
+            else
+                Log.e(TAG, "Wearable.CapabilityApi.getAllCapabilities() : failed.");
+        }
+    };
 
     /**
      * GoogleApiClient 에서 연결 가능한 노드 정보를 업데이트 한다.
@@ -182,12 +202,13 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     }
 
     /**
+     * {@link #MESSAGE_PATH_SEND_DATA} path를 이용하여
      * 상대 Device 에 메시지를 보낸다.
      *
      * @param message 보낼 메시지
      */
-    public final boolean sendMessage(String message) {
-        return sendMessage(NODE_ID_MAP.get(NODE_ID_MAP.keyAt(0)), message);
+    public final void sendMessage(String message) {
+        sendMessage(MESSAGE_PATH_SEND_DATA, message);
     }
 
     /**
@@ -196,8 +217,28 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      * @param path    메시지를 보낼 노드 path
      * @param message 보낼 메시지
      */
-    public final boolean sendMessage(String path, String message) {
-        return sendMessage(NODE_ID_MAP.get(path), path, message);
+    public final void sendMessage(String path, String message) {
+        sendMessage(NODE_ID_MAP.get(path), path, message.getBytes());
+    }
+
+    /**
+     * {@link #MESSAGE_PATH_SEND_DATA} path를 이용하여
+     * 상대 Device 에 메시지를 보낸다.
+     *
+     * @param message 보낼 메시지
+     */
+    public final void sendMessage(byte[] message) {
+        sendMessage(MESSAGE_PATH_SEND_DATA, message);
+    }
+
+    /**
+     * 상대 Device 에 메시지를 보낸다.
+     *
+     * @param path    메시지를 보낼 노드 path
+     * @param message 보낼 메시지
+     */
+    public final void sendMessage(String path, byte[] message) {
+        sendMessage(NODE_ID_MAP.get(path), path, message);
     }
 
 
@@ -208,24 +249,12 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
      * @param path    메시지를 보낼 노드 path
      * @param message 보낼 메시지
      */
-    private boolean sendMessage(final String nodeId, final String path, final String message) {
+    private void sendMessage(final String nodeId, final String path, final byte[] message) {
         if (nodeId != null) {
-            AsyncTask.execute(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            Wearable.MessageApi
-                                    .sendMessage(mGoogleApiClient, nodeId, path, message.getBytes())
-                                    .setResultCallback(WearableCommunicator.this);
-                        }
-                    }
-            );
-
-            return true;
-
-        } else
-            return false;
-
+            Wearable.MessageApi
+                    .sendMessage(mGoogleApiClient, nodeId, path, message)
+                    .setResultCallback(this);
+        }
     }
 
     @Override

@@ -63,7 +63,7 @@ public class OperationInputConnector {
      * @param inputRst
      * @return
      */
-    boolean transferDataset(int[] inputRst) {
+    protected boolean transferDataset(int[] inputRst) {
         if (mControlHandlerF == null || !isEnabled)
             return false;
 
@@ -77,7 +77,7 @@ public class OperationInputConnector {
      * @param inputRstArray
      * @return
      */
-    boolean transferDataset(int[][] inputRstArray) {
+    protected boolean transferDataset(int[][] inputRstArray) {
         if (mControlHandlerF == null || !isEnabled)
             return false;
 
