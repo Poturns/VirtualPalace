@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import kr.poturns.virtualpalace.communication.WearMessageObject;
 import kr.poturns.virtualpalace.communication.WearableCommunicator;
+import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 
 /**
@@ -23,7 +24,7 @@ public class WearInputConnector extends OperationInputConnector implements Messa
     private WearableCommunicator mWearableCommunicator;
 
     public WearInputConnector(Context context) {
-        super(context, TAG);
+        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_WATCH);
         mWearableCommunicator = new WearableCommunicator(context);
         mWearableCommunicator.setMessageListener(this);
     }

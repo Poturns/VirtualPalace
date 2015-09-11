@@ -12,5 +12,5 @@ public abstract class GlobalApplication extends Application {
 
     public abstract Handler getControlHandler();
 
-    public abstract void setInputConnector(OperationInputConnector connector, String name);
+    public abstract void setInputConnector(int supportType, OperationInputConnector connector);
 }

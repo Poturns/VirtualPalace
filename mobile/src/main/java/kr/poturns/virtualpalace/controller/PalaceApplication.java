@@ -76,14 +76,14 @@ public class PalaceApplication extends GlobalApplication {
     }
 
     @Override
-    public void setInputConnector(OperationInputConnector connector, String name) {
-        if (name == null)
+    public void setInputConnector(int supportType, OperationInputConnector connector) {
+        if (supportType > 0)
             return;
 
         //FIXME infinite loop
         PalaceMaster master = PalaceMaster.getInstance(this);
         if (master != null)
-            master.addInputConnector(connector, name);
+            master.attachInputConnector(supportType, connector);
     }
 
 

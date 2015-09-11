@@ -4,7 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 
-import kr.poturns.virtualpalace.db.LocalArchive;
+import kr.poturns.virtualpalace.data.LocalArchive;
 
 /**
  * Created by YeonhoKim on 2015-07-20.

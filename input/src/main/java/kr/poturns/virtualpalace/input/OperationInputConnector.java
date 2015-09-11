@@ -29,7 +29,7 @@ public class OperationInputConnector {
     /**
      * CONNECTOR 명칭
      */
-    private final String mName;
+    private final int mSupportTypeF;
 
 
 
@@ -42,13 +42,13 @@ public class OperationInputConnector {
 
 
     // * * * C O N S T R U C T O R S * * * //
-    public OperationInputConnector(Context context, String name) {
+    public OperationInputConnector(Context context, int supportType) {
         mContextF = (context == null)? null : context.getApplicationContext();
-        mName = name;
+        mSupportTypeF = supportType;
 
         GlobalApplication app = (mContextF instanceof GlobalApplication)? (GlobalApplication) mContextF : null;
         if (app != null) {
-            app.setInputConnector(this, name);
+            app.setInputConnector(supportType, this);
         }
 
         mControlHandlerF = (app == null)? null : app.getControlHandler();
@@ -67,7 +67,7 @@ public class OperationInputConnector {
         if (mControlHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControlHandlerF, IControllerCommands.INPUT_SINGLE_COMMAND, inputRst).sendToTarget();
+        Message.obtain(mControlHandlerF, IControllerCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
         return true;
     }
 
@@ -81,7 +81,7 @@ public class OperationInputConnector {
         if (mControlHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControlHandlerF, IControllerCommands.INPUT_MULTI_COMMANDS, inputRstArray).sendToTarget();
+        Message.obtain(mControlHandlerF, IControllerCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
         return true;
     }
 
@@ -107,7 +107,7 @@ public class OperationInputConnector {
 
 
     // * * * G E T T E R S & S E T T E R S * * * //
-    public String getName() {
-        return mName;
+    public int getSupportType() {
+        return mSupportTypeF;
     }
 }

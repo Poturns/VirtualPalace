@@ -196,7 +196,7 @@ public class OperationInputDetectorTest extends AndroidTestCase {
         }
     });
 
-    OperationInputConnector mConnector = new OperationInputConnector(getContext(), "WordInputTest") {
+    OperationInputConnector mConnector = new OperationInputConnector(getContext(), IControllerCommands.TYPE_INPUT_SUPPORT_VOICE) {
 
         /**
          * 단일 명령 메시지를 전송한다.
@@ -205,13 +205,13 @@ public class OperationInputDetectorTest extends AndroidTestCase {
          * @return
          */
         @Override
-        boolean transferDataset(int[] inputRst) {
+        protected boolean transferDataset(int[] inputRst) {
             Log.d("InputDetectorTest", "Operation: " + inputRst[0] + " / Value1 (Direction) : " + inputRst[1] + " / Value2 (Amount) : " + inputRst[2]);
             return true;
         }
 
         @Override
-        boolean transferDataset(int[][] inputRstArray) {
+        protected boolean transferDataset(int[][] inputRstArray) {
             for(int[] inputRst : inputRstArray)
                 Log.d("InputDetectorTest", "Operation: " + inputRst[0] + " / Value1 (Direction) : " + inputRst[1] + " / Value2 (Amount) : " + inputRst[2]);
 

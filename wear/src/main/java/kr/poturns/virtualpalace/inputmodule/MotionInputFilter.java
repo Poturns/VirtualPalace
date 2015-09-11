@@ -36,20 +36,52 @@ public class MotionInputFilter implements IOperationInputFilter<MotionData> {
 
     private static int checkGestureDataDirection2D(MotionData in) {
         if (!in.isTypeOf(MotionData.TYPE_FLING))
-            return DIRECTION_NONE;
+            return Direction.NONE;
 
         switch (in.type) {
             case MotionData.TYPE_FLING_TOWARD_RIGHT:
-                return DIRECTION_EAST;
+                return Direction.EAST;
             case MotionData.TYPE_FLING_TOWARD_LEFT:
-                return DIRECTION_WEST;
+                return Direction.WEST;
             case MotionData.TYPE_FLING_TOWARD_DOWN:
-                return DIRECTION_SOUTH;
+                return Direction.SOUTH;
             case MotionData.TYPE_FLING_TOWARD_UP:
-                return DIRECTION_NORTH;
+                return Direction.NORTH;
             default:
-                return DIRECTION_NONE;
+                return Direction.NONE;
         }
     }
 
+    /**
+     * 취소 이벤트를 발생한다.
+     *
+     * @param motionData 입력
+     * @return 취소 이벤트의 발생 여부
+     */
+    @Override
+    public boolean isCanceling(MotionData motionData) {
+        return false;
+    }
+
+    /**
+     * Return 에 해당하는 특수 기능 코드를 반환한다.
+     *
+     * @param motionData 입력
+     * @return {#Operation} 내 KEY.. OPERATIONS.
+     */
+    @Override
+    public int isKeyPressed(MotionData motionData) {
+        return 0;
+    }
+
+    /**
+     * Return 에 해당하는 특수 기능 코드를 반환한다.
+     *
+     * @param motionData 입력
+     * @return 특수 기능 코드
+     */
+    @Override
+    public int isSpecialOperation(MotionData motionData) {
+        return 0;
+    }
 }

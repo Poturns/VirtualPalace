@@ -52,15 +52,15 @@ public class GestureInputFilter implements IOperationInputFilter<String> {
     private int detectDirection(String s) {
         switch (s) {
             case DIRECTION_UP_TO_DOWN:
-                return DIRECTION_SOUTH;
+                return Direction.SOUTH;
             case DIRECTION_DOWN_TO_UP:
-                return DIRECTION_NORTH;
+                return Direction.NORTH;
             case DIRECTION_RIGHT_TO_LEFT:
-                return DIRECTION_WEST;
+                return Direction.WEST;
             case DIRECTION_LEFT_TO_RIGHT:
-                return DIRECTION_EAST;
+                return Direction.EAST;
             default:
-                return DIRECTION_NONE;
+                return Direction.NONE;
         }
     }
 
@@ -82,22 +82,22 @@ public class GestureInputFilter implements IOperationInputFilter<String> {
             case SPECIAL_OP_SEARCH:
                 return 0;
             default:
-                return OPERATION_NONE;
+                return Operation.NONE;
         }
     }
 
     @Override
-    public boolean isCanceling(GestureData gestureData) {
+    public boolean isCanceling(String gestureData) {
         return false;
     }
 
     @Override
-    public int isKeyPressed(GestureData gestureData) {
+    public int isKeyPressed(String gestureData) {
         return 0;
     }
 
     @Override
-    public int isSpecialOperation(GestureData gestureData) {
+    public int isSpecialOperation(String gestureData) {
         return 0;
     }
 
