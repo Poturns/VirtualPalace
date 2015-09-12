@@ -42,67 +42,101 @@ public interface IOperationInputFilter<InputUnit> {
         /**
          * 0차원 : NO- DIRECTION
          */
-        public static final int NONE = 0;  // 000 이지만, Java 에서 8진수로 인식하기에 앞 0 생략.
+        int NONE = 0;  // 000 이지만, Java 에서 8진수로 인식하기에 앞 0 생략.
         /**
          * N 차원 : 중앙
          */
-        public static final int CENTER = 5;
+        int CENTER = 5;
         /**
          * 1차원 : 오른쪽
          */
-        public static final int RIGHT = 7;  // 07 이지만, Java 에서 8진수로 인식하기에 앞 0 생략.
+        int RIGHT = 7;  // 07 이지만, Java 에서 8진수로 인식하기에 앞 0 생략.
         /**
          * 1차원 : 왼쪽
          */
-        public static final int LEFT = 3;  // 03 이지만, Java 에서 8진수로 인식하기에 앞 0 생략.
+        int LEFT = 3;  // 03 이지만, Java 에서 8진수로 인식하기에 앞 0 생략.
         /**
          * 1차원 : 위쪽
          */
-        public static final int UP = 70;
+        int UP = 70;
         /**
          * 1차원 : 아래쪽
          */
-        public static final int DOWN = 30;
+        int DOWN = 30;
         /**
          * 2차원 : 동쪽
          */
-        public static final int EAST = 57;
+        int EAST = 57;
         /**
          * 2차원 : 서쪽
          */
-        public static final int WEST = 53;
+        int WEST = 53;
         /**
          * 2차원 : 남쪽
          */
-        public static final int SOUTH = 35;
+        int SOUTH = 35;
         /**
          * 2차원 : 북쪽
          */
-        public static final int NORTH = 75;
+        int NORTH = 75;
         /**
          * 3차원 : 앞쪽
          */
-        public static final int FORWARD = 755;
+        int FORWARD = 755;
         /**
          * 3차원 : 뒷쪽
          */
-        public static final int BACKWARD = 355;
+        int BACKWARD = 355;
         /**
          * 3차원 : 하늘 방향
          */
-        public static final int UPWARD = 575;
+        int UPWARD = 575;
         /**
          * 3차원 : 땅 방향
          */
-        public static final int DOWNWARD = 535;
+        int DOWNWARD = 535;
         /**
          * 3차원 : 좌측 방향
          */
-        public static final int LEFTWARD = 553;
+        int LEFTWARD = 553;
         /**
          * 3차원 : 우측 방향
          */
-        public static final int RIGHTWARD = 557;
+        int RIGHTWARD = 557;
+
+        /**
+         * Direction | Amount, 분리 계수.
+         */
+        int SEPARATION = 1000;
+
+        /**
+         *
+         */
+        final class Helper {
+            /**
+             * 주어진 방향값에서 좌/우 만 구별한다.
+             *
+             * @param direction
+             * @return
+             */
+            static int isLeftOrRight(int direction) {
+                int axisX = direction % 10;
+                return (axisX == 0)? NONE :
+                        (axisX-5 < 0)? LEFT : RIGHT;
+            }
+
+            /**
+             * 주어진 방향값에서 위/아래 만 구별한다.
+             *
+             * @param direction
+             * @return
+             */
+            static int isUpOrDown(int direction) {
+                int axisX = (direction / 10) % 10;
+                return (axisX == 0)? NONE :
+                        (axisX-5 < 0)? DOWN : UP;
+            }
+        }
     }
 
 
@@ -112,77 +146,78 @@ public interface IOperationInputFilter<InputUnit> {
         /**
          * NO - OPERATION
          */
-        public static final int NONE = 0x0;
+        int NONE = 0x0;
         /**
          * OK/Confirm 키를 누른 효과를 나타낸다.
          */
-        public static final int KEY_OK = 0x1;
+        int KEY_OK = 0x1;
         /**
          * BACK 하드웨어 키를 누른 효과를 나타낸다.
          */
-        public static final int KEY_BACK = 0x2;
+        int KEY_BACK = 0x2;
         /**
          * MENU 하드웨어 키를 누른 효과를 나타낸다.
          */
-        public static final int KEY_MENU = 0x4;
+        int KEY_MENU = 0x4;
         /**
          * HOME 하드웨어 키를 누른 효과를 나타낸다.
          */
-        public static final int KEY_HOME = 0x8;
+        int KEY_HOME = 0x8;
         /**
          * VOL.UP 하드웨어 키를 누른 효과를 나타낸다.
          */
-        public static final int KEY_VOLUME_UP = 0x10;
+        int KEY_VOLUME_UP = 0x10;
         /**
          * VOL.DOWN 하드웨어 키를 누른 효과를 나타낸다.
          */
-        public static final int KEY_VOLUME_DOWN = 0x20;
+        int KEY_VOLUME_DOWN = 0x20;
 
         /**
          * (1) 결정 기능 : 선택한다.    >> OK / Confirm 하드웨어 키를 눌렀을 때와 동일.
          */
-        public static final int SELECT = 0x1;
+        int SELECT = 0x1;
         /**
          * (1) 결정 기능 : 취소한다.    >> BACK 하드웨어 키를 눌렀을 때와 동일.
          */
-        public static final int CANCEL = 0x2;
+        int CANCEL = 0x2;
         /**
          * (2) 기본 기능 : 전진한다.
          */
-        public static final int GO = 0x100;
+        int GO = 0x100;
         /**
          * (2) 기본 기능 : 회전한다.
          */
-        public static final int TURN = 0x200;
+        int TURN = 0x200;
         /**
          * (2) 기본 기능 : Focus 를 이동한다.
          */
-        public static final int FOCUS = 0x400;
+        int FOCUS = 0x400;
         /**
          * (2) 기본 기능 : 화면 확대/축소 전환을 한다.
          */
-        public static final int ZOOM = 0x800;
+        int ZOOM = 0x800;
         /**
          * (3) 특수 기능 : OPERATION : 숨겨진 기능을 수행한다. (LongClick, 오른쪽클릭 등의 효과)
          */
-        public static final int DEEP = 0x1000;
+        int DEEP = 0x1000;
         /**
          * (3) 특수 기능 : 검색한다.
          */
-        public static final int SEARCH = 0x2000;
+        int SEARCH = 0x2000;
         /**
          * (3) 특수 기능 : 설정/수정한다.
          */
-        public static final int CONFIG = 0x4000;
+        int CONFIG = 0x4000;
         /**
          * (3) 특수 기능 : 모드를 전환한다.
          */
-        public static final int SWITCH_MODE = 0x8000;
+        int SWITCH_MODE = 0x8000;
         /**
          * (3) 특수 기능 : 종료한다.
          */
-        public static final int TERMINATE = 0x10000;
+        int TERMINATE = 0x10000;
     }
+
 
 
 
