@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.data;
+package kr.poturns.virtualpalace.controller;
 
 
 import android.text.format.DateFormat;

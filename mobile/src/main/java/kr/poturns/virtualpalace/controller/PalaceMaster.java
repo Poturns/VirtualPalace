@@ -9,6 +9,8 @@ import android.view.KeyEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 
@@ -261,7 +263,7 @@ public class PalaceMaster extends PalaceCore {
      *
      * @author Yeonho.Kim
      */
-    private final class RequestHandler extends Handler implements IControllerCommands {
+    private final class RequestHandler extends Handler implements IControllerCommands, IControllerCommands.JsonKey {
 
         // TODO : THREAD 관리 및 처리.
 
@@ -269,7 +271,7 @@ public class PalaceMaster extends PalaceCore {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case REQUEST_MESSAGE_FROM_UNITY:
-                    process( (String) msg.obj );
+                    process((String) msg.obj);
                     break;
 
                 case REQUEST_CALLBACK_FROM_UNITY:
@@ -286,13 +288,64 @@ public class PalaceMaster extends PalaceCore {
 
         private JSONObject process(String jsonMessage) {
             JSONObject jsonResult = new JSONObject();
+            boolean result = false;
 
             try {
                 JSONObject message = new JSONObject(jsonMessage);
-                // TODO : 작업.
+                Iterator<String> keys = message.keys();
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+
+                    String table = null;
+                    if (key.endsWith("_AR"))
+                        table = LocalDatabaseCenter.TABLE_AUGMENTED;
+                    else if (key.endsWith("_VR"))
+                        table = LocalDatabaseCenter.TABLE_VIRTUAL;
+                    else if (key.endsWith("_RES"))
+                        table = LocalDatabaseCenter.TABLE_RESOURCE;
+
+
+                    switch (key) {
+                        case INSERT_AR:
+                        case INSERT_VR:
+                        case INSERT_RES:
+                            result = insertNewMetadata(message.getJSONObject(key), table);
+                            break;
+
+                        case UPDATE_AR:
+                        case UPDATE_VR:
+                        case UPDATE_RES:
+                            result = updateMetadata(message.getJSONObject(key), table);
+                            break;
+
+                        case DELETE_AR:
+                        case DELETE_VR:
+                        case DELETE_RES:
+                            result = deleteMetadata(message.getJSONObject(key), table);
+                            break;
+
+                        case SWITCH_PLAY_MODE:
+                            int mode = message.getInt(key);
+                            result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
+                            break;
+
+                        case ACTIVATE_INPUT:
+                            message.getInt(key);
+                            break;
+
+                        case DEACTIVATE_INPUT:
+                            message.getInt(key);
+                            break;
+                    }
+                }
+                jsonResult.put(RESULT, result? "success" : "fail");
 
             } catch (JSONException e){
+                try {
+                    jsonResult.put(RESULT, "error");
 
+                } catch (JSONException e2) { }
             }
 
             return jsonResult;

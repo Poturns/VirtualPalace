@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.data;
+package kr.poturns.virtualpalace.controller;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -61,6 +61,11 @@ public class LocalDatabaseCenter {
         public String getTableName() {
             return TABLE_RESOURCE;
         }
+
+        @Override
+        public boolean equalString(String str) {
+            return this.name().equalsIgnoreCase(str);
+        }
     }
 
     /**
@@ -84,6 +89,11 @@ public class LocalDatabaseCenter {
         public String getTableName() {
             return TABLE_VIRTUAL;
         }
+
+        @Override
+        public boolean equalString(String str) {
+            return this.name().equalsIgnoreCase(str);
+        }
     }
 
     /**
@@ -99,6 +109,11 @@ public class LocalDatabaseCenter {
         @Override
         public String getTableName() {
             return TABLE_AUGMENTED;
+        }
+
+        @Override
+        public boolean equalString(String str) {
+            return this.name().equalsIgnoreCase(str);
         }
     }
 
@@ -212,12 +227,44 @@ public class LocalDatabaseCenter {
      * @param id
      * @return JSON ARRAY
      */
-    public synchronized JSONArray queryObjectDetails(int id) {
-        JSONArray array = new JSONArray();
-
+    public JSONArray queryObjectDetailsById(int id) {
         Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
                 "SELECT * FROM resource WHERE _id = ?",
                 new String[]{ String.valueOf(id) });
+
+        return query(cursor);
+    }
+
+    /**
+     * 해당 name 값을 가진 Resource 데이터를 반환한다.
+     *
+     * @param name
+     * @return
+     */
+    public JSONArray queryObjectDetailsByName(String name) {
+        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
+                "SELECT * FROM resource WHERE name = ?",
+                new String[]{ name });
+
+        return query(cursor);
+    }
+
+    /**
+     * 해당 type 값을 갖는 Resource 데이터를 반환한다.
+     *
+     * @param type
+     * @return
+     */
+    public JSONArray queryObjectDetailsByType(String type) {
+        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
+                "SELECT * FROM resource WHERE type = ?",
+                new String[]{ type });
+
+        return query(cursor);
+    }
+
+    private JSONArray query(Cursor cursor) {
+        JSONArray array = new JSONArray();
 
         while(cursor.moveToNext()) {
             try {
@@ -255,7 +302,7 @@ public class LocalDatabaseCenter {
      * @param radius 반경
      * @return JSON ARRAY
      */
-    public synchronized JSONArray queryNearObjectsByRealLocation(double latitude, double longitude, double altitude, double radius) {
+    public JSONArray queryNearObjectsByRealLocation(double latitude, double longitude, double altitude, double radius) {
         JSONArray array = new JSONArray();
 
         Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
@@ -348,6 +395,13 @@ public class LocalDatabaseCenter {
         String getTableName();
 
         /**
+         *
+         * @param str
+         * @return
+         */
+        boolean equalString(String str);
+
+        /**
          * 해당 필드의 DB 내 순서 값을 반환한다.
          * @return
          */
@@ -360,18 +414,23 @@ public class LocalDatabaseCenter {
      * 상황에 맞게 SQL 구문을 생성하고, 호출할 수 있도록 하는 BUILDER 패턴 클래스.
      *
      * 테이블 필드 상수 (
-     * {@link kr.poturns.virtualpalace.data.LocalDatabaseCenter.RESOURCE_FIELD},
-     * {@link kr.poturns.virtualpalace.data.LocalDatabaseCenter.VIRTUAL_FIELD},
-     * {@link kr.poturns.virtualpalace.data.LocalDatabaseCenter.AUGMENTED_FIELD})를
+     * {@link LocalDatabaseCenter.RESOURCE_FIELD},
+     * {@link LocalDatabaseCenter.VIRTUAL_FIELD},
+     * {@link LocalDatabaseCenter.AUGMENTED_FIELD})를
      * 제네릭 변수로 입력받아, SQL 구문을 작성한다.
      */
-    public final class WriteBuilder<E extends IField> {
+    public static class WriteBuilder<E extends IField> {
         // NOTICE >  DB 내 필드 개수가 많아질 경우, 크기를 늘릴 것.
         private final int MAX = 16;
 
+        private final LocalDatabaseCenter mCenterF;
         private final ArrayList<Pair<String, String>> mSetClauseList = new ArrayList<Pair<String, String>>(MAX);
         private final ArrayList<String> mWhereClauseList = new ArrayList<String>(MAX);
         private String mTableName = null;
+
+        public WriteBuilder(LocalDatabaseCenter center) {
+            mCenterF = center;
+        }
 
         /**
          * 테이블 내 유효한 필드가 맞는지 확인한다.
@@ -504,12 +563,31 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        public WriteBuilder whereLessThan(E field, String value, boolean allowEqual) {
+        public WriteBuilder whereSmallerThan(E field, String value, boolean allowEqual) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " <= " : " < ")
                             .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 유사 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @return
+         */
+        public WriteBuilder whereLike(E field, String value) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" LIKE %")
+                            .append(value)
+                            .append("% ")
                             .toString()
             );
             return check(field);
@@ -554,7 +632,7 @@ public class LocalDatabaseCenter {
 
             try {
                 setClear().whereClear();
-                mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+                mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
                 return true;
 
             } catch (SQLException e) {
@@ -593,7 +671,7 @@ public class LocalDatabaseCenter {
 
             try {
                 setClear().whereClear();
-                mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+                mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
                 return true;
 
             } catch (SQLException e) {
@@ -621,7 +699,7 @@ public class LocalDatabaseCenter {
 
             try {
                 setClear().whereClear();
-                mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+                mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
                 return true;
 
             } catch (SQLException e) {

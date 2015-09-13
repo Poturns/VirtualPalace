@@ -1,14 +1,16 @@
 package kr.poturns.virtualpalace.controller;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
-import kr.poturns.virtualpalace.data.LocalArchive;
-import kr.poturns.virtualpalace.data.LocalDatabaseCenter;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.util.DriveAssistant;
 
 /**
  * <b> INTERNAL CONTROLLER : 컨트롤러의 관리 기능을 다룬다 </b>
@@ -26,6 +28,7 @@ class PalaceCore {
 
     private final LocalArchive mLocalArchiveF;
     private final LocalDatabaseCenter mDBCenterF;
+    private final DriveAssistant mDriveAssistantF;
     private final TreeMap<Long, OnPlayModeListener> mPlayModeListenersF;
 
 
@@ -40,6 +43,7 @@ class PalaceCore {
         mAppF = application;
         mLocalArchiveF = LocalArchive.getInstance(application);
         mDBCenterF = LocalDatabaseCenter.getInstance(application);
+        mDriveAssistantF = new DriveAssistant(application);
 
         mInputConnectorMapF = new TreeMap<Integer, OperationInputConnector>();
         mPlayModeListenersF = new TreeMap<Long, OnPlayModeListener>();
@@ -56,7 +60,6 @@ class PalaceCore {
                 isOnCardboard = onCardboard;
             }
         });
-
 
         mCurrentMode = OnPlayModeListener.PlayMode.STANDARD;
         isOnCardboard = false;
@@ -86,13 +89,14 @@ class PalaceCore {
      *
      * @param mode
      */
-    void switchMode(OnPlayModeListener.PlayMode mode, boolean onCardboard) {
+    boolean switchMode(OnPlayModeListener.PlayMode mode, boolean onCardboard) {
         if (mCurrentMode == mode && isOnCardboard == onCardboard)
-            return;
+            return false;
 
         for(OnPlayModeListener listener : mPlayModeListenersF.values()) {
             listener.onPlayModeChanged(mode, onCardboard);
         }
+        return true;
     }
 
     /**
@@ -153,11 +157,20 @@ class PalaceCore {
 
     /**
      *
+     * @param key 속성
+     * @param value 속성 값
      * @return
      */
-    JSONArray searchMetadata() {
-        // 1. Local DB 쿼리
-        // 2.
+    JSONArray searchMetadata(String key, String value) {
+        if ("id".equalsIgnoreCase(key)) {
+            return mDBCenterF.queryObjectDetailsById(Integer.parseInt(value));
+
+        } else if ("name".equalsIgnoreCase(key)) {
+            return mDBCenterF.queryObjectDetailsByName(value);
+
+        } else if ("type".equalsIgnoreCase(key)) {
+            return mDBCenterF.queryObjectDetailsByType(value);
+        }
 
         return null;
     }
@@ -166,24 +179,131 @@ class PalaceCore {
      *
      * @return
      */
-    boolean insertNewMetadata() {
-        return false;
+    boolean insertNewMetadata(JSONObject insert, String table) {
+        LocalDatabaseCenter.WriteBuilder builder = getBuilderWithParsing(table, insert);
+        return (builder == null)? false : builder.insert();
     }
 
     /**
      *
      * @return
      */
-    boolean updateMetadata() {
-        return false;
+    boolean updateMetadata(JSONObject update, String table) {
+        LocalDatabaseCenter.WriteBuilder builder = getBuilderWithParsing(table, update);
+        return (builder == null)? false : builder.modify();
     }
 
     /**
      *
      * @return
      */
-    boolean deleteMetadata() {
-        return false;
+    boolean deleteMetadata(JSONObject delete, String table) {
+        LocalDatabaseCenter.WriteBuilder builder = getBuilderWithParsing(table, delete);
+        return (builder == null)? false : builder.delete();
+    }
+
+    /**
+     *
+     * @param table
+     * @param command
+     * @return
+     */
+    private LocalDatabaseCenter.WriteBuilder getBuilderWithParsing(String table, JSONObject command) {
+        LocalDatabaseCenter.WriteBuilder builder;
+        switch (table) {
+            case LocalDatabaseCenter.TABLE_VIRTUAL:
+                builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+                break;
+
+            case LocalDatabaseCenter.TABLE_AUGMENTED:
+                builder =  new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+                break;
+
+            case LocalDatabaseCenter.TABLE_RESOURCE:
+                builder =  new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+                break;
+
+            default:
+                return null;
+        }
+
+        Iterator<String> conditions = command.keys();
+        while (conditions.hasNext()) {
+            String condition = conditions.next();
+
+            try {
+                JSONObject content = command.getJSONObject(condition);
+                Iterator<String> iter = content.keys();
+
+                // WHERE BETWEEN
+                if (IControllerCommands.JsonKey.WHERE_FROM.equalsIgnoreCase(condition)) {
+                    JSONObject dest = command.getJSONObject(IControllerCommands.JsonKey.WHERE_TO);
+
+                    while (iter.hasNext()) {
+                        String key = iter.next();
+                        builder.whereBetween(getField(table, key), content.getString(key), dest.getString(key));
+                    }
+
+                } else if (IControllerCommands.JsonKey.WHERE_TO.equalsIgnoreCase(condition)){
+                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    continue;
+
+                    // ELSE
+                } else {
+                    while (iter.hasNext()) {
+                        String key = iter.next();
+                        LocalDatabaseCenter.IField field = getField(table, key);
+                        String value = content.getString(key);
+
+                        switch (condition) {
+                            case IControllerCommands.JsonKey.SET:
+                                builder.set(field, value);
+                                break;
+
+                            case IControllerCommands.JsonKey.WHERE:
+                                builder.whereEqual(field, value);
+                                break;
+
+                            case IControllerCommands.JsonKey.WHERE_NOT:
+                                builder.whereNotEqual(field, value);
+                                break;
+
+                            case IControllerCommands.JsonKey.WHERE_GREATER:
+                                builder.whereGreaterThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL))?
+                                        content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
+                                break;
+
+                            case IControllerCommands.JsonKey.WHERE_SMALLER:
+                                builder.whereSmallerThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL))?
+                                        content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
+                                break;
+
+                            case IControllerCommands.JsonKey.WHERE_LIKE:
+                                builder.whereLike(field, value);
+                                break;
+                        }
+                    }
+                }
+            } catch (JSONException e) { }
+        }
+
+        return builder;
+    }
+
+    private LocalDatabaseCenter.IField getField(String table, String name) {
+        switch (table) {
+            case LocalDatabaseCenter.TABLE_VIRTUAL:
+                return LocalDatabaseCenter.VIRTUAL_FIELD.valueOf(name);
+
+            case LocalDatabaseCenter.TABLE_AUGMENTED:
+                return LocalDatabaseCenter.AUGMENTED_FIELD.valueOf(name);
+
+            case LocalDatabaseCenter.TABLE_RESOURCE:
+                return LocalDatabaseCenter.RESOURCE_FIELD.valueOf(name);
+
+            default:
+                return null;
+        }
     }
 
     /**
@@ -191,6 +311,8 @@ class PalaceCore {
      * @return
      */
     boolean executeBackup() {
+
+        mDriveAssistantF.getAppFolder();
         return false;
     }
 

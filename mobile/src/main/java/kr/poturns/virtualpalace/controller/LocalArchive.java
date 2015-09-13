@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.data;
+package kr.poturns.virtualpalace.controller;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -36,20 +36,24 @@ public class LocalArchive  {
     public static final String NAME = "LocalArchive";
     /**
      * 외부저장소 : 앱 기본 디렉토리
-     *      /sdcard/ VirtualPalace
+     *      /sdcard/ VirtualPalace/
      */
     public static final String BASE_DIR = "VirtualPalace";
     /**
      * 외부저장소 : 로그 디렉토리
-     *      /sdcard/ VirtualPalace/ Logs
+     *      /sdcard/ VirtualPalace/ Logs/
      */
     public static final String LOG_DIR = BASE_DIR + File.pathSeparator + "Logs";
     /**
-     * 내부저장소 : 다운로드 디렉토리
-     *      /data/data/kr.poturns.virtualpalace/ VirtualPalace/ Downloads
+     * 외부저장소 : 다운로드 디렉토리
+     *      /sdcard/ VirtualPalace/ Downloads/
      */
     public static final String DOWNLOAD_DIR = BASE_DIR + File.pathSeparator + "Downloads";
-
+    /**
+     * 내부저장소 : 시스템 디렉토리
+     *      /data/data/kr.poturns.virtualpalace/ System/
+     */
+    public static final String SYSTEM_DIR = "System";
 
     private final Context mContextF;
 
@@ -72,14 +76,24 @@ public class LocalArchive  {
 
 
     // * * * M E T H O D S * * * //
+    /**
+     *
+     */
     private void ready() {
         File logDir = new File(Environment.getExternalStorageDirectory(), LOG_DIR);
         logDir.mkdirs();
 
-        File downloadDir = new File (Environment.getDataDirectory(), DOWNLOAD_DIR);
-        downloadDir.mkdirs();
+        File downloadDir = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_DIR);
+        logDir.mkdirs();
+
+        File systemDir = new File (SYSTEM_DIR);
+        systemDir.mkdirs();
     }
 
+    /**
+     *
+     * @param logShard
+     */
     public synchronized void appendLog(LogShard logShard) {
         if (logShard == null)
             return;
@@ -111,16 +125,64 @@ public class LocalArchive  {
         }
     }
 
-    public void saveFileIntoDownloads(String name) {
-        File downloads = new File(Environment.getDataDirectory(), DOWNLOAD_DIR);
+    /**
+     *
+     * @param name
+     * @param overwrite
+     * @throws NoSuchFileException 해당 파일이 이미 존재하고 Overwrite 가 아닐 경우 발생.
+     */
+    public void saveFileIntoDownloads(String name, boolean overwrite) throws NoSuchFileException {
+        File downloads = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_DIR);
         File target = new File(downloads, name);
+        if (!target.exists() || overwrite) {
+            // TODO : Write
 
+        } else
+            throw new NoSuchFileException("The file already exists. If you want to continue, set OVERWRITE flag.");
     }
 
-    public void loadFileFromDownloads(String name) {
-        File downloads = new File(Environment.getDataDirectory(), DOWNLOAD_DIR);
+    /**
+     *
+     * @param name
+     * @throws NoSuchFileException 파일이 존재하지 않을 경우 발생.
+     */
+    public void loadFileFromDownloads(String name) throws NoSuchFileException {
+        File downloads = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_DIR);
         File target = new File(downloads, name);
+        if (target.exists()) {
+            // TODO : Read
 
+        } else
+            throw new NoSuchFileException("The file doesn't exist.");
+    }
+
+    /**
+     *
+     * @param name
+     * @param overwrite
+     * @throws NoSuchFileException 해당 파일이 이미 존재하고 Overwrite 가 아닐 경우 발생.
+     */
+    public void saveFileIntoSystem(String name, boolean overwrite) throws NoSuchFileException {
+        File target = new File(new File(SYSTEM_DIR), name);
+        if (!target.exists() || overwrite) {
+            // TODO : Write
+
+        } else
+            throw new NoSuchFileException("The file already exists. If you want to continue, set OVERWRITE flag.");
+    }
+
+    /**
+     *
+     * @param name
+     * @throws NoSuchFileException 파일이 존재하지 않을 경우 발생.
+     */
+    public void loadFileFromSystem(String name) throws NoSuchFileException  {
+        File target = new File(new File(SYSTEM_DIR), name);
+        if (target.exists()) {
+            // TODO : Read
+
+        } else
+            throw new NoSuchFileException("The file doesn't exist.");
     }
 
 
@@ -140,9 +202,17 @@ public class LocalArchive  {
 
     // * * * I N N E R  C L A S S E S * * * //
     public interface ISystem {
-        public static final String ACCOUNT = "local_archive_system_account";
+        String ACCOUNT = "local_archive_system_account";
     }
 
 
+    /**
+     *
+     */
+    public static class NoSuchFileException extends Exception {
+        public NoSuchFileException(String message) {
+            super(message);
+        }
+    }
 
 }

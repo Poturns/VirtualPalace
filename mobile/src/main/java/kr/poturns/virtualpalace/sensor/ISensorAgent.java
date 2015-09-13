@@ -11,31 +11,31 @@ public interface ISensorAgent {
     /**
      * Agent Type 개수.
      */
-    public static final int TYPE_TOTAL_COUNT = 6;
+    int TYPE_TOTAL_COUNT = 6;
     /**
      * Agent Type : 가속도
      */
-    public static final int TYPE_AGENT_ACCELEROMETER = 1;
+    int TYPE_AGENT_ACCELEROMETER = 1;
     /**
      * Agent Type : 배터리
      */
-    public static final int TYPE_AGENT_BATTERY = 2;
+    int TYPE_AGENT_BATTERY = 2;
     /**
      * Agent Type : 자이로
      */
-    public static final int TYPE_AGENT_GYROSCOPE = 3;
+    int TYPE_AGENT_GYROSCOPE = 3;
     /**
      * Agent Type : 위치
      */
-    public static final int TYPE_AGENT_LOCATION = 4;
+    int TYPE_AGENT_LOCATION = 4;
     /**
      * Agent Type : 자기장
      */
-    public static final int TYPE_AGENT_MAGNETIC = 5;
+    int TYPE_AGENT_MAGNETIC = 5;
     /**
      * Agent Type : 네트워크
      */
-    public static final int TYPE_AGENT_NETWORK = 6;
+    int TYPE_AGENT_NETWORK = 6;
 
     // * * * M E T H O D S * * * //
     // TODO:
