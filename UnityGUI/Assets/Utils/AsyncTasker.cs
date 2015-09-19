@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace UnityApi
+namespace Utils
 {
-	public class AsyncTasker
+	public sealed class AsyncTasker
 	{
 		//public const int maxThreads = Environment.ProcessorCount + 1;
 

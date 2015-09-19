@@ -4,9 +4,10 @@ using LitJson;
 
 namespace AndroidApi.Media
 {
-    public class ImageDirInfo : BaseDirInfo<ImageInfo>
+	public class ImageDirInfo : BaseDirInfo<ImageInfo>
 	{
-		public const string ImageDirInfoClassName = "kr.poturns.virtualpalace.media.image.ImageDirInfo";
+		protected const string ImageDirInfoClassName = "kr.poturns.virtualpalace.media.image.ImageDirInfo";
+
 		private ImageDirInfo ()
 		{
 		}
@@ -36,6 +37,11 @@ namespace AndroidApi.Media
 
 				return list;
 			}
+		}
+
+		public override List<ImageInfo> GetInfoList (AndroidJavaObject activity)
+		{
+			ImageInfo.GetImageInfoList (activity);
 		}
 
 	}

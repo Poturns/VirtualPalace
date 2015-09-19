@@ -5,9 +5,10 @@ using LitJson;
 
 namespace AndroidApi.Media
 {
-    public class VideoInfo : BaseInfo
+	public class VideoInfo : BaseInfo
 	{
-		public const string VideoInfoClassName = "kr.poturns.virtualpalace.media.video.VideoInfo";
+		protected const string VideoInfoClassName = "kr.poturns.virtualpalace.media.video.VideoInfo";
+
 		internal VideoInfo ()
 		{
 		}
@@ -48,7 +49,7 @@ namespace AndroidApi.Media
 			return info;
 		}
 		
-		public List<VideoInfo> GetInfoList (AndroidJavaObject activity)
+		internal static List<VideoInfo> GetInfoList (AndroidJavaObject activity)
 		{
 			using (AndroidJavaClass imageInfoClass = new AndroidJavaClass(VideoInfoClassName)) {
 				string listJson = imageInfoClass.CallStatic<string> (GetJsonInfoListMethodName, activity, DirName);

@@ -6,7 +6,7 @@ namespace AndroidApi.Media
 {
     public class ImageInfo : BaseInfo
 	{
-		public const string ImageInfoClassName = "kr.poturns.virtualpalace.media.image.ImageInfo";
+		protected const string ImageInfoClassName = "kr.poturns.virtualpalace.media.image.ImageInfo";
 		internal ImageInfo ()
 		{
 		}
@@ -25,7 +25,7 @@ namespace AndroidApi.Media
 
 		}
 		
-		public List<ImageInfo> GetImageInfoList (AndroidJavaObject activity)
+		internal static List<ImageInfo> GetImageInfoList (AndroidJavaObject activity)
 		{
 			using (AndroidJavaClass imageInfoClass = new AndroidJavaClass(ImageInfoClassName)) {
 				string listJson = imageInfoClass.CallStatic<string> (GetJsonInfoListMethodName, activity, DirName);

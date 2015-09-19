@@ -4,9 +4,10 @@ using LitJson;
 
 namespace AndroidApi.Media
 {
-    public class VideoDirInfo : BaseDirInfo<VideoInfo>
+	public class VideoDirInfo : BaseDirInfo<VideoInfo>
 	{
-		public const string VideoDirInfoClassName = "kr.poturns.virtualpalace.media.video.VideoDirInfo";
+		protected const string VideoDirInfoClassName = "kr.poturns.virtualpalace.media.video.VideoDirInfo";
+
 		private VideoDirInfo ()
 		{
 		}
@@ -33,6 +34,11 @@ namespace AndroidApi.Media
 				
 				return list;
 			}
+		}
+
+		public override List<VideoInfo> GetInfoList (AndroidJavaObject activity)
+		{
+			return VideoInfo.GetInfoList (activity);
 		}
 	}
 }

@@ -3,10 +3,14 @@ using UnityEngine;
 
 namespace AndroidApi
 {
-	public class AndroidUtils
+	public sealed class AndroidUtils
 	{
 		public const string UnityPlayerClassName = "com.unity3d.player.UnityPlayer";
 		public const string RunOnUiThreadMethodName = "runOnUiThread";
+
+		private AndroidUtils ()
+		{
+		}
 
 		public static AndroidJavaObject GetActivityObject ()
 		{
