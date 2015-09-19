@@ -1,6 +1,10 @@
-/Library/ShaderCache
-/Library/metadata
+/Library
+/ProjectSettings
+/obj
+/Temp
+/.vs
 
 /*.csproj
 /*.sln
 /*.userprefs
+/*.apk

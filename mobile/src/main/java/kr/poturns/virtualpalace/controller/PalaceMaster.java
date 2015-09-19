@@ -67,7 +67,7 @@ public class PalaceMaster extends PalaceCore {
      */
     private final class InputHandler extends Handler implements IControllerCommands, IOperationInputFilter.Operation {
 
-        private Object inputLock = new Object();
+        private final Object inputLock = new Object();
         private JSONObject singleMessage = new JSONObject();
 
         private InputHandler() {
@@ -100,7 +100,7 @@ public class PalaceMaster extends PalaceCore {
                     break;
 
                 default:
-                    return;
+                    break;
             }
         }
 
@@ -110,7 +110,7 @@ public class PalaceMaster extends PalaceCore {
          */
         private void doPackOnScanning(int[] command) {
             int cmd = command[0];
-            int value = 0;
+            int value;
 
             String cmdStr = String.valueOf(cmd);
             switch (cmd) {
@@ -247,8 +247,7 @@ public class PalaceMaster extends PalaceCore {
                 return;
 
             synchronized (inputLock) {
-                // TODO : Unity 어느 곳으로 보내는가!
-                AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(null, null, singleMessage.toString());
+                AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(singleMessage.toString());
                 init();
             }
         }

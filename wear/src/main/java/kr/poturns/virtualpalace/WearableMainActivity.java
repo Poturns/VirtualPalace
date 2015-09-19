@@ -5,18 +5,13 @@ import android.os.Bundle;
 
 import kr.poturns.virtualpalace.inputcollector.GestureInputCollector;
 import kr.poturns.virtualpalace.inputcollector.SensorInputCollector;
-import kr.poturns.virtualpalace.inputcollector.SensorMovementData;
 import kr.poturns.virtualpalace.inputmodule.GestureInputFilter;
-import kr.poturns.virtualpalace.inputmodule.SensorInputFilter;
 import kr.poturns.virtualpalace.inputmodule.WearInputConnector;
 import kr.poturns.virtualpalace.inputmodule.WearableInputDetector;
 
 
 public class WearableMainActivity extends Activity {
-    //private WearableInputDetector<MotionData> motionInputDetector;
-   // private MotionInputCollector motionInputCollector;
 
-    private WearableInputDetector<SensorMovementData> sensorInputDetector;
     private SensorInputCollector sensorInputCollector;
 
     private WearableInputDetector<String> gestureInputDetector;
@@ -40,17 +35,8 @@ public class WearableMainActivity extends Activity {
                 .commit();
     }
 
-    /*
-    private void initMotionInputDetector() {
-        motionInputCollector = new MotionInputCollector(this);
-        motionInputDetector = new WearableInputDetector<>(new MotionInputFilter(), motionInputCollector);
-        motionInputDetector.setOperationInputConnector(wearInputConnector);
-    }
-    */
-
     private void initSensorInputDetector() {
         sensorInputCollector = new SensorInputCollector(this);
-        sensorInputDetector = new WearableInputDetector<>(new SensorInputFilter(), sensorInputCollector);
     }
 
     private void initGestureInputDetector() {
@@ -78,29 +64,6 @@ public class WearableMainActivity extends Activity {
         wearInputConnector.destroy();
     }
 
-    /*
-    /**
-     * GestureInputDetector 를 얻는다.
-
-    public WearableInputDetector<MotionData> getMotionInputDetector() {
-        return motionInputDetector;
-    }
-
-    /**
-     * MotionInputCollector 를 얻는다.
-
-    public MotionInputCollector getMotionInputCollector() {
-        return motionInputCollector;
-    }
-     */
-
-    /**
-     * SensorInputDetector 를 얻는다.
-     */
-    public WearableInputDetector<SensorMovementData> getSensorInputDetector() {
-        return sensorInputDetector;
-    }
-
     /**
      * SensorInputCollector 를 얻는다.
      */
@@ -109,16 +72,10 @@ public class WearableMainActivity extends Activity {
     }
 
     /**
-     *  GestureInputCollector 를 얻는다.
+     * GestureInputCollector 를 얻는다.
      */
     public GestureInputCollector getGestureInputCollector() {
         return gestureInputCollector;
-    }
-    /**
-     * GestureInputDetector 를 얻는다.
-     */
-    public WearableInputDetector<String> getGestureInputDetector() {
-        return gestureInputDetector;
     }
 
     /**

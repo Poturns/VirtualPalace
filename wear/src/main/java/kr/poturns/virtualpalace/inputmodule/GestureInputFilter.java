@@ -7,17 +7,17 @@ import kr.poturns.virtualpalace.input.IOperationInputFilter;
  * Created by Myungjin Kim on 2015-09-03.
  */
 public class GestureInputFilter implements IOperationInputFilter<String> {
-    private static final String SPECIAL_OP_CALL_UI = "callUI";
-    private static final String SPECIAL_OP_CANCEL = "cancel";
-    private static final String SPECIAL_OP_CHANGE_MODE = "changeMode";
-    private static final String SPECIAL_OP_EXIT = "exit";
-    private static final String SPECIAL_OP_MENU = "menu";
-    private static final String SPECIAL_OP_SEARCH = "search";
+    private static final String SPECIAL_OP_CANCEL1 = "Cancel1";
+    private static final String SPECIAL_OP_CANCEL2 = "Cancel2";
+    private static final String SPECIAL_OP_MENU = "Menu";
+    private static final String SPECIAL_OP_DEEP = "Deep";
+    private static final String SPECIAL_OP_SELECT = "Select";
+    private static final String SPECIAL_OP_SWITCH_MODE = "SwitchMode";
 
-    private static final String DIRECTION_UP_TO_DOWN = "upToDown";
-    private static final String DIRECTION_DOWN_TO_UP = "downToUp";
-    private static final String DIRECTION_LEFT_TO_RIGHT = "leftToRight";
-    private static final String DIRECTION_RIGHT_TO_LEFT = "rightToLeft";
+    private static final String DIRECTION_UP_TO_DOWN = "DupToDown";
+    private static final String DIRECTION_DOWN_TO_UP = "DdownToUp";
+    private static final String DIRECTION_LEFT_TO_RIGHT = "DleftToRight";
+    private static final String DIRECTION_RIGHT_TO_LEFT = "DrightToLeft";
     /**
      * 한번 터치한 이벤트 / 명령
      */
@@ -26,27 +26,48 @@ public class GestureInputFilter implements IOperationInputFilter<String> {
 
     @Override
     public int isGoingTo(String s) {
-        return 0;
+        return detectDirection(s);
     }
 
     @Override
     public int isTurningTo(String s) {
-        return 0;
+        return detectDirection(s);
     }
 
     @Override
     public int isFocusingTo(String s) {
-        return 0;
+        return detectDirection(s);
     }
 
     @Override
     public int isZoomingTo(String s) {
-        return 0;
+        return detectDirection(s);
     }
 
     @Override
     public boolean isSelecting(String s) {
         return s.equals(OPERATION_CLICK);
+    }
+
+    /**
+     * 특별한 명령을 감지한다.
+     */
+    private int detectSpecialOperation(String s) {
+        switch (s) {
+            case SPECIAL_OP_CANCEL1:
+            case SPECIAL_OP_CANCEL2:
+                return Operation.CANCEL;
+            case SPECIAL_OP_MENU:
+                return Operation.KEY_MENU;
+            case SPECIAL_OP_DEEP:
+                return Operation.DEEP;
+            case SPECIAL_OP_SELECT:
+                return Operation.SELECT;
+            case SPECIAL_OP_SWITCH_MODE:
+                return Operation.SWITCH_MODE;
+            default:
+                return Operation.NONE;
+        }
     }
 
     private int detectDirection(String s) {
@@ -64,41 +85,19 @@ public class GestureInputFilter implements IOperationInputFilter<String> {
         }
     }
 
-    /**
-     * 특별한 명령을 감지한다.
-     */
-    private int detectSpecialOperation(String s) {
-        switch (s) {
-            case SPECIAL_OP_CALL_UI:
-                return 0;
-            case SPECIAL_OP_CANCEL:
-                return 0;
-            case SPECIAL_OP_CHANGE_MODE:
-                return 0;
-            case SPECIAL_OP_EXIT:
-                return 0;
-            case SPECIAL_OP_MENU:
-                return 0;
-            case SPECIAL_OP_SEARCH:
-                return 0;
-            default:
-                return Operation.NONE;
-        }
-    }
-
     @Override
     public boolean isCanceling(String gestureData) {
-        return false;
+        return detectSpecialOperation(gestureData) == Operation.CANCEL;
     }
 
     @Override
     public int isKeyPressed(String gestureData) {
-        return 0;
+        return Operation.NONE;
     }
 
     @Override
     public int isSpecialOperation(String gestureData) {
-        return 0;
+        return detectSpecialOperation(gestureData);
     }
 
 }

@@ -46,7 +46,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\AndroidApi\AndroidUnityBridge.cs" />
      <Compile Include="Assets\AndroidApi\AndroidUtils.cs" />
+     <Compile Include="Assets\AndroidApi\InternalIAndroidUnityCallback.cs" />
      <Compile Include="Assets\AndroidApi\Media\BaseDirInfo.cs" />
      <Compile Include="Assets\AndroidApi\Media\BaseInfo.cs" />
      <Compile Include="Assets\AndroidApi\Media\ImageDirInfo.cs" />

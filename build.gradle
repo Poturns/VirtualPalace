@@ -18,3 +18,61 @@ allprojects {
         jcenter()
     }
 }
+
+/**
+ * Unity Plugin Directory에 있는 모듈 리소스를 삭제한다.
+ * */
+task clearUnityAndroidLibs(type: Delete) {
+    String unityPluginDir = 'UnityGUI/Assets/Plugins/Android/'
+
+    delete unityPluginDir + 'AndroidManifest.xml'
+    delete unityPluginDir + 'mobile-debug.aar'
+
+
+    String unityPluginLibsDir = unityPluginDir + 'libs/'
+
+    delete unityPluginLibsDir + 'communication-debug.aar'
+    delete unityPluginLibsDir + 'input-debug.aar'
+}
+
+/**
+ * 각 모듈에서 필요한 리소스를 Unity Plugin Directory에 복사한다.
+ * */
+task copyUnityAndroidLibs(dependsOn: 'copyUnityAndroidLibInput') {
+}
+
+/**
+ * Mobile Module에서 AndroidManifest.xml를 Unity Plugin Directory에 복사한다.
+ * */
+task copyUnityAndroidLibMobileXml(type: Copy, dependsOn: 'clearUnityAndroidLibs') {
+    from('/mobile/src/main')
+    into('UnityGUI/Assets/Plugins/Android/')
+    include('AndroidManifest.xml')
+}
+
+/**
+ * Mobile Module에서 빌드된 aar파일을 Unity Plugin Directory에 복사한다.
+ * */
+task copyUnityAndroidLibMobile(type: Copy, dependsOn: 'copyUnityAndroidLibMobileXml') {
+    from('/mobile/build/outputs/aar')
+    into('UnityGUI/Assets/Plugins/Android/')
+    include('mobile-debug.aar')
+}
+
+/**
+ * Communication Module에서 빌드된 aar파일을 Unity Plugin Directory에 복사한다.
+ * */
+task copyUnityAndroidLibComm(type: Copy, dependsOn: 'copyUnityAndroidLibMobile') {
+    from('/communication/build/outputs/aar')
+    into('UnityGUI/Assets/Plugins/Android/libs/')
+    include('communication-debug.aar')
+}
+
+/**
+ * Input Module에서 빌드된 aar파일을 Unity Plugin Directory에 복사한다.
+ * */
+task copyUnityAndroidLibInput(type: Copy, dependsOn: 'copyUnityAndroidLibComm') {
+    from('/input/build/outputs/aar')
+    into('UnityGUI/Assets/Plugins/Android/libs/')
+    include('input-debug.aar')
+}

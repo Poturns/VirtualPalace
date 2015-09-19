@@ -59,12 +59,6 @@ public class BasicInputFragment extends BaseFragment {
         gestureInputCollector = getGestureInputCollector();
         sensorInputCollector = getSensorInputCollector();
 
-        gestureInputCollector.setResultListener(new InputCollector.OnInputResultListener<String>() {
-            @Override
-            public void onInputResult(String s) {
-                Toast.makeText(getActivity(), String.format("gesture : [ %s ]", s), Toast.LENGTH_SHORT).show();
-            }
-        });
         sensorInputCollector.setResultListener(new InputCollector.OnInputResultListener<SensorMovementData>() {
             @Override
             public void onInputResult(SensorMovementData sensorMovementData) {
@@ -72,6 +66,7 @@ public class BasicInputFragment extends BaseFragment {
                 if (!isInShaking) {
                     if (sensorMovementData.speed > SHAKING_MIN_SPEED) {
                         isInShaking = true;
+                        Toast.makeText(getActivity(), "2초동안 흔들면 이전 화면으로 돌아갑니다.", Toast.LENGTH_SHORT).show();
                         // 2초 뒤에 '뒤로가기' 명령을 실행하도록 하고,
                         // CANCELING_DELAY 동안 흔들림이 감지되지 않으면 '뒤로가기' 명령을 취소함.
                         mHandler.sendEmptyMessageDelayed(MESSAGE_ANDROID_BACK, 2000);

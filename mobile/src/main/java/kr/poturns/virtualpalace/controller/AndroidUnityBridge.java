@@ -1,11 +1,8 @@
 package kr.poturns.virtualpalace.controller;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v4.util.LongSparseArray;
-
-import com.unity3d.player.UnityPlayer;
 
 import kr.poturns.virtualpalace.annotation.UnityApi;
 
@@ -14,27 +11,27 @@ import static kr.poturns.virtualpalace.input.IControllerCommands.REQUEST_MESSAGE
 
 /**
  * <b> ANDROID - UNITY 간 통신 클래스 </b>
+ * <p>
+ * * Unity -> Android 콜백 요청시,
+ * 1. [Unity] AndroidUnityBridge의 requestCallbackToAndroid (jsonMessage, callback) 호출.
+ * 2. [Android] 요청한 작업 처리 후, respondCallbackToUnity (id, jsonResult) 호출.
+ * 3. [Android] AndroidUnityBridge에서 Unity가 요청한 callback 메소드 실행 및 jsonResult 전달.
+ * 4. [Unity] jsonResult 받음.
+ * <p>
+ * * Android -> Unity 콜백 요청시,
+ * 1. [Android] AndroidUnityBridge의 reqeustCallbackToUnity (jsonMessage, callback) 호출.
+ * 2. [Unity] 요청한 작업 처리 후, AndroidUnityBridge의 respondCallbackToAndroid (id, jsonResult) 호출.
+ * 3. [Unity] id에 해당하는 callback 메소드 실행 및 jsonResult 전달.
  *
- *  * Unity -> Android 콜백 요청시,
- *   1. [Unity] AndroidUnityBridge의 requestCallbackToAndroid (jsonMessage, callback) 호출.
- *   2. [Android] 요청한 작업 처리 후, respondCallbackToUnity (id, jsonResult) 호출.
- *   3. [Android] AndroidUnityBridge에서 Unity가 요청한 callback 메소드 실행 및 jsonResult 전달.
- *   4. [Unity] jsonResult 받음.
- *
- *  * Android -> Unity 콜백 요청시,
- *   1. [Android] AndroidUnityBridge의 reqeustCallbackToUnity (jsonMessage, callback) 호출.
- *   2. [Unity] 요청한 작업 처리 후, AndroidUnityBridge의 respondCallbackToAndroid (id, jsonResult) 호출.
- *   3. [Unity] id에 해당하는 callback 메소드 실행 및 jsonResult 전달.
- *
- *  @author Myungjin.Kim
- *  @author Yeonho.Kim
+ * @author Myungjin.Kim
+ * @author Yeonho.Kim
  */
 public final class AndroidUnityBridge {
 
     // * * * S I N G L E T O N * * * //
     private static AndroidUnityBridge sInstance;
 
-    public static AndroidUnityBridge getInstance(PalaceApplication app) {
+    public static synchronized AndroidUnityBridge getInstance(PalaceApplication app) {
         if (sInstance == null)
             sInstance = new AndroidUnityBridge(app);
         return sInstance;
@@ -47,18 +44,19 @@ public final class AndroidUnityBridge {
 
     private final Object LOCK = new Object();
     private final PalaceMaster mMasterF;
-    private final Handler mRequestHandlerF;
+    // private final Handler mRequestHandlerF;
 
     private final LongSparseArray<IAndroidUnityCallback> mCallbackMapF;
 
     // * * * C O N S T A N T S * * * //
 
+    private IAndroidUnityCallback mInputCallback;
+    private IAndroidUnityCallback mMessageCallback;
 
     // * * * C O N S T R U C T O R S * * * //
     private AndroidUnityBridge(PalaceApplication app) {
-        //FIXME infinite loop : PalaceMaster - AndroidUnityBridge
         mMasterF = PalaceMaster.getInstance(app);
-        mRequestHandlerF = mMasterF.getRequestHandler();
+        //mRequestHandlerF = mMasterF.getRequestHandler();
 
         mCallbackMapF = new LongSparseArray<IAndroidUnityCallback>();
     }
@@ -157,14 +155,42 @@ public final class AndroidUnityBridge {
     /**
      * ANDROID 에서 단일 메시지를 UNITY 로 전송한다.
      *
-     * @param target gameObject 이름
-     * @param func   gameObject에 존재하는 함수 이름
-     * @param param  함수의 매개변수
+     * @param json 전송할 메시지
      */
-    public synchronized void sendSingleMessageToUnity(String target, String func, String param) {
-        UnityPlayer.UnitySendMessage(target, func, param);
+    public synchronized void sendSingleMessageToUnity(String json) {
+        if (mMessageCallback != null)
+            mMessageCallback.onCallback(json);
     }
 
+    /**
+     * ANDROID 에서 Input 메시지를 UNITY 로 전송한다.
+     *
+     * @param json 전송할 메시지
+     */
+    public void sendInputMessageToUnity(String json) {
+        if (mInputCallback != null)
+            mInputCallback.onCallback(json);
+    }
+
+    /**
+     * UNITY에서 SingleMessage를 전달받을 CALLBACK을 등록한다.
+     *
+     * @param callback ANDROID로 부터 SingleMessage를 전달받을 callback
+     */
+    @UnityApi
+    public void setMessageCallback(IAndroidUnityCallback callback) {
+        this.mMessageCallback = callback;
+    }
+
+    /**
+     * UNITY에서 Input을 전달받을 CALLBACK을 등록한다.
+     *
+     * @param callback ANDROID로 부터 Input을 전달받을 callback
+     */
+    @UnityApi
+    public void setInputCallback(IAndroidUnityCallback callback) {
+        mInputCallback = callback;
+    }
 
     // * * * I N N E R  C L A S S E S * * * //
 
