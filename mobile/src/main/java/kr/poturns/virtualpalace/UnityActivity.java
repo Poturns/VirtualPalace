@@ -2,9 +2,9 @@ package kr.poturns.virtualpalace;
 
 import android.view.KeyEvent;
 
-import com.unity3d.player.UnityPlayerActivity;
+import com.google.unity.GoogleUnityActivity;
 
-public class UnityActivity extends UnityPlayerActivity {
+public class UnityActivity extends GoogleUnityActivity {
 
     @Override
     public boolean onKeyDown(int i, KeyEvent keyEvent) {

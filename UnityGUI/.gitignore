@@ -1,2 +1,6 @@
 /Library/ShaderCache
 /Library/metadata
+
+/*.csproj
+/*.sln
+/*.userprefs

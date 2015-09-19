@@ -1,11 +1,10 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "kr.poturns.virtualpalace"
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
@@ -25,10 +24,10 @@ android {
 
 dependencies {
     provided files('libs/unity.jar')
+    provided files('libs/google_cardboard.jar')
     compile project(':input')
     compile project(':communication')
-    compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services:7.8.0'
-    wearApp project(':wear')
-    compile files('libs/unity.jar')
+    //wearApp project(':wear')
+    //compile files('libs/unity.jar')
 }

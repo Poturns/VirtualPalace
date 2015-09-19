@@ -210,21 +210,17 @@ class PalaceCore {
      */
     private LocalDatabaseCenter.WriteBuilder getBuilderWithParsing(String table, JSONObject command) {
         LocalDatabaseCenter.WriteBuilder builder;
-        switch (table) {
-            case LocalDatabaseCenter.TABLE_VIRTUAL:
-                builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
-                break;
+        if (table.equals(LocalDatabaseCenter.TABLE_VIRTUAL)) {
+            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
 
-            case LocalDatabaseCenter.TABLE_AUGMENTED:
-                builder =  new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
-                break;
+        } else if (table.equals(LocalDatabaseCenter.TABLE_AUGMENTED)) {
+            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
 
-            case LocalDatabaseCenter.TABLE_RESOURCE:
-                builder =  new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
-                break;
+        } else if (table.equals(LocalDatabaseCenter.TABLE_RESOURCE)) {
+            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
 
-            default:
-                return null;
+        } else {
+            return null;
         }
 
         Iterator<String> conditions = command.keys();
@@ -255,32 +251,26 @@ class PalaceCore {
                         LocalDatabaseCenter.IField field = getField(table, key);
                         String value = content.getString(key);
 
-                        switch (condition) {
-                            case IControllerCommands.JsonKey.SET:
-                                builder.set(field, value);
-                                break;
+                        if (condition.equals(IControllerCommands.JsonKey.SET)) {
+                            builder.set(field, value);
 
-                            case IControllerCommands.JsonKey.WHERE:
-                                builder.whereEqual(field, value);
-                                break;
+                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE)) {
+                            builder.whereEqual(field, value);
 
-                            case IControllerCommands.JsonKey.WHERE_NOT:
-                                builder.whereNotEqual(field, value);
-                                break;
+                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_NOT)) {
+                            builder.whereNotEqual(field, value);
 
-                            case IControllerCommands.JsonKey.WHERE_GREATER:
-                                builder.whereGreaterThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL))?
-                                        content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
-                                break;
+                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_GREATER)) {
+                            builder.whereGreaterThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL)) ?
+                                    content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
 
-                            case IControllerCommands.JsonKey.WHERE_SMALLER:
-                                builder.whereSmallerThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL))?
-                                        content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
-                                break;
+                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_SMALLER)) {
+                            builder.whereSmallerThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL)) ?
+                                    content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
 
-                            case IControllerCommands.JsonKey.WHERE_LIKE:
-                                builder.whereLike(field, value);
-                                break;
+                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_LIKE)) {
+                            builder.whereLike(field, value);
+
                         }
                     }
                 }
@@ -291,18 +281,14 @@ class PalaceCore {
     }
 
     private LocalDatabaseCenter.IField getField(String table, String name) {
-        switch (table) {
-            case LocalDatabaseCenter.TABLE_VIRTUAL:
-                return LocalDatabaseCenter.VIRTUAL_FIELD.valueOf(name);
-
-            case LocalDatabaseCenter.TABLE_AUGMENTED:
-                return LocalDatabaseCenter.AUGMENTED_FIELD.valueOf(name);
-
-            case LocalDatabaseCenter.TABLE_RESOURCE:
-                return LocalDatabaseCenter.RESOURCE_FIELD.valueOf(name);
-
-            default:
-                return null;
+        if (table.equals(LocalDatabaseCenter.TABLE_VIRTUAL)) {
+            return LocalDatabaseCenter.VIRTUAL_FIELD.valueOf(name);
+        } else if (table.equals(LocalDatabaseCenter.TABLE_AUGMENTED)) {
+            return LocalDatabaseCenter.AUGMENTED_FIELD.valueOf(name);
+        } else if (table.equals(LocalDatabaseCenter.TABLE_RESOURCE)) {
+            return LocalDatabaseCenter.RESOURCE_FIELD.valueOf(name);
+        } else {
+            return null;
         }
     }
 

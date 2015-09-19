@@ -306,37 +306,25 @@ public class PalaceMaster extends PalaceCore {
                         table = LocalDatabaseCenter.TABLE_RESOURCE;
 
 
-                    switch (key) {
-                        case INSERT_AR:
-                        case INSERT_VR:
-                        case INSERT_RES:
-                            result = insertNewMetadata(message.getJSONObject(key), table);
-                            break;
+                    if (key.equals(INSERT_AR) || key.equals(INSERT_VR) || key.equals(INSERT_RES)) {
+                        result = insertNewMetadata(message.getJSONObject(key), table);
 
-                        case UPDATE_AR:
-                        case UPDATE_VR:
-                        case UPDATE_RES:
-                            result = updateMetadata(message.getJSONObject(key), table);
-                            break;
+                    } else if (key.equals(UPDATE_AR) || key.equals(UPDATE_VR) || key.equals(UPDATE_RES)) {
+                        result = updateMetadata(message.getJSONObject(key), table);
 
-                        case DELETE_AR:
-                        case DELETE_VR:
-                        case DELETE_RES:
-                            result = deleteMetadata(message.getJSONObject(key), table);
-                            break;
+                    } else if (key.equals(DELETE_AR) || key.equals(DELETE_VR) || key.equals(DELETE_RES)) {
+                        result = deleteMetadata(message.getJSONObject(key), table);
 
-                        case SWITCH_PLAY_MODE:
-                            int mode = message.getInt(key);
-                            result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
-                            break;
+                    } else if (key.equals(SWITCH_PLAY_MODE)) {
+                        int mode = message.getInt(key);
+                        result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
-                        case ACTIVATE_INPUT:
-                            message.getInt(key);
-                            break;
+                    } else if (key.equals(ACTIVATE_INPUT)) {
+                        message.getInt(key);
 
-                        case DEACTIVATE_INPUT:
-                            message.getInt(key);
-                            break;
+                    } else if (key.equals(DEACTIVATE_INPUT)) {
+                        message.getInt(key);
+
                     }
                 }
                 jsonResult.put(RESULT, result? "success" : "fail");
