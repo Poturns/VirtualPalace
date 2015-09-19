@@ -48,7 +48,7 @@ public class SensorInputFilter implements IOperationInputFilter<SensorMovementDa
     public int isSpecialOperation(SensorMovementData sensorMovementData) {
         return 0;
     }
-    
+
     private static int checkDataDirection(SensorMovementData in) {
         float max = in.x > in.y ? (in.x > in.z ? in.x : in.z) : (in.y > in.z ? in.y : in.z);
 
@@ -62,5 +62,9 @@ public class SensorInputFilter implements IOperationInputFilter<SensorMovementDa
             if (in.z > 0) return Direction.UPWARD;
             else return Direction.DOWNWARD;
         }
+    }
+
+    private static int checkAndroidBackOperation(){
+        return  0;
     }
 }

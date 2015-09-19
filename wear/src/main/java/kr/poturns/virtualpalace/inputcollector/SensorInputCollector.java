@@ -16,7 +16,7 @@ public class SensorInputCollector extends AbstractInputCollector<SensorMovementD
     /**
      * 센서가 움직임을 감지할 최소한의 속도
      */
-    private static final int MOVEMENT_SPEED_THRESHOLD = 500;
+    private static final int MOVEMENT_SPEED_THRESHOLD = 200;
     /**
      * 센서가 한번 측정 후, 다시 측정하기까지 걸리는 시간
      */

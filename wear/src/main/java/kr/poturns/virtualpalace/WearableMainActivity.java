@@ -51,12 +51,12 @@ public class WearableMainActivity extends Activity {
     private void initSensorInputDetector() {
         sensorInputCollector = new SensorInputCollector(this);
         sensorInputDetector = new WearableInputDetector<>(new SensorInputFilter(), sensorInputCollector);
-        sensorInputDetector.setOperationInputConnector(wearInputConnector);
     }
 
     private void initGestureInputDetector() {
         gestureInputCollector = new GestureInputCollector(this);
         gestureInputDetector = new WearableInputDetector<>(new GestureInputFilter(), gestureInputCollector);
+        gestureInputDetector.setOperationInputConnector(wearInputConnector);
     }
 
 

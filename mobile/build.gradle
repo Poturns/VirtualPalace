@@ -27,7 +27,7 @@ dependencies {
     provided files('libs/unity.jar')
     compile project(':input')
     compile project(':communication')
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services:7.8.0'
     wearApp project(':wear')
     compile files('libs/unity.jar')

@@ -51,7 +51,7 @@ public class GestureInputCollector extends AbstractInputCollector<String> implem
 
         if (predictions.size() > 0) {
             Prediction prediction = predictions.get(0);
-            if (prediction.score > 30.0) {
+            if (prediction.score > 6.0) {
                 listener.onInputResult(prediction.name);
             }
         }

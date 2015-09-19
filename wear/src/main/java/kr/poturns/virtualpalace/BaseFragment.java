@@ -43,19 +43,6 @@ public abstract class BaseFragment extends Fragment {
     @LayoutRes
     protected abstract int getLayoutResId();
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        view.findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
-            }
-        });
-    }
-
-
     /**
      * SensorInputCollector 를 얻는다.
      */
