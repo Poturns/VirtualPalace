@@ -49,10 +49,10 @@ namespace AndroidApi.Media
 			return info;
 		}
 		
-		internal static List<VideoInfo> GetInfoList (AndroidJavaObject activity)
+		internal static List<VideoInfo> GetInfoList (AndroidJavaObject activity, string dirName)
 		{
 			using (AndroidJavaClass imageInfoClass = new AndroidJavaClass(VideoInfoClassName)) {
-				string listJson = imageInfoClass.CallStatic<string> (GetJsonInfoListMethodName, activity, DirName);
+				string listJson = imageInfoClass.CallStatic<string> (GetJsonInfoListMethodName, activity, dirName);
 				
 				JsonData jData = JsonMapper.ToObject (listJson);
 				int count = jData.Count;

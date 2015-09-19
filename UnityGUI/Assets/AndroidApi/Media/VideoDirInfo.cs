@@ -38,7 +38,7 @@ namespace AndroidApi.Media
 
 		public override List<VideoInfo> GetInfoList (AndroidJavaObject activity)
 		{
-			return VideoInfo.GetInfoList (activity);
+			return VideoInfo.GetInfoList (activity, DirName);
 		}
 	}
 }

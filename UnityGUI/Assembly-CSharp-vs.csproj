@@ -78,6 +78,7 @@
      <Compile Include="Assets\Cardboard\Scripts\VRDevices\VRDevice.cs" />
      <Compile Include="Assets\Cardboard\Scripts\VRDevices\iOSVRDevice.cs" />
      <Compile Include="Assets\ContatinerManager.cs" />
+     <Compile Include="Assets\ExternalInput.cs" />
      <Compile Include="Assets\MemoObject.cs" />
      <Compile Include="Assets\MyScript\Controller.cs" />
      <Compile Include="Assets\MyScript\Interface\IStateBase.cs" />

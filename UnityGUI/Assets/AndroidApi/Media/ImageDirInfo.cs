@@ -41,7 +41,7 @@ namespace AndroidApi.Media
 
 		public override List<ImageInfo> GetInfoList (AndroidJavaObject activity)
 		{
-			ImageInfo.GetImageInfoList (activity);
+			return ImageInfo.GetImageInfoList (activity, DirName);
 		}
 
 	}
