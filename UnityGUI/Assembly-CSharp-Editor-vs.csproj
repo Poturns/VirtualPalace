@@ -48,12 +48,114 @@
   <ItemGroup>
      <Compile Include="Assets\Cardboard\Editor\CardboardEditor.cs" />
      <Compile Include="Assets\Cardboard\Editor\StereoControllerEditor.cs" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-cs\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-es\wallet_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sw\common_strings.xml" />
      <None Include="Assets\Cardboard\Legacy\Resources\SkyboxMesh.shader" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ms-rMY\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_icon_light.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_text_dark.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fr-rCA\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_icon_dark.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-si-rLK\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-da\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-de\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\cast_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\admob_iap_style.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-vi\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-tr\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-it\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\wallet_secondary_text_holo_dark.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-en-rGB\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\common_signin_btn_text_dark.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\cast_ic_notification_connecting.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ky-rKG\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sl\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-mr-rIN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-eu-rES\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\common_signin_btn_text_light.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-kn-rIN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zh-rTW\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_text_light.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ta-rIN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-km-rKH\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pt-rPT\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\auth_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-kk-rKZ\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-iw\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-lv\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ml-rIN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zh-rHK\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hy-rAM\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-bg\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_styles.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_attrs.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\maps_attrs.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-es\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-nb\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pt\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zu\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\wallet_primary_text_holo_light.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\version.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-th\common_strings.xml" />
      <None Include="Assets\Cardboard\Legacy\Resources\GUIScreen.shader" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-te-rIN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-bn-rBD\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fa\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-am\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\admob_ads_attrs.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-lo-rLA\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-my-rMM\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ca\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ur-rPK\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_colors.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\common_attrs.xml" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hu\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-lt\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-et-rEE\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-mn-rMN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ja\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sk\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fr\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-nl\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\README.txt" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-el\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\admob_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ne-rNP\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-tl\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-en-rIN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\proguard.txt" />
      <None Include="Assets\Plugins\Legacy\Android\AndroidManifest.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pl\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-af\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-uz-rUZ\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ro\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hi\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-en-rAU\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\cast_ids.xml" />
      <None Include="Assets\Cardboard\Resources\RadialUndistortionEffect.shader" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\AndroidManifest.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ko\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-in\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-es-rUS\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hr\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fi\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ka-rGE\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pt-rBR\common_strings.xml" />
      <None Include="Assets\Cardboard\Resources\SolidColor.shader" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zh-rCN\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\common_colors.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sv\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sr\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-uk\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-gl-rES\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-is-rIS\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ar\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ru\common_strings.xml" />
+     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-mk-rMK\common_strings.xml" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -68,6 +170,9 @@
  </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="LitJson">
+ <HintPath>D:/Git/VirtualPalace/UnityGUI/Assets/Plugins/LitJson.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
@@ -101,9 +206,6 @@
  </Reference>
  <Reference Include="UnityEditor.OSXStandalone.Extensions">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/macstandalonesupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="LitJson">
- <HintPath>D:/Git/VirtualPalace/UnityGUI/Assets/Plugins/LitJson.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
