@@ -6,7 +6,7 @@ import kr.poturns.virtualpalace.input.IOperationInputFilter;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p/>
+ * <p>
  * STT 를 통해 얻어진 결과를 적절한 방향 / 명령 으로 해석하는 클래스
  */
 public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String>> {
@@ -17,11 +17,13 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
     private static final String WORD_OPERATION_KEY_VOLUME_UP = "소리 크게";
     private static final String WORD_OPERATION_KEY_VOLUME_DOWN = "소리 작게";
 
-    private static final String WORD_OPERATION_GO = "가";
-    private static final String WORD_OPERATION_TURN = "돌아";
-    private static final String WORD_OPERATION_FOCUS = "포커스";
-    private static final String WORD_OPERATION_ZOOM = "확대";
-    private static final String WORD_OPERATION_SELECT = "선택";
+    private static final String WORD_OPERATION_SPECIAL_EXIT = "종료";
+    private static final String WORD_OPERATION_SPECIAL_SEARCH = "검색";
+    private static final String WORD_OPERATION_SPECIAL_CANCEL = "취소";
+    private static final String WORD_OPERATION_SPECIAL_SWITCH_MODE = "모드";
+    private static final String WORD_OPERATION_SPECIAL_MENU = "메뉴";
+    private static final String WORD_OPERATION_SPECIAL_SELECT = "선택";
+    private static final String WORD_OPERATION_SPECIAL_DEEP = "딥";
 
     //private static final String WORD_DIRECTION_NONE = "";
     private static final String WORD_DIRECTION_EAST = "동쪽";
@@ -37,68 +39,48 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
 
     @Override
     public int isGoingTo(ArrayList<String> strings) {
-        return 0;
+        return checkDirectionFor2D(strings);
     }
 
     @Override
     public int isTurningTo(ArrayList<String> strings) {
-        return 0;
+        return checkDirectionFor2D(strings);
     }
 
     @Override
     public int isFocusingTo(ArrayList<String> strings) {
-        return 0;
+        return checkDirectionFor2D(strings);
     }
 
     @Override
     public int isZoomingTo(ArrayList<String> strings) {
-        return 0;
+        return checkDirectionFor2D(strings);
     }
 
     @Override
     public boolean isSelecting(ArrayList<String> strings) {
-        return false;
+        return checkOneOperation(strings, WORD_OPERATION_SPECIAL_SELECT);
     }
 
     @Override
     public boolean isCanceling(ArrayList<String> strings) {
+        return checkOneOperation(strings, WORD_OPERATION_SPECIAL_CANCEL);
+    }
+
+    private static boolean checkOneOperation(ArrayList<String> strings, String operation) {
+        int N = strings.size();
+        for (int i = 0; i < N; i++)
+            if (strings.get(i).equals(operation)) return true;
+
         return false;
     }
 
     @Override
     public int isKeyPressed(ArrayList<String> strings) {
-        return 0;
+        return checkKeyOperation(strings);
     }
 
-    @Override
-    public int isSpecialOperation(ArrayList<String> strings) {
-        return 0;
-    }
-
-    private int checkOperation(ArrayList<String> strings) {
-        final int N = strings.size();
-        for (int i = 0; i < N; i++) {
-            String s = strings.get(i);
-
-            if (WORD_OPERATION_GO.equals(s))
-                return Operation.GO;
-
-            else if (WORD_OPERATION_FOCUS.equals(s))
-                return Operation.FOCUS;
-
-            else if (WORD_OPERATION_SELECT.equals(s))
-                return Operation.SELECT;
-
-            else if (WORD_OPERATION_TURN.equals(s))
-                return Operation.TURN;
-
-            else if (WORD_OPERATION_ZOOM.equals(s))
-                return Operation.ZOOM;
-        }
-        return Direction.NONE;
-    }
-
-    private int checkOperationForSpecial(ArrayList<String> strings) {
+    private static int checkKeyOperation(ArrayList<String> strings) {
         final int N = strings.size();
         for (int i = 0; i < N; i++) {
             String s = strings.get(i);
@@ -118,8 +100,37 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
             else if (WORD_OPERATION_KEY_VOLUME_DOWN.equals(s))
                 return Operation.KEY_VOLUME_DOWN;
         }
-        return Direction.NONE;
+        return Operation.NONE;
     }
+
+    @Override
+    public int isSpecialOperation(ArrayList<String> strings) {
+        return checkSpecialOperation(strings);
+    }
+
+    private static int checkSpecialOperation(ArrayList<String> strings) {
+        final int N = strings.size();
+        for (int i = 0; i < N; i++) {
+            String s = strings.get(i);
+            if (s.equals(WORD_OPERATION_SPECIAL_CANCEL)) {
+                return Operation.CANCEL;
+            } else if (s.equals(WORD_OPERATION_SPECIAL_EXIT)) {
+                return Operation.TERMINATE;
+            } else if (s.equals(WORD_OPERATION_SPECIAL_MENU)) {
+                return Operation.KEY_MENU;
+            } else if (s.equals(WORD_OPERATION_SPECIAL_SEARCH)) {
+                return Operation.SEARCH;
+            } else if (s.equals(WORD_OPERATION_SPECIAL_SELECT)) {
+                return Operation.SELECT;
+            } else if (s.equals(WORD_OPERATION_SPECIAL_SWITCH_MODE)) {
+                return Operation.SWITCH_MODE;
+            } else if (s.equals(WORD_OPERATION_SPECIAL_DEEP)) {
+                return Operation.DEEP;
+            }
+        }
+        return Operation.NONE;
+    }
+
 
     private int checkDirectionFor3D(ArrayList<String> strings) {
         final int N = strings.size();
