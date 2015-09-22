@@ -1,8 +1,10 @@
+using AndroidApi.Controller;
+using AndroidApi.Controller.Request;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace AndroidApi
+namespace AndroidApi.Controller
 {
     /// <summary>
     /// ANDROID - UNITY 간 통신 클래스
@@ -30,20 +32,25 @@ namespace AndroidApi
         /// java 형태의 AndroidUnityBridge 객체
         /// </summary>
         private AndroidJavaObject javaAndroidUnityBridge;
-        private Action<string> inputCallback, messageCallback;
+        private Action<string> messageCallback;
+        private Action<Controller.Operation[]> inputCallback;
 
         private AndroidUnityBridge()
         {
             javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
             javaAndroidUnityBridge.Call("setMessageCallback", new InternalIAndroidUnityCallback(OnMessageCallback));
-            javaAndroidUnityBridge.Call("setInputCallback", new InternalIAndroidUnityCallback(OnMessageCallback));
+            javaAndroidUnityBridge.Call("setInputCallback", new InternalIAndroidUnityCallback(OnInputCallback));
         }
 
+        /// <summary>
+        /// java AndroidUnityBridge에서 Input이 전달될 때 호출된다.
+        /// </summary>
+        /// <param name="json">Input이 기술된 Json</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void OnInputCallback(string json)
         {
             if (inputCallback != null)
-                inputCallback(json);
+                inputCallback(JsonInterpreter.InterpretInputCommands(json));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -58,7 +65,7 @@ namespace AndroidApi
         /// </summary>
         /// <param name="callback"> Input 메시지를 전달받을 콜백</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void SetInputCallback(Action<string> callback)
+        public void SetInputCallback(Action<Controller.Operation[]> callback)
         {
             inputCallback = callback;
         }
@@ -74,14 +81,16 @@ namespace AndroidApi
         }
 
         /// <summary>
-        /// UNITY 에서 ANDROID 에 요청을 보낸다.
+        /// UNITY에서 ANDROID 에 요청을 보낸다.
         /// </summary>
         /// <param name="jsonMessage">요청의 세부 사항이 Json형태로 기술되어 있는 문자열</param>
         /// <param name="callback">요청에 대한 응답을 받을 콜백</param>
         /// <returns>요청이 접수되었을 경우, TRUE</returns>
-        public bool RequestCallbackToAndroid(string jsonMessage, Action<string> callback)
+        public bool RequestToAndroid(IRequest request, Action<Controller.RequestResult> callback)
         {
-            return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", jsonMessage, new InternalIAndroidUnityCallback(callback));
+            return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", request.ToJson(),
+                new InternalIAndroidUnityCallback((json) => callback(JsonInterpreter.InterpretResultFromAndroid(json)))
+            );
         }
 
         /// <summary>
@@ -89,7 +98,7 @@ namespace AndroidApi
         /// </summary>
         /// <param name="id">콜백의 id</param>
         /// <param name="jsonResult">요청에 대한 결과값이 Json형태로 기술된 문자열</param>
-        public void RespondCallbackToAndroid(long id, string jsonResult)
+        public void RespondToAndroid(long id, string jsonResult)
         {
             javaAndroidUnityBridge.Call("respondCallbackToAndroid", id, jsonResult);
         }
@@ -104,6 +113,12 @@ namespace AndroidApi
             return javaAndroidUnityBridge.Call<bool>("sendSingleMessageToAndroid", jsonMessage);
         }
 
+
+    }
+
+
+    internal class SimpleAndroidCallback
+    {
 
     }
 

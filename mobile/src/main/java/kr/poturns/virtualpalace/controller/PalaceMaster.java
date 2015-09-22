@@ -68,7 +68,7 @@ public class PalaceMaster extends PalaceCore {
     private final class InputHandler extends Handler implements IControllerCommands, IOperationInputFilter.Operation {
 
         private final Object inputLock = new Object();
-        private JSONObject singleMessage = new JSONObject();
+        private JSONObject singleMessage;
 
         private InputHandler() {
             init();
@@ -138,6 +138,10 @@ public class PalaceMaster extends PalaceCore {
                 case TERMINATE:
                     synchronized (inputLock) {
                         try {
+                            /*
+                            value = singleMessage.optInt(cmdStr) + 1;
+                            singleMessage.put(cmdStr, value);
+                            */
                             try {
                                 value = singleMessage.getInt(cmdStr) + 1;
                             } catch (JSONException e) {
@@ -247,7 +251,7 @@ public class PalaceMaster extends PalaceCore {
                 return;
 
             synchronized (inputLock) {
-                AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(singleMessage.toString());
+                AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
                 init();
             }
         }
@@ -318,11 +322,12 @@ public class PalaceMaster extends PalaceCore {
                         int mode = message.getInt(key);
                         result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
+                        //TODO UNITY에서 전송하는 deviceType은 IControllerCommands.TYPE_INPUT**** 임 -mj
                     } else if (key.equals(ACTIVATE_INPUT)) {
-                        message.getInt(key);
+                        int deviceType = message.getInt(key);
 
                     } else if (key.equals(DEACTIVATE_INPUT)) {
-                        message.getInt(key);
+                        int deviceType = message.getInt(key);
 
                     }
                 }

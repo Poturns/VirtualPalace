@@ -32,6 +32,9 @@ public class UnityActivity extends GoogleUnityActivity {
         return super.onKeyDown(i, keyEvent);
     }
 
+    /**
+     * AndroidUnityBridge 객체를 반환한다.
+     */
     @UnityApi
     public AndroidUnityBridge getAndroidUnityBridge() {
         return mAndroidUnityBridge;

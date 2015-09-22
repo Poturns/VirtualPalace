@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace AndroidApi
+namespace AndroidApi.Controller
 {
     /// <summary>
     /// Android에서의 AndroidUnityBridge$IAndroidUnityCallback 구현체

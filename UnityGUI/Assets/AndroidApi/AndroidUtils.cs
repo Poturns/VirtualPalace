@@ -4,7 +4,7 @@ using UnityEngine;
 namespace AndroidApi
 {
     /// <summary>
-    /// 안드로이드 관런 작업 유틸리티 클래스
+    /// 안드로이드 관련 작업 유틸리티 클래스
     /// </summary>
     public sealed class AndroidUtils
     {

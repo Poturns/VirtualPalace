@@ -11,13 +11,13 @@ import static kr.poturns.virtualpalace.input.IControllerCommands.REQUEST_MESSAGE
 
 /**
  * <b> ANDROID - UNITY 간 통신 클래스 </b>
- * <p>
+ * <p/>
  * * Unity -> Android 콜백 요청시,
  * 1. [Unity] AndroidUnityBridge의 requestCallbackToAndroid (jsonMessage, callback) 호출.
  * 2. [Android] 요청한 작업 처리 후, respondCallbackToUnity (id, jsonResult) 호출.
  * 3. [Android] AndroidUnityBridge에서 Unity가 요청한 callback 메소드 실행 및 jsonResult 전달.
  * 4. [Unity] jsonResult 받음.
- * <p>
+ * <p/>
  * * Android -> Unity 콜백 요청시,
  * 1. [Android] AndroidUnityBridge의 reqeustCallbackToUnity (jsonMessage, callback) 호출.
  * 2. [Unity] 요청한 작업 처리 후, AndroidUnityBridge의 respondCallbackToAndroid (id, jsonResult) 호출.
@@ -50,8 +50,10 @@ public final class AndroidUnityBridge {
 
     // * * * C O N S T A N T S * * * //
 
+
     private IAndroidUnityCallback mInputCallback;
     private IAndroidUnityCallback mMessageCallback;
+
 
     // * * * C O N S T R U C T O R S * * * //
     private AndroidUnityBridge(PalaceApplication app) {
@@ -118,9 +120,8 @@ public final class AndroidUnityBridge {
             mCallbackMapF.put(id, callback);
         }
 
-        //TODO 어떠한 GameObject로 전달해야 하는지 알 수 없음.
-        //UnityPlayer.UnitySendMessage();
-        return true;
+        //TODO id를 반영하게 만들기
+        return sendSingleMessageToAndroid(jsonMessage);
     }
 
     /**
@@ -167,7 +168,7 @@ public final class AndroidUnityBridge {
      *
      * @param json 전송할 메시지
      */
-    public void sendInputMessageToUnity(String json) {
+    public synchronized void sendInputMessageToUnity(String json) {
         if (mInputCallback != null)
             mInputCallback.onCallback(json);
     }

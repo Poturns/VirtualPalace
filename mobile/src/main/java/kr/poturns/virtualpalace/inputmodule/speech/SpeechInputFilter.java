@@ -39,22 +39,22 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
 
     @Override
     public int isGoingTo(ArrayList<String> strings) {
-        return checkDirectionFor2D(strings);
+        return checkDirection(strings);
     }
 
     @Override
     public int isTurningTo(ArrayList<String> strings) {
-        return checkDirectionFor2D(strings);
+        return checkDirection(strings);
     }
 
     @Override
     public int isFocusingTo(ArrayList<String> strings) {
-        return checkDirectionFor2D(strings);
+        return checkDirection(strings);
     }
 
     @Override
     public int isZoomingTo(ArrayList<String> strings) {
-        return checkDirectionFor2D(strings);
+        return checkDirection(strings);
     }
 
     @Override
@@ -131,12 +131,25 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
         return Operation.NONE;
     }
 
-
-    private int checkDirectionFor3D(ArrayList<String> strings) {
+    private int checkDirection(ArrayList<String> strings) {
         final int N = strings.size();
         for (int i = 0; i < N; i++) {
             String s = strings.get(i);
 
+            //2d
+            if (WORD_DIRECTION_EAST.equals(s))
+                return Direction.EAST;
+
+            else if (WORD_DIRECTION_WEST.equals(s))
+                return Direction.WEST;
+
+            else if (WORD_DIRECTION_SOUTH.equals(s))
+                return Direction.SOUTH;
+
+            else if (WORD_DIRECTION_NORTH.equals(s))
+                return Direction.NORTH;
+
+            //3d
             if (WORD_DIRECTION_3D_BACKWARD.equals(s))
                 return Direction.BACKWARD;
 
@@ -151,26 +164,6 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
 
             else if (WORD_DIRECTION_3D_CENTER.equals(s))
                 return Direction.CENTER;
-        }
-        return Direction.NONE;
-    }
-
-    private int checkDirectionFor2D(ArrayList<String> strings) {
-        final int N = strings.size();
-        for (int i = 0; i < N; i++) {
-            String s = strings.get(i);
-
-            if (WORD_DIRECTION_EAST.equals(s))
-                return Direction.EAST;
-
-            else if (WORD_DIRECTION_WEST.equals(s))
-                return Direction.WEST;
-
-            else if (WORD_DIRECTION_SOUTH.equals(s))
-                return Direction.SOUTH;
-
-            else if (WORD_DIRECTION_NORTH.equals(s))
-                return Direction.NORTH;
         }
         return Direction.NONE;
     }

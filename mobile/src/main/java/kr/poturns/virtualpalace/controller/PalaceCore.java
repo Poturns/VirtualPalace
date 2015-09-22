@@ -9,13 +9,15 @@ import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.input.IControllerCommands;
+import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.util.DriveAssistant;
+
 
 /**
  * <b> INTERNAL CONTROLLER : 컨트롤러의 관리 기능을 다룬다 </b>
  * <p>
- *
+ * <p/>
  * </p>
  *
  * @author Yeonho.Kim
@@ -232,15 +234,15 @@ class PalaceCore {
                 Iterator<String> iter = content.keys();
 
                 // WHERE BETWEEN
-                if (IControllerCommands.JsonKey.WHERE_FROM.equalsIgnoreCase(condition)) {
-                    JSONObject dest = command.getJSONObject(IControllerCommands.JsonKey.WHERE_TO);
+                if (JsonKey.WHERE_FROM.equalsIgnoreCase(condition)) {
+                    JSONObject dest = command.getJSONObject(JsonKey.WHERE_TO);
 
                     while (iter.hasNext()) {
                         String key = iter.next();
                         builder.whereBetween(getField(table, key), content.getString(key), dest.getString(key));
                     }
 
-                } else if (IControllerCommands.JsonKey.WHERE_TO.equalsIgnoreCase(condition)){
+                } else if (JsonKey.WHERE_TO.equalsIgnoreCase(condition)) {
                     // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
 
@@ -251,24 +253,24 @@ class PalaceCore {
                         LocalDatabaseCenter.IField field = getField(table, key);
                         String value = content.getString(key);
 
-                        if (condition.equals(IControllerCommands.JsonKey.SET)) {
+                        if (condition.equals(JsonKey.SET)) {
                             builder.set(field, value);
 
-                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE)) {
+                        } else if (condition.equals(JsonKey.WHERE)) {
                             builder.whereEqual(field, value);
 
-                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_NOT)) {
+                        } else if (condition.equals(JsonKey.WHERE_NOT)) {
                             builder.whereNotEqual(field, value);
 
-                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_GREATER)) {
-                            builder.whereGreaterThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL)) ?
-                                    content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
+                        } else if (condition.equals(JsonKey.WHERE_GREATER)) {
+                            builder.whereGreaterThan(field, value, (content.has(JsonKey.ALLOW_EQUAL)) ?
+                                    content.getBoolean(JsonKey.ALLOW_EQUAL) : false);
 
-                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_SMALLER)) {
-                            builder.whereSmallerThan(field, value, (content.has(IControllerCommands.JsonKey.ALLOW_EQUAL)) ?
-                                    content.getBoolean(IControllerCommands.JsonKey.ALLOW_EQUAL) : false);
+                        } else if (condition.equals(JsonKey.WHERE_SMALLER)) {
+                            builder.whereSmallerThan(field, value, (content.has(JsonKey.ALLOW_EQUAL)) ?
+                                    content.getBoolean(JsonKey.ALLOW_EQUAL) : false);
 
-                        } else if (condition.equals(IControllerCommands.JsonKey.WHERE_LIKE)) {
+                        } else if (condition.equals(JsonKey.WHERE_LIKE)) {
                             builder.whereLike(field, value);
 
                         }
@@ -293,7 +295,6 @@ class PalaceCore {
     }
 
     /**
-     *
      * @return
      */
     boolean executeBackup() {

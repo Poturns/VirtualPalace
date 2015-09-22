@@ -443,7 +443,7 @@ public class LocalDatabaseCenter {
             if (mTableName == null)
                 mTableName = field.getTableName();
 
-            else if (mTableName != field.getTableName())
+            else if (!mTableName.equals(field.getTableName()))
                 throw new InvalidParameterException();
 
             return this;
