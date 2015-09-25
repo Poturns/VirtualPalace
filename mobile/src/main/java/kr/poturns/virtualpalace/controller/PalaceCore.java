@@ -134,7 +134,33 @@ class PalaceCore {
             mSupportsFlag ^= supportType;
             connector.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
         }
+    }
 
+    /**
+     *
+     * @param supportType
+     */
+    void activateInputConector(int supportType) {
+        OperationInputConnector connector = mInputConnectorMapF.get(supportType);
+
+        if (connector != null) {
+            mSupportsFlag |= supportType;
+            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
+        }
+
+    }
+
+    /**
+     *
+     * @param supportType
+     */
+    void deactivateInputConnector(int supportType) {
+        OperationInputConnector connector = mInputConnectorMapF.get(supportType);
+
+        if (connector != null) {
+            mSupportsFlag ^= supportType;
+            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
+        }
     }
 
     /**

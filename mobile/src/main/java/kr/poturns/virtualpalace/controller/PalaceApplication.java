@@ -7,6 +7,8 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 
+import java.security.InvalidParameterException;
+
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.input.GlobalApplication;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
@@ -66,22 +68,30 @@ public class PalaceApplication extends GlobalApplication {
 
     // * * * I N H E R I T S * * * //
     @Override
-    public Handler getControlHandler() {
+    public Handler getInputHandler(int supportType) {
         PalaceMaster master = PalaceMaster.getInstance(this);
         if (master != null)
-            return master.getInputHandler();
+            return master.getInputHandler(supportType);
 
         return null;
     }
 
     @Override
-    public void setInputConnector(int supportType, OperationInputConnector connector) {
-        if (supportType > 0)
-            return;
-
+    public Handler setInputConnector(int supportType, OperationInputConnector connector) {
         PalaceMaster master = PalaceMaster.getInstance(this);
-        if (master != null)
-            master.attachInputConnector(supportType, connector);
+
+        if (supportType < 0)
+            throw new InvalidParameterException("SupportType is not valid.");
+
+        if ( master != null) {
+            if (connector != null)
+                master.attachInputConnector(supportType, connector);
+            else
+                master.detachInputConnector(supportType);
+
+            return master.getInputHandler(supportType);
+        }
+        return null;
     }
 
 

@@ -48,6 +48,10 @@ public interface IControllerCommands {
     /**
      *
      */
+    int REQUEST_MESSAGE = 0x10;
+    /**
+     *
+     */
     int REQUEST_MESSAGE_FROM_UNITY = 0x10;
     /**
      *

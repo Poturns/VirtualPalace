@@ -136,7 +136,7 @@ public class LocalDatabaseCenter {
      */
     private static final String NAME = "LocalDB";
 
-    private static final int VERSION = 0;
+    private static final int VERSION = 1;
 
     private final Context mContextF;
 

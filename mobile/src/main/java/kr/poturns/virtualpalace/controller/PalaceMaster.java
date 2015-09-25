@@ -4,6 +4,7 @@ import android.app.Instrumentation;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import org.json.JSONException;
@@ -37,11 +38,11 @@ public class PalaceMaster extends PalaceCore {
     // * * * C O N S T A N T S * * * //
     private final InputHandler mInputHandlerF;
     private final RequestHandler mRequestHandlerF;
+    private final ThreadGroup mOperationGroupF;
     //private final GoogleServiceAssistant mGoogleServiceAssistantF;
 
 
     // * * * F I E L D S * * * //
-
 
 
     // * * * C O N S T R U C T O R S * * * //
@@ -51,8 +52,16 @@ public class PalaceMaster extends PalaceCore {
         mInputHandlerF = new InputHandler();
         mRequestHandlerF = new RequestHandler();
 
+        mOperationGroupF = new ThreadGroup("PalaceMaster");
         //mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
     }
+
+
+    // * * * M E T H O D S * * * //
+    protected void destroy() {
+
+    }
+
 
 
     // * * * I N N E R  C L A S S E S * * * //
@@ -66,9 +75,11 @@ public class PalaceMaster extends PalaceCore {
      * @author Yeonho.Kim
      */
     private final class InputHandler extends Handler implements IControllerCommands, IOperationInputFilter.Operation {
+        private static final long INTERVAL = 400;   // ms : 2.5 FPS
 
         private final Object inputLock = new Object();
         private JSONObject singleMessage;
+        private long mExpectedFlushTime;
 
         private InputHandler() {
             init();
@@ -80,12 +91,14 @@ public class PalaceMaster extends PalaceCore {
 
         @Override
         public void handleMessage(Message msg) {
+            // 활성화되지 않은 InputConnector 로부터 전달된 메시지는 처리하지 않는다.
             int from = msg.arg1;
+            if ((mSupportsFlag & from) != from)
+                return;
 
             switch(msg.what) {
                 case INPUT_SYNC_COMMAND:
                     send();
-                    sendEmptyMessageDelayed(INPUT_SYNC_COMMAND, 400);   // ms : 2.5 FPS
                     break;
 
                 case INPUT_SINGLE_COMMAND:
@@ -98,9 +111,6 @@ public class PalaceMaster extends PalaceCore {
                     for (int[] command : cmds)
                        doPackOnScanning(command);
                     break;
-
-                default:
-                    break;
             }
         }
 
@@ -109,6 +119,16 @@ public class PalaceMaster extends PalaceCore {
          * @param command
          */
         private void doPackOnScanning(int[] command) {
+            long current = System.currentTimeMillis();
+
+            // JsonMessage 객체를 초기화한 후 첫 입력 값이거나,
+            // 예상 전송 시간을 넘길 때까지 명령이 생략되었을 경우
+            // 메시지 전송을 예약한다.
+            if (singleMessage.length() == 0 || current > mExpectedFlushTime) {
+                mExpectedFlushTime = current + INTERVAL;
+                sendEmptyMessageDelayed(INPUT_SYNC_COMMAND, INTERVAL);
+            }
+
             int cmd = command[0];
             int value;
 
@@ -169,20 +189,30 @@ public class PalaceMaster extends PalaceCore {
                                 int curr_d = command[1];
                                 int curr_a = command[2];
 
-                                // 각 축 별로 값을 분해하여, 합산한다.
-                                int axisX = filterD(old_d) * old_a + filterD(curr_d) * curr_a;
-                                old_d /= 10;
-                                curr_d /= 10;
-                                int axisY = filterD(old_d) * old_a + filterD(curr_d) * curr_a;
-                                old_d /= 10;
-                                curr_d /= 10;
-                                int axisZ = filterD(old_d) * old_a + filterD(curr_d) * curr_a;
+                                if (old_d == curr_d && old_a % 10 > 0) {
+                                    // VALUE 에 1의 자리수가 존재할 경우,
+                                    // SEPARATION 미만의 수는 해당 명령이 발생한 횟수를 의미한다.
+                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION+ (old_a + curr_a);
 
-                                value = convertV(axisX, axisY, axisZ);
+                                } else {
+                                    // VALUE 에 1의 자리수가 존재하지 않을 경우,
+                                    // 각 축 별로 값을 분해하여, 합산한다.
+                                    // 이때, 10의 자리수부터 차례대로 각 축별 이벤트 발생 횟수를 의미한다.
+                                    int axisX = filterD(old_d) * old_a + filterD(curr_d) * curr_a;
+                                    old_d /= 10;
+                                    curr_d /= 10;
+                                    int axisY = filterD(old_d) * old_a + filterD(curr_d) * curr_a;
+                                    old_d /= 10;
+                                    curr_d /= 10;
+                                    int axisZ = filterD(old_d) * old_a + filterD(curr_d) * curr_a;
+
+                                    value = convertV(axisX, axisY, axisZ);
+                                }
+
 
                             } catch (JSONException e) {
                                 // 초기 값 설정
-                                // VALUE = CODE * 1000 + AMOUNT
+                                // VALUE = CODE * 100000 + AMOUNT
                                 value = command[1] * IOperationInputFilter.Direction.SEPARATION + command[2];
                             }
 
@@ -220,26 +250,40 @@ public class PalaceMaster extends PalaceCore {
          * @return
          */
         private int convertV(int axisX, int axisY, int axisZ) {
-            int v_x = (axisX == 0)? Integer.MAX_VALUE : Math.abs(axisX);
-            int v_y = (axisY == 0)? Integer.MAX_VALUE : Math.abs(axisY);
-            int v_z = (axisZ == 0)? Integer.MAX_VALUE : Math.abs(axisZ);
+            int levelX = 1, levelY = 1, levelZ = 1;
 
-            int unit = Math.min(v_x, Math.min(v_y, v_z));
+            // 각 축별 횟수는 각 자리수마다 할당되므로, 10 미만의 수이어야 한다.
+            // Amount 가 10을 넘어갈 경우, Direction Level 을 상승시켜 횟수를 감소시킨다.
+            int absX = Math.abs(axisX);
+            while (absX / levelX >= 10)
+                levelX++;
+            levelX *= (axisX > 0? 1 : -1);
 
-            float f_x = axisX / (float) unit;
-            float f_y = axisY / (float) unit;
-            float f_z = axisZ / (float) unit;
+            int absY = Math.abs(axisY);
+            while (absY/ levelY >= 10)
+                levelY++;
+            levelY *= (axisY > 0? 1 : -1);
 
-            int x = (axisX == 0)? 0 : Math.min(9, Math.max(1,
-                    (int)(f_x + (f_x > 0? 5.5 : 4.5))));
-            int y = (axisY == 0)? 0 : Math.min(9, Math.max(1,
-                    (int)(f_y + (f_y > 0? 5.5 : 4.5))));
-            int z = (axisZ == 0)? 0 : Math.min(9, Math.max(1,
-                    (int)(f_z + (f_z > 0? 5.5 : 4.5))));
+            int absZ = Math.abs(axisZ);
+            while (absZ / levelZ >= 10)
+                levelZ++;
+            levelZ *= (axisZ > 0? 1 : -1);
 
-            int operation = x + (z == 5? 0 : z * 100);
-            operation += ((y == 5 && operation < 100)? 0 : y * 10);
-            return operation * IOperationInputFilter.Direction.SEPARATION + unit;
+
+            // Direction Level 을 적용한다.
+            int x = (axisX == 0)? 0 : Math.min(9, Math.max(1,levelX + 5));
+            int y = (axisY == 0)? 0 : Math.min(9, Math.max(1,levelY + 5));
+            int z = (axisZ == 0)? 0 : Math.min(9, Math.max(1,levelZ + 5));
+
+            // 차원 수에 맞는 Direction 값을 만든다.
+            int direction = x + (z == 5? 0 : z * 100);
+            direction += ((y == 5 && direction < 100)? 0 : y * 10);
+
+            // 각 축별 Amount 를 계산하기 때문에 1의 자리수는 사용하지 않고,
+            // 10의 자리수부터 차례대로 축별 Amount 를 기록한다.
+            int amount = ((axisX / levelX) * 10) + ((axisY / levelY) * 100) + ((axisZ / levelZ) * 1000);
+
+            return direction * IOperationInputFilter.Direction.SEPARATION + amount;
         }
 
 
@@ -247,11 +291,14 @@ public class PalaceMaster extends PalaceCore {
          *
          */
         private void send() {
+            Log.d("PalaceMast_Input","Input Message : " + singleMessage.length() + " transfered. " + singleMessage.toString());
             if (singleMessage.length() == 0)
                 return;
 
             synchronized (inputLock) {
                 AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
+
+                // Send 후 JsonMessage 초기화.
                 init();
             }
         }
@@ -268,30 +315,58 @@ public class PalaceMaster extends PalaceCore {
      */
     private final class RequestHandler extends Handler implements IControllerCommands, IControllerCommands.JsonKey {
 
-        // TODO : THREAD 관리 및 처리.
-
         @Override
         public void handleMessage(Message msg) {
+            Runnable runnable = null;
             switch (msg.what) {
-                case REQUEST_MESSAGE_FROM_UNITY:
-                    process((String) msg.obj);
-                    break;
+                case REQUEST_MESSAGE: {
+                    //case REQUEST_MESSAGE_FROM_UNITY:  // REQUEST_MESSAGE 와 동일.
+                    final String jsonMessage = (String) msg.obj;
 
-                case REQUEST_CALLBACK_FROM_UNITY:
+                    runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            process(jsonMessage);
+                        }
+                    };
+                } break;
+
+                case REQUEST_CALLBACK_FROM_UNITY: {
                     Bundle bundle = (Bundle) msg.obj;
-                    long id = bundle.getLong(AndroidUnityBridge.BUNDLE_KEY_ID);
-                    String jsonMessage = bundle.getString(AndroidUnityBridge.BUNDLE_KEY_MESSAGE_JSON);
+                    final long id = bundle.getLong(AndroidUnityBridge.BUNDLE_KEY_ID);
+                    final String jsonMessage = bundle.getString(AndroidUnityBridge.BUNDLE_KEY_MESSAGE_JSON);
 
-                    JSONObject result = process(jsonMessage);
-                    AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
-                    break;
+                    runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            JSONObject result = process(jsonMessage);
+                            AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
+                        }
+                    };
+                } break;
 
+                default:
+                    return;
             }
+
+            // UI Thread 에서의 연산 과부하를 막기위해, Thread 로 요청받은 작업을 수행한다.
+            // ※ Thread 내에서 Message 객체에 접근할 때, 정상적인 데이터를 불러오지 못하는 문제가 있음.
+            Thread worker = new Thread(mOperationGroupF, runnable, "OperationWorker");
+            worker.setDaemon(true);
+            worker.start();
         }
 
+        /**
+         * JSON 메시지를 분류하여, 요청한 기능을 수행한다.
+         *
+         * @param jsonMessage
+         * @return
+         */
         private JSONObject process(String jsonMessage) {
             JSONObject jsonResult = new JSONObject();
             boolean result = false;
+
+            Log.d("PalaceMaster_Request", "Request Message : " + jsonMessage);
 
             try {
                 JSONObject message = new JSONObject(jsonMessage);
@@ -322,13 +397,14 @@ public class PalaceMaster extends PalaceCore {
                         int mode = message.getInt(key);
                         result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
-                        //TODO UNITY에서 전송하는 deviceType은 IControllerCommands.TYPE_INPUT**** 임 -mj
                     } else if (key.equals(ACTIVATE_INPUT)) {
-                        int deviceType = message.getInt(key);
+                        // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
+                        int supportType = message.getInt(key);
+                        activateInputConector(supportType);
 
                     } else if (key.equals(DEACTIVATE_INPUT)) {
-                        int deviceType = message.getInt(key);
-
+                        int supportType = message.getInt(key);
+                        deactivateInputConnector(supportType);
                     }
                 }
                 jsonResult.put(RESULT, result? "success" : "fail");
@@ -346,7 +422,9 @@ public class PalaceMaster extends PalaceCore {
 
 
     // * * * G E T T E R S & S E T T E R S * * * //
-    public Handler getInputHandler() {
+    public Handler getInputHandler(int supportType) {
+        if (mInputConnectorMapF.get(supportType) == null)
+            return null;
 
         return mInputHandlerF;
     }

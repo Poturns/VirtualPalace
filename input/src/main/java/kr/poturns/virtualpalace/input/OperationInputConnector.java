@@ -16,6 +16,7 @@ public class OperationInputConnector {
      * CONTROLLER 사용 KEY : 본 CONNECTOR 활성화 여부
      */
     public static final int KEY_ENABLE = 0x1;
+    public static final int KEY_ACTIVATE = 0x2;
 
     public static final int VALUE_TRUE = 1;
     public static final int VALUE_FALSE = 0;
@@ -25,7 +26,7 @@ public class OperationInputConnector {
     /**
      * CONTROLLER 의 핸들러
      */
-    private final Handler mControlHandlerF;
+    private final Handler mControllerInputHandlerF;
     /**
      * CONNECTOR 명칭
      */
@@ -35,9 +36,20 @@ public class OperationInputConnector {
 
     // * * * F I E L D S * * * //
     /**
-     * 활성화 플래그 : CONTROLLER 가 제어.
+     * 사용 가능 플래그 : CONTROLLER 가 제어.
+     *
+     * - CONTROLLER 에서 해당 Connector 정보를 유지하고 있는지 여부를 나타낸다.
+     *  Enabled 플래그가 활성화 되어 있지 않을 경우, 데이터 전송 자체를 BLOCK 한다.
      */
     private boolean isEnabled = false;
+    /**
+     * 활성화 플래그 : CONTROLLER 가 제어.
+     *
+     * - CONTROLLER 에서 해당 Connector 정보를 유지하고는 있으나,
+     *  일시적으로 명령을 받아들이는가 여부를 내부에서 판단한다.
+     *  Connector 에서는 활성화 플래그와 관계없이 데이터를 전송할 수 있다.
+     */
+    private boolean isActivated = false;
 
 
 
@@ -51,7 +63,7 @@ public class OperationInputConnector {
             app.setInputConnector(supportType, this);
         }
 
-        mControlHandlerF = (app == null)? null : app.getControlHandler();
+        mControllerInputHandlerF = (app == null)? null : app.getInputHandler(supportType);
     }
 
 
@@ -64,10 +76,10 @@ public class OperationInputConnector {
      * @return
      */
     protected boolean transferDataset(int[] inputRst) {
-        if (mControlHandlerF == null || !isEnabled)
+        if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControlHandlerF, IControllerCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
         return true;
     }
 
@@ -78,10 +90,10 @@ public class OperationInputConnector {
      * @return
      */
     protected boolean transferDataset(int[][] inputRstArray) {
-        if (mControlHandlerF == null || !isEnabled)
+        if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControlHandlerF, IControllerCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
         return true;
     }
 
@@ -100,7 +112,9 @@ public class OperationInputConnector {
         switch (key) {
             case KEY_ENABLE:
                 isEnabled = (value == VALUE_TRUE)? true : false;
-                break;
+
+            case KEY_ACTIVATE:
+                isActivated = (value == VALUE_TRUE)? true : false;
         }
     }
 
