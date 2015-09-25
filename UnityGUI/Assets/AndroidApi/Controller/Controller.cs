@@ -1,10 +1,6 @@
 ﻿namespace AndroidApi.Controller
 {
-    /// <summary>
-    /// Controller와 연관된 Api가 기술되어 있는 클래스
-    /// </summary>
-    public sealed class Controller
-    {
+ 
         /// <summary>
         /// Input Module을 통해 전송되는 명령
         /// </summary>
@@ -93,34 +89,41 @@
                 return Type == GO || Type == TURN || Type == FOCUS || Type == ZOOM;
             }
 
+            public override string ToString()
+            {
+                return "[ Type : " + Type + " , Value : " + Value + " ]";
+            }
+
         }
 
 
         /// <summary>
-        ///  <b>DIRECTION  CONSTANTS</b>
-        /// 1-차원 : x축 > 1의 자리
-        /// 2-차원 : y축 > 10의 자리
-        /// 3-차원 : z축 > 100의 자리
+        ///  <b>DIRECTION  CONSTANTS</b> <para />
+        /// 
+        /// 1-차원 : x축 > 1의 자리 <para />
+        /// 2-차원 : y축 > 10의 자리 <para />
+        /// 3-차원 : z축 > 100의 자리 <para />
         ///
-        /// ( 0 = 해당 축에 값이 존재하지 않는 경우 )
-        /// ( 유효한 수의 범위 = 1 ~ 9 )
-        /// ( 각 축의 영점 = 5 )
+        /// ( 0 = 해당 축에 값이 존재하지 않는 경우 ) <para />
+        /// ( 유효한 수의 범위 = 1 ~ 9 )<para />
+        /// ( 각 축의 영점 = 5 ) <para />
+        /// 
+        /// Example ) 2차원일 경우, (16방위표)       <para />
+        ///               N                                   <para />                     
+        ///               9-                                  <para />
         ///
-        /// Example ) 2차원일 경우, (16방위표)
-        ///               N
-        ///               9-
+        ///               7-    * => 77 .. NE 북동쪽.  <para />
         ///
-        ///               7-    * => 77 .. NE 북동쪽.
+        /// W 1-  3-  5-  7-  9- E (x축)     <para />
         ///
-        /// W 1-    3-    5-    7-    9- E (x축)
+        ///               3-                                    <para />
         ///
-        ///               3-
+        ///               1-    * => 17 .. SSE 남남동쪽     <para />
+        ///               S                                           <para />           
+        ///              (y축)                                     <para />      
         ///
-        ///               1-    * => 17 .. SSE 남남동쪽
-        ///              S
-        ///              (y축)
+        /// Example ) 3차원일 경우, 스마트폰 카메라 시야를 기준으로 축을 설정함. <para />
         ///
-        /// Example ) 3차원일 경우, 스마트폰 카메라 시야를 기준으로 축을 설정함.
         /// </summary>
         public struct Direction
         {
@@ -248,5 +251,3 @@
         AR,
         VR
     }
-
-}

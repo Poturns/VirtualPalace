@@ -62,7 +62,7 @@ public class BasicInputFragment extends BaseFragment {
         sensorInputCollector.setResultListener(new InputCollector.OnInputResultListener<SensorMovementData>() {
             @Override
             public void onInputResult(SensorMovementData sensorMovementData) {
-                Toast.makeText(getActivity(), String.format("sensor : [ %s ]", sensorMovementData.toString()), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getActivity(), String.format("sensor : [ %s ]", sensorMovementData.toString()), Toast.LENGTH_SHORT).show();
                 if (!isInShaking) {
                     if (sensorMovementData.speed > SHAKING_MIN_SPEED) {
                         isInShaking = true;

@@ -46,9 +46,15 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\AndroidApi\AndroidUnityBridge.cs" />
      <Compile Include="Assets\AndroidApi\AndroidUtils.cs" />
-     <Compile Include="Assets\AndroidApi\InternalIAndroidUnityCallback.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\AndroidUnityBridge.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\Controller.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\InternalIAndroidUnityCallback.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\JsonInterpreter.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\Request\Database\DatabaseRequest.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\Request\Database\DatabaseRequests.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\Request\IRequest.cs" />
+     <Compile Include="Assets\AndroidApi\Controller\Request\StateNotifyRequest.cs" />
      <Compile Include="Assets\AndroidApi\Media\BaseDirInfo.cs" />
      <Compile Include="Assets\AndroidApi\Media\BaseInfo.cs" />
      <Compile Include="Assets\AndroidApi\Media\ImageDirInfo.cs" />
@@ -91,6 +97,7 @@
      <Compile Include="Assets\MyScript\States\VRSceneIdleState.cs" />
      <Compile Include="Assets\PrefabContainer.cs" />
      <Compile Include="Assets\SceneChange.cs" />
+     <Compile Include="Assets\TestRequest.cs" />
      <Compile Include="Assets\TestScriptCode.cs" />
      <Compile Include="Assets\Utils\AsyncTasker.cs" />
      <Compile Include="Assets\Utils\Utils.cs" />

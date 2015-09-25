@@ -1,5 +1,6 @@
 package kr.poturns.virtualpalace.controller;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.util.LongSparseArray;
@@ -158,9 +159,16 @@ public final class AndroidUnityBridge {
      *
      * @param json 전송할 메시지
      */
-    public synchronized void sendSingleMessageToUnity(String json) {
-        if (mMessageCallback != null)
-            mMessageCallback.onCallback(json);
+    public synchronized void sendSingleMessageToUnity(final String json) {
+        if (mMessageCallback != null) {
+            // Input이 아닌 기타 Message는 ThreadPool에서 병렬전송
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+                @Override
+                public void run() {
+                    mMessageCallback.onCallback(json);
+                }
+            });
+        }
     }
 
     /**
@@ -168,9 +176,16 @@ public final class AndroidUnityBridge {
      *
      * @param json 전송할 메시지
      */
-    public synchronized void sendInputMessageToUnity(String json) {
-        if (mInputCallback != null)
-            mInputCallback.onCallback(json);
+    public synchronized void sendInputMessageToUnity(final String json) {
+        if (mInputCallback != null) {
+            // Input은 하나의 Thread에서 순차적으로 전송
+            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+                @Override
+                public void run() {
+                    mInputCallback.onCallback(json);
+                }
+            });
+        }
     }
 
     /**

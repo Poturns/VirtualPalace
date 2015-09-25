@@ -2,6 +2,6 @@
     <string name="app_name">Communication</string>
 
     <array name="android_wear_capabilities">
-        send_data
+        <item>send_data</item>
     </array>
 </resources>

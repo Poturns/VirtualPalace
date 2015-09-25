@@ -1,14 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
-
-//using AndroidApi.Media;
+using AndroidApi.Controller;
 
 public class ExternalInput : MonoBehaviour
 {
 
 	private List<AndroidApi.Media.ImageDirInfo> imageDirInfo;
 	private int count = 0;
+
+    void Start()
+    {
+        AndroidUnityBridge.GetInstance().OnInputReceived += (inputs)=>{
+            string s = "";
+
+            foreach (Operation op in inputs)
+                s += op.ToString() + "\n";
+            Debug.Log(s);
+        };
+    }
 
 	public void TestCode ()
 	{

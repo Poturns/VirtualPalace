@@ -31,7 +31,7 @@ public class LocalDatabaseCenter {
     // * * * S I N G L E T O N * * * //
     private static LocalDatabaseCenter sInstance;
 
-    public static final LocalDatabaseCenter getInstance(Context context) {
+    public static LocalDatabaseCenter getInstance(Context context) {
         if (sInstance == null)
             sInstance = new LocalDatabaseCenter(context);
         return sInstance;
@@ -136,7 +136,7 @@ public class LocalDatabaseCenter {
      */
     private static final String NAME = "LocalDB";
 
-    private static final int VERSION = 0;
+    private static final int VERSION = 1;
 
     private final Context mContextF;
 

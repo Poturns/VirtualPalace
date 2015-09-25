@@ -1,46 +1,99 @@
 ﻿using LitJson;
+using System;
 
 namespace AndroidApi.Controller.Request.Database
 {
-    /*
-      Command : {
-                Operation : {       
-                 Field - Value
-
-                }
-            }
-
-        예시 : 
-      INSERT_VR/AR/RES : {
-                SET : {
-                 //  삽입할 필드 - 값
-
-                }
-            }
-    */
     /// <summary>
     /// Database관련 처리를 요청하는 IRequest
     /// </summary>
-    public class DatabaseRequest : IRequest
+    public interface IDatabaseRequest : IRequest
     {
-        internal JsonData jData = new JsonData();
-   
-        public IInsert INSERT
+
+        IInsert INSERT
         {
             get;
-            
+        }
+
+        IUpdate UPDATE
+        {
+            get;
+        }
+
+        IDelete DELETE
+        {
+            get;
+        }
+
+    }
+
+
+    public interface ICommand
+    {
+        /// <summary>
+        /// Database Operation을 마치고 추가적으로 다른 Operation을 요청하기 위해 IDatabaseRequest객체를 반환한다.
+        /// <para />
+        /// * 추가적으로 Operation을 요청하지 않는다면 이 메소드를 호출하지 않아도 상관없다.
+        /// </summary>
+        /// <returns>IDatabaseRequest 객체</returns>
+        IDatabaseRequest End();
+    }
+
+    public interface IInsert : ICommand
+    {
+        IInsert Set(Place place, Enum field, string value);
+    }
+
+    public interface IDelete : ICommand
+    {
+        IDelete Where(Place place, Enum field, string value);
+        IDelete WhereGreater(Place place, Enum field, string value, bool allowEqual);
+        IDelete WhereSmaller(Place place, Enum field, string value, bool allowEqual);
+        IWhereFrom<IDelete> WhereFrom(Place place, Enum field, string value);
+        IDelete WhereLike(Place place, Enum field, string value);
+    }
+
+    public interface IUpdate : ICommand
+    {
+        IUpdate Set(Place place, Enum field, string value);
+        IUpdate Where(Place place, Enum field, string value);
+        IUpdate WhereGreater(Place place, Enum field, string value, bool allowEqual);
+        IUpdate WhereSmaller(Place place, Enum field, string value, bool allowEqual);
+        IWhereFrom<IUpdate> WhereFrom(Place place, Enum field, string value);
+        IUpdate WhereLike(Place place, Enum field, string value);
+    }
+
+    public interface IWhereFrom<T>
+    {
+        T WhereTo(Place place, Enum field, string value);
+    }
+
+
+    public static class DatabaseRequests
+    {
+        public static IDatabaseRequest NewRequest()
+        {
+            return new DatabaseRequest();
+        }
+
+    }
+
+    internal class DatabaseRequest : IDatabaseRequest
+    {
+        internal JsonData jData = new JsonData();
+
+        public IInsert INSERT
+        {
+            get; private set;
         }
 
         public IUpdate UPDATE
         {
-            get;
-            
+            get; private set;
         }
 
         public IDelete DELETE
         {
-            get;
-           
+            get; private set;
         }
 
         public DatabaseRequest()
@@ -66,6 +119,4 @@ namespace AndroidApi.Controller.Request.Database
         }
 
     }
-
-
 }

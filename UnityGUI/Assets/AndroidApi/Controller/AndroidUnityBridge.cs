@@ -1,4 +1,3 @@
-using AndroidApi.Controller;
 using AndroidApi.Controller.Request;
 using System;
 using System.Runtime.CompilerServices;
@@ -28,12 +27,21 @@ namespace AndroidApi.Controller
             return sInstance;
         }
 
+
         /// <summary>
         /// java 형태의 AndroidUnityBridge 객체
         /// </summary>
         private AndroidJavaObject javaAndroidUnityBridge;
-        private Action<string> messageCallback;
-        private Action<Controller.Operation[]> inputCallback;
+		/// <summary>
+		/// Single 메시지를 전달받는 event
+		/// </summary>
+        public event Action<string> OnMessageReceived;
+		/// <summary>
+		/// Input 메시지를 전달받는 event
+		/// </summary>
+        public event Action<Controller.Operation[]> OnInputReceived;
+
+
 
         private AndroidUnityBridge()
         {
@@ -49,35 +57,15 @@ namespace AndroidApi.Controller
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void OnInputCallback(string json)
         {
-            if (inputCallback != null)
-                inputCallback(JsonInterpreter.InterpretInputCommands(json));
+            if (OnInputReceived != null)
+                OnInputReceived(JsonInterpreter.InterpretInputCommands(json));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void OnMessageCallback(string json)
         {
-            if (messageCallback != null)
-                messageCallback(json);
-        }
-
-        /// <summary>
-        /// Input 메시지를 전달받을 콜백을 등록한다.
-        /// </summary>
-        /// <param name="callback"> Input 메시지를 전달받을 콜백</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void SetInputCallback(Action<Controller.Operation[]> callback)
-        {
-            inputCallback = callback;
-        }
-
-        /// <summary>
-        /// Single 메시지를 전달받을 콜백을 등록한다.
-        /// </summary>
-        /// <param name="callback">Single 메시지를 전달받을 콜백</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void SetMessageCallback(Action<string> callback)
-        {
-            messageCallback = callback;
+            if (OnMessageReceived != null)
+                OnMessageReceived(json);
         }
 
         /// <summary>
@@ -113,12 +101,6 @@ namespace AndroidApi.Controller
             return javaAndroidUnityBridge.Call<bool>("sendSingleMessageToAndroid", jsonMessage);
         }
 
-
-    }
-
-
-    internal class SimpleAndroidCallback
-    {
 
     }
 

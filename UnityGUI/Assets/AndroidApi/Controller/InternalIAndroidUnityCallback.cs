@@ -34,5 +34,9 @@ namespace AndroidApi.Controller
             if (androidUnityCallback != null)
                 androidUnityCallback(json);
         }
+
+		public string toString(){
+			return "InternalIAndroidUnityCallback : " + ToString();
+		}
     }
 }

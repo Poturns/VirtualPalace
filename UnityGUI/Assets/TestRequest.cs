@@ -7,7 +7,8 @@ public class TestRequest : MonoBehaviour
 {
     public void Test()
     {
-        DatabaseRequest request = new DatabaseRequest();
+
+        IDatabaseRequest request = DatabaseRequests.NewRequest();
 
         request
             .INSERT

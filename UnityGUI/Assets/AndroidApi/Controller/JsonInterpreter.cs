@@ -1,6 +1,5 @@
 ﻿using LitJson;
 using System;
-using static AndroidApi.Controller.Controller;
 
 namespace AndroidApi.Controller
 {
