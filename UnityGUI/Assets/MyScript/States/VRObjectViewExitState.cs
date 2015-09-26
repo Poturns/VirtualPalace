@@ -8,27 +8,27 @@ namespace MyScript.States
 	{
 		private StateManager manager;
 		
-		private GameObject SelTarget;
-		private GameObject SelText;
+		private GameObject UIBookMesh;
+		private GameObject UITitleTextObj;
 		
 		public VRObjectViewExitState (StateManager managerRef)
 		{
 			manager = managerRef;
 			
 			
-			Debug.Log ("VRObjectView");
+			Debug.Log ("VRObjectViewExit");
 			
-			SelTarget = GameObject.FindWithTag ("Disposol");
-			if (!SelTarget)
-				Debug.Log ("VRObjectViewExitState:Sel Target is Null");
-			GameObject.Destroy (SelTarget);
+			UIBookMesh = GameObject.Find ("UIBook");
+			if (!UIBookMesh)
+				Debug.Log ("Sel Target is Null");
 
-			SelText = GameObject.Find ("SelectTargetText");
-			if (!SelText)
+			UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+
+			UITitleTextObj = GameObject.Find ("UITitleText");
+			if (!UITitleTextObj)
 				Debug.Log ("Sel Text is Null");
 			
-			
-			SelText.GetComponent<TextMesh>().text = "";
+			UITitleTextObj.GetComponent<TextMesh>().text = "";
 	
 
 			
