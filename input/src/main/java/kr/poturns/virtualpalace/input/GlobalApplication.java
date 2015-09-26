@@ -10,7 +10,7 @@ import android.os.Handler;
  */
 public abstract class GlobalApplication extends Application {
 
-    public abstract Handler getControlHandler();
+    public abstract Handler getInputHandler(int supportType);
 
-    public abstract void setInputConnector(int supportType, OperationInputConnector connector);
+    public abstract Handler setInputConnector(int supportType, OperationInputConnector connector);
 }

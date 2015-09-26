@@ -107,7 +107,7 @@ public interface IOperationInputFilter<InputUnit> {
         /**
          * Direction | Amount, 분리 계수.
          */
-        int SEPARATION = 1000;
+        int SEPARATION = 100000;
 
         /**
          *
