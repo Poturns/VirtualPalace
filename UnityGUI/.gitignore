@@ -1,5 +1,8 @@
 /Library/ShaderCache
 /Library/metadata
+/Library/*.log
+
+/Temp
 
 /*.csproj
 /*.sln

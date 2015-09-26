@@ -6,7 +6,10 @@ using MyScript.States;
 public class MemoObject : MonoBehaviour 
 {
 
-	
+	public string Title {
+		get;
+		set;
+	}
 	private string Memo;
 	public GameObject UIObject;
 
@@ -29,6 +32,7 @@ public class MemoObject : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 		Memo = "Test Memo String";
+		Title = "Test Title";
 	}
 	
 	// Update is called once per frame

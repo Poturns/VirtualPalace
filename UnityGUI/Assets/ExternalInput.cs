@@ -6,12 +6,12 @@ using UnityEngine.UI;
 public class ExternalInput : MonoBehaviour {
 
 	public void TestCode(){
-		string temp = AndroidApi.Media.ImageDirInfo.GetDirInfoList( AndroidApi.AndroidUtils.GetActivityObject ())[0].FirstInfo.Path;
+		//string temp = AndroidApi.Media.ImageDirInfo.GetDirInfoList( AndroidApi.AndroidUtils.GetActivityObject ())[0].FirstInfo.Path;
 
-		gameObject.GetComponent<Image>().sprite = Sprite.Create(Utils.Image.Load (temp) ,
+		gameObject.GetComponent<Image> ().sprite = null;/*Sprite.Create(Utils.Image.Load (temp) ,
 		                                                                gameObject.GetComponent<RectTransform>().rect ,
 		                                                                gameObject.GetComponent<RectTransform>().pivot);
-
+*/
 	}
 
 }
