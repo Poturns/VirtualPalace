@@ -1,5 +1,7 @@
 package kr.poturns.virtualpalace.controller;
 
+import android.database.Cursor;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,6 +73,11 @@ class PalaceCore {
 
 
     // * * * M E T H O D S * * * //
+
+    /**
+     *
+     * @param listener
+     */
     void attachOnPlayModeChangedListener(OnPlayModeListener listener) {
         if (listener == null)
             return ;
@@ -80,6 +87,10 @@ class PalaceCore {
         listener.onAttached(key);
     }
 
+    /**
+     *
+     * @param key
+     */
     void detachOnPlayModeChangedListener(long key) {
         if (key == 0)
             return ;
@@ -103,6 +114,7 @@ class PalaceCore {
 
     /**
      * {@link OperationInputConnector}를 Controller 에 연결한다.
+     * 연결할 경우, 자동으로 활성화된다.
      *
      * @param connector Connector Support Type
      * @param supportType Connector Instance
@@ -114,16 +126,18 @@ class PalaceCore {
             attached.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
         }
 
-        // 동일 SupportType 은 새로운 Connector 로 연결된다.
+        // 동일 SupportType 은 새로운 Connector 로 연결되고, 활성화 된다.
         if (connector != null) {
             mSupportsFlag |= supportType;
             mInputConnectorMapF.put(supportType, connector);
             connector.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_TRUE);
+            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
         }
     }
 
     /**
      * {@link OperationInputConnector}를 Controller 에서 해제한다.
+     * 해제할 경우, 자동으로 비활성화된다.
      *
      * @param supportType Connector Support Type
      */
@@ -131,12 +145,18 @@ class PalaceCore {
         OperationInputConnector connector = mInputConnectorMapF.remove(supportType);
 
         if (connector != null) {
-            mSupportsFlag ^= supportType;
+            mSupportsFlag = 0;
+            for(int type : mInputConnectorMapF.keySet())
+                mSupportsFlag |= type;
+
             connector.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
+            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
         }
     }
 
     /**
+     * 연결되어 있는 supportType {@link OperationInputConnector}를 활성화한다.
+     * 활성화된 Input Connector 에서 전달된 Input 데이터만 처리된다.
      *
      * @param supportType
      */
@@ -151,6 +171,8 @@ class PalaceCore {
     }
 
     /**
+     * 연결되어 있는 supportType {@link OperationInputConnector}를 비활성화한다.
+     * 비활성화된 Input Connector 에서 전달된 Input 데이터는 처리되지 않는다.
      *
      * @param supportType
      */
@@ -159,6 +181,10 @@ class PalaceCore {
 
         if (connector != null) {
             mSupportsFlag ^= supportType;
+            for(int type : mInputConnectorMapF.keySet())
+                if (type != supportType)
+                    mSupportsFlag |= type;
+
             connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
         }
     }
@@ -182,6 +208,27 @@ class PalaceCore {
         return false;
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
+    JSONArray searchResource(JSONObject obj) {
+        Iterator<String> keys = obj.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            LocalDatabaseCenter.IField field = getField(LocalDatabaseCenter.TABLE_RESOURCE, key);
+
+            if (field != null) {
+
+            } else if ("".equalsIgnoreCase(key)) {
+
+            }
+
+
+        }
+        return null;
+    }
 
     /**
      *
@@ -191,133 +238,295 @@ class PalaceCore {
      */
     JSONArray searchMetadata(String key, String value) {
         if ("id".equalsIgnoreCase(key)) {
-            return mDBCenterF.queryObjectDetailsById(Integer.parseInt(value));
+            return mDBCenterF.queryResourceDetailsById(Integer.parseInt(value));
 
         } else if ("name".equalsIgnoreCase(key)) {
-            return mDBCenterF.queryObjectDetailsByName(value);
+            return mDBCenterF.queryResourceDetailsByName(value);
 
         } else if ("type".equalsIgnoreCase(key)) {
-            return mDBCenterF.queryObjectDetailsByType(value);
+            return mDBCenterF.queryResourceDetailsByType(value);
         }
 
         return null;
     }
 
     /**
+     * 세부 사항이 담긴 JSON 객체를 읽어 INSERT 작업을 수행한다.
      *
+     * @param insert
+     * @param table
      * @return
      */
     boolean insertNewMetadata(JSONObject insert, String table) {
-        LocalDatabaseCenter.WriteBuilder builder = getBuilderWithParsing(table, insert);
+        LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, insert);
         return (builder == null)? false : builder.insert();
     }
 
     /**
      *
+     * @param select
+     * @param table
+     * @return
+     */
+    boolean selectMetadata(JSONObject select, String table, JSONObject result) {
+        LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(table, select);
+
+        try {
+            JSONArray array = new JSONArray();
+
+            Cursor cursor = builder.select();
+            while (cursor.moveToNext()) {
+                JSONObject row = new JSONObject();
+
+                if (LocalDatabaseCenter.TABLE_RESOURCE.equalsIgnoreCase(table)) {
+                    LocalDatabaseCenter.RESOURCE_FIELD[] fields = LocalDatabaseCenter.RESOURCE_FIELD.values();
+                    for (int i=0; i<fields.length; i++)
+                        row.put(fields[i].name(), cursor.getString(i));
+
+                } else if (LocalDatabaseCenter.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
+                    LocalDatabaseCenter.AUGMENTED_FIELD[] fields = LocalDatabaseCenter.AUGMENTED_FIELD.values();
+                    for (int i=0; i<fields.length; i++)
+                        row.put(fields[i].name(), cursor.getString(i));
+
+                } else if (LocalDatabaseCenter.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
+                    LocalDatabaseCenter.VIRTUAL_FIELD[] fields = LocalDatabaseCenter.VIRTUAL_FIELD.values();
+                    for (int i=0; i<fields.length; i++)
+                        row.put(fields[i].name(), cursor.getString(i));
+                }
+                array.put(row);
+            }
+            cursor.close();
+
+            result.put(IControllerCommands.JsonKey.QUERY_RESULT, array);
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 세부 사항이 담긴 JSON 객체를 읽어 UPDATE 작업을 수행한다.
+     *
+     * @param update
+     * @param table
      * @return
      */
     boolean updateMetadata(JSONObject update, String table) {
-        LocalDatabaseCenter.WriteBuilder builder = getBuilderWithParsing(table, update);
+        LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, update);
         return (builder == null)? false : builder.modify();
     }
 
     /**
+     * 세부 사항이 담긴 JSON 객체를 읽어 DELETE 작업을 수행한다.
      *
+     * @param delete
+     * @param table
      * @return
      */
     boolean deleteMetadata(JSONObject delete, String table) {
-        LocalDatabaseCenter.WriteBuilder builder = getBuilderWithParsing(table, delete);
+        LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, delete);
         return (builder == null)? false : builder.delete();
     }
 
     /**
+     * JSON 객체를 파싱하여
+     * {@link kr.poturns.virtualpalace.controller.LocalDatabaseCenter.ReadBuilder}로 변환한다.
      *
-     * @param table
-     * @param command
+     * @param table 처리할 Table 명.
+     * @param elements 명령에 대한 세부내용이 담긴 JSON 객체. (null일 경우, return null)
      * @return
      */
-    private LocalDatabaseCenter.WriteBuilder getBuilderWithParsing(String table, JSONObject command) {
-        LocalDatabaseCenter.WriteBuilder builder;
-        if (table.equals(LocalDatabaseCenter.TABLE_VIRTUAL)) {
-            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+    private LocalDatabaseCenter.ReadBuilder makeReadBuilder(String table, JSONObject elements) {
+        LocalDatabaseCenter.ReadBuilder builder = null;
+        if (LocalDatabaseCenter.TABLE_VIRTUAL.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
 
-        } else if (table.equals(LocalDatabaseCenter.TABLE_AUGMENTED)) {
-            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+        else if (LocalDatabaseCenter.TABLE_AUGMENTED.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
 
-        } else if (table.equals(LocalDatabaseCenter.TABLE_RESOURCE)) {
-            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+        else if (LocalDatabaseCenter.TABLE_RESOURCE.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
 
-        } else {
+        if (builder == null || elements == null)
             return null;
-        }
 
-        Iterator<String> conditions = command.keys();
-        while (conditions.hasNext()) {
-            String condition = conditions.next();
+
+        Iterator<String> elementIterator = elements.keys();
+        while (elementIterator.hasNext()) {
+            String element = elementIterator.next();
 
             try {
-                JSONObject content = command.getJSONObject(condition);
-                Iterator<String> iter = content.keys();
+                if (JsonKey.SET.equalsIgnoreCase(element)) {
+                    JSONArray array = elements.getJSONArray(element);
+                    for (int i=0; i<array.length(); i++) {
+                        LocalDatabaseCenter.IField field = getField(table, array.getString(i));
+                        builder.set(field, null);
+                    }
+                    continue;
+                }
+
+                JSONObject items = elements.getJSONObject(element);
+                Iterator<String> itemIterator = items.keys();
 
                 // WHERE BETWEEN
-                if (JsonKey.WHERE_FROM.equalsIgnoreCase(condition)) {
-                    JSONObject dest = command.getJSONObject(JsonKey.WHERE_TO);
+                if (JsonKey.WHERE_FROM.equalsIgnoreCase(element)) {
+                    JSONObject dest = elements.getJSONObject(JsonKey.WHERE_TO);
 
-                    while (iter.hasNext()) {
-                        String key = iter.next();
-                        builder.whereBetween(getField(table, key), content.getString(key), dest.getString(key));
+                    // 조건 내 (필드 : 값) Pair 단위 처리.
+                    while (itemIterator.hasNext()) {
+                        String item = itemIterator.next();
+                        builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
-
-                } else if (JsonKey.WHERE_TO.equalsIgnoreCase(condition)) {
+                } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
                     // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
+                }
+                // OTHER CLAUSES
+                else {
+                    // 조건 내 (필드 : 값) Pair 단위 처리.
+                    while (itemIterator.hasNext()) {
+                        String item = itemIterator.next();
 
-                    // ELSE
-                } else {
-                    while (iter.hasNext()) {
-                        String key = iter.next();
-                        LocalDatabaseCenter.IField field = getField(table, key);
-                        String value = content.getString(key);
+                        LocalDatabaseCenter.IField field = getField(table, item);
+                        if (field == null)
+                            // 찾을 수 없는 필드명은 제외.
+                            continue;
 
-                        if (condition.equals(JsonKey.SET)) {
-                            builder.set(field, value);
-
-                        } else if (condition.equals(JsonKey.WHERE)) {
+                        String value = items.getString(item);
+                        if (JsonKey.WHERE.equalsIgnoreCase(element)) {
                             builder.whereEqual(field, value);
 
-                        } else if (condition.equals(JsonKey.WHERE_NOT)) {
+                        } else if (JsonKey.WHERE_NOT.equalsIgnoreCase(element)) {
                             builder.whereNotEqual(field, value);
 
-                        } else if (condition.equals(JsonKey.WHERE_GREATER)) {
-                            builder.whereGreaterThan(field, value, (content.has(JsonKey.ALLOW_EQUAL)) ?
-                                    content.getBoolean(JsonKey.ALLOW_EQUAL) : false);
+                        } else if (JsonKey.WHERE_GREATER.equalsIgnoreCase(element)) {
+                            builder.whereGreaterThan(field, value, items.optBoolean(JsonKey.ALLOW_EQUAL, false));
 
-                        } else if (condition.equals(JsonKey.WHERE_SMALLER)) {
-                            builder.whereSmallerThan(field, value, (content.has(JsonKey.ALLOW_EQUAL)) ?
-                                    content.getBoolean(JsonKey.ALLOW_EQUAL) : false);
+                        } else if (JsonKey.WHERE_SMALLER.equalsIgnoreCase(element)) {
+                            builder.whereSmallerThan(field, value, items.optBoolean(JsonKey.ALLOW_EQUAL, false));
 
-                        } else if (condition.equals(JsonKey.WHERE_LIKE)) {
+                        } else if (JsonKey.WHERE_LIKE.equalsIgnoreCase(element)) {
                             builder.whereLike(field, value);
-
                         }
                     }
                 }
-            } catch (JSONException e) { }
+
+            } catch (JSONException e) {
+                // JSONException 예외가 발생하는 조건은 처리하지 않는다.
+            }
+        }
+        return builder;
+    }
+
+    /**
+     * JSON 객체를 파싱하여
+     * {@link kr.poturns.virtualpalace.controller.LocalDatabaseCenter.WriteBuilder}로 변환한다.
+     *
+     * @param table 처리할 Table 명.
+     * @param elements 명령에 대한 세부내용이 담긴 JSON 객체. (null일 경우, return null)
+     * @return
+     */
+    private LocalDatabaseCenter.WriteBuilder makeWriteBuilder(String table, JSONObject elements) {
+        LocalDatabaseCenter.WriteBuilder builder = null;
+        if (LocalDatabaseCenter.TABLE_VIRTUAL.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+
+        else if (LocalDatabaseCenter.TABLE_AUGMENTED.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+
+        else if (LocalDatabaseCenter.TABLE_RESOURCE.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+
+        if (builder == null || elements == null)
+            return null;
+
+
+        Iterator<String> elementIterator = elements.keys();
+        while (elementIterator.hasNext()) {
+            String element = elementIterator.next();
+
+            try {
+                JSONObject items = elements.getJSONObject(element);
+                Iterator<String> itemIterator = items.keys();
+
+                // WHERE BETWEEN
+                if (JsonKey.WHERE_FROM.equalsIgnoreCase(element)) {
+                    JSONObject dest = elements.getJSONObject(JsonKey.WHERE_TO);
+
+                    // 조건 내 (필드 : 값) Pair 단위 처리.
+                    while (itemIterator.hasNext()) {
+                        String item = itemIterator.next();
+                        builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
+                    }
+                } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
+                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    continue;
+                }
+
+                // OTHER CLAUSES
+                else {
+                    // 조건 내 (필드 : 값) Pair 단위 처리.
+                    while (itemIterator.hasNext()) {
+                        String item = itemIterator.next();
+
+                        LocalDatabaseCenter.IField field = getField(table, item);
+                        if (field == null)
+                            // 찾을 수 없는 필드명은 제외.
+                            continue;
+
+                        String value = items.getString(item);
+                        if (JsonKey.SET.equalsIgnoreCase(element)) {
+                            builder.set(field, value);
+
+                        } else if (JsonKey.WHERE.equalsIgnoreCase(element)) {
+                            builder.whereEqual(field, value);
+
+                        } else if (JsonKey.WHERE_NOT.equalsIgnoreCase(element)) {
+                            builder.whereNotEqual(field, value);
+
+                        } else if (JsonKey.WHERE_GREATER.equalsIgnoreCase(element)) {
+                            builder.whereGreaterThan(field, value, items.optBoolean(JsonKey.ALLOW_EQUAL, false));
+
+                        } else if (JsonKey.WHERE_SMALLER.equalsIgnoreCase(element)) {
+                            builder.whereSmallerThan(field, value, items.optBoolean(JsonKey.ALLOW_EQUAL, false));
+
+                        } else if (JsonKey.WHERE_LIKE.equalsIgnoreCase(element)) {
+                            builder.whereLike(field, value);
+                        }
+                    }
+                }
+
+            } catch (JSONException e) {
+                // JSONException 예외가 발생하는 조건은 처리하지 않는다.
+            }
         }
 
         return builder;
     }
 
+    /**
+     * 특정 Table 에서 name 값의 이름을 갖는 필드를 반환한다.
+     *
+     * @param table
+     * @param name
+     * @return
+     */
     private LocalDatabaseCenter.IField getField(String table, String name) {
-        if (table.equals(LocalDatabaseCenter.TABLE_VIRTUAL)) {
-            return LocalDatabaseCenter.VIRTUAL_FIELD.valueOf(name);
-        } else if (table.equals(LocalDatabaseCenter.TABLE_AUGMENTED)) {
-            return LocalDatabaseCenter.AUGMENTED_FIELD.valueOf(name);
-        } else if (table.equals(LocalDatabaseCenter.TABLE_RESOURCE)) {
-            return LocalDatabaseCenter.RESOURCE_FIELD.valueOf(name);
-        } else {
-            return null;
-        }
+        final String NAME = name.toUpperCase();
+        try {
+            if (LocalDatabaseCenter.TABLE_VIRTUAL.equals(table)) {
+                return LocalDatabaseCenter.VIRTUAL_FIELD.valueOf(NAME);
+
+            } else if (LocalDatabaseCenter.TABLE_AUGMENTED.equals(table)) {
+                return LocalDatabaseCenter.AUGMENTED_FIELD.valueOf(NAME);
+
+            } else if (LocalDatabaseCenter.TABLE_RESOURCE.equals(table)) {
+                return LocalDatabaseCenter.RESOURCE_FIELD.valueOf(NAME);
+            }
+
+        } catch (IllegalArgumentException e) { ; }
+        return null;
     }
 
     /**
@@ -333,12 +542,37 @@ class PalaceCore {
 
 
     // * * * G E T T E R S & S E T T E R S * * * //
+
+    /**
+     *
+     * @param sensorType
+     * @return
+     */
     protected double[] getSensorData(int sensorType) {
         InfraDataService service = mAppF.getInfraDataService();
         if (service != null)
             return service.getSensorAgent(sensorType).getLatestData();
 
         return null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    protected Integer[] listEnabledInputType() {
+        Integer[] list = new Integer[mInputConnectorMapF.size()];
+        mInputConnectorMapF.keySet().toArray(list);
+        return list;
+    }
+
+    /**
+     *
+     * @param inputType
+     * @return
+     */
+    protected boolean isActivatedInputType(int inputType) {
+        return (mSupportsFlag & inputType) == inputType;
     }
 
 }

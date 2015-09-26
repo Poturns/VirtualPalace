@@ -1,6 +1,7 @@
 package kr.poturns.virtualpalace;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.KeyEvent;
 
 import com.google.unity.GoogleUnityActivity;
@@ -8,10 +9,8 @@ import com.google.unity.GoogleUnityActivity;
 import kr.poturns.virtualpalace.annotation.UnityApi;
 import kr.poturns.virtualpalace.controller.AndroidUnityBridge;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.input.GlobalApplication;
 import kr.poturns.virtualpalace.input.IControllerCommands;
-import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.inputmodule.wear.WearInputConnector;
 
 /**
@@ -29,9 +28,13 @@ public class UnityActivity extends GoogleUnityActivity {
         mAndroidUnityBridge = AndroidUnityBridge.getInstance((PalaceApplication) getApplication());
         wearInputConnector = new WearInputConnector(getApplicationContext());
 
-        //TODO connector 와 InputHandler를 동작하게 하기
-        wearInputConnector.configureFromController((GlobalApplication) getApplication(), OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_TRUE);
-        PalaceMaster.getInstance((PalaceApplication) getApplication()).getInputHandler().sendEmptyMessage(IControllerCommands.INPUT_SYNC_COMMAND);
+        // connector 와 InputHandler를 동작하게 하기
+        int wearSupportType =
+                IControllerCommands.TYPE_INPUT_SUPPORT_WATCH |
+                        IControllerCommands.TYPE_INPUT_SUPPORT_MOTION;
+
+        GlobalApplication app = (GlobalApplication) getApplication();
+        Handler inputHandler = app.setInputConnector(wearSupportType, wearInputConnector);
     }
 
     @Override
