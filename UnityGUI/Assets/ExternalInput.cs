@@ -33,8 +33,10 @@ public class ExternalInput : MonoBehaviour
 		Texture2D texture = Utils.Image.Load (imageDirInfo[count++].FirstInfo.Path);
 
 		gameObject.GetComponent<Image> ().sprite = Sprite.Create (texture,
-		         */                                               new Rect (0, 0, texture.width, texture.height),
+		                                                       new Rect (0, 0, texture.width, texture.height),
 		                                                                gameObject.GetComponent<RectTransform> ().pivot);
+
+		 */
 	}
 
 }

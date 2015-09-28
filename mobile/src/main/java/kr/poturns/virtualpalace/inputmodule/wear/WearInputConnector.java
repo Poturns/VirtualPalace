@@ -24,7 +24,7 @@ public class WearInputConnector extends OperationInputConnector implements Messa
     private WearableCommunicator mWearableCommunicator;
 
     public WearInputConnector(Context context) {
-        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_WATCH);
+        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_WATCH | IControllerCommands.TYPE_INPUT_SUPPORT_MOTION);
         mWearableCommunicator = new WearableCommunicator(context);
         mWearableCommunicator.setMessageListener(this);
     }
@@ -48,11 +48,13 @@ public class WearInputConnector extends OperationInputConnector implements Messa
      */
     public void destroy() {
         mWearableCommunicator.destroy();
+        mWearableCommunicator.setMessageListener(null);
+        mWearableCommunicator = null;
     }
 
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
-        if(!messageEvent.getPath().equals(WearableCommunicator.MESSAGE_PATH_SEND_DATA))
+        if (!messageEvent.getPath().equals(WearableCommunicator.MESSAGE_PATH_SEND_DATA))
             return;
 
         AsyncTask.execute(new Runnable() {

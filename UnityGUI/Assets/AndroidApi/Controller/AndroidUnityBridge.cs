@@ -48,6 +48,15 @@ namespace AndroidApi.Controller
             javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
             javaAndroidUnityBridge.Call("setMessageCallback", new InternalIAndroidUnityCallback(OnMessageCallback));
             javaAndroidUnityBridge.Call("setInputCallback", new InternalIAndroidUnityCallback(OnInputCallback));
+
+			OnMessageReceived += (msg) => Debug.Log("AndroidUnityBridge [OnMessageReceived]: \n" + msg);
+			OnInputReceived += (inputs) => {
+				string s = "";
+				
+				foreach (Operation op in inputs)
+					s += op.ToString() + "\n";
+				Debug.Log(s);
+			};
         }
 
         /// <summary>

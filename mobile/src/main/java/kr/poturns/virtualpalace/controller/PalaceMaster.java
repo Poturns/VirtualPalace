@@ -403,7 +403,6 @@ public class PalaceMaster extends PalaceCore {
                         result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
                     } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                        // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
                         int supportType = message.getInt(key);
                         activateInputConector(supportType);
 

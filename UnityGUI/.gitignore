@@ -4,5 +4,7 @@
 /Temp
 /.vs
 
+/*.csproj
 /*.userprefs
 /*.apk
+/*.sln
