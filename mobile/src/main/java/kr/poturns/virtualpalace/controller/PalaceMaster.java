@@ -383,8 +383,8 @@ public class PalaceMaster extends PalaceCore {
                         table = LocalDatabaseCenter.TABLE_RESOURCE;
 
 
-                    if (QUERY_RES.equalsIgnoreCase(key)) {
-                        message.getJSONObject(key);
+                    if (QUERY_NEAR_ITEMS.equalsIgnoreCase(key) || QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
+                        result = queryBuildedOperation(key, message.getJSONObject(key), jsonResult);
 
                     } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
                         result = selectMetadata(message.getJSONObject(key), table, jsonResult);

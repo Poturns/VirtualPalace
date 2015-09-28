@@ -235,8 +235,14 @@ public interface IControllerCommands {
      */
     // * * * J S O N  C O M M A N D S  K E Y S * * * //
     interface JsonKey {
-        /* 수정 작업 중 */
-        String QUERY_RES = "query_res";
+        /**
+         * 현재 위치에서 일정 범위 내 존재하는 데이터를 찾는다.
+         */
+        String QUERY_NEAR_ITEMS = "query_near_items";
+        /**
+         * VR 아이템에 렌더링할 아이템 데이터를 찾는다.
+         */
+        String QUERY_ALL_VR_ITEMS = "query_all_vr_items";
 
         /**
          * (응답 반환시) 결과 상태 KEY.
@@ -310,6 +316,7 @@ public interface IControllerCommands {
         String DELETE_RES = "delete_res";
 
 
+        // *** 단일 수행 명령 *** //
         /**
          * Virtual Palace 애플리케이션의 구동 모드(VR/AR/MENU) 변경 명령.
          */

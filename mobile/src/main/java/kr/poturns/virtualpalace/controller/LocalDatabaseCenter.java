@@ -215,6 +215,56 @@ public class LocalDatabaseCenter {
                 // DATA 옮기는 과정 필요.
                 // or
                 // Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
+
+                // 변경된 내용 적용.
+                db.execSQL(
+                        "ALTER TABLE resource (" +
+                                "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "name           TEXT NOT NULL," +
+                                "type           TEXT NOT NULL," +
+                                "category       TEXT," +
+                                "archive_path   TEXT," +
+                                "archive_key    TEXT," +
+                                "drive_path     TEXT," +
+                                "drive_key      TEXT," +
+                                "thumbnail_path TEXT," +
+                                "description    TEXT," +
+                                "ctime          INTEGER NOT NULL," +
+                                "mtime          INTEGER" +
+                                ");"
+                );
+
+                // VR Table
+                db.execSQL(
+                        "ALTER TABLE virtual (" +
+                                "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                // Resource Table 의 _id 값.
+                                // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
+                                "res_id          INTEGER NOT NULL," +
+                                "type           TEXT NOT NULL," +
+                                "pos_x          REAL NOT NULL," +
+                                "pos_y          REAL NOT NULL," +
+                                "pos_z          REAL NOT NULL," +
+                                "rotate_x       REAL," +
+                                "rotate_y       REAL," +
+                                "rotate_z       REAL," +
+                                "container      INTEGER," +
+                                "cont_order     INTEGER," +
+                                "style          TEXT" +
+                                ");"
+                );
+
+                // AR Table
+                db.execSQL(
+                        "ALTER TABLE augmented (" +
+                                "_id          INTEGER PRIMARY KEY AUTOINCREMENT,"  +
+                                // Resource Table 의 _id 값.
+                                // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
+                                "res_id        INTEGER NOT NULL," +
+                                "altitude     REAL NOT NULL," +
+                                "latitude     REAL NOT NULL," +
+                                "longitude    REAL NOT NULL)"
+                );
             }
         };
     }
@@ -222,78 +272,6 @@ public class LocalDatabaseCenter {
 
 
     // * * * M E T H O D S * * * //
-    /**
-     * 해당 id 값을 가진 Resource 데이터를 반환한다.
-     *
-     * @param id
-     * @return JSON ARRAY
-     */
-    public JSONArray queryResourceDetailsById(int id) {
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT * FROM resource WHERE _id = ?",
-                new String[]{ String.valueOf(id) });
-
-        return query(cursor);
-    }
-
-    /**
-     * 해당 name 값을 가진 Resource 데이터를 반환한다.
-     *
-     * @param name
-     * @return
-     */
-    public JSONArray queryResourceDetailsByName(String name) {
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT * FROM resource WHERE name = ?",
-                new String[]{ name });
-
-        return query(cursor);
-    }
-
-    /**
-     * 해당 type 값을 갖는 Resource 데이터를 반환한다.
-     *
-     * @param type
-     * @return
-     */
-    public JSONArray queryResourceDetailsByType(String type) {
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT * FROM resource WHERE type = ?",
-                new String[]{ type });
-
-        return query(cursor);
-    }
-
-    private JSONArray query(Cursor cursor) {
-        JSONArray array = new JSONArray();
-
-        while(cursor.moveToNext()) {
-            try {
-                JSONObject row = new JSONObject();
-                row.put(RESOURCE_FIELD._ID.toString(), cursor.getInt(RESOURCE_FIELD._ID.ordinal()));
-                row.put(RESOURCE_FIELD.NAME.toString(), cursor.getString(RESOURCE_FIELD.NAME.ordinal()));
-                row.put(RESOURCE_FIELD.TYPE.toString(), cursor.getString(RESOURCE_FIELD.TYPE.ordinal()));
-                row.put(RESOURCE_FIELD.CATEGORY.toString(), cursor.getString(RESOURCE_FIELD.CATEGORY.ordinal()));
-                row.put(RESOURCE_FIELD.ARCHIVE_PATH.toString(), cursor.getString(RESOURCE_FIELD.ARCHIVE_PATH.ordinal()));
-                row.put(RESOURCE_FIELD.ARCHIVE_KEY.toString(), cursor.getString(RESOURCE_FIELD.ARCHIVE_KEY.ordinal()));
-                row.put(RESOURCE_FIELD.DRIVE_PATH.toString(), cursor.getString(RESOURCE_FIELD.DRIVE_PATH.ordinal()));
-                row.put(RESOURCE_FIELD.DRIVE_KEY.toString(), cursor.getString(RESOURCE_FIELD.DRIVE_KEY.ordinal()));
-                row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), cursor.getString(RESOURCE_FIELD.THUMBNAIL_PATH.ordinal()));
-                row.put(RESOURCE_FIELD.DESCRIPTION.toString(), cursor.getString(RESOURCE_FIELD.DESCRIPTION.ordinal()));
-                row.put(RESOURCE_FIELD.CTIME.toString(), cursor.getLong(RESOURCE_FIELD.CTIME.ordinal()));
-                row.put(RESOURCE_FIELD.MTIME.toString(), cursor.getLong(RESOURCE_FIELD.MTIME.ordinal()));
-
-                array.put(row);
-
-            } catch (JSONException e) {
-                Log.e("LocalDB_Field_Exception", e.getMessage());
-            }
-        }
-
-        cursor.close();
-        return array;
-    }
-
     /**
      * 주어진 현실 위치 좌표로 부터 일정 반경범위 내에 위치한 Object 들을 찾는다.
      *
