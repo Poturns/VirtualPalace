@@ -240,6 +240,20 @@
 
         }
 
+        /// <summary>
+        /// 쿼리 결과
+        /// </summary>
+        public struct QueryResult
+        {
+            /// <summary>
+            ///  필드
+            /// </summary>
+            public string Field;
+            /// <summary>
+            /// 값
+            /// </summary>
+            public string Value;
+        }
     }
 
     /// <summary>

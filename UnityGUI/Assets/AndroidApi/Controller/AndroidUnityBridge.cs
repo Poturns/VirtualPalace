@@ -1,5 +1,6 @@
 using AndroidApi.Controller.Request;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ namespace AndroidApi.Controller
 		/// <summary>
 		/// Input 메시지를 전달받는 event
 		/// </summary>
-        public event Action<Controller.Operation[]> OnInputReceived;
+        public event Action<List<Operation>> OnInputReceived;
 
 
 

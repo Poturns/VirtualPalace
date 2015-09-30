@@ -29,9 +29,15 @@ public class SpeechInputHelper implements RecognitionListener {
     private SpeechRecognizer mRecognizer;
     private Intent speechIntent;
     private OnSpeechDataListener listener;
+
+    /** 현재 음성인식을 수행중인지 여부*/
+    private boolean isInRecognizing = false;
+
+    /** 지속적인 음성인식을 수행할 지 여부*/
     private boolean isContinueRecognizing = false;
-    private Handler mHandler;
+    /** 지속적인 음성인식을 수행할 때, 그 시간 간격*/
     private long delay = 1000;
+    private Handler mHandler;
 
     private final Context mContext;
 
@@ -116,6 +122,8 @@ public class SpeechInputHelper implements RecognitionListener {
         mRecognizer.stopListening();
         mRecognizer.destroy();
         mRecognizer = null;
+
+        mHandler = null;
     }
 
 
@@ -160,6 +168,8 @@ public class SpeechInputHelper implements RecognitionListener {
     @Override
     public void onReadyForSpeech(Bundle params) {
         Log.i(TAG, "=onReadyForSpeech=");
+
+        isInRecognizing = true;
     }
 
     @Override
@@ -185,6 +195,8 @@ public class SpeechInputHelper implements RecognitionListener {
     @Override
     public void onError(int error) {
         Log.e(TAG, "=onError : " + error + "=");
+
+        isInRecognizing = false;
 
         if (isContinueRecognizing)
             delayedStartRecognition();
@@ -213,6 +225,8 @@ public class SpeechInputHelper implements RecognitionListener {
         if (listener != null)
             listener.onResult(new SpeechResults(getRecognitionResult(results), getConfidenceResult(results), null));
 
+        isInRecognizing = false;
+
         if (isContinueRecognizing)
             delayedStartRecognition();
     }
@@ -239,12 +253,17 @@ public class SpeechInputHelper implements RecognitionListener {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            if (mRef.get() == null)
+            SpeechInputHelper helper = mRef.get();
+            if (helper == null)
                 return;
 
             switch (msg.what) {
                 case HANDLER_MSG_START_LISTENING:
-                    mRef.get().startListening();
+                    if (helper.isInRecognizing) {
+                        helper.delayedStartRecognition();
+                    } else {
+                        helper.startListening();
+                    }
                     break;
 
                 default:

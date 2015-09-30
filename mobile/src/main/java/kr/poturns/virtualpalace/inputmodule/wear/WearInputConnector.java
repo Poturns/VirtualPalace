@@ -1,7 +1,6 @@
 package kr.poturns.virtualpalace.inputmodule.wear;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageApi;
@@ -13,6 +12,7 @@ import kr.poturns.virtualpalace.communication.WearMessageObject;
 import kr.poturns.virtualpalace.communication.WearableCommunicator;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
@@ -57,7 +57,7 @@ public class WearInputConnector extends OperationInputConnector implements Messa
         if (!messageEvent.getPath().equals(WearableCommunicator.MESSAGE_PATH_SEND_DATA))
             return;
 
-        AsyncTask.execute(new Runnable() {
+        ThreadUtils.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
                 try {
