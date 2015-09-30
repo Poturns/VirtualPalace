@@ -13,6 +13,7 @@ import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.util.DriveAssistant;
 
 
@@ -210,6 +211,32 @@ class PalaceCore {
 
     /**
      *
+     * @param command
+     * @param paramObj
+     * @param returnObj
+     * @return
+     */
+    boolean queryBuildedOperation(String command, JSONObject paramObj, JSONObject returnObj) {
+        try {
+            if (JsonKey.QUERY_NEAR_ITEMS.equalsIgnoreCase(command)) {
+                double[] data = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
+                double range = 0.001;
+
+                JSONArray rst = mDBCenterF.queryNearObjectsOnRealLocation(data[0], data[1], data[2], range);
+                returnObj.put(JsonKey.QUERY_RESULT, rst);
+                return true;
+
+            } else if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
+                returnObj.put(JsonKey.QUERY_RESULT, mDBCenterF.queryAllVirtualRenderings());
+                return true;
+            }
+
+        } catch (Exception e) {  }
+        return false;
+    }
+
+    /**
+     *
      * @param obj
      * @return
      */
@@ -227,26 +254,6 @@ class PalaceCore {
 
 
         }
-        return null;
-    }
-
-    /**
-     *
-     * @param key 속성
-     * @param value 속성 값
-     * @return
-     */
-    JSONArray searchMetadata(String key, String value) {
-        if ("id".equalsIgnoreCase(key)) {
-            return mDBCenterF.queryResourceDetailsById(Integer.parseInt(value));
-
-        } else if ("name".equalsIgnoreCase(key)) {
-            return mDBCenterF.queryResourceDetailsByName(value);
-
-        } else if ("type".equalsIgnoreCase(key)) {
-            return mDBCenterF.queryResourceDetailsByType(value);
-        }
-
         return null;
     }
 
