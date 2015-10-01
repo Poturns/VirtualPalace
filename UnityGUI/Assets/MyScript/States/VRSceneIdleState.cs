@@ -10,12 +10,14 @@ namespace MyScript.States
 	{
 		private StateManager manager;
 		private GameObject EventSys;
+		private GazeInputModule SelectModule;
 
 		public VRSceneIdleState (StateManager managerRef)
 		{
 			Debug.Log ("VRSceneState");
 			manager = managerRef;
 			EventSys = GameObject.Find ("EventSystem");
+			SelectModule = EventSys.GetComponent<GazeInputModule> ();
 			if(!EventSys) Debug.Log("Event System Find Fail");
 		}
 		public void StateUpdate()
@@ -37,7 +39,7 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-                        GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedGameObject;
+						GameObject SelObj = SelectModule.RaycastedGameObject;
                         if (SelObj != null)
                         {
                             SelObj.GetComponent<IRaycastedObject>().OnSelect();

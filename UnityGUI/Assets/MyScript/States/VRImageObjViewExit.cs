@@ -22,9 +22,13 @@ namespace MyScript.States
 			ImageUI = GameObject.Find ("ImageView");
 			if (!ImageUI)
 				Debug.Log ("ImageSelector is Null");
-			
-			
+
+			// Apply Change Texture
+			TargetObject.gameObject.GetComponent<Renderer> ().materials [1].mainTexture 
+				= ImageUI.GetComponent<ImageControl> ().GetTexture ();
+
 			ImageUI.GetComponent<MeshCollider> ().enabled = false;
+			ImageUI.GetComponent<MeshRenderer> ().enabled = false;
 		}
 		public void StateUpdate()
 		{

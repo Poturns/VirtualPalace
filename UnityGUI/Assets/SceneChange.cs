@@ -2,6 +2,7 @@
 using System.Collections;
 using MyScript.States;
 using MyScript.Interface;
+using MyScript;
 
 public class SceneChange : MonoBehaviour , IRaycastedObject
 {
@@ -14,8 +15,7 @@ public class SceneChange : MonoBehaviour , IRaycastedObject
 
 	public void SceneMove ()
 	{
-		StateManager.GetManager ().SwitchState (new VRSceneIdleState (StateManager.GetManager ()));
-		Application.LoadLevel (SceneName);
+		StateManager.SwitchScene (SceneName);
 	}
 
 }
