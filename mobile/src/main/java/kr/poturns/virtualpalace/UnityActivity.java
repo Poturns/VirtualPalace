@@ -8,10 +8,9 @@ import com.google.unity.GoogleUnityActivity;
 import kr.poturns.virtualpalace.annotation.UnityApi;
 import kr.poturns.virtualpalace.controller.AndroidUnityBridge;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
-import kr.poturns.virtualpalace.input.GlobalApplication;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputDetector;
 import kr.poturns.virtualpalace.inputmodule.wear.WearInputConnector;
 
 /**
@@ -20,36 +19,55 @@ import kr.poturns.virtualpalace.inputmodule.wear.WearInputConnector;
 public class UnityActivity extends GoogleUnityActivity {
 
     private AndroidUnityBridge mAndroidUnityBridge;
-    private WearInputConnector wearInputConnector;
+    private WearInputConnector mWearInputConnector;
+    private SpeechInputDetector mSpeechInputDetector;
+    private OperationInputConnector mSpeechInputConnector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAndroidUnityBridge = AndroidUnityBridge.getInstance((PalaceApplication) getApplication());
-        wearInputConnector = new WearInputConnector(getApplicationContext());
+        PalaceApplication application = (PalaceApplication) getApplication();
+        mAndroidUnityBridge = AndroidUnityBridge.getInstance(application);
+        mWearInputConnector = new WearInputConnector(application);
 
-        //TODO connector 와 InputHandler를 동작하게 하기
-        wearInputConnector.configureFromController((GlobalApplication) getApplication(), OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_TRUE);
-        PalaceMaster.getInstance((PalaceApplication) getApplication()).getInputHandler().sendEmptyMessage(IControllerCommands.INPUT_SYNC_COMMAND);
+        mSpeechInputDetector = new SpeechInputDetector(application);
+        mSpeechInputDetector.setContinueRecognizing(true);
+        mSpeechInputConnector = new OperationInputConnector(application, IControllerCommands.TYPE_INPUT_SUPPORT_VOICE);
+        mSpeechInputDetector.setOperationInputConnector(mSpeechInputConnector);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        wearInputConnector.connect();
+        mWearInputConnector.connect();
+        mSpeechInputDetector.startInputDetecting();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        wearInputConnector.disconnect();
+        mWearInputConnector.disconnect();
+        mSpeechInputDetector.stopInputDetecting();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        wearInputConnector.destroy();
+
+        PalaceApplication application = (PalaceApplication) getApplication();
+
+        //TODO InputConnector 에서 disconnect 메소드를 지원하는 건 어떤지?
+        application.setInputConnector(mWearInputConnector.getSupportType(), null);
+        mWearInputConnector.destroy();
+        mWearInputConnector = null;
+
+        application.setInputConnector(mSpeechInputConnector.getSupportType(), null);
+        mSpeechInputDetector.destroy();
+        mSpeechInputDetector = null;
+        mSpeechInputConnector = null;
+
+        mAndroidUnityBridge = null;
     }
 
     @Override

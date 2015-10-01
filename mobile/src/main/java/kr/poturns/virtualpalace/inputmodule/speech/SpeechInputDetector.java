@@ -8,7 +8,7 @@ import kr.poturns.virtualpalace.input.OperationInputDetector;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p>
+ * <p/>
  * 음성 형태의 입력을 처리하는 InputModule
  */
 public class SpeechInputDetector extends OperationInputDetector<ArrayList<String>> implements SpeechInputHelper.OnSpeechDataListener {
@@ -19,6 +19,15 @@ public class SpeechInputDetector extends OperationInputDetector<ArrayList<String
         super(new SpeechInputFilter());
         this.mSpeechInputHelper = new SpeechInputHelper(context);
         mSpeechInputHelper.setSpeechListener(this);
+    }
+
+    /**
+     * 음성인식 수행이 끝나도 계속 음성인식을 수행하는지 여부를 설정한다.
+     *
+     * @param continueRecognizing True : 음성인식을 계속 수행
+     */
+    public void setContinueRecognizing(boolean continueRecognizing) {
+        mSpeechInputHelper.setContinueRecognizing(continueRecognizing);
     }
 
     /**

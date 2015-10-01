@@ -1,5 +1,6 @@
 using UnityEngine;
 using MyScript.Interface;
+using System.Collections.Generic;
 using AndroidApi.Controller;
 
 
@@ -52,7 +53,7 @@ namespace MyScript.States
 		{
 			
 		}
-		public void InputHandling(Operation[] InputOp)
+		public void InputHandling(List<Operation> InputOp)
 		{
 			foreach (Operation op in InputOp) 
 			{

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * <b> 로컬 저장소의 DATABASE 를 관리한다. </b>
@@ -31,7 +32,7 @@ public class LocalDatabaseCenter {
     // * * * S I N G L E T O N * * * //
     private static LocalDatabaseCenter sInstance;
 
-    public static LocalDatabaseCenter getInstance(Context context) {
+    public static final LocalDatabaseCenter getInstance(Context context) {
         if (sInstance == null)
             sInstance = new LocalDatabaseCenter(context);
         return sInstance;
@@ -73,7 +74,7 @@ public class LocalDatabaseCenter {
      */
     public enum VIRTUAL_FIELD implements IField {
         _ID,
-        RESID,
+        RES_ID,
         TYPE,
         POS_X,
         POS_Y,
@@ -101,7 +102,7 @@ public class LocalDatabaseCenter {
      */
     public enum AUGMENTED_FIELD implements IField {
         _ID,
-        RESID,
+        RES_ID,
         ALTITUDE,
         LATITUDE,
         LONGITUDE;
@@ -136,7 +137,7 @@ public class LocalDatabaseCenter {
      */
     private static final String NAME = "LocalDB";
 
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     private final Context mContextF;
 
@@ -180,7 +181,7 @@ public class LocalDatabaseCenter {
                                 "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
                                 // Resource Table 의 _id 값.
                                 // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
-                                "resid          INTEGER NOT NULL," +
+                                "res_id          INTEGER NOT NULL," +
                                 "type           TEXT NOT NULL," +
                                 "pos_x          REAL NOT NULL," +
                                 "pos_y          REAL NOT NULL," +
@@ -200,7 +201,7 @@ public class LocalDatabaseCenter {
                                 "_id          INTEGER PRIMARY KEY AUTOINCREMENT,"  +
                                 // Resource Table 의 _id 값.
                                 // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
-                                "resid        INTEGER NOT NULL," +
+                                "res_id        INTEGER NOT NULL," +
                                 "altitude     REAL NOT NULL," +
                                 "latitude     REAL NOT NULL," +
                                 "longitude    REAL NOT NULL)"
@@ -214,6 +215,56 @@ public class LocalDatabaseCenter {
                 // DATA 옮기는 과정 필요.
                 // or
                 // Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
+
+                // 변경된 내용 적용.
+                db.execSQL(
+                        "ALTER TABLE resource (" +
+                                "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "name           TEXT NOT NULL," +
+                                "type           TEXT NOT NULL," +
+                                "category       TEXT," +
+                                "archive_path   TEXT," +
+                                "archive_key    TEXT," +
+                                "drive_path     TEXT," +
+                                "drive_key      TEXT," +
+                                "thumbnail_path TEXT," +
+                                "description    TEXT," +
+                                "ctime          INTEGER NOT NULL," +
+                                "mtime          INTEGER" +
+                                ");"
+                );
+
+                // VR Table
+                db.execSQL(
+                        "ALTER TABLE virtual (" +
+                                "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                // Resource Table 의 _id 값.
+                                // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
+                                "res_id          INTEGER NOT NULL," +
+                                "type           TEXT NOT NULL," +
+                                "pos_x          REAL NOT NULL," +
+                                "pos_y          REAL NOT NULL," +
+                                "pos_z          REAL NOT NULL," +
+                                "rotate_x       REAL," +
+                                "rotate_y       REAL," +
+                                "rotate_z       REAL," +
+                                "container      INTEGER," +
+                                "cont_order     INTEGER," +
+                                "style          TEXT" +
+                                ");"
+                );
+
+                // AR Table
+                db.execSQL(
+                        "ALTER TABLE augmented (" +
+                                "_id          INTEGER PRIMARY KEY AUTOINCREMENT,"  +
+                                // Resource Table 의 _id 값.
+                                // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
+                                "res_id        INTEGER NOT NULL," +
+                                "altitude     REAL NOT NULL," +
+                                "latitude     REAL NOT NULL," +
+                                "longitude    REAL NOT NULL)"
+                );
             }
         };
     }
@@ -221,78 +272,6 @@ public class LocalDatabaseCenter {
 
 
     // * * * M E T H O D S * * * //
-    /**
-     * 해당 id 값을 가진 Resource 데이터를 반환한다.
-     *
-     * @param id
-     * @return JSON ARRAY
-     */
-    public JSONArray queryObjectDetailsById(int id) {
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT * FROM resource WHERE _id = ?",
-                new String[]{ String.valueOf(id) });
-
-        return query(cursor);
-    }
-
-    /**
-     * 해당 name 값을 가진 Resource 데이터를 반환한다.
-     *
-     * @param name
-     * @return
-     */
-    public JSONArray queryObjectDetailsByName(String name) {
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT * FROM resource WHERE name = ?",
-                new String[]{ name });
-
-        return query(cursor);
-    }
-
-    /**
-     * 해당 type 값을 갖는 Resource 데이터를 반환한다.
-     *
-     * @param type
-     * @return
-     */
-    public JSONArray queryObjectDetailsByType(String type) {
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT * FROM resource WHERE type = ?",
-                new String[]{ type });
-
-        return query(cursor);
-    }
-
-    private JSONArray query(Cursor cursor) {
-        JSONArray array = new JSONArray();
-
-        while(cursor.moveToNext()) {
-            try {
-                JSONObject row = new JSONObject();
-                row.put(RESOURCE_FIELD._ID.toString(), cursor.getInt(RESOURCE_FIELD._ID.ordinal()));
-                row.put(RESOURCE_FIELD.NAME.toString(), cursor.getString(RESOURCE_FIELD.NAME.ordinal()));
-                row.put(RESOURCE_FIELD.TYPE.toString(), cursor.getString(RESOURCE_FIELD.TYPE.ordinal()));
-                row.put(RESOURCE_FIELD.CATEGORY.toString(), cursor.getString(RESOURCE_FIELD.CATEGORY.ordinal()));
-                row.put(RESOURCE_FIELD.ARCHIVE_PATH.toString(), cursor.getString(RESOURCE_FIELD.ARCHIVE_PATH.ordinal()));
-                row.put(RESOURCE_FIELD.ARCHIVE_KEY.toString(), cursor.getString(RESOURCE_FIELD.ARCHIVE_KEY.ordinal()));
-                row.put(RESOURCE_FIELD.DRIVE_PATH.toString(), cursor.getString(RESOURCE_FIELD.DRIVE_PATH.ordinal()));
-                row.put(RESOURCE_FIELD.DRIVE_KEY.toString(), cursor.getString(RESOURCE_FIELD.DRIVE_KEY.ordinal()));
-                row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), cursor.getString(RESOURCE_FIELD.THUMBNAIL_PATH.ordinal()));
-                row.put(RESOURCE_FIELD.DESCRIPTION.toString(), cursor.getString(RESOURCE_FIELD.DESCRIPTION.ordinal()));
-                row.put(RESOURCE_FIELD.CTIME.toString(), cursor.getLong(RESOURCE_FIELD.CTIME.ordinal()));
-                row.put(RESOURCE_FIELD.MTIME.toString(), cursor.getLong(RESOURCE_FIELD.MTIME.ordinal()));
-
-                array.put(row);
-
-            } catch (JSONException e) {
-                Log.e("LocalDB_Field_Exception", e.getMessage());
-            }
-        }
-
-        cursor.close();
-        return array;
-    }
-
     /**
      * 주어진 현실 위치 좌표로 부터 일정 반경범위 내에 위치한 Object 들을 찾는다.
      *
@@ -302,7 +281,7 @@ public class LocalDatabaseCenter {
      * @param radius 반경
      * @return JSON ARRAY
      */
-    public JSONArray queryNearObjectsByRealLocation(double latitude, double longitude, double altitude, double radius) {
+    public JSONArray queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
         JSONArray array = new JSONArray();
 
         Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
@@ -320,7 +299,7 @@ public class LocalDatabaseCenter {
                 row.put(RESOURCE_FIELD.NAME.toString(), cursor.getString(0));
                 row.put(RESOURCE_FIELD.DESCRIPTION.toString(), cursor.getString(1));
                 row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), cursor.getString(2));
-                row.put(AUGMENTED_FIELD.RESID.toString(), cursor.getInt(3));
+                row.put(AUGMENTED_FIELD.RES_ID.toString(), cursor.getInt(3));
                 row.put(AUGMENTED_FIELD.LATITUDE.toString(), cursor.getDouble(4));
                 row.put(AUGMENTED_FIELD.LONGITUDE.toString(), cursor.getDouble(4));
                 row.put(AUGMENTED_FIELD.ALTITUDE.toString(), cursor.getDouble(4));
@@ -355,7 +334,7 @@ public class LocalDatabaseCenter {
             try {
                 JSONObject row = new JSONObject();
                 row.put(VIRTUAL_FIELD._ID.toString(), VIRTUAL_FIELD._ID.ordinal());
-                row.put(VIRTUAL_FIELD.RESID.toString(), VIRTUAL_FIELD.RESID.ordinal());
+                row.put(VIRTUAL_FIELD.RES_ID.toString(), VIRTUAL_FIELD.RES_ID.ordinal());
                 row.put(VIRTUAL_FIELD.TYPE.toString(), VIRTUAL_FIELD.TYPE.ordinal());
                 row.put(VIRTUAL_FIELD.POS_X.toString(), VIRTUAL_FIELD.POS_X.ordinal());
                 row.put(VIRTUAL_FIELD.POS_Y.toString(), VIRTUAL_FIELD.POS_Y.ordinal());
@@ -409,202 +388,62 @@ public class LocalDatabaseCenter {
         int ordinal();
     }
 
+
+    /**
+     * DB에 데이터를 조회하는 작업을 수행할 시,
+     * 상황에 맞게 SQL 구문을 생성하고, 호출할 수 있도록 하는 BUILDER 패턴 클래스.
+     *
+     * @param <E>
+     */
+    public static class ReadBuilder<E extends IField> extends CrudBuilder<E> {
+
+        public ReadBuilder(LocalDatabaseCenter center) {
+            super(center);
+        }
+
+        public Cursor select() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("SELECT ");
+
+            if (mSetClauseMap.isEmpty())
+                builder.append("*");
+            else {
+                for (Pair<String, String> pair : mSetClauseMap.values())
+                    builder.append(pair.first).append(",");
+                builder.deleteCharAt(builder.length()-1);   // 마지막 ' , ' 지우기
+            }
+            builder.append(" FROM ").append(mTableName);
+
+            if (!mWhereClauseList.isEmpty()) {
+                builder.append(" WHERE ");
+                for (String clause : mWhereClauseList) {
+                    builder.append("(").append(clause).append("),");
+                }
+                builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
+            }
+
+            Log.d("LDB_Select", "LDB Select : " + builder.toString());
+            try {
+                setClear().whereClear();
+                return mCenterF.mOpenHelperF.getReadableDatabase().rawQuery(builder.toString(), null);
+
+            } catch (SQLException e) {
+                Log.e("LDB_Insert_Exception", e.getMessage());
+                return null;
+            }
+        }
+    }
+
     /**
      * DB에 데이터를 삽입/수정/삭제하는 작업을 수행할 시,
      * 상황에 맞게 SQL 구문을 생성하고, 호출할 수 있도록 하는 BUILDER 패턴 클래스.
      *
-     * 테이블 필드 상수 (
-     * {@link LocalDatabaseCenter.RESOURCE_FIELD},
-     * {@link LocalDatabaseCenter.VIRTUAL_FIELD},
-     * {@link LocalDatabaseCenter.AUGMENTED_FIELD})를
-     * 제네릭 변수로 입력받아, SQL 구문을 작성한다.
+     * @param <E>
      */
-    public static class WriteBuilder<E extends IField> {
-        // NOTICE >  DB 내 필드 개수가 많아질 경우, 크기를 늘릴 것.
-        private final int MAX = 16;
-
-        private final LocalDatabaseCenter mCenterF;
-        private final ArrayList<Pair<String, String>> mSetClauseList = new ArrayList<Pair<String, String>>(MAX);
-        private final ArrayList<String> mWhereClauseList = new ArrayList<String>(MAX);
-        private String mTableName = null;
+    public static class WriteBuilder<E extends IField> extends CrudBuilder<E> {
 
         public WriteBuilder(LocalDatabaseCenter center) {
-            mCenterF = center;
-        }
-
-        /**
-         * 테이블 내 유효한 필드가 맞는지 확인한다.
-         *
-         * @param field
-         * @throws {@link InvalidParameterException}
-         * @return
-         */
-        private WriteBuilder check(E field) {
-            if (mTableName == null)
-                mTableName = field.getTableName();
-
-            else if (!mTableName.equals(field.getTableName()))
-                throw new InvalidParameterException();
-
-            return this;
-        }
-
-        /**
-         * 다룰 SET 데이터를 추가한다.
-         *
-         * @param field
-         * @param value
-         * @return
-         */
-        public WriteBuilder set(E field, String value) {
-            mSetClauseList.set(field.ordinal(), new Pair<String, String>(field.toString(), value));
-            return check(field);
-        }
-
-        /**
-         * 추가된 SET 데이터를 초기화한다.
-         *
-         * @return
-         */
-        public WriteBuilder setClear() {
-            mSetClauseList.clear();
-
-            if (mWhereClauseList.isEmpty())
-                mTableName = null;
-            return this;
-        }
-
-        /**
-         * WHERE 구문에 NOT EQUAL 조건을 추가한다.
-         *
-         * @param field
-         * @param value
-         * @throws {@link InvalidParameterException}
-         * @return
-         */
-        public WriteBuilder whereNotEqual(E field, String value) {
-            mWhereClauseList.add(
-                    new StringBuilder()
-                            .append(field.toString())
-                            .append(" != ")
-                            .append(value)
-                            .toString()
-            );
-            return check(field);
-        }
-
-        /**
-         * WHERE 구문에 EQUAL 조건을 추가한다.
-         *
-         * @param field
-         * @param value
-         * @throws {@link InvalidParameterException}
-         * @return
-         */
-        public WriteBuilder whereEqual(E field, String value) {
-            mWhereClauseList.add(
-                    new StringBuilder()
-                            .append(field.toString())
-                            .append(" = ")
-                            .append(value)
-                            .toString()
-            );
-            return check(field);
-        }
-
-        /**
-         * WHERE 구문에 BETWEEN 조건을 추가한다.
-         *
-         * @param field
-         * @param min
-         * @param max
-         * @throws {@link InvalidParameterException}
-         * @return
-         */
-        public WriteBuilder whereBetween(E field, String min, String max) {
-            mWhereClauseList.add(
-                    new StringBuilder()
-                            .append(field.toString())
-                            .append(" BETWEEN ")
-                            .append(min)
-                            .append(" AND ")
-                            .append(max)
-                            .toString()
-            );
-            return check(field);
-        }
-
-        /**
-         * WHERE 구문에 초과/이상 조건을 추가한다.
-         *
-         * @param field
-         * @param value
-         * @param allowEqual true = 이상, false = 초과
-         * @throws {@link InvalidParameterException}
-         * @return
-         */
-        public WriteBuilder whereGreaterThan(E field, String value, boolean allowEqual) {
-            mWhereClauseList.add(
-                    new StringBuilder()
-                            .append(field.toString())
-                            .append(allowEqual ? " >= " : " > ")
-                            .append(value)
-                            .toString()
-            );
-            return check(field);
-        }
-
-        /**
-         * WHERE 구문에 미만/이하 조건을 추가한다.
-         *
-         * @param field
-         * @param value
-         * @param allowEqual true = 이하, false = 미만
-         * @throws {@link InvalidParameterException}
-         * @return
-         */
-        public WriteBuilder whereSmallerThan(E field, String value, boolean allowEqual) {
-            mWhereClauseList.add(
-                    new StringBuilder()
-                            .append(field.toString())
-                            .append(allowEqual ? " <= " : " < ")
-                            .append(value)
-                            .toString()
-            );
-            return check(field);
-        }
-
-        /**
-         * WHERE 구문에 유사 조건을 추가한다.
-         *
-         * @param field
-         * @param value
-         * @return
-         */
-        public WriteBuilder whereLike(E field, String value) {
-            mWhereClauseList.add(
-                    new StringBuilder()
-                            .append(field.toString())
-                            .append(" LIKE %")
-                            .append(value)
-                            .append("% ")
-                            .toString()
-            );
-            return check(field);
-        }
-
-        /**
-         * 추가된 조건들을 초기화한다.
-         *
-         * @return
-         */
-        public WriteBuilder whereClear() {
-            mWhereClauseList.clear();
-
-            if (mSetClauseList.isEmpty())
-                mTableName = null;
-
-            return this;
+            super(center);
         }
 
         /**
@@ -624,12 +463,14 @@ public class LocalDatabaseCenter {
                     (TABLE_AUGMENTED.equals(mTableName))? AUGMENTED_FIELD.values().length : 0;
 
             for (int i=0; i<length; i++) {
-                Pair<String, String> element = mSetClauseList.get(i);
+                Pair<String, String> element = mSetClauseMap.get(i);
                 builder.append((element == null)? null : element.second).append(",");
             }
+
             builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
             builder.append(" )");
 
+            Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
             try {
                 setClear().whereClear();
                 mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
@@ -652,7 +493,7 @@ public class LocalDatabaseCenter {
                     .append(mTableName)
                     .append(" SET ");
 
-            for (Pair<String, String> element : mSetClauseList) {
+            for (Pair<String, String> element : mSetClauseMap.values()) {
                 if (element == null)
                     continue;
 
@@ -669,6 +510,7 @@ public class LocalDatabaseCenter {
             }
             builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
+            Log.d("LDB_Update", "LDB Update : " + builder.toString());
             try {
                 setClear().whereClear();
                 mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
@@ -697,6 +539,7 @@ public class LocalDatabaseCenter {
             }
             builder.deleteCharAt(builder.length()-1);   // 마지막 ' , ' 지우기
 
+            Log.d("LDB_Delete", "LDB Delete : " + builder.toString());
             try {
                 setClear().whereClear();
                 mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
@@ -707,6 +550,211 @@ public class LocalDatabaseCenter {
                 return false;
             }
         }
+    }
 
+    /**
+     * 테이블 필드 상수 (
+     * {@link LocalDatabaseCenter.RESOURCE_FIELD},
+     * {@link LocalDatabaseCenter.VIRTUAL_FIELD},
+     * {@link LocalDatabaseCenter.AUGMENTED_FIELD})를
+     * 제네릭 변수로 입력받아, SQL 구문을 작성한다.
+     *
+     * @param <E>
+     */
+    protected static abstract class CrudBuilder<E extends IField> {
+        // NOTICE >  DB 내 필드 개수가 많아질 경우, 크기를 늘릴 것.
+        protected final int MAX = 16;
+
+        protected final LocalDatabaseCenter mCenterF;
+        protected final ArrayList<String> mWhereClauseList;
+        protected final TreeMap<Integer, Pair<String, String>> mSetClauseMap;
+        protected String mTableName = null;
+
+        protected CrudBuilder(LocalDatabaseCenter center) {
+            mCenterF = center;
+            mSetClauseMap = new TreeMap<Integer, Pair<String, String>>();
+            mWhereClauseList = new ArrayList<String>(MAX);
+        }
+
+        /**
+         * 테이블 내 유효한 필드가 맞는지 확인한다.
+         *
+         * @param field
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        private CrudBuilder check(E field) {
+            if (field == null)
+                return this;
+
+            if (mTableName == null)
+                mTableName = field.getTableName();
+
+            else if (!mTableName.equals(field.getTableName()))
+                throw new InvalidParameterException();
+
+            return this;
+        }
+
+        /**
+         * 다룰 SET 데이터를 추가한다.
+         *
+         * @param field
+         * @param value
+         * @return
+         */
+        public CrudBuilder set(E field, String value) {
+            if (field == null)
+                return this;
+
+            mSetClauseMap.put(field.ordinal(), new Pair<String, String>(field.toString(), value));
+            return check(field);
+        }
+
+        /**
+         * 추가된 SET 데이터를 초기화한다.
+         *
+         * @return
+         */
+        public CrudBuilder setClear() {
+            mSetClauseMap.clear();
+
+            if (mWhereClauseList.isEmpty())
+                mTableName = null;
+            return this;
+        }
+
+        /**
+         * WHERE 구문에 NOT EQUAL 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public CrudBuilder whereNotEqual(E field, String value) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" != ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 EQUAL 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public CrudBuilder whereEqual(E field, String value) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" = ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 BETWEEN 조건을 추가한다.
+         *
+         * @param field
+         * @param min
+         * @param max
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public CrudBuilder whereBetween(E field, String min, String max) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" BETWEEN ")
+                            .append(min)
+                            .append(" AND ")
+                            .append(max)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 초과/이상 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @param allowEqual true = 이상, false = 초과
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public CrudBuilder whereGreaterThan(E field, String value, boolean allowEqual) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(allowEqual ? " >= " : " > ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 미만/이하 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @param allowEqual true = 이하, false = 미만
+         * @throws {@link InvalidParameterException}
+         * @return
+         */
+        public CrudBuilder whereSmallerThan(E field, String value, boolean allowEqual) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(allowEqual ? " <= " : " < ")
+                            .append(value)
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * WHERE 구문에 유사 조건을 추가한다.
+         *
+         * @param field
+         * @param value
+         * @return
+         */
+        public CrudBuilder whereLike(E field, String value) {
+            mWhereClauseList.add(
+                    new StringBuilder()
+                            .append(field.toString())
+                            .append(" LIKE %")
+                            .append(value)
+                            .append("% ")
+                            .toString()
+            );
+            return check(field);
+        }
+
+        /**
+         * 추가된 조건들을 초기화한다.
+         *
+         * @return
+         */
+        public CrudBuilder whereClear() {
+            mWhereClauseList.clear();
+
+            if (mSetClauseMap.isEmpty())
+                mTableName = null;
+
+            return this;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AndroidApi.Controller;
 
 namespace MyScript.Interface
@@ -6,6 +7,6 @@ namespace MyScript.Interface
 	{
 		void StateUpdate();
 		void ShowIt();
-		void InputHandling(Operation[] InputOp);
+		void InputHandling(List<Operation> InputOp);
 	}
 }

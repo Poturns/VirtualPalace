@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using MyScript.Interface;
 using AndroidApi.Controller;
 
@@ -45,17 +46,18 @@ namespace MyScript.States
 		{
 			
 		}
-		public void InputHandling(Operation[] InputOp)
+		public void InputHandling(List<Operation> InputOp)
 		{
 			foreach (Operation op in InputOp) 
 			{
-				if(op.Type == Operation.CANCEL)
-				{
+				switch(op.Type){
+				case Operation.CANCEL:
 					manager.SwitchState(new VRMemoViewExit(manager,TargetObj));
-				}
-				else if(op.Type == Operation.SELECT)
-				{
+					break;
 					
+				case Operation.SELECT:
+					
+					break;
 				}
 			}
 		}

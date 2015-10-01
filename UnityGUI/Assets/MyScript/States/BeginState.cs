@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using MyScript.Interface;
 using AndroidApi.Controller;
 using UnityEngine.EventSystems;
@@ -24,21 +25,22 @@ namespace MyScript.States
 		{
 
 		}
-		public void InputHandling(Operation[] InputOp)
+		public void InputHandling(List<Operation> InputOp)
 		{
 			foreach (Operation op in InputOp) 
 			{
-				if(op.Type == Operation.CANCEL)
-				{
+				switch(op.Type){
+				case Operation.CANCEL:
 
-				}
-				else if(op.Type == Operation.SELECT)
-				{
+					break;
+
+				case Operation.SELECT:
 					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
 					if(!SelObj)
 					{
 						SelObj.GetComponent<IObject>().OnSelect();
 					}
+					break;
 				}
 			}
 		}
