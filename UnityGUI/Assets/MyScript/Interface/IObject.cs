@@ -4,6 +4,6 @@ namespace MyScript.Interface
 {
 	public interface IObject
 	{
-		void OnSelect(Operation[] InputOp);
+		void OnSelect();
 	}
 }

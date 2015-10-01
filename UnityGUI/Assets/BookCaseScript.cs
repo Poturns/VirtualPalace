@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MyScript.Interface;
 
 
-public class BookCaseScript : MonoBehaviour {
+public class BookCaseScript : MonoBehaviour , IObject {
 
 	public GameObject BookPrefab;
 	public float ZFirstOffset;
@@ -30,7 +31,7 @@ public class BookCaseScript : MonoBehaviour {
 		BookList.Add (NewBook);
 		Cnt++;
 	}
-	public void BookPointDown()
+	public void OnSelect()
 	{
 		CreateBook ();
 	}
