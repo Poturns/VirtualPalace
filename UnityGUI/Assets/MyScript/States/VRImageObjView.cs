@@ -25,6 +25,7 @@ namespace MyScript.States
 
 			
 			ImageUI.GetComponent<MeshCollider> ().enabled = true;
+			ImageUI.GetComponent<MeshRenderer> ().enabled = true;
 		}
 		public void StateUpdate()
 		{
