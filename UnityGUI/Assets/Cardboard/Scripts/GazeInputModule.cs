@@ -36,7 +36,7 @@ public class GazeInputModule : BaseInputModule {
   [Tooltip("Optional object to place at raycast intersections as a 3D cursor. " +
            "Be sure it is on a layer that raycasts will ignore.")]
   public GameObject cursor;
-
+	public GameObject RaycastedObj;
   // Time in seconds between the pointer down and up events sent by a magnet click.
   // Allows time for the UI elements to make their state transitions.
   [HideInInspector]
@@ -64,6 +64,7 @@ public class GazeInputModule : BaseInputModule {
       pointerData = null;
     }
     eventSystem.SetSelectedGameObject(null, GetBaseEventData());
+	
     if (cursor != null) {
       cursor.SetActive(false);
     }
@@ -111,6 +112,7 @@ public class GazeInputModule : BaseInputModule {
     if (cursor == null)
       return;
     var go = pointerData.pointerCurrentRaycast.gameObject;
+		RaycastedObj = go;
     cursor.SetActive(go != null);
     if (cursor.activeInHierarchy) {
       Camera cam = pointerData.enterEventCamera;
