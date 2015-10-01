@@ -1,5 +1,7 @@
 using UnityEngine;
 using MyScript.Interface;
+using AndroidApi.Controller;
+
 
 namespace MyScript.States
 {
@@ -40,13 +42,30 @@ namespace MyScript.States
 				Debug.Log ("A");
 			// Input
 				
-			ChangeMemoScene ();
+			//ChangeMemoScene ();
 
 		
 		}
 		public void ShowIt()
 		{
 			
+		}
+		public void InputHandling(Operation[] InputOp)
+		{
+			foreach (Operation op in InputOp) 
+			{
+				if(op.Type == Operation.CANCEL)
+				{
+					UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+					UITitleTextObj.GetComponent<TextMesh> ().text = "";
+					manager.SwitchState (new VRSceneIdleState(manager));
+				}
+				else if(op.Type == Operation.SELECT)
+				{
+					
+					ChangeMemoScene ();
+				}
+			}
 		}
 		void ChangeMemoScene()
 		{

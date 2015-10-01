@@ -1,6 +1,7 @@
 using UnityEngine;
 using MyScript.States;
 using MyScript.Interface;
+using AndroidApi.Controller;
 
 public class StateManager : MonoBehaviour 
 {
@@ -16,6 +17,7 @@ public class StateManager : MonoBehaviour
 		{
 			instanceRef = this;
 			DontDestroyOnLoad (gameObject);
+			AndroidUnityBridge.GetInstance().OnInputReceived += InputControlFunc;
 		} 
 		else 
 		{
@@ -37,6 +39,10 @@ public class StateManager : MonoBehaviour
 	{
 		if (activeState != null)
 			activeState.ShowIt ();
+	}
+	public void InputControlFunc(Operation[] InputOp)
+	{
+		activeState.InputHandling (InputOp);
 	}
 	public void SwitchState(IStateBase newState)
 	{
