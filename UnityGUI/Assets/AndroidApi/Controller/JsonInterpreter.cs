@@ -65,30 +65,39 @@ namespace AndroidApi.Controller
         /// <returns>요청한 결과. RequestResult</returns>
         public static RequestResult InterpretResultFromAndroid(string json)
         {
-            switch ((string)JsonMapper.ToObject(json)["result"]){
-                case "success":
-                    return RequestResult.Success;
-                case "fail":
-                    return RequestResult.Fail;
-                case "error":
-                default:
-                    return RequestResult.Error;
-            }
+            RequestResult requestResult = new RequestResult();
+            requestResult.Json = JsonMapper.ToObject(json);
+            requestResult.Status = (string)requestResult.Json["result"];
+
+            return requestResult;
         }
 
-
-        public static List<QueryResult> InterpretQueryFromAndroid(string json)
+        /// <summary>
+        /// Json으로 표현된 Database에 질의한 결과를 해석한다.
+        /// <para/>
+        /// 그 결과는  Field-Value로 구성된 Json 리스트이다.
+        /// <para/>
+        /// 예)<para/>
+        /// index 0 : { "_id" : 1, "res_id" : 1, .... }<para/>
+        ///  index 1 : { "_id" : 2, "res_id" : 2, .... }<para/>
+        /// ....
+        /// 
+        /// </summary>
+        /// <param name="json">Json으로 표현된 Database 질의 결과</param>
+        /// <returns>Field-Value로 구성된 Json 리스트
+        /// 
+        /// </returns>
+        public static List<JsonData> InterpretQueryFromAndroid(JsonData jData)
         {
-            //TODO 안드로이드를 참고하여 작업하기
-            JsonData jData = JsonMapper.ToObject(json);
+            List<JsonData> queryResults = new List<JsonData>();
 
-            List<QueryResult> queryResults = new List<QueryResult>();
-
-            if (jData["query_result"] == null)
+            JsonData queryResultJson = jData["query_result"];
+            if (queryResultJson == null || !queryResultJson.IsArray)
                 return queryResults;
 
+            for (int i = 0; i < queryResultJson.Count; i++)
+                queryResults.Add(queryResultJson[i]);
 
-           
             return queryResults;
         }
     }

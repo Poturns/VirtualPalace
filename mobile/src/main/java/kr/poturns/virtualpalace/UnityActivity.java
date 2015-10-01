@@ -55,14 +55,11 @@ public class UnityActivity extends GoogleUnityActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        PalaceApplication application = (PalaceApplication) getApplication();
-
-        //TODO InputConnector 에서 disconnect 메소드를 지원하는 건 어떤지?
-        application.setInputConnector(mWearInputConnector.getSupportType(), null);
+        mWearInputConnector.disconnect();
         mWearInputConnector.destroy();
         mWearInputConnector = null;
 
-        application.setInputConnector(mSpeechInputConnector.getSupportType(), null);
+        mSpeechInputConnector.disconnect();
         mSpeechInputDetector.destroy();
         mSpeechInputDetector = null;
         mSpeechInputConnector = null;

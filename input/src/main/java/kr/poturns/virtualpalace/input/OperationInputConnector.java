@@ -33,42 +33,40 @@ public class OperationInputConnector {
     private final int mSupportTypeF;
 
 
-
     // * * * F I E L D S * * * //
     /**
      * 사용 가능 플래그 : CONTROLLER 가 제어.
-     *
+     * <p/>
      * - CONTROLLER 에서 해당 Connector 정보를 유지하고 있는지 여부를 나타낸다.
-     *  Enabled 플래그가 활성화 되어 있지 않을 경우, 데이터 전송 자체를 BLOCK 한다.
+     * Enabled 플래그가 활성화 되어 있지 않을 경우, 데이터 전송 자체를 BLOCK 한다.
      */
     private boolean isEnabled = false;
     /**
      * 활성화 플래그 : CONTROLLER 가 제어.
-     *
+     * <p/>
      * - CONTROLLER 에서 해당 Connector 정보를 유지하고는 있으나,
-     *  일시적으로 명령을 받아들이는가 여부를 내부에서 판단한다.
-     *  Connector 에서는 활성화 플래그와 관계없이 데이터를 전송할 수 있다.
+     * 일시적으로 명령을 받아들이는가 여부를 내부에서 판단한다.
+     * Connector 에서는 활성화 플래그와 관계없이 데이터를 전송할 수 있다.
      */
     private boolean isActivated = false;
 
 
-
     // * * * C O N S T R U C T O R S * * * //
     public OperationInputConnector(Context context, int supportType) {
-        mContextF = (context == null)? null : context.getApplicationContext();
+        mContextF = (context == null) ? null : context.getApplicationContext();
         mSupportTypeF = supportType;
 
-        GlobalApplication app = (mContextF instanceof GlobalApplication)? (GlobalApplication) mContextF : null;
+        GlobalApplication app = (mContextF instanceof GlobalApplication) ? (GlobalApplication) mContextF : null;
         if (app != null) {
             app.setInputConnector(supportType, this);
         }
 
-        mControllerInputHandlerF = (app == null)? null : app.getInputHandler(supportType);
+        mControllerInputHandlerF = (app == null) ? null : app.getInputHandler(supportType);
     }
 
 
-
     // * * * M E T H O D S * * * //
+
     /**
      * 단일 명령 메시지를 전송한다.
      *
@@ -101,8 +99,8 @@ public class OperationInputConnector {
      * CONNECTOR 를 제어하기 위해 CONTROLLER 가 사용하는 메소드.
      * ( CONTROLLER 외 호출 금지 )
      *
-     * @param app CONTROLLER에서 호출했음을 증명하기 위한 매개변수
-     * @param key 설정 기능에 대한 키
+     * @param app   CONTROLLER에서 호출했음을 증명하기 위한 매개변수
+     * @param key   설정 기능에 대한 키
      * @param value 설정 기능에 대한 값
      */
     public final void configureFromController(GlobalApplication app, int key, int value) {
@@ -111,13 +109,21 @@ public class OperationInputConnector {
 
         switch (key) {
             case KEY_ENABLE:
-                isEnabled = (value == VALUE_TRUE)? true : false;
+                isEnabled = (value == VALUE_TRUE) ? true : false;
 
             case KEY_ACTIVATE:
-                isActivated = (value == VALUE_TRUE)? true : false;
+                isActivated = (value == VALUE_TRUE) ? true : false;
         }
     }
 
+    /**
+     * Controller와의 연결을 해제한다.
+     */
+    public void disconnect() {
+        if (mContextF instanceof GlobalApplication) {
+            ((GlobalApplication) mContextF).setInputConnector(mSupportTypeF, null);
+        }
+    }
 
 
     // * * * G E T T E R S & S E T T E R S * * * //

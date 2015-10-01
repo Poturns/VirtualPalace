@@ -26,29 +26,31 @@ public class WearInputConnector extends OperationInputConnector implements Messa
     public WearInputConnector(Context context) {
         super(context, IControllerCommands.TYPE_INPUT_SUPPORT_WATCH | IControllerCommands.TYPE_INPUT_SUPPORT_MOTION);
         mWearableCommunicator = new WearableCommunicator(context);
+    }
+
+    /**
+     * GoogleApiClient 및 Controller  와 연결한다.
+     */
+    public void connect() {
+        mWearableCommunicator.connect();
         mWearableCommunicator.setMessageListener(this);
     }
 
     /**
-     * GoogleApiClient 와 연결한다.
+     * GoogleApiClient 및 Controller 와 연결 해제한다.
      */
-    public void connect() {
-        mWearableCommunicator.connect();
-    }
-
-    /**
-     * GoogleApiClient 와 연결 해제한다.
-     */
+    @Override
     public void disconnect() {
         mWearableCommunicator.disconnect();
+        mWearableCommunicator.setMessageListener(null);
     }
+
 
     /**
      * GoogleApiClient 와 연결 해제하고, 리소스를 정리한다.
      */
     public void destroy() {
         mWearableCommunicator.destroy();
-        mWearableCommunicator.setMessageListener(null);
         mWearableCommunicator = null;
     }
 

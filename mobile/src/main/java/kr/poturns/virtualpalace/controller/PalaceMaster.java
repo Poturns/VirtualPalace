@@ -159,11 +159,6 @@ public class PalaceMaster extends PalaceCore {
                 case TERMINATE:
                     synchronized (inputLock) {
                         try {
-                            /*
-                            TODO exception을 띄우지 않는 코드
-                            value = singleMessage.optInt(cmdStr) + 1;
-                            singleMessage.put(cmdStr, value);
-                            */
                             try {
                                 value = singleMessage.getInt(cmdStr) + 1;
                             } catch (JSONException e) {
@@ -360,14 +355,6 @@ public class PalaceMaster extends PalaceCore {
 
             // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
             ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
-
-            /*
-            // UI Thread 에서의 연산 과부하를 막기위해, Thread 로 요청받은 작업을 수행한다.
-            // ※ Thread 내에서 Message 객체에 접근할 때, 정상적인 데이터를 불러오지 못하는 문제가 있음.
-            Thread worker = new Thread(mOperationGroupF, runnable, "OperationWorker");
-            worker.setDaemon(true);
-            worker.start();
-            */
         }
 
         /**
