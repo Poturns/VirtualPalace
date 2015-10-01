@@ -326,7 +326,9 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            process(jsonMessage);
+                            try {
+                                process(jsonMessage);
+                            } catch (Exception e) { }
                         }
                     };
                 } break;
@@ -339,7 +341,13 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            JSONObject result = process(jsonMessage);
+                            JSONObject result;
+                            try {
+                                result = process(jsonMessage);
+                            } catch (Exception e) {
+                                result = new JSONObject();
+                            }
+
                             AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
                         }
                     };
@@ -362,64 +370,67 @@ public class PalaceMaster extends PalaceCore {
          * @param jsonMessage
          * @return
          */
-        private JSONObject process(String jsonMessage) {
+        private JSONObject process(String jsonMessage) throws JSONException {
             JSONObject jsonResult = new JSONObject();
-            boolean result = false;
-
             Log.d("PalaceMaster_Request", "Request Message : " + jsonMessage);
 
-            try {
-                JSONObject message = new JSONObject(jsonMessage);
-                Iterator<String> keys = message.keys();
+            JSONObject message = new JSONObject(jsonMessage);
+            Iterator<String> keys = message.keys();
 
                 while (keys.hasNext()) {
                     String key = keys.next();
-                    String table = null;
-                    if (key.endsWith("_ar") || key.endsWith("_AR"))
-                        table = LocalDatabaseCenter.TABLE_AUGMENTED;
-                    else if (key.endsWith("_vr") || key.endsWith("_VR"))
-                        table = LocalDatabaseCenter.TABLE_VIRTUAL;
-                    else if (key.endsWith("_res") || key.endsWith("_RES"))
-                        table = LocalDatabaseCenter.TABLE_RESOURCE;
+                    JSONObject rstEach = new JSONObject();
+                    boolean result = false;
+
+                    try {
+                        String table = null;
+                        if (key.endsWith("_ar") || key.endsWith("_AR"))
+                            table = LocalDatabaseCenter.TABLE_AUGMENTED;
+                        else if (key.endsWith("_vr") || key.endsWith("_VR"))
+                            table = LocalDatabaseCenter.TABLE_VIRTUAL;
+                        else if (key.endsWith("_res") || key.endsWith("_RES"))
+                            table = LocalDatabaseCenter.TABLE_RESOURCE;
 
 
-                    if (QUERY_NEAR_ITEMS.equalsIgnoreCase(key) || QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
-                        result = queryBuildedOperation(key, message.getJSONObject(key), jsonResult);
+                        if (QUERY_NEAR_ITEMS.equalsIgnoreCase(key) || QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
+                            result = queryBuildedOperation(key, message.getJSONObject(key), jsonResult);
 
-                    } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
-                        result = selectMetadata(message.getJSONObject(key), table, jsonResult);
+                        } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
+                            result = selectMetadata(message.getJSONObject(key), table, jsonResult);
 
-                    } else if (INSERT_AR.equalsIgnoreCase(key) || INSERT_VR.equalsIgnoreCase(key) || INSERT_RES.equalsIgnoreCase(key)) {
-                        result = insertNewMetadata(message.getJSONObject(key), table);
+                        } else if (INSERT_AR.equalsIgnoreCase(key) || INSERT_VR.equalsIgnoreCase(key) || INSERT_RES.equalsIgnoreCase(key)) {
+                            result = insertNewMetadata(message.getJSONObject(key), table);
 
-                    } else if (UPDATE_AR.equalsIgnoreCase(key) || UPDATE_VR.equalsIgnoreCase(key) || UPDATE_RES.equalsIgnoreCase(key)) {
-                        result = updateMetadata(message.getJSONObject(key), table);
+                        } else if (UPDATE_AR.equalsIgnoreCase(key) || UPDATE_VR.equalsIgnoreCase(key) || UPDATE_RES.equalsIgnoreCase(key)) {
+                            result = updateMetadata(message.getJSONObject(key), table);
 
-                    } else if (DELETE_AR.equalsIgnoreCase(key) || DELETE_VR.equalsIgnoreCase(key) || DELETE_RES.equalsIgnoreCase(key)) {
-                        result = deleteMetadata(message.getJSONObject(key), table);
+                        } else if (DELETE_AR.equalsIgnoreCase(key) || DELETE_VR.equalsIgnoreCase(key) || DELETE_RES.equalsIgnoreCase(key)) {
+                            result = deleteMetadata(message.getJSONObject(key), table);
 
-                    } else if (SWITCH_PLAY_MODE.equalsIgnoreCase(key)) {
-                        int mode = message.getInt(key);
-                        result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
+                        } else if (SWITCH_PLAY_MODE.equalsIgnoreCase(key)) {
+                            int mode = message.getInt(key);
+                            result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
-                    } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                        // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
-                        int supportType = message.getInt(key);
-                        activateInputConector(supportType);
+                        } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
+                            // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
+                            int supportType = message.getInt(key);
+                            activateInputConector(supportType);
 
-                    } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                        int supportType = message.getInt(key);
-                        deactivateInputConnector(supportType);
+                        } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
+                            int supportType = message.getInt(key);
+                            deactivateInputConnector(supportType);
+                        }
+                        rstEach.put(RESULT, result? "success" : "fail");
+
+                    } catch (JSONException e){
+                        try {
+                            rstEach.put(RESULT, "error");
+
+                        } catch (JSONException e2) { }
                     }
+
+                    jsonResult.put(key, rstEach);
                 }
-                jsonResult.put(RESULT, result? "success" : "fail");
-
-            } catch (JSONException e){
-                try {
-                    jsonResult.put(RESULT, "error");
-
-                } catch (JSONException e2) { }
-            }
 
             return jsonResult;
         }
