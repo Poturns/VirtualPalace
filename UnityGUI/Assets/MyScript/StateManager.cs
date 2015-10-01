@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
 using AndroidApi.Controller;
@@ -40,7 +41,7 @@ public class StateManager : MonoBehaviour
 		if (activeState != null)
 			activeState.ShowIt ();
 	}
-	public void InputControlFunc(Operation[] InputOp)
+	public void InputControlFunc(List<Operation> InputOp)
 	{
 		activeState.InputHandling (InputOp);
 	}

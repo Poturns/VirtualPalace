@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using MyScript.Interface;
 using AndroidApi.Controller;
 
@@ -33,18 +34,20 @@ namespace MyScript.States
 		{
 			
 		}
-		public void InputHandling(Operation[] InputOp)
+		public void InputHandling(List<Operation> InputOp)
 		{
 			foreach (Operation op in InputOp) 
 			{
-				if(op.Type == Operation.CANCEL)
-				{
-					ExitImageState ();
-				}
-				else if(op.Type == Operation.SELECT)
-				{
+				switch(op.Type){
+				case Operation.CANCEL:
 
+					break;
+
+				case Operation.SELECT:
+
+					break;
 				}
+
 			}
 		}
 		void ExitImageState()
