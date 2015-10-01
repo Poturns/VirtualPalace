@@ -3,15 +3,18 @@ using System.Collections;
 using MyScript.States;
 using MyScript.Interface;
 
-public class SceneChange : MonoBehaviour , IObject {
+public class SceneChange : MonoBehaviour , IRaycastedObject
+{
 	public string SceneName;
-	public void OnSelect()
+
+	public void OnSelect ()
 	{
-		SceneMove ();
+        SceneMove();
 	}
-	public void SceneMove()
+
+	public void SceneMove ()
 	{
-		StateManager.GetManager().SwitchState (new VRSceneIdleState(StateManager.GetManager()));
+		StateManager.GetManager ().SwitchState (new VRSceneIdleState (StateManager.GetManager ()));
 		Application.LoadLevel (SceneName);
 	}
 

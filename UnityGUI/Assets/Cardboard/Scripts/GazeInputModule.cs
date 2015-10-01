@@ -20,6 +20,7 @@
 //   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //   THE SOFTWARE.
 
+using MyScript.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -36,7 +37,10 @@ public class GazeInputModule : BaseInputModule {
   [Tooltip("Optional object to place at raycast intersections as a 3D cursor. " +
            "Be sure it is on a layer that raycasts will ignore.")]
   public GameObject cursor;
-	public GameObject RaycastedObj;
+
+	public GameObject RaycastedGameObject;
+   // public IRaycastedObject RaycastedScript;
+
   // Time in seconds between the pointer down and up events sent by a magnet click.
   // Allows time for the UI elements to make their state transitions.
   [HideInInspector]
@@ -111,8 +115,13 @@ public class GazeInputModule : BaseInputModule {
   private void PlaceCursor() {
     if (cursor == null)
       return;
+
     var go = pointerData.pointerCurrentRaycast.gameObject;
-		RaycastedObj = go;
+    
+    RaycastedGameObject = go;
+   // if(RaycastedGameObject != null)
+    //    RaycastedScript = RaycastedGameObject.GetComponent<IRaycastedObject>();
+
     cursor.SetActive(go != null);
     if (cursor.activeInHierarchy) {
       Camera cam = pointerData.enterEventCamera;

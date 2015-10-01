@@ -44,10 +44,10 @@ namespace MyScript.States
 					break;
 
 				case Operation.SELECT:
-						GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
+						GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedGameObject;
 						if(!SelObj)
 						{
-							SelObj.GetComponent<IObject>().OnSelect();
+							SelObj.GetComponent<IRaycastedObject>().OnSelect();
 						}
 						//EventSystem.current.currentSelectedGameObject();
 					break;

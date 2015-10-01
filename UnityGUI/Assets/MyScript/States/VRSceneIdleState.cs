@@ -30,19 +30,22 @@ namespace MyScript.States
 		{
 			foreach (Operation op in InputOp) 
 			{
-				if(op.Type == Operation.CANCEL)
-				{
+                switch (op.Type)
+                {
+                    case Operation.CANCEL:
+                        StateManager.SwitchScene(StateManager.SCENE_MAIN);
+                        break;
 
-				}
-				else if(op.Type == Operation.SELECT)
-				{
-					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
-					if(!SelObj)
-					{
-						SelObj.GetComponent<IObject>().OnSelect();
-					}
-					//EventSystem.current.currentSelectedGameObject();
-				}
+                    case Operation.SELECT:
+                        GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedGameObject;
+                        if (SelObj != null)
+                        {
+                            SelObj.GetComponent<IRaycastedObject>().OnSelect();
+                        }
+                        //EventSystem.current.currentSelectedGameObject();
+                        break;
+                }
+				
 			}
 		}
 		void Switch()

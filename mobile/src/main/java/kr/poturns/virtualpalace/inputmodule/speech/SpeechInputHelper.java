@@ -30,12 +30,18 @@ public class SpeechInputHelper implements RecognitionListener {
     private Intent speechIntent;
     private OnSpeechDataListener listener;
 
-    /** 현재 음성인식을 수행중인지 여부*/
+    /**
+     * 현재 음성인식을 수행중인지 여부
+     */
     private boolean isInRecognizing = false;
 
-    /** 지속적인 음성인식을 수행할 지 여부*/
+    /**
+     * 지속적인 음성인식을 수행할 지 여부
+     */
     private boolean isContinueRecognizing = false;
-    /** 지속적인 음성인식을 수행할 때, 그 시간 간격*/
+    /**
+     * 지속적인 음성인식을 수행할 때, 그 시간 간격
+     */
     private long delay = 1000;
     private Handler mHandler;
 
@@ -235,6 +241,9 @@ public class SpeechInputHelper implements RecognitionListener {
      * 일정시간 대기 후, 음성인식을 시작한다.
      */
     private void delayedStartRecognition() {
+        if (mHandler.hasMessages(HANDLER_MSG_START_LISTENING)) {
+            mHandler.removeMessages(HANDLER_MSG_START_LISTENING);
+        }
         mHandler.sendEmptyMessageDelayed(HANDLER_MSG_START_LISTENING, delay);
     }
 

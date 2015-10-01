@@ -2,7 +2,7 @@ using AndroidApi.Controller;
 
 namespace MyScript.Interface
 {
-	public interface IObject
+	public interface IRaycastedObject
 	{
 		void OnSelect();
 	}

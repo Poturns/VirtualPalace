@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using MyScript.Interface;
 
 
-public class BookCaseScript : MonoBehaviour , IObject {
+public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 
 	public GameObject BookPrefab;
 	public float ZFirstOffset;

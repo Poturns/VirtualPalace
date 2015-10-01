@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MyScript.Interface;
 using AndroidApi.Controller;
 using UnityEngine.EventSystems;
+using System;
 
 namespace MyScript.States
 {
@@ -10,36 +11,47 @@ namespace MyScript.States
 	{
 		private StateManager manager;
 		private GameObject EventSys;
+		private GazeInputModule SelectModule;
 
 		public BeginState (StateManager managerRef)
 		{
 			Debug.Log ("BeginState");
 			EventSys = GameObject.Find ("EventSystem");
 			manager = managerRef;
-		}
-		public void StateUpdate()
-		{
+
+			SelectModule = EventSys.GetComponent<GazeInputModule>();
+		
 
 		}
-		public void ShowIt()
-		{
 
-		}
-		public void InputHandling(List<Operation> InputOp)
+
+        public void StateUpdate()
+        {
+        }
+
+        public void ShowIt()
+        {
+        }
+
+        public void InputHandling(List<Operation> InputOp)
 		{
 			foreach (Operation op in InputOp) 
 			{
-				switch(op.Type){
-				case Operation.CANCEL:
+                switch (op.Type) {
+                    case Operation.CANCEL:
 
-					break;
+                        break;
 
-				case Operation.SELECT:
-					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
-					if(!SelObj)
-					{
-						SelObj.GetComponent<IObject>().OnSelect();
-					}
+                    case Operation.SELECT:
+                        if (SelectModule.RaycastedGameObject != null)
+                        {
+                            IRaycastedObject obj = SelectModule.RaycastedGameObject.GetComponent<IRaycastedObject>();
+
+                            if (obj != null) {
+                                obj.OnSelect();
+                            }
+                        }
+				
 					break;
 				}
 			}
@@ -51,6 +63,8 @@ namespace MyScript.States
 			
 			
 		}
-	}
+
+        
+    }
 }
 

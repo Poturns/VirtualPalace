@@ -6,8 +6,15 @@ using AndroidApi.Controller;
 
 public class StateManager : MonoBehaviour 
 {
-	private IStateBase activeState;	
+
+    public const string SCENE_MAIN = "MyTest";
+
+
+
+    private readonly Utils.AsyncTasker Tasker = new Utils.AsyncTasker();
+    private IStateBase activeState;	
 	private static StateManager instanceRef;
+
 	public static StateManager GetManager()
 	{
 		return instanceRef;
@@ -33,20 +40,46 @@ public class StateManager : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update () {
-		if (activeState != null)
+        Tasker.OnUpdate();
+
+        if (activeState != null)
 			activeState.StateUpdate ();
 	}
+
 	void OnGUI()
 	{
 		if (activeState != null)
 			activeState.ShowIt ();
 	}
+
 	public void InputControlFunc(List<Operation> InputOp)
 	{
-		activeState.InputHandling (InputOp);
+        Tasker.QueueOnMainThread(()=> 
+        {
+            if(activeState != null)
+                activeState.InputHandling(InputOp);
+        });
 	}
+
 	public void SwitchState(IStateBase newState)
 	{
 		activeState = newState;
 	}
+
+    public static void SwitchScene(string sceneName)
+    {
+        switch (sceneName)
+        {
+            case SCENE_MAIN:
+               GetManager().SwitchState(new BeginState(GetManager()));
+                
+                break;
+
+            default:
+                return;
+
+        }
+
+        Application.LoadLevel(sceneName);
+    }
 }

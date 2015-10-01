@@ -26,7 +26,7 @@ namespace AndroidApi.Controller
                 operation.Type = int.Parse(key);
                 operation.Value = (int)jData[key];
                 
-                operations[i++] = operation;
+                operations.Add(operation);
             }
 
             return operations;

@@ -5,7 +5,7 @@ using MyScript.States;
 using MyScript.Interface;
 using AndroidApi.Controller;
 
-public class MemoObject : MonoBehaviour ,IObject
+public class MemoObject : MonoBehaviour ,IRaycastedObject
 {
 
 	public string Title {
