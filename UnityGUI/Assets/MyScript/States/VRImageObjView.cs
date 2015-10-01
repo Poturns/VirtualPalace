@@ -8,7 +8,7 @@ namespace MyScript.States
 	public class VRImageObjView : IStateBase
 	{
 		private StateManager manager;
-		
+		private GameObject EventSys;
 		private GameObject ImageUI;
 		private GameObject Target;
 
@@ -44,11 +44,12 @@ namespace MyScript.States
 					break;
 
 				case Operation.SELECT:
-					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
-					if(!SelObj)
-					{
-						SelObj.GetComponent<IObject>().OnSelect();
-					}
+						GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
+						if(!SelObj)
+						{
+							SelObj.GetComponent<IObject>().OnSelect();
+						}
+						//EventSystem.current.currentSelectedGameObject();
 					break;
 				}
 
