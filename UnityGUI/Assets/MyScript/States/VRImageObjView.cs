@@ -18,7 +18,7 @@ namespace MyScript.States
 			Target = TargetObject;
 			
 			Debug.Log ("VRImageObjectView");
-			
+			EventSys = GameObject.Find ("EventSystem");
 			ImageUI = GameObject.Find ("ImageView");
 			if (!ImageUI)
 				Debug.Log ("ImageSelector is Null");
@@ -44,7 +44,11 @@ namespace MyScript.States
 					break;
 
 				case Operation.SELECT:
-
+					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
+					if(!SelObj)
+					{
+						SelObj.GetComponent<IObject>().OnSelect();
+					}
 					break;
 				}
 

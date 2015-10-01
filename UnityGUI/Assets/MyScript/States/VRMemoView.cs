@@ -13,6 +13,7 @@ namespace MyScript.States
 		private GameObject UIMemoTxt;
 
 		private GameObject TargetObj;
+		private GameObject EventSys;
 		
 		public VRMemoView (StateManager managerRef , GameObject TargetObject)
 		{
@@ -20,7 +21,8 @@ namespace MyScript.States
 			TargetObj = TargetObject;
 			
 			Debug.Log ("MemoView");
-			
+
+			EventSys = GameObject.Find ("EventSystem");
 			UIMemoBG = GameObject.Find ("MemoView");
 			if (!UIMemoBG)
 				Debug.Log ("Sel Target is Null");
