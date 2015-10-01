@@ -8,6 +8,8 @@ public class StateManager : MonoBehaviour
 {
 
     public const string SCENE_MAIN = "MyTest";
+	public const string SCENE_VR = "VRWorld";
+	public const string SCENE_AR = "ARScene";
 
 
 
@@ -70,13 +72,20 @@ public class StateManager : MonoBehaviour
     {
         switch (sceneName)
         {
-            case SCENE_MAIN:
-               GetManager().SwitchState(new BeginState(GetManager()));
-                
-                break;
+        case SCENE_MAIN:
+           GetManager().SwitchState(new BeginState(GetManager()));
+            
+            break;
 
-            default:
-                return;
+		case SCENE_VR:
+			GetManager().SwitchState(new VRSceneIdleState(GetManager()));
+			break;
+
+		case SCENE_AR:
+			//GetManager().SwitchState(new AR(GetManager()));
+			break;
+        default:
+            return;
 
         }
 

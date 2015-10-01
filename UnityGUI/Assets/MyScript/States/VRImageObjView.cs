@@ -8,7 +8,7 @@ namespace MyScript.States
 	public class VRImageObjView : IStateBase
 	{
 		private StateManager manager;
-		private GameObject EventSys;
+		private GazeInputModule SelectModule;
 		private GameObject ImageUI;
 		private GameObject Target;
 
@@ -18,7 +18,7 @@ namespace MyScript.States
 			Target = TargetObject;
 			
 			Debug.Log ("VRImageObjectView");
-			EventSys = GameObject.Find ("EventSystem");
+			SelectModule = GameObject.Find ("EventSystem").GetComponent<GazeInputModule>();
 			ImageUI = GameObject.Find ("ImageView");
 			if (!ImageUI)
 				Debug.Log ("ImageSelector is Null");
@@ -36,25 +36,27 @@ namespace MyScript.States
 		}
 		public void InputHandling(List<Operation> InputOp)
 		{
-			foreach (Operation op in InputOp) 
-			{
-				switch(op.Type){
+			foreach (Operation op in InputOp) {
+				switch (op.Type) {
 				case Operation.CANCEL:
+					ExitImageState();
 
 					break;
-
+					
 				case Operation.SELECT:
-						GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedGameObject;
-						if(!SelObj)
-						{
-							SelObj.GetComponent<IRaycastedObject>().OnSelect();
+					if (SelectModule.RaycastedGameObject != null) {
+						IRaycastedObject obj = SelectModule.RaycastedGameObject.GetComponent<IRaycastedObject> ();
+						
+						if (obj != null) {
+							obj.OnSelect ();
 						}
-						//EventSystem.current.currentSelectedGameObject();
+					}
+					
 					break;
 				}
-
 			}
 		}
+	
 		void ExitImageState()
 		{
 			Debug.Log("Exit Image");
