@@ -288,9 +288,10 @@ public class PalaceMaster extends PalaceCore {
          *
          */
         private void send() {
-            Log.d("PalaceMast_Input","Input Message : " + singleMessage.length() + " transfered. " + singleMessage.toString());
             if (singleMessage.length() == 0)
                 return;
+
+            Log.d("PalaceMast_Input","Input Message : " + singleMessage.length() + " transfered. " + singleMessage.toString());
 
             // Input은 순차적으로 전송
             ThreadUtils.SERIAL_EXECUTOR.execute(new Runnable() {
