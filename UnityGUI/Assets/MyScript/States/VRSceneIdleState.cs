@@ -39,7 +39,7 @@ namespace MyScript.States
 					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
 					if(!SelObj)
 					{
-						SelObj.GetComponent<MemoObject>().ClickObj();
+						SelObj.GetComponent<IObject>().OnSelect();
 					}
 					//EventSystem.current.currentSelectedGameObject();
 				}
