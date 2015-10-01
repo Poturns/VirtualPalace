@@ -13,6 +13,7 @@ namespace MyScript.States
 		public BeginState (StateManager managerRef)
 		{
 			Debug.Log ("BeginState");
+			EventSys = GameObject.Find ("EventSystem");
 			manager = managerRef;
 		}
 		public void StateUpdate()
@@ -36,7 +37,7 @@ namespace MyScript.States
 					GameObject SelObj = EventSys.GetComponent<GazeInputModule>().RaycastedObj;
 					if(!SelObj)
 					{
-						//SelObj.GetComponent<VR>().ClickObj();
+						SelObj.GetComponent<IObject>().OnSelect();
 					}
 				}
 			}

@@ -13,6 +13,7 @@ namespace MyScript.States
 		private GameObject UITitleTextObj;
 
 		private GameObject Target;
+		private GameObject EventSys;
 
 		public VRObjectView (StateManager managerRef , GameObject TargetObject)
 		{
@@ -21,6 +22,7 @@ namespace MyScript.States
 
 			Debug.Log ("VRObjectView");
 
+			EventSys = GameObject.Find ("EventSystem");
 			UIBookMesh = GameObject.Find ("UIBook");
 			if (!UIBookMesh)
 				Debug.Log ("Sel Target is Null");
