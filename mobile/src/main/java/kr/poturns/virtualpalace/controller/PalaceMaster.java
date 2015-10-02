@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
+import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
  * <b> EXTERNAL CONTROLLER : 컨트롤러의 중개 기능을 다룬다 </b>
@@ -38,7 +39,7 @@ public class PalaceMaster extends PalaceCore {
     // * * * C O N S T A N T S * * * //
     private final InputHandler mInputHandlerF;
     private final RequestHandler mRequestHandlerF;
-    private final ThreadGroup mOperationGroupF;
+   // private final ThreadGroup mOperationGroupF;
     //private final GoogleServiceAssistant mGoogleServiceAssistantF;
 
 
@@ -52,7 +53,7 @@ public class PalaceMaster extends PalaceCore {
         mInputHandlerF = new InputHandler();
         mRequestHandlerF = new RequestHandler();
 
-        mOperationGroupF = new ThreadGroup("PalaceMaster");
+       // mOperationGroupF = new ThreadGroup("PalaceMaster");
         //mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
     }
 
@@ -158,10 +159,6 @@ public class PalaceMaster extends PalaceCore {
                 case TERMINATE:
                     synchronized (inputLock) {
                         try {
-                            /*
-                            value = singleMessage.optInt(cmdStr) + 1;
-                            singleMessage.put(cmdStr, value);
-                            */
                             try {
                                 value = singleMessage.getInt(cmdStr) + 1;
                             } catch (JSONException e) {
@@ -295,12 +292,19 @@ public class PalaceMaster extends PalaceCore {
             if (singleMessage.length() == 0)
                 return;
 
-            synchronized (inputLock) {
-                AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
+            // Input은 순차적으로 전송
+            ThreadUtils.SERIAL_EXECUTOR.execute(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (inputLock) {
+                        AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
 
-                // Send 후 JsonMessage 초기화.
-                init();
-            }
+                        // Send 후 JsonMessage 초기화.
+                        init();
+                    }
+                }
+            });
+
         }
     }
 
@@ -326,9 +330,7 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                process(jsonMessage);
-                            } catch (Exception e) { }
+                            process(jsonMessage);
                         }
                     };
                 } break;
@@ -341,13 +343,7 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            JSONObject result;
-                            try {
-                                result = process(jsonMessage);
-                            } catch (Exception e) {
-                                result = new JSONObject();
-                            }
-
+                            JSONObject result = process(jsonMessage);
                             AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
                         }
                     };
@@ -357,11 +353,8 @@ public class PalaceMaster extends PalaceCore {
                     return;
             }
 
-            // UI Thread 에서의 연산 과부하를 막기위해, Thread 로 요청받은 작업을 수행한다.
-            // ※ Thread 내에서 Message 객체에 접근할 때, 정상적인 데이터를 불러오지 못하는 문제가 있음.
-            Thread worker = new Thread(mOperationGroupF, runnable, "OperationWorker");
-            worker.setDaemon(true);
-            worker.start();
+            // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
+            ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
         }
 
         /**
@@ -370,67 +363,63 @@ public class PalaceMaster extends PalaceCore {
          * @param jsonMessage
          * @return
          */
-        private JSONObject process(String jsonMessage) throws JSONException {
+        private JSONObject process(String jsonMessage) {
             JSONObject jsonResult = new JSONObject();
+            boolean result = false;
+
             Log.d("PalaceMaster_Request", "Request Message : " + jsonMessage);
 
-            JSONObject message = new JSONObject(jsonMessage);
-            Iterator<String> keys = message.keys();
+            try {
+                JSONObject message = new JSONObject(jsonMessage);
+                Iterator<String> keys = message.keys();
 
                 while (keys.hasNext()) {
                     String key = keys.next();
-                    JSONObject rstEach = new JSONObject();
-                    boolean result = false;
-
-                    try {
-                        String table = null;
-                        if (key.endsWith("_ar") || key.endsWith("_AR"))
-                            table = LocalDatabaseCenter.TABLE_AUGMENTED;
-                        else if (key.endsWith("_vr") || key.endsWith("_VR"))
-                            table = LocalDatabaseCenter.TABLE_VIRTUAL;
-                        else if (key.endsWith("_res") || key.endsWith("_RES"))
-                            table = LocalDatabaseCenter.TABLE_RESOURCE;
+                    String table = null;
+                    if (key.endsWith("_ar") || key.endsWith("_AR"))
+                        table = LocalDatabaseCenter.TABLE_AUGMENTED;
+                    else if (key.endsWith("_vr") || key.endsWith("_VR"))
+                        table = LocalDatabaseCenter.TABLE_VIRTUAL;
+                    else if (key.endsWith("_res") || key.endsWith("_RES"))
+                        table = LocalDatabaseCenter.TABLE_RESOURCE;
 
 
-                        if (QUERY_NEAR_ITEMS.equalsIgnoreCase(key) || QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
-                            result = queryBuildedOperation(key, message.getJSONObject(key), jsonResult);
+                    if (QUERY_NEAR_ITEMS.equalsIgnoreCase(key) || QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
+                        result = queryBuildedOperation(key, message.getJSONObject(key), jsonResult);
 
-                        } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
-                            result = selectMetadata(message.getJSONObject(key), table, jsonResult);
+                    } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
+                        result = selectMetadata(message.getJSONObject(key), table, jsonResult);
 
-                        } else if (INSERT_AR.equalsIgnoreCase(key) || INSERT_VR.equalsIgnoreCase(key) || INSERT_RES.equalsIgnoreCase(key)) {
-                            result = insertNewMetadata(message.getJSONObject(key), table);
+                    } else if (INSERT_AR.equalsIgnoreCase(key) || INSERT_VR.equalsIgnoreCase(key) || INSERT_RES.equalsIgnoreCase(key)) {
+                        result = insertNewMetadata(message.getJSONObject(key), table);
 
-                        } else if (UPDATE_AR.equalsIgnoreCase(key) || UPDATE_VR.equalsIgnoreCase(key) || UPDATE_RES.equalsIgnoreCase(key)) {
-                            result = updateMetadata(message.getJSONObject(key), table);
+                    } else if (UPDATE_AR.equalsIgnoreCase(key) || UPDATE_VR.equalsIgnoreCase(key) || UPDATE_RES.equalsIgnoreCase(key)) {
+                        result = updateMetadata(message.getJSONObject(key), table);
 
-                        } else if (DELETE_AR.equalsIgnoreCase(key) || DELETE_VR.equalsIgnoreCase(key) || DELETE_RES.equalsIgnoreCase(key)) {
-                            result = deleteMetadata(message.getJSONObject(key), table);
+                    } else if (DELETE_AR.equalsIgnoreCase(key) || DELETE_VR.equalsIgnoreCase(key) || DELETE_RES.equalsIgnoreCase(key)) {
+                        result = deleteMetadata(message.getJSONObject(key), table);
 
-                        } else if (SWITCH_PLAY_MODE.equalsIgnoreCase(key)) {
-                            int mode = message.getInt(key);
-                            result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
+                    } else if (SWITCH_PLAY_MODE.equalsIgnoreCase(key)) {
+                        int mode = message.getInt(key);
+                        result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
-                        } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                            // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
-                            int supportType = message.getInt(key);
-                            activateInputConector(supportType);
+                    } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
+                        int supportType = message.getInt(key);
+                        activateInputConector(supportType);
 
-                        } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                            int supportType = message.getInt(key);
-                            deactivateInputConnector(supportType);
-                        }
-                        rstEach.put(RESULT, result? "success" : "fail");
-
-                    } catch (JSONException e){
-                        try {
-                            rstEach.put(RESULT, "error");
-
-                        } catch (JSONException e2) { }
+                    } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
+                        int supportType = message.getInt(key);
+                        deactivateInputConnector(supportType);
                     }
-
-                    jsonResult.put(key, rstEach);
                 }
+                jsonResult.put(RESULT, result? "success" : "fail");
+
+            } catch (JSONException e){
+                try {
+                    jsonResult.put(RESULT, "error");
+
+                } catch (JSONException e2) { }
+            }
 
             return jsonResult;
         }

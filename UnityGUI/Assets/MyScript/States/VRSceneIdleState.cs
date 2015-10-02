@@ -1,17 +1,24 @@
 using UnityEngine;
 using MyScript.Interface;
+using AndroidApi.Controller;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 namespace MyScript.States
 {
 	public class VRSceneIdleState : IStateBase
 	{
 		private StateManager manager;
-
+		private GameObject EventSys;
+		private GazeInputModule SelectModule;
 
 		public VRSceneIdleState (StateManager managerRef)
 		{
 			Debug.Log ("VRSceneState");
 			manager = managerRef;
+			EventSys = GameObject.Find ("EventSystem");
+			SelectModule = EventSys.GetComponent<GazeInputModule> ();
+			if(!EventSys) Debug.Log("Event System Find Fail");
 		}
 		public void StateUpdate()
 		{
@@ -20,6 +27,28 @@ namespace MyScript.States
 		public void ShowIt()
 		{
 			
+		}
+		public void InputHandling(List<Operation> InputOp)
+		{
+			foreach (Operation op in InputOp) 
+			{
+                switch (op.Type)
+                {
+                    case Operation.CANCEL:
+                        StateManager.SwitchScene(StateManager.SCENE_MAIN);
+                        break;
+
+                    case Operation.SELECT:
+						GameObject SelObj = SelectModule.RaycastedGameObject;
+                        if (SelObj != null)
+                        {
+                            SelObj.GetComponent<IRaycastedObject>().OnSelect();
+                        }
+                        //EventSystem.current.currentSelectedGameObject();
+                        break;
+                }
+				
+			}
 		}
 		void Switch()
 		{

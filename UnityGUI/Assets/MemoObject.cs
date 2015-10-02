@@ -2,8 +2,10 @@
 using System.Collections;
 using UnityEngine.UI;
 using MyScript.States;
+using MyScript.Interface;
+using AndroidApi.Controller;
 
-public class MemoObject : MonoBehaviour 
+public class MemoObject : MonoBehaviour ,IRaycastedObject
 {
 
 	public string Title {
@@ -25,10 +27,11 @@ public class MemoObject : MonoBehaviour
 	{
 		StateManager.GetManager ().SwitchState (new VRObjectViewExitState (StateManager.GetManager ()));
 	}
-	public void ClickObj()
+	public void OnSelect()
 	{
 		StateManager.GetManager().SwitchState (new VRObjectView(StateManager.GetManager(),gameObject));
 	}
+
 	// Use this for initialization
 	void Start () {
 		Memo = "Test Memo String";

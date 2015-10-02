@@ -1,6 +1,7 @@
 using UnityEngine;
+using System.Collections.Generic;
 using MyScript.Interface;
-
+using AndroidApi.Controller;
 
 namespace MyScript.States
 {
@@ -40,6 +41,11 @@ namespace MyScript.States
 
 		}
 		public void ShowIt()
+		{
+			
+		}
+
+		public void InputHandling(List<Operation> InputOp)
 		{
 			
 		}

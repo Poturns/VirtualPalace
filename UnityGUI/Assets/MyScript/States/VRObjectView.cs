@@ -1,5 +1,8 @@
 using UnityEngine;
 using MyScript.Interface;
+using System.Collections.Generic;
+using AndroidApi.Controller;
+
 
 namespace MyScript.States
 {
@@ -11,6 +14,7 @@ namespace MyScript.States
 		private GameObject UITitleTextObj;
 
 		private GameObject Target;
+		private GameObject EventSys;
 
 		public VRObjectView (StateManager managerRef , GameObject TargetObject)
 		{
@@ -19,6 +23,7 @@ namespace MyScript.States
 
 			Debug.Log ("VRObjectView");
 
+			EventSys = GameObject.Find ("EventSystem");
 			UIBookMesh = GameObject.Find ("UIBook");
 			if (!UIBookMesh)
 				Debug.Log ("Sel Target is Null");
@@ -40,13 +45,30 @@ namespace MyScript.States
 				Debug.Log ("A");
 			// Input
 				
-			ChangeMemoScene ();
+			//ChangeMemoScene ();
 
 		
 		}
 		public void ShowIt()
 		{
 			
+		}
+		public void InputHandling(List<Operation> InputOp)
+		{
+			foreach (Operation op in InputOp) 
+			{
+				if(op.Type == Operation.CANCEL)
+				{
+					UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+					UITitleTextObj.GetComponent<TextMesh> ().text = "";
+					manager.SwitchState (new VRSceneIdleState(manager));
+				}
+				else if(op.Type == Operation.SELECT)
+				{
+					
+					ChangeMemoScene ();
+				}
+			}
 		}
 		void ChangeMemoScene()
 		{

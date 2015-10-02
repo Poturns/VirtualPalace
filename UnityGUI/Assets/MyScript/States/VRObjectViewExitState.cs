@@ -1,6 +1,7 @@
 using UnityEngine;
 using MyScript.Interface;
-
+using AndroidApi.Controller;
+using System.Collections.Generic;
 
 namespace MyScript.States
 {
@@ -38,6 +39,10 @@ namespace MyScript.States
 			manager.SwitchState (new VRSceneIdleState (manager));
 		}
 		public void ShowIt()
+		{
+			
+		}
+		public void InputHandling(List<Operation> InputOp)
 		{
 			
 		}

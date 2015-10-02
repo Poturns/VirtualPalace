@@ -1,13 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 using MyScript.States;
+using MyScript.Interface;
+using MyScript;
 
-public class SceneChange : MonoBehaviour {
+public class SceneChange : MonoBehaviour , IRaycastedObject
+{
 	public string SceneName;
-	public void SceneMove()
+
+	public void OnSelect ()
 	{
-		StateManager.GetManager().SwitchState (new VRSceneIdleState(StateManager.GetManager()));
-		Application.LoadLevel (SceneName);
+        SceneMove();
+	}
+
+	public void SceneMove ()
+	{
+		StateManager.SwitchScene (SceneName);
 	}
 
 }

@@ -5,11 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -20,24 +24,60 @@ import java.util.ArrayList;
 public class SpeechInputHelper implements RecognitionListener {
     private static final String TAG = "SpeechInputHelper";
     public static final int ACTIVITY_REQUEST_CODE = 9567;
+    private static final int HANDLER_MSG_START_LISTENING = 1234;
 
     private SpeechRecognizer mRecognizer;
     private Intent speechIntent;
     private OnSpeechDataListener listener;
 
+    /**
+     * 현재 음성인식을 수행중인지 여부
+     */
+    private boolean isInRecognizing = false;
+
+    /**
+     * 지속적인 음성인식을 수행할 지 여부
+     */
+    private boolean isContinueRecognizing = false;
+    /**
+     * 지속적인 음성인식을 수행할 때, 그 시간 간격
+     */
+    private long delay = 1000;
+    private Handler mHandler;
+
     private final Context mContext;
 
     public SpeechInputHelper(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
+        mHandler = new SpeechHandler(this);
         initSTT();
     }
 
-    public static interface OnSpeechDataListener {
-        void onResult(SpeechResults speechResults);
-    }
-
+    /**
+     * 음성인식 결과를 전달받을 리스너를 등록한다.
+     *
+     * @param listener 음성인식 결과를 전달받을 리스너
+     */
     public void setSpeechListener(OnSpeechDataListener listener) {
         this.listener = listener;
+    }
+
+    /**
+     * 음성인식 수행이 끝나도 계속 음성인식을 수행하는지 여부를 설정한다.
+     *
+     * @param continueRecognizing True : 음성인식을 계속 수행
+     */
+    public void setContinueRecognizing(boolean continueRecognizing) {
+        isContinueRecognizing = continueRecognizing;
+    }
+
+    /**
+     * 음성인식 수행이 끝나도 계속 음성인식을 수행하는 경우, 얼마나 지연된 뒤 수행될 지 결정한다.
+     *
+     * @param delay 음성인식이 끝나고 다음 음성인식을 수행하기 까지 대기할 시간.
+     */
+    public void setContinueRecognizingDelay(long delay) {
+        this.delay = delay;
     }
 
     private void initSTT() {
@@ -88,6 +128,8 @@ public class SpeechInputHelper implements RecognitionListener {
         mRecognizer.stopListening();
         mRecognizer.destroy();
         mRecognizer = null;
+
+        mHandler = null;
     }
 
 
@@ -127,20 +169,13 @@ public class SpeechInputHelper implements RecognitionListener {
     }
 
 
-    /**
-     * 결과를 전달한다.
-     */
-    private void deliverSttResult(Bundle results) {
-        if (listener != null)
-            listener.onResult(new SpeechResults(getRecognitionResult(results), getConfidenceResult(results), null));
-    }
-
-
     // ******* RecognitionListener
 
     @Override
     public void onReadyForSpeech(Bundle params) {
         Log.i(TAG, "=onReadyForSpeech=");
+
+        isInRecognizing = true;
     }
 
     @Override
@@ -166,6 +201,11 @@ public class SpeechInputHelper implements RecognitionListener {
     @Override
     public void onError(int error) {
         Log.e(TAG, "=onError : " + error + "=");
+
+        isInRecognizing = false;
+
+        if (isContinueRecognizing)
+            delayedStartRecognition();
     }
 
     @Override
@@ -183,6 +223,64 @@ public class SpeechInputHelper implements RecognitionListener {
         Log.i(TAG, "=onEvent : " + eventType + " , extra : " + params + "=");
     }
 
+
+    /**
+     * 결과를 전달한다.
+     */
+    private void deliverSttResult(Bundle results) {
+        if (listener != null)
+            listener.onResult(new SpeechResults(getRecognitionResult(results), getConfidenceResult(results), null));
+
+        isInRecognizing = false;
+
+        if (isContinueRecognizing)
+            delayedStartRecognition();
+    }
+
+    /**
+     * 일정시간 대기 후, 음성인식을 시작한다.
+     */
+    private void delayedStartRecognition() {
+        if (mHandler.hasMessages(HANDLER_MSG_START_LISTENING)) {
+            mHandler.removeMessages(HANDLER_MSG_START_LISTENING);
+        }
+        mHandler.sendEmptyMessageDelayed(HANDLER_MSG_START_LISTENING, delay);
+    }
+
+    /**
+     * 지연된 음성인식 처리를 위한 Handler
+     */
+    private static class SpeechHandler extends Handler {
+        private WeakReference<SpeechInputHelper> mRef;
+
+        public SpeechHandler(SpeechInputHelper speechInputHelper) {
+            super(Looper.getMainLooper());
+            mRef = new WeakReference<SpeechInputHelper>(speechInputHelper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            SpeechInputHelper helper = mRef.get();
+            if (helper == null)
+                return;
+
+            switch (msg.what) {
+                case HANDLER_MSG_START_LISTENING:
+                    if (helper.isInRecognizing) {
+                        helper.delayedStartRecognition();
+                    } else {
+                        helper.startListening();
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
     /**
      * {@link RecognitionListener}에서 얻어진 {@link Bundle}에서 음성인식 결과 리스트를 가져온다.
      */
@@ -195,5 +293,18 @@ public class SpeechInputHelper implements RecognitionListener {
      */
     static float[] getConfidenceResult(Bundle results) {
         return results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+    }
+
+
+    /**
+     * 음성인식 결과를 전달받는 리스너
+     */
+    public interface OnSpeechDataListener {
+        /**
+         * 음성인식 결과를 전달받는다.
+         *
+         * @param speechResults 음성인식 결과
+         */
+        void onResult(SpeechResults speechResults);
     }
 }
