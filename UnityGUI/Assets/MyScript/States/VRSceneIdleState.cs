@@ -19,11 +19,11 @@ namespace MyScript.States
 
             EventSys = GameObject.Find("EventSystem");
             if (EventSys == null) Debug.Log("Event System Find Fail");
-            else Debug.Log(EventSys);
+            //else Debug.Log(EventSys);
 
             SelectModule = EventSys.GetComponent<GazeInputModule>();
             if (SelectModule == null) Debug.Log("GazeInputModule == null");
-            else Debug.Log(SelectModule);
+            //else Debug.Log(SelectModule);
 
         }
 
@@ -51,10 +51,10 @@ namespace MyScript.States
 
                         if (SelectModule == null)
                         {
-                            Debug.Log("1. Select Module == null");
+                           // Debug.Log("1. Select Module == null");
                             if (EventSys == null)
                             {
-                                Debug.Log("2. EventSys == null");
+                                //Debug.Log("2. EventSys == null");
                                 EventSys = GameObject.Find("EventSystem");
                             }
                             SelectModule = EventSys.GetComponent<GazeInputModule>();

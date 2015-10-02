@@ -33,13 +33,13 @@ namespace AndroidApi.Controller
         /// java 형태의 AndroidUnityBridge 객체
         /// </summary>
         private AndroidJavaObject javaAndroidUnityBridge;
-		/// <summary>
-		/// Single 메시지를 전달받는 event
-		/// </summary>
+        /// <summary>
+        /// Single 메시지를 전달받는 event
+        /// </summary>
         public event Action<string> OnMessageReceived;
-		/// <summary>
-		/// Input 메시지를 전달받는 event
-		/// </summary>
+        /// <summary>
+        /// Input 메시지를 전달받는 event
+        /// </summary>
         public event Action<List<Operation>> OnInputReceived;
 
 
@@ -50,14 +50,15 @@ namespace AndroidApi.Controller
             javaAndroidUnityBridge.Call("setMessageCallback", new InternalIAndroidUnityCallback(OnMessageCallback));
             javaAndroidUnityBridge.Call("setInputCallback", new InternalIAndroidUnityCallback(OnInputCallback));
 
-			OnMessageReceived += (msg) => Debug.Log("AndroidUnityBridge [OnMessageReceived]: \n" + msg);
-			OnInputReceived += (inputs) => {
-				string s = "";
-				
-				foreach (Operation op in inputs)
-					s += op.ToString() + "\n";
-				Debug.Log(s);
-			};
+            OnMessageReceived += (msg) => Debug.Log("AndroidUnityBridge [OnMessageReceived]: \n" + msg);
+            OnInputReceived += (inputs) =>
+            {
+                string s = "";
+
+                foreach (Operation op in inputs)
+                    s += op.ToString() + "\n";
+                Debug.Log(s);
+            };
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace AndroidApi.Controller
         private void OnInputCallback(string json)
         {
             if (OnInputReceived != null)
-                OnInputReceived(JsonInterpreter.InterpretInputCommands(json));
+                OnInputReceived(JsonInterpreter.ParseInputCommands(json));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -84,11 +85,9 @@ namespace AndroidApi.Controller
         /// <param name="jsonMessage">요청의 세부 사항이 Json형태로 기술되어 있는 문자열</param>
         /// <param name="callback">요청에 대한 응답을 받을 콜백</param>
         /// <returns>요청이 접수되었을 경우, TRUE</returns>
-        public bool RequestToAndroid(IRequest request, Action<Controller.RequestResult> callback)
+        public bool RequestToAndroid(IRequest request, Action<string> callback)
         {
-            return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", request.ToJson(),
-                new InternalIAndroidUnityCallback((json) => callback(JsonInterpreter.InterpretResultFromAndroid(json)))
-            );
+            return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", request.ToJson(), new InternalIAndroidUnityCallback(callback));
         }
 
         /// <summary>

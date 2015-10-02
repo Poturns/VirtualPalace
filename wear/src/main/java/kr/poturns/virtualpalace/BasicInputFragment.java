@@ -13,6 +13,7 @@ import kr.poturns.virtualpalace.inputcollector.GestureInputCollector;
 import kr.poturns.virtualpalace.inputcollector.InputCollector;
 import kr.poturns.virtualpalace.inputcollector.SensorInputCollector;
 import kr.poturns.virtualpalace.inputcollector.SensorMovementData;
+import kr.poturns.virtualpalace.inputmodule.GestureInputFilter;
 
 /**
  * 가속도 센서 / 제스쳐 입력을 받아 Controller로 전송하는 Fragment
@@ -57,6 +58,12 @@ public class BasicInputFragment extends BaseFragment {
         mHandler = new BackHandler(this);
 
         gestureInputCollector = getGestureInputCollector();
+        gestureInputCollector.setAdditionalListener(new InputCollector.OnInputResultListener<String>() {
+            @Override
+            public void onInputResult(String s) {
+                Toast.makeText(getActivity(), GestureInputFilter.getOperationName(s), Toast.LENGTH_SHORT).show();
+            }
+        });
         sensorInputCollector = getSensorInputCollector();
 
         sensorInputCollector.setResultListener(new InputCollector.OnInputResultListener<SensorMovementData>() {

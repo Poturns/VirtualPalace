@@ -1,4 +1,5 @@
 ﻿using LitJson;
+using System.Collections.Generic;
 
 namespace AndroidApi.Controller
 {
@@ -131,6 +132,12 @@ namespace AndroidApi.Controller
     {
 
         #region Constants
+
+        public const int DIMENSION_NONE = 0;
+        public const int DIMENSION_1 = 1;
+        public const int DIMENSION_2 = 2;
+        public const int DIMENSION_3 = 3;
+
         ///<summary>
         /// 0차원 : NO- DIRECTION
         ///</summary>
@@ -233,17 +240,48 @@ namespace AndroidApi.Controller
     /// <summary>
     /// Android 요청에 대한 결과
     /// </summary>
-    public struct RequestResult
+    public class RequestResult
     {
+        ///
+        /// (응답 반환시) 결과 상태 KEY.
+        ///
+        /// Ex)
+        /// {
+        ///     "result" : "success / fail / error"
+        /// }
+        ///
+        public const string RESULT = "result";
+
         public const string STATUS_SUCCESS = "success";
         public const string STATUS_FAIL = "fail";
         public const string STATUS_ERROR = "error";
 
+        public string RequestName;
         public string Status;
-        internal JsonData Json;
 
+        public override string ToString()
+        {
+            return "QueryRequestResult : [\nRequest : " + RequestName
+               + "\nStatus : " + Status
+               + "\n]";
+        }
     }
 
+    /// <summary>
+    /// Database Query 결과
+    /// </summary>
+    public class QueryRequestResult : RequestResult
+    {
+        public List<JsonData> QueryData;
+
+        public override string ToString()
+        {
+            return "QueryRequestResult : [\nRequest : " + RequestName 
+                + "\nStatus : " + Status 
+                + "\nData : " + (QueryData == null? "null": QueryData.ToString()) 
+                + "\n]";
+        }
+    }
 }
 
 /// <summary>

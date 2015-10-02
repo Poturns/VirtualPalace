@@ -23,6 +23,31 @@ public class GestureInputFilter implements IOperationInputFilter<String> {
      */
     public static final String OPERATION_CLICK = "click";
 
+    /**
+     * 주어진 명령의 이름을 반환한다.
+     */
+    public static String getOperationName(String s) {
+        switch (s) {
+            case DIRECTION_UP_TO_DOWN:
+                return "Down";
+            case DIRECTION_DOWN_TO_UP:
+                return "Up";
+            case DIRECTION_RIGHT_TO_LEFT:
+                return "Left";
+            case DIRECTION_LEFT_TO_RIGHT:
+                return "Right";
+            case SPECIAL_OP_CANCEL1:
+            case SPECIAL_OP_CANCEL2:
+                return "Cancel";
+            case SPECIAL_OP_MENU:
+            case SPECIAL_OP_DEEP:
+            case SPECIAL_OP_SELECT:
+            case SPECIAL_OP_SWITCH_MODE:
+                return s;
+            default:
+                return "";
+        }
+    }
 
     @Override
     public int isGoingTo(String s) {
