@@ -110,7 +110,7 @@ public class PalaceMaster extends PalaceCore {
                 case INPUT_MULTI_COMMANDS:
                     int[][] cmds = (int[][]) msg.obj;
                     for (int[] command : cmds)
-                       doPackOnScanning(command);
+                        doPackOnScanning(command);
                     break;
             }
         }
@@ -188,8 +188,8 @@ public class PalaceMaster extends PalaceCore {
 
                                 if (old_d == curr_d && old_a % 10 > 0) {
                                     // VALUE 에 1의 자리수가 존재할 경우,
-                                    // SEPARATION 미만의 수는 해당 명령이 발생한 횟수를 의미한다.
-                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION+ (old_a + curr_a);
+                                    // SEPARATION 미만의 수는 해당 명령이 발생한 횟수를 의미한다. (10의 자리수부터 판단)
+                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION+ (old_a + curr_a * 10);
 
                                 } else {
                                     // VALUE 에 1의 자리수가 존재하지 않을 경우,
@@ -209,8 +209,8 @@ public class PalaceMaster extends PalaceCore {
 
                             } catch (JSONException e) {
                                 // 초기 값 설정
-                                // VALUE = CODE * 100000 + AMOUNT
-                                value = command[1] * IOperationInputFilter.Direction.SEPARATION + command[2];
+                                // VALUE = CODE * 100000 + AMOUNT * 10 + 1
+                                value = command[1] * IOperationInputFilter.Direction.SEPARATION + command[2] * 10 + 1;
                             }
 
                             singleMessage.put(cmdStr, value);
@@ -331,7 +331,9 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            process(jsonMessage);
+                            try {
+                                process(jsonMessage);
+                            } catch (Exception e) { }
                         }
                     };
                 } break;
@@ -344,7 +346,13 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            JSONObject result = process(jsonMessage);
+                            JSONObject result;
+                            try {
+                                result = process(jsonMessage);
+                            } catch (Exception e) {
+                                result = new JSONObject();
+                            }
+
                             AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
                         }
                     };
@@ -364,18 +372,19 @@ public class PalaceMaster extends PalaceCore {
          * @param jsonMessage
          * @return
          */
-        private JSONObject process(String jsonMessage) {
+        private JSONObject process(String jsonMessage) throws JSONException {
             JSONObject jsonResult = new JSONObject();
-            boolean result = false;
-
             Log.d("PalaceMaster_Request", "Request Message : " + jsonMessage);
 
-            try {
-                JSONObject message = new JSONObject(jsonMessage);
-                Iterator<String> keys = message.keys();
+            JSONObject message = new JSONObject(jsonMessage);
+            Iterator<String> keys = message.keys();
 
-                while (keys.hasNext()) {
-                    String key = keys.next();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONObject rstEach = new JSONObject();
+                boolean result = false;
+
+                try {
                     String table = null;
                     if (key.endsWith("_ar") || key.endsWith("_AR"))
                         table = LocalDatabaseCenter.TABLE_AUGMENTED;
@@ -412,14 +421,16 @@ public class PalaceMaster extends PalaceCore {
                         int supportType = message.getInt(key);
                         deactivateInputConnector(supportType);
                     }
+                    rstEach.put(RESULT, result? "success" : "fail");
+
+                } catch (JSONException e){
+                    try {
+                        rstEach.put(RESULT, "error");
+
+                    } catch (JSONException e2) { }
                 }
-                jsonResult.put(RESULT, result? "success" : "fail");
 
-            } catch (JSONException e){
-                try {
-                    jsonResult.put(RESULT, "error");
-
-                } catch (JSONException e2) { }
+                jsonResult.put(key, rstEach);
             }
 
             return jsonResult;
