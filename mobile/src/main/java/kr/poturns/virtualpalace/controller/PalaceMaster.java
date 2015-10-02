@@ -14,7 +14,6 @@ import java.util.Iterator;
 
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
-import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
  * <b> EXTERNAL CONTROLLER : 컨트롤러의 중개 기능을 다룬다 </b>
@@ -39,7 +38,7 @@ public class PalaceMaster extends PalaceCore {
     // * * * C O N S T A N T S * * * //
     private final InputHandler mInputHandlerF;
     private final RequestHandler mRequestHandlerF;
-   // private final ThreadGroup mOperationGroupF;
+    private final ThreadGroup mOperationGroupF;
     //private final GoogleServiceAssistant mGoogleServiceAssistantF;
 
 
@@ -53,7 +52,7 @@ public class PalaceMaster extends PalaceCore {
         mInputHandlerF = new InputHandler();
         mRequestHandlerF = new RequestHandler();
 
-       // mOperationGroupF = new ThreadGroup("PalaceMaster");
+        mOperationGroupF = new ThreadGroup("PalaceMaster");
         //mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
     }
 
@@ -110,7 +109,7 @@ public class PalaceMaster extends PalaceCore {
                 case INPUT_MULTI_COMMANDS:
                     int[][] cmds = (int[][]) msg.obj;
                     for (int[] command : cmds)
-                       doPackOnScanning(command);
+                        doPackOnScanning(command);
                     break;
             }
         }
@@ -159,6 +158,10 @@ public class PalaceMaster extends PalaceCore {
                 case TERMINATE:
                     synchronized (inputLock) {
                         try {
+                            /*
+                            value = singleMessage.optInt(cmdStr) + 1;
+                            singleMessage.put(cmdStr, value);
+                            */
                             try {
                                 value = singleMessage.getInt(cmdStr) + 1;
                             } catch (JSONException e) {
@@ -188,8 +191,8 @@ public class PalaceMaster extends PalaceCore {
 
                                 if (old_d == curr_d && old_a % 10 > 0) {
                                     // VALUE 에 1의 자리수가 존재할 경우,
-                                    // SEPARATION 미만의 수는 해당 명령이 발생한 횟수를 의미한다.
-                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION+ (old_a + curr_a);
+                                    // SEPARATION 미만의 수는 해당 명령이 발생한 횟수를 의미한다. (10의 자리수부터 판단)
+                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION+ (old_a + curr_a * 10);
 
                                 } else {
                                     // VALUE 에 1의 자리수가 존재하지 않을 경우,
@@ -209,8 +212,8 @@ public class PalaceMaster extends PalaceCore {
 
                             } catch (JSONException e) {
                                 // 초기 값 설정
-                                // VALUE = CODE * 100000 + AMOUNT
-                                value = command[1] * IOperationInputFilter.Direction.SEPARATION + command[2];
+                                // VALUE = CODE * 100000 + AMOUNT * 10 + 1
+                                value = command[1] * IOperationInputFilter.Direction.SEPARATION + command[2] * 10 + 1;
                             }
 
                             singleMessage.put(cmdStr, value);
@@ -292,19 +295,12 @@ public class PalaceMaster extends PalaceCore {
             if (singleMessage.length() == 0)
                 return;
 
-            // Input은 순차적으로 전송
-            ThreadUtils.SERIAL_EXECUTOR.execute(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (inputLock) {
-                        AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
+            synchronized (inputLock) {
+                AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
 
-                        // Send 후 JsonMessage 초기화.
-                        init();
-                    }
-                }
-            });
-
+                // Send 후 JsonMessage 초기화.
+                init();
+            }
         }
     }
 
@@ -330,7 +326,9 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            process(jsonMessage);
+                            try {
+                                process(jsonMessage);
+                            } catch (Exception e) { }
                         }
                     };
                 } break;
@@ -343,7 +341,13 @@ public class PalaceMaster extends PalaceCore {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            JSONObject result = process(jsonMessage);
+                            JSONObject result;
+                            try {
+                                result = process(jsonMessage);
+                            } catch (Exception e) {
+                                result = new JSONObject();
+                            }
+
                             AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
                         }
                     };
@@ -353,8 +357,11 @@ public class PalaceMaster extends PalaceCore {
                     return;
             }
 
-            // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
-            ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
+            // UI Thread 에서의 연산 과부하를 막기위해, Thread 로 요청받은 작업을 수행한다.
+            // ※ Thread 내에서 Message 객체에 접근할 때, 정상적인 데이터를 불러오지 못하는 문제가 있음.
+            Thread worker = new Thread(mOperationGroupF, runnable, "OperationWorker");
+            worker.setDaemon(true);
+            worker.start();
         }
 
         /**
@@ -363,18 +370,19 @@ public class PalaceMaster extends PalaceCore {
          * @param jsonMessage
          * @return
          */
-        private JSONObject process(String jsonMessage) {
+        private JSONObject process(String jsonMessage) throws JSONException {
             JSONObject jsonResult = new JSONObject();
-            boolean result = false;
-
             Log.d("PalaceMaster_Request", "Request Message : " + jsonMessage);
 
-            try {
-                JSONObject message = new JSONObject(jsonMessage);
-                Iterator<String> keys = message.keys();
+            JSONObject message = new JSONObject(jsonMessage);
+            Iterator<String> keys = message.keys();
 
-                while (keys.hasNext()) {
-                    String key = keys.next();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONObject rstEach = new JSONObject();
+                boolean result = false;
+
+                try {
                     String table = null;
                     if (key.endsWith("_ar") || key.endsWith("_AR"))
                         table = LocalDatabaseCenter.TABLE_AUGMENTED;
@@ -404,6 +412,7 @@ public class PalaceMaster extends PalaceCore {
                         result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
                     } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
+                        // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
                         int supportType = message.getInt(key);
                         activateInputConector(supportType);
 
@@ -411,14 +420,16 @@ public class PalaceMaster extends PalaceCore {
                         int supportType = message.getInt(key);
                         deactivateInputConnector(supportType);
                     }
+                    rstEach.put(RESULT, result? "success" : "fail");
+
+                } catch (JSONException e){
+                    try {
+                        rstEach.put(RESULT, "error");
+
+                    } catch (JSONException e2) { }
                 }
-                jsonResult.put(RESULT, result? "success" : "fail");
 
-            } catch (JSONException e){
-                try {
-                    jsonResult.put(RESULT, "error");
-
-                } catch (JSONException e2) { }
+                jsonResult.put(key, rstEach);
             }
 
             return jsonResult;
