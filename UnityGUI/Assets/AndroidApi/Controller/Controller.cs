@@ -282,6 +282,23 @@ namespace AndroidApi.Controller
                 + "\n]";
         }
     }
+
+    public class SpeechRequestResult : RequestResult
+    {
+        /// <summary>
+        /// 음성인식 정보 key
+        /// </summary>
+        public const string SPEECH_REQUEST_KEY = "speech_memo_request";
+        public string Speech;
+
+        public override string ToString()
+        {
+            return "SpeechRequestResult  : [\nRequest : " + RequestName
+                + "\nStatus : " + Status
+                + "\nData : " + Speech
+                + "\n]";
+        }
+    }
 }
 
 /// <summary>

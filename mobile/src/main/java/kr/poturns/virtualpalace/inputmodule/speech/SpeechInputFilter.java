@@ -1,15 +1,13 @@
 package kr.poturns.virtualpalace.inputmodule.speech;
 
-import java.util.ArrayList;
-
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p>
+ * <p/>
  * STT 를 통해 얻어진 결과를 적절한 방향 / 명령 으로 해석하는 클래스
  */
-public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String>> {
+public class SpeechInputFilter implements IOperationInputFilter<String> {
 
     private static final String WORD_OPERATION_KEY_OK = "ok";
     private static final String WORD_OPERATION_KEY_BACK = "뒤로";
@@ -38,134 +36,124 @@ public class SpeechInputFilter implements IOperationInputFilter<ArrayList<String
     private static final String WORD_DIRECTION_3D_DOWNWARD = "아래로";
 
     @Override
-    public int isGoingTo(ArrayList<String> strings) {
-        return checkDirection(strings);
+    public int isGoingTo(String string) {
+        return checkDirection(string);
     }
 
     @Override
-    public int isTurningTo(ArrayList<String> strings) {
-        return checkDirection(strings);
+    public int isTurningTo(String string) {
+        return checkDirection(string);
     }
 
     @Override
-    public int isFocusingTo(ArrayList<String> strings) {
-        return checkDirection(strings);
+    public int isFocusingTo(String string) {
+        return checkDirection(string);
     }
 
     @Override
-    public int isZoomingTo(ArrayList<String> strings) {
-        return checkDirection(strings);
+    public int isZoomingTo(String string) {
+        return checkDirection(string);
     }
 
     @Override
-    public boolean isSelecting(ArrayList<String> strings) {
-        return checkOneOperation(strings, WORD_OPERATION_SPECIAL_SELECT);
+    public boolean isSelecting(String string) {
+        return checkOneOperation(string, WORD_OPERATION_SPECIAL_SELECT);
     }
 
     @Override
-    public boolean isCanceling(ArrayList<String> strings) {
-        return checkOneOperation(strings, WORD_OPERATION_SPECIAL_CANCEL);
+    public boolean isCanceling(String string) {
+        return checkOneOperation(string, WORD_OPERATION_SPECIAL_CANCEL);
     }
 
-    private static boolean checkOneOperation(ArrayList<String> strings, String operation) {
-        int N = strings.size();
-        for (int i = 0; i < N; i++)
-            if (strings.get(i).equals(operation)) return true;
-
-        return false;
+    private static boolean checkOneOperation(String string, String operation) {
+        return string.equals(operation);
     }
 
     @Override
-    public int isKeyPressed(ArrayList<String> strings) {
-        return checkKeyOperation(strings);
+    public int isKeyPressed(String string) {
+        return checkKeyOperation(string);
     }
 
-    private static int checkKeyOperation(ArrayList<String> strings) {
-        final int N = strings.size();
-        for (int i = 0; i < N; i++) {
-            String s = strings.get(i);
+    private static int checkKeyOperation(String s) {
+        if (WORD_OPERATION_KEY_OK.equals(s))
+            return Operation.KEY_OK;
 
-            if (WORD_OPERATION_KEY_OK.equals(s))
-                return Operation.KEY_OK;
+        else if (WORD_OPERATION_KEY_BACK.equals(s))
+            return Operation.KEY_BACK;
 
-            else if (WORD_OPERATION_KEY_BACK.equals(s))
-                return Operation.KEY_BACK;
+        else if (WORD_OPERATION_KEY_HOME.equals(s))
+            return Operation.KEY_HOME;
 
-            else if (WORD_OPERATION_KEY_HOME.equals(s))
-                return Operation.KEY_HOME;
+        else if (WORD_OPERATION_KEY_VOLUME_UP.equals(s))
+            return Operation.KEY_VOLUME_UP;
 
-            else if (WORD_OPERATION_KEY_VOLUME_UP.equals(s))
-                return Operation.KEY_VOLUME_UP;
+        else if (WORD_OPERATION_KEY_VOLUME_DOWN.equals(s))
+            return Operation.KEY_VOLUME_DOWN;
 
-            else if (WORD_OPERATION_KEY_VOLUME_DOWN.equals(s))
-                return Operation.KEY_VOLUME_DOWN;
-        }
-        return Operation.NONE;
+        else return Operation.NONE;
     }
 
     @Override
-    public int isSpecialOperation(ArrayList<String> strings) {
-        return checkSpecialOperation(strings);
+    public int isSpecialOperation(String string) {
+        return checkSpecialOperation(string);
     }
 
-    private static int checkSpecialOperation(ArrayList<String> strings) {
-        final int N = strings.size();
-        for (int i = 0; i < N; i++) {
-            String s = strings.get(i);
-            if (s.equals(WORD_OPERATION_SPECIAL_CANCEL)) {
-                return Operation.CANCEL;
-            } else if (s.equals(WORD_OPERATION_SPECIAL_EXIT)) {
-                return Operation.TERMINATE;
-            } else if (s.equals(WORD_OPERATION_SPECIAL_MENU)) {
-                return Operation.KEY_MENU;
-            } else if (s.equals(WORD_OPERATION_SPECIAL_SEARCH)) {
-                return Operation.SEARCH;
-            } else if (s.equals(WORD_OPERATION_SPECIAL_SELECT)) {
-                return Operation.SELECT;
-            } else if (s.equals(WORD_OPERATION_SPECIAL_SWITCH_MODE)) {
-                return Operation.SWITCH_MODE;
-            } else if (s.equals(WORD_OPERATION_SPECIAL_DEEP)) {
-                return Operation.DEEP;
-            }
-        }
-        return Operation.NONE;
+    private static int checkSpecialOperation(String s) {
+        if (s.equals(WORD_OPERATION_SPECIAL_CANCEL))
+            return Operation.CANCEL;
+
+        else if (s.equals(WORD_OPERATION_SPECIAL_EXIT))
+            return Operation.TERMINATE;
+
+        else if (s.equals(WORD_OPERATION_SPECIAL_MENU))
+            return Operation.KEY_MENU;
+
+        else if (s.equals(WORD_OPERATION_SPECIAL_SEARCH))
+            return Operation.SEARCH;
+
+        else if (s.equals(WORD_OPERATION_SPECIAL_SELECT))
+            return Operation.SELECT;
+
+        else if (s.equals(WORD_OPERATION_SPECIAL_SWITCH_MODE))
+            return Operation.SWITCH_MODE;
+
+        else if (s.equals(WORD_OPERATION_SPECIAL_DEEP))
+            return Operation.DEEP;
+
+        else return Operation.NONE;
     }
 
-    private int checkDirection(ArrayList<String> strings) {
-        final int N = strings.size();
-        for (int i = 0; i < N; i++) {
-            String s = strings.get(i);
+    private int checkDirection(String s) {
+        //2d
+        if (WORD_DIRECTION_EAST.equals(s))
+            return Direction.EAST;
 
-            //2d
-            if (WORD_DIRECTION_EAST.equals(s))
-                return Direction.EAST;
+        else if (WORD_DIRECTION_WEST.equals(s))
+            return Direction.WEST;
 
-            else if (WORD_DIRECTION_WEST.equals(s))
-                return Direction.WEST;
+        else if (WORD_DIRECTION_SOUTH.equals(s))
+            return Direction.SOUTH;
 
-            else if (WORD_DIRECTION_SOUTH.equals(s))
-                return Direction.SOUTH;
+        else if (WORD_DIRECTION_NORTH.equals(s))
+            return Direction.NORTH;
 
-            else if (WORD_DIRECTION_NORTH.equals(s))
-                return Direction.NORTH;
+        //3d
+        if (WORD_DIRECTION_3D_BACKWARD.equals(s))
+            return Direction.BACKWARD;
 
-            //3d
-            if (WORD_DIRECTION_3D_BACKWARD.equals(s))
-                return Direction.BACKWARD;
+        else if (WORD_DIRECTION_3D_FORWARD.equals(s))
+            return Direction.FORWARD;
 
-            else if (WORD_DIRECTION_3D_FORWARD.equals(s))
-                return Direction.FORWARD;
+        else if (WORD_DIRECTION_3D_UPWARD.equals(s))
+            return Direction.UPWARD;
 
-            else if (WORD_DIRECTION_3D_UPWARD.equals(s))
-                return Direction.UPWARD;
+        else if (WORD_DIRECTION_3D_DOWNWARD.equals(s))
+            return Direction.DOWNWARD;
 
-            else if (WORD_DIRECTION_3D_DOWNWARD.equals(s))
-                return Direction.DOWNWARD;
+        else if (WORD_DIRECTION_3D_CENTER.equals(s))
+            return Direction.CENTER;
 
-            else if (WORD_DIRECTION_3D_CENTER.equals(s))
-                return Direction.CENTER;
-        }
-        return Direction.NONE;
+        else return Direction.NONE;
     }
 
 

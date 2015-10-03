@@ -42,7 +42,7 @@ namespace AndroidApi.Controller
         /// <param name="operation">방향 Operation</param>
         /// <returns>방향 Operation에 대한 정보를 지닌 Dictionary, Key는 Direction.DIMENSION_*** 이다.</returns>
         /// <exception cref="ArgumentException">방향 Operation이 아닌 Operation이 매개변수로 메소드가 호출 된 경우</exception>
-        internal static Dictionary<int, Direction> ParseDirectionAmount(Operation operation)
+        public static Dictionary<int, Direction> ParseDirectionAmount(Operation operation)
         {
             if (!operation.IsDirection())
                 throw new ArgumentException();
@@ -116,9 +116,9 @@ namespace AndroidApi.Controller
         /// </summary>
         /// <param name="json">Android에 대해 요청한 결과가 기술된 Json Message</param>
         /// <returns>요청들에 대한 결과</returns>
-        internal static List<RequestResult> ParseResultFromAndroid(string json)
+        public static List<RequestResult> ParseResultFromAndroid(string json)
         {
-            Debug.Log(json);
+            //Debug.Log(json);
             JsonData jData = JsonMapper.ToObject(json);
             List<RequestResult> list = new List<RequestResult>(jData.Count);
 
@@ -144,9 +144,9 @@ namespace AndroidApi.Controller
         /// <param name="json">Json으로 표현된 Database 질의 결과</param>
         /// <param name="requestKey">요청 Key</param>
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
-        internal static QueryRequestResult ParseQueryFromAndroid(string json, string requestKey)
+        public static QueryRequestResult ParseQueryFromAndroid(string json, string requestKey)
         {
-            Debug.Log(json);
+            //Debug.Log(json);
             JsonData jData = JsonMapper.ToObject(json);
             List<JsonData> queryResults = new List<JsonData>();
 
@@ -189,6 +189,23 @@ namespace AndroidApi.Controller
                 return false;
 
             return tdictionary.Contains(key);
+        }
+
+        /// <summary>
+        /// 음성인식 요청한 결과를 해석한다. 
+        /// </summary>
+        /// <param name="json">Android에 대해 요청한 결과가 기술된 Json Message</param>
+        /// <returns>음성인식 데이터</returns>
+        public static SpeechRequestResult ParseSpeechResultFromAndroid(string json)
+        {
+            JsonData jData = JsonMapper.ToObject(json);
+            SpeechRequestResult result = new SpeechRequestResult();
+
+            result.RequestName = SpeechRequestResult.SPEECH_REQUEST_KEY;
+            result.Status = (string)jData[RequestResult.RESULT];
+            result.Speech = (string)jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
+
+            return result;
         }
     }
 

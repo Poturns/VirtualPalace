@@ -41,14 +41,14 @@ public class UnityActivity extends GoogleUnityActivity {
     protected void onResume() {
         super.onResume();
         mWearInputConnector.connect();
-        //mSpeechInputDetector.startInputDetecting();
+        //mSpeechInputDetector.startSpeechListening();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mWearInputConnector.disconnect();
-        mSpeechInputDetector.stopInputDetecting();
+        mSpeechInputDetector.stopSpeechListening();
     }
 
     @Override
