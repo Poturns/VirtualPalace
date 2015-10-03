@@ -433,6 +433,11 @@ public class PalaceMaster extends PalaceCore {
 
                     } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
                         int supportType = message.getInt(key);
+                        result = deactivateInputConnector(supportType);
+
+                    } else if (RECOGNIZE_TEXT_RESULT.equalsIgnoreCase(key)) {
+                        int supportType = IControllerCommands.TYPE_INPUT_SUPPORT_VOICE;
+                        requestTextResultByVoiceRecognition(supportType);
 
                     }
 
