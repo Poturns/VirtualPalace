@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
+import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
  * <b> EXTERNAL CONTROLLER : 컨트롤러의 중개 기능을 다룬다 </b>
@@ -38,7 +39,7 @@ public class PalaceMaster extends PalaceCore {
     // * * * C O N S T A N T S * * * //
     private final InputHandler mInputHandlerF;
     private final RequestHandler mRequestHandlerF;
-    private final ThreadGroup mOperationGroupF;
+   // private final ThreadGroup mOperationGroupF;
     //private final GoogleServiceAssistant mGoogleServiceAssistantF;
 
 
@@ -52,7 +53,7 @@ public class PalaceMaster extends PalaceCore {
         mInputHandlerF = new InputHandler();
         mRequestHandlerF = new RequestHandler();
 
-        mOperationGroupF = new ThreadGroup("PalaceMaster");
+       // mOperationGroupF = new ThreadGroup("PalaceMaster");
         //mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
     }
 
@@ -124,7 +125,14 @@ public class PalaceMaster extends PalaceCore {
                         result = "{'result' : 'error'}";
                     }
 
-                    AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(result);
+                    final String sendResult = result;
+                    ThreadUtils.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(sendResult);
+                        }
+                    });
+
                     break;
             }
         }
@@ -173,10 +181,6 @@ public class PalaceMaster extends PalaceCore {
                 case TERMINATE:
                     synchronized (inputLock) {
                         try {
-                            /*
-                            value = singleMessage.optInt(cmdStr) + 1;
-                            singleMessage.put(cmdStr, value);
-                            */
                             try {
                                 value = singleMessage.getInt(cmdStr) + 1;
                             } catch (JSONException e) {
@@ -306,16 +310,24 @@ public class PalaceMaster extends PalaceCore {
          *
          */
         private void send() {
-            Log.d("PalaceMast_Input","Input Message : " + singleMessage.length() + " transfered. " + singleMessage.toString());
             if (singleMessage.length() == 0)
                 return;
 
-            synchronized (inputLock) {
-                AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
+            Log.d("PalaceMast_Input","Input Message : " + singleMessage.length() + " transfered. " + singleMessage.toString());
 
-                // Send 후 JsonMessage 초기화.
-                init();
-            }
+            // Input은 순차적으로 전송
+            ThreadUtils.SERIAL_EXECUTOR.execute(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (inputLock) {
+                        AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
+
+                        // Send 후 JsonMessage 초기화.
+                        init();
+                    }
+                }
+            });
+
         }
     }
 
@@ -372,11 +384,8 @@ public class PalaceMaster extends PalaceCore {
                     return;
             }
 
-            // UI Thread 에서의 연산 과부하를 막기위해, Thread 로 요청받은 작업을 수행한다.
-            // ※ Thread 내에서 Message 객체에 접근할 때, 정상적인 데이터를 불러오지 못하는 문제가 있음.
-            Thread worker = new Thread(mOperationGroupF, runnable, "OperationWorker");
-            worker.setDaemon(true);
-            worker.start();
+            // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
+            ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
         }
 
         /**
@@ -427,7 +436,6 @@ public class PalaceMaster extends PalaceCore {
                         result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
 
                     } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                        // UNITY 에서 전송하는 deviceType 은 IControllerCommands.TYPE_INPUT**** 임 -mj
                         int supportType = message.getInt(key);
                         result = activateInputConector(supportType);
 

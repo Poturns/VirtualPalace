@@ -20,11 +20,13 @@ public class PictureObj : MonoBehaviour, IRaycastedObject {
 	}
 	// Use this for initialization
 	void Start () {
-		Title = "Test Obj";
+		Title = "Image Obj";
 	}
 	public void PictureUpdate()
 	{
-		GetComponent<Renderer>().materials[1].mainTexture = Utils.Image.Load (Path);
+		int Length = GetComponent<Renderer> ().materials.GetLength (0);
+		GetComponent<Renderer>().materials[Length - 1].mainTexture = Utils.Image.Load (Path);
+
 	}
 	// Update is called once per frame
 	void Update () {

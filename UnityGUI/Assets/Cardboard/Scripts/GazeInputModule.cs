@@ -38,8 +38,7 @@ public class GazeInputModule : BaseInputModule {
            "Be sure it is on a layer that raycasts will ignore.")]
   public GameObject cursor;
 
-	public GameObject RaycastedGameObject;
-   // public IRaycastedObject RaycastedScript;
+  public GameObject RaycastedGameObject;
 
   // Time in seconds between the pointer down and up events sent by a magnet click.
   // Allows time for the UI elements to make their state transitions.
@@ -119,10 +118,15 @@ public class GazeInputModule : BaseInputModule {
     var go = pointerData.pointerCurrentRaycast.gameObject;
     
     RaycastedGameObject = go;
-   // if(RaycastedGameObject != null)
-    //    RaycastedScript = RaycastedGameObject.GetComponent<IRaycastedObject>();
 
-    cursor.SetActive(go != null);
+    if (go != null && go.CompareTag("InteractiveObject")) {
+        cursor.SetActive(true);
+    }
+    else {
+        cursor.SetActive(false);
+    }
+    
+
     if (cursor.activeInHierarchy) {
       Camera cam = pointerData.enterEventCamera;
       // Note: rays through screen start at near clipping plane.

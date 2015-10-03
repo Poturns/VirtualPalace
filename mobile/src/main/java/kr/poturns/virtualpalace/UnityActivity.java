@@ -32,7 +32,7 @@ public class UnityActivity extends GoogleUnityActivity {
         mWearInputConnector = new WearInputConnector(application);
 
         mSpeechInputDetector = new SpeechInputDetector(application);
-        mSpeechInputDetector.setContinueRecognizing(true);
+        //mSpeechInputDetector.setContinueRecognizing(true);
         mSpeechInputConnector = new OperationInputConnector(application, IControllerCommands.TYPE_INPUT_SUPPORT_VOICE);
         mSpeechInputDetector.setOperationInputConnector(mSpeechInputConnector);
     }
@@ -41,14 +41,14 @@ public class UnityActivity extends GoogleUnityActivity {
     protected void onResume() {
         super.onResume();
         mWearInputConnector.connect();
-        mSpeechInputDetector.startInputDetecting();
+        //mSpeechInputDetector.startSpeechListening();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mWearInputConnector.disconnect();
-        mSpeechInputDetector.stopInputDetecting();
+        mSpeechInputDetector.stopSpeechListening();
     }
 
     @Override

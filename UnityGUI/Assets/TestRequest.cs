@@ -1,51 +1,54 @@
-﻿using AndroidApi.Controller;
-using AndroidApi.Controller.Request;
-using AndroidApi.Controller.Request.Database;
+﻿using AndroidApi.Controller.Request.Database;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TestRequest : MonoBehaviour
 {
     public void Test()
     {
+        DatabaseRequestFactory.InsertInto(Place.AR)
+                     .Values(
+                         new KeyValuePair<Enum, string>(AUGMENTED_FIELD.RES_ID, "1"),
+                         new KeyValuePair<Enum, string>(AUGMENTED_FIELD.ALTITUDE, "1.22"),
+                         new KeyValuePair<Enum, string>(AUGMENTED_FIELD.LONGITUDE, "1.33"),
+                         new KeyValuePair<Enum, string>(AUGMENTED_FIELD.LATITUDE, "1.44")
+                    )
+                    .SendRequest((queryResults) =>
+                    {
+                        Debug.Log(queryResults);
+                    });
 
-        IDatabaseRequest request = DatabaseRequests.NewRequest();
+        DatabaseRequestFactory.Select(Place.AR)
+           .SetField(AUGMENTED_FIELD.ALTITUDE)
+           .SendRequest((queryResults) =>
+           {
+               Debug.Log(queryResults);
+           });
 
-        request
-            .INSERT
-                .Set(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .Set(Place.VR, VIRTUAL_FIELD.CONTAINER, "somevalue")
-                .End()
-            .UPDATE
-                .Set(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .Where(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .WhereFrom(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .WhereTo(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .End()
-            .DELETE
-                .Where(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .WhereFrom(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .WhereTo(Place.AR, AUGMENTED_FIELD.ALTITUDE, "somevalue")
-                .End();
-
-        AndroidUnityBridge.GetInstance().RequestToAndroid(request,
-            (result) =>
-            {
-                Debug.Log(result);
-            });
+        DatabaseRequestFactory.Update(Place.AR)
+           .Set(
+                 new KeyValuePair<Enum, string>(AUGMENTED_FIELD.ALTITUDE, "7.22"),
+                 new KeyValuePair<Enum, string>(AUGMENTED_FIELD.LONGITUDE, "6.22")
+           )
+           .WhereEqual(AUGMENTED_FIELD.ALTITUDE, "1.22")
+           .SendRequest((queryResults) =>
+           {
+               Debug.Log(queryResults);
+           });
 
 
-        StateNotifyRequest request2 = new StateNotifyRequest();
+        DatabaseRequestFactory.Delete(Place.AR)
+           .WhereEqual(AUGMENTED_FIELD.ALTITUDE, "7.22")
+           .SendRequest((queryResults) =>
+           {
+               Debug.Log(queryResults);
+           });
 
-        request2.ActivateInput(StateNotifyRequest.InputDevice.Voice);
-        request2.ActivateInput(StateNotifyRequest.InputDevice.Watch);
-        request2.DeactivateInput(StateNotifyRequest.InputDevice.Watch);
-        request2.SwitchPlayMode(VirtualPalacePlayMode.VR);
-
-        AndroidUnityBridge.GetInstance().RequestToAndroid(request2,
-            (result) =>
-            {
-                Debug.Log(result);
-            });
+        DatabaseRequestFactory.QueryAllVRItems().SendRequest((queryResults) =>
+        {
+            Debug.Log(queryResults);
+        });
 
     }
 }

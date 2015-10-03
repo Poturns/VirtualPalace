@@ -1,4 +1,6 @@
 ﻿using LitJson;
+using System;
+using System.Collections.Generic;
 
 namespace AndroidApi.Controller.Request
 {
@@ -54,9 +56,18 @@ namespace AndroidApi.Controller.Request
             jData[DEACTIVATE_INPUT] = (int)device;
         }
 
+        public void SendRequest(Action<List<RequestResult>> callback)
+        {
+            AndroidUnityBridge.GetInstance().RequestToAndroid(this, (result) =>
+            {
+                callback(JsonInterpreter.ParseResultFromAndroid(result));
+            });
+        }
+
         public string ToJson()
         {
             return jData.ToJson();
         }
+
     }
 }

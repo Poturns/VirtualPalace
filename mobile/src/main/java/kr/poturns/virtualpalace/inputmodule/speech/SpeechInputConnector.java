@@ -9,9 +9,10 @@ import kr.poturns.virtualpalace.input.OperationInputDetector;
 /**
  * Created by YeonhoKim on 2015-10-03.
  */
-public class SpeechInputConnector extends OperationInputConnector {
+public class SpeechInputConnector extends OperationInputConnector implements SpeechController.OnSpeechDataListener {
 
     public static final int KEY_SWITCH_MODE = 0x3;
+    public static final int KEY_ACTIVE_RECOGNIZE = 0x4;
 
     public SpeechInputConnector(Context context, int supportType) {
         super(context, supportType);
@@ -22,8 +23,10 @@ public class SpeechInputConnector extends OperationInputConnector {
         if (detector == null)
             mRegisteredDetector = null;
 
-        if (detector instanceof SpeechInputDetector)
+        if (detector instanceof SpeechInputDetector) {
             mRegisteredDetector = detector;
+            ((SpeechInputDetector) mRegisteredDetector).setSpeechListener(this);
+        }
     }
 
     /**
@@ -42,20 +45,42 @@ public class SpeechInputConnector extends OperationInputConnector {
         switch (key) {
             case KEY_SWITCH_MODE:
                 switch (value) {
-                    //TODO:
-                    case 0:
-                        //((SpeechInputDetector) mRegisteredDetector).startInputDetecting();
+                    case SpeechController.MODE_COMMAND:
+                        ((SpeechInputDetector) mRegisteredDetector).setRecognitionMode(SpeechController.MODE_COMMAND);
                         break;
 
-                    case 1:
-                        //((SpeechInputDetector) mRegisteredDetector).stopInputDetecting();
+                    case SpeechController.MODE_MEMO:
+                        ((SpeechInputDetector) mRegisteredDetector).setRecognitionMode(SpeechController.MODE_MEMO);
                         break;
                 }
                 break;
+
+            case KEY_ACTIVE_RECOGNIZE:
+                switch (value){
+                    case 1:
+                        ((SpeechInputDetector) mRegisteredDetector).startSpeechListening();
+                        break;
+
+                    case 0:
+                        ((SpeechInputDetector) mRegisteredDetector).stopSpeechListening();
+                        break;
+                }
+                break;
+
 
             default:
                 super.configureFromController(app, key, value);
         }
 
+    }
+
+    @Override
+    public void onResult(SpeechResult speechResult) {
+        transferTextData(speechResult.result, 0);
+    }
+
+    @Override
+    public void onError(int cause) {
+        transferTextData(null, 0);
     }
 }

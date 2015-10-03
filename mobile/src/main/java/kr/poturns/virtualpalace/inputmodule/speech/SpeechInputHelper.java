@@ -28,7 +28,7 @@ public class SpeechInputHelper implements RecognitionListener {
 
     private SpeechRecognizer mRecognizer;
     private Intent speechIntent;
-    private OnSpeechDataListener listener;
+    private SpeechController.OnSpeechDataListener listener;
 
     /**
      * 현재 음성인식을 수행중인지 여부
@@ -58,7 +58,7 @@ public class SpeechInputHelper implements RecognitionListener {
      *
      * @param listener 음성인식 결과를 전달받을 리스너
      */
-    public void setSpeechListener(OnSpeechDataListener listener) {
+    public void setSpeechListener(SpeechController.OnSpeechDataListener listener) {
         this.listener = listener;
     }
 
@@ -101,7 +101,7 @@ public class SpeechInputHelper implements RecognitionListener {
     /**
      * 음성인식을 시작한다.
      * <p/>
-     * 음성인식 결과는 {@link OnSpeechDataListener}를 통해 전달된다.
+     * 음성인식 결과는 {@link SpeechController.OnSpeechDataListener}를 통해 전달된다.
      */
     public void startListening() {
         mRecognizer.startListening(speechIntent);
@@ -153,16 +153,15 @@ public class SpeechInputHelper implements RecognitionListener {
      *
      * @return 음성인식 결과 데이터들이 담겨져 있는 객체
      */
-    public static SpeechResults onActivityResult(int requestCode, int resultCode, Intent data) {
+    public static SpeechResult onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == ACTIVITY_REQUEST_CODE) {
             Bundle resultsBundle = data.getExtras();
 
             ArrayList<String> results = getRecognitionResult(resultsBundle);
-            float[] confidences = getConfidenceResult(resultsBundle);
             Uri audioUri = data.getData();
 
-            return new SpeechResults(results, confidences, audioUri);
+            return new SpeechResult(results.get(0), audioUri);
         }
 
         return null;
@@ -202,6 +201,8 @@ public class SpeechInputHelper implements RecognitionListener {
     public void onError(int error) {
         Log.e(TAG, "=onError : " + error + "=");
 
+        if (listener != null)
+            listener.onError(error);
         isInRecognizing = false;
 
         if (isContinueRecognizing)
@@ -229,7 +230,7 @@ public class SpeechInputHelper implements RecognitionListener {
      */
     private void deliverSttResult(Bundle results) {
         if (listener != null)
-            listener.onResult(new SpeechResults(getRecognitionResult(results), getConfidenceResult(results), null));
+            listener.onResult(new SpeechResult(getRecognitionResult(results).get(0),null));
 
         isInRecognizing = false;
 
@@ -296,15 +297,5 @@ public class SpeechInputHelper implements RecognitionListener {
     }
 
 
-    /**
-     * 음성인식 결과를 전달받는 리스너
-     */
-    public interface OnSpeechDataListener {
-        /**
-         * 음성인식 결과를 전달받는다.
-         *
-         * @param speechResults 음성인식 결과
-         */
-        void onResult(SpeechResults speechResults);
-    }
+
 }

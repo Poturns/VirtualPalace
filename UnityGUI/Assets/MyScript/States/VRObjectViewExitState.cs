@@ -22,8 +22,10 @@ namespace MyScript.States
 			UIBookMesh = GameObject.Find ("UIBook");
 			if (!UIBookMesh)
 				Debug.Log ("Sel Target is Null");
+			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+			GameObject.Destroy (DisposolObj);
+			//UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
 
-			UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
 
 			UITitleTextObj = GameObject.Find ("UITitleText");
 			if (!UITitleTextObj)

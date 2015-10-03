@@ -22,6 +22,7 @@ import kr.poturns.virtualpalace.inputmodule.GestureInputFilter;
 public class GestureInputCollector extends AbstractInputCollector<String> implements GestureOverlayView.OnGesturePerformedListener, View.OnClickListener {
     private final GestureLibrary gestureLibrary;
     private boolean isListening = false;
+    private OnInputResultListener<String> mAdditionalListener;
 
     public GestureInputCollector(Context context) {
         gestureLibrary = GestureLibraries.fromRawResource(context, R.raw.gestures);
@@ -30,6 +31,10 @@ public class GestureInputCollector extends AbstractInputCollector<String> implem
             Log.w("Gesture", "could not load gesture library");
             throw new RuntimeException("could not load gesture library");
         }
+    }
+
+    public void setAdditionalListener(OnInputResultListener<String> listener){
+        this.mAdditionalListener = listener;
     }
 
     @Override
@@ -53,6 +58,8 @@ public class GestureInputCollector extends AbstractInputCollector<String> implem
             Prediction prediction = predictions.get(0);
             if (prediction.score > 6.0) {
                 listener.onInputResult(prediction.name);
+                if(mAdditionalListener != null)
+                    mAdditionalListener.onInputResult(prediction.name);
             }
         }
 
