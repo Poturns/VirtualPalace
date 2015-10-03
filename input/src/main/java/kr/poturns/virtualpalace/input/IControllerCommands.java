@@ -44,7 +44,10 @@ public interface IControllerCommands {
      * INPUT_HANDLER 로 다수의 INPUT 이벤트들을 전달하는 명령 코드.
      */
     int INPUT_MULTI_COMMANDS = 0x12;
-
+    /**
+     * INPUT_HANDLER 로 텍스트 결과를 전달하는 명령 코드.
+     */
+    int INPUT_TEXT_RESULT = 0x13;
 
     /**
      *
@@ -339,6 +342,15 @@ public interface IControllerCommands {
          * }
          */
         String DEACTIVATE_INPUT = "deactivate_input";
+        /**
+         * 음성 인식을 통한 텍스트 결과를 요청하는 명령.
+         *
+         * Ex)
+         * {
+         *     "recognize_text_result" : "*"
+         * }
+         */
+        String RECOGNIZE_TEXT_RESULT = "recognize_text_result";
 
 
         // *** LocalDatabaseCenter.WriteBuilder 조건 Clause Keyword *** //

@@ -32,6 +32,9 @@ public class OperationInputConnector {
      */
     private final int mSupportTypeF;
 
+    protected OperationInputDetector<?> mRegisteredDetector;
+
+
 
     // * * * F I E L D S * * * //
     /**
@@ -96,6 +99,21 @@ public class OperationInputConnector {
     }
 
     /**
+     * 텍스트 결과를 전송한다.
+     *
+     * @param text
+     * @param confidence (전송안함)
+     * @return
+     */
+    protected boolean transferTextData(String text, float confidence) {
+        if (mControllerInputHandlerF == null || !isEnabled)
+            return false;
+
+        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_TEXT_RESULT, text).sendToTarget();
+        return true;
+    }
+
+    /**
      * CONNECTOR 를 제어하기 위해 CONTROLLER 가 사용하는 메소드.
      * ( CONTROLLER 외 호출 금지 )
      *
@@ -103,16 +121,18 @@ public class OperationInputConnector {
      * @param key   설정 기능에 대한 키
      * @param value 설정 기능에 대한 값
      */
-    public final void configureFromController(GlobalApplication app, int key, int value) {
+    public void configureFromController(GlobalApplication app, int key, int value) {
         if (app == null)
             return;
 
         switch (key) {
             case KEY_ENABLE:
                 isEnabled = (value == VALUE_TRUE) ? true : false;
+                break;
 
             case KEY_ACTIVATE:
                 isActivated = (value == VALUE_TRUE) ? true : false;
+                break;
         }
     }
 
@@ -123,6 +143,10 @@ public class OperationInputConnector {
         if (mContextF instanceof GlobalApplication) {
             ((GlobalApplication) mContextF).setInputConnector(mSupportTypeF, null);
         }
+    }
+
+    public void setRegisteredDetector(OperationInputDetector<?> detector) {
+        mRegisteredDetector = detector;
     }
 
 

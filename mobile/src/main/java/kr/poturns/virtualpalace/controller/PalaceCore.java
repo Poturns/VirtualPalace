@@ -12,7 +12,9 @@ import java.util.TreeMap;
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
+import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.util.DriveAssistant;
 
@@ -161,14 +163,16 @@ class PalaceCore {
      *
      * @param supportType
      */
-    void activateInputConector(int supportType) {
+    boolean activateInputConector(int supportType) {
         OperationInputConnector connector = mInputConnectorMapF.get(supportType);
 
         if (connector != null) {
             mSupportsFlag |= supportType;
             connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
+            return true;
         }
 
+        return false;
     }
 
     /**
@@ -177,7 +181,7 @@ class PalaceCore {
      *
      * @param supportType
      */
-    void deactivateInputConnector(int supportType) {
+    boolean deactivateInputConnector(int supportType) {
         OperationInputConnector connector = mInputConnectorMapF.get(supportType);
 
         if (connector != null) {
@@ -187,7 +191,28 @@ class PalaceCore {
                     mSupportsFlag |= type;
 
             connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
+            return true;
         }
+
+        return false;
+    }
+
+    /**
+     *
+     * @param supportType
+     * @return
+     */
+    boolean requestTextResultByVoiceRecognition(int supportType) {
+        if ((mSupportsFlag & supportType) == supportType) {
+
+            for (int support : mInputConnectorMapF.keySet()) {
+                if ((support & supportType) == supportType) {
+                    mInputConnectorMapF.get(support).configureFromController(mAppF, SpeechInputConnector.KEY_SWITCH_MODE, 1);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
