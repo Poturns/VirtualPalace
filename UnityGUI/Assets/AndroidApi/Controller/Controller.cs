@@ -288,7 +288,7 @@ namespace AndroidApi.Controller
         /// <summary>
         /// 음성인식 정보 key
         /// </summary>
-        public const string SPEECH_REQUEST_KEY = "speech_memo_request";
+        public const string SPEECH_REQUEST_KEY = "recognize_text_result";
         public string Speech;
 
         public override string ToString()

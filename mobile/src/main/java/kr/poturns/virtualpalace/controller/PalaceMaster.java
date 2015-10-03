@@ -125,7 +125,14 @@ public class PalaceMaster extends PalaceCore {
                         result = "{'result' : 'error'}";
                     }
 
-                    AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(result);
+                    final String sendResult = result;
+                    ThreadUtils.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(sendResult);
+                        }
+                    });
+
                     break;
             }
         }
