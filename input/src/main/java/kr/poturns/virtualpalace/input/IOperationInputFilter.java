@@ -171,6 +171,10 @@ public interface IOperationInputFilter<InputUnit> {
          * VOL.DOWN 하드웨어 키를 누른 효과를 나타낸다.
          */
         int KEY_VOLUME_DOWN = 0x20;
+        /**
+         * 텍스트 결과를 전달한다.
+         */
+        int KEY_TEXT_RESULT = 0x40;
 
         /**
          * (1) 결정 기능 : 선택한다.    >> OK / Confirm 하드웨어 키를 눌렀을 때와 동일.

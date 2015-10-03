@@ -112,6 +112,21 @@ public class PalaceMaster extends PalaceCore {
                     for (int[] command : cmds)
                         doPackOnScanning(command);
                     break;
+
+                case INPUT_TEXT_RESULT:
+                    String result = null;
+                    try {
+                        JSONObject obj = new JSONObject();
+                        obj.put(JsonKey.RECOGNIZE_TEXT_RESULT,  (String) msg.obj);
+                        obj.put(JsonKey.RESULT, "success");
+                        result = obj.toString();
+
+                    } catch (JSONException e) {
+                        result = "{'result' : 'error'}";
+                    }
+
+                    AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(result);
+                    break;
             }
         }
 
@@ -415,12 +430,14 @@ public class PalaceMaster extends PalaceCore {
 
                     } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
                         int supportType = message.getInt(key);
-                        activateInputConector(supportType);
+                        result = activateInputConector(supportType);
 
                     } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
                         int supportType = message.getInt(key);
-                        deactivateInputConnector(supportType);
+
                     }
+
+
                     rstEach.put(RESULT, result? "success" : "fail");
 
                 } catch (JSONException e){

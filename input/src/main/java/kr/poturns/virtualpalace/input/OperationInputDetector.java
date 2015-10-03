@@ -120,6 +120,11 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
         // 기존에 등록되어 있던 Connector 처리.
         flushOperationQueue();
 
+        if (connector == null && mConnector != null)
+            mConnector.setRegisteredDetector(null);
+        else
+            connector.setRegisteredDetector(this);
+
         mConnector = connector;
     }
 
