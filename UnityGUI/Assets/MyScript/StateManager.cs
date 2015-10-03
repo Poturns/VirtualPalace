@@ -33,6 +33,7 @@ public class StateManager : MonoBehaviour
 		{
 			DestroyImmediate(gameObject);
 		}
+
 	}
 	void Start () 
 	{
