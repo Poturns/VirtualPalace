@@ -241,7 +241,7 @@ public class SpeechInputHelper implements RecognitionListener {
     /**
      * 일정시간 대기 후, 음성인식을 시작한다.
      */
-    private void delayedStartRecognition() {
+    public void delayedStartRecognition() {
         if (mHandler.hasMessages(HANDLER_MSG_START_LISTENING)) {
             mHandler.removeMessages(HANDLER_MSG_START_LISTENING);
         }

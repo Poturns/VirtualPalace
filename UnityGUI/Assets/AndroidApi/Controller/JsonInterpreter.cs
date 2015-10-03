@@ -198,6 +198,7 @@ namespace AndroidApi.Controller
         /// <returns>음성인식 데이터</returns>
         public static SpeechRequestResult ParseSpeechResultFromAndroid(string json)
         {
+            Debug.Log(json);
             JsonData jData = JsonMapper.ToObject(json);
             SpeechRequestResult result = new SpeechRequestResult();
 

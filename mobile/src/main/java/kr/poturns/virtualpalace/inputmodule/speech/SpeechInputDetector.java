@@ -13,6 +13,7 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
     //private static final String TAG = "SpeechInputDetector";
     private SpeechInputHelper mSpeechInputHelper;
     private int mRecognitionMode;
+    //TODO 리스너를 활용하지 않고, OperationConnector의 text전송 메소드 사용하기
     private SpeechController.OnSpeechDataListener listener;
 
     public SpeechInputDetector(Context context) {
@@ -32,8 +33,27 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
     }
 
     @Override
-    public void setRecognitionMode(int mode) {
+    public void setRecognitionMode(@RecognitionMode int mode) {
         this.mRecognitionMode = mode;
+
+        switch (mode){
+            // Text 입력 모드의 경우, 지속적인 인식요청은 하지 않고
+            // 잠시 후에 음성인식을 시작한다.
+            case MODE_TEXT:
+                mSpeechInputHelper.setContinueRecognizing(false);
+                mSpeechInputHelper.delayedStartRecognition();
+                break;
+
+            // Input 입력 모드의 경우, Input을 꾸준히 입력받기 위해 지속적인 인식요청을 하고
+            // 잠시 후에 음성인식을 시작한다.
+            default:
+            case MODE_COMMAND:
+                mSpeechInputHelper.setContinueRecognizing(true);
+                mSpeechInputHelper.delayedStartRecognition();
+                break;
+
+
+        }
     }
 
     @Override
@@ -67,9 +87,14 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
                 detect(speechResult.result);
                 break;
 
-            case MODE_MEMO:
+            // Text 입력 모드의 경우, 따로 정의된 리스너에 입력을 전송하고, 지속적인 인식요청은 하지 않고
+            // 잠시 후에 음성인식을 시작한다.
+            case MODE_TEXT:
                 if (listener != null)
                     listener.onResult(speechResult);
+
+                setRecognitionMode(MODE_COMMAND);
+
                 break;
         }
     }
@@ -82,9 +107,12 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
             case MODE_COMMAND:
                 break;
 
-            case MODE_MEMO:
+            case MODE_TEXT:
                 if (listener != null)
                     listener.onError(cause);
+
+                setRecognitionMode(MODE_COMMAND);
+
                 break;
         }
     }

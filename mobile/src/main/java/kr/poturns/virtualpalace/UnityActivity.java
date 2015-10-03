@@ -8,8 +8,9 @@ import com.google.unity.GoogleUnityActivity;
 import kr.poturns.virtualpalace.annotation.UnityApi;
 import kr.poturns.virtualpalace.controller.AndroidUnityBridge;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputDetector;
 import kr.poturns.virtualpalace.inputmodule.wear.WearInputConnector;
 
@@ -32,8 +33,10 @@ public class UnityActivity extends GoogleUnityActivity {
         mWearInputConnector = new WearInputConnector(application);
 
         mSpeechInputDetector = new SpeechInputDetector(application);
-        //mSpeechInputDetector.setContinueRecognizing(true);
-        mSpeechInputConnector = new OperationInputConnector(application, IControllerCommands.TYPE_INPUT_SUPPORT_VOICE);
+        mSpeechInputDetector.setContinueRecognizing(true);
+        mSpeechInputDetector.setRecognitionMode(SpeechController.MODE_COMMAND);
+
+        mSpeechInputConnector = new SpeechInputConnector(this);
         mSpeechInputDetector.setOperationInputConnector(mSpeechInputConnector);
     }
 

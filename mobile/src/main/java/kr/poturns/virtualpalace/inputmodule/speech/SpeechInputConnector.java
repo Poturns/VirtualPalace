@@ -3,19 +3,22 @@ package kr.poturns.virtualpalace.inputmodule.speech;
 import android.content.Context;
 
 import kr.poturns.virtualpalace.input.GlobalApplication;
+import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.input.OperationInputDetector;
 
 /**
  * Created by YeonhoKim on 2015-10-03.
+ *
+ * 음성인식 모듈과 연동되어 음성인식과 관련한 요청을 전송할 수 있는 OperationInputConnector
  */
 public class SpeechInputConnector extends OperationInputConnector implements SpeechController.OnSpeechDataListener {
 
     public static final int KEY_SWITCH_MODE = 0x3;
     public static final int KEY_ACTIVE_RECOGNIZE = 0x4;
 
-    public SpeechInputConnector(Context context, int supportType) {
-        super(context, supportType);
+    public SpeechInputConnector(Context context) {
+        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_VOICE);
     }
 
     @Override
@@ -29,14 +32,6 @@ public class SpeechInputConnector extends OperationInputConnector implements Spe
         }
     }
 
-    /**
-     * CONNECTOR 를 제어하기 위해 CONTROLLER 가 사용하는 메소드.
-     * ( CONTROLLER 외 호출 금지 )
-     *
-     * @param app   CONTROLLER에서 호출했음을 증명하기 위한 매개변수
-     * @param key   설정 기능에 대한 키
-     * @param value 설정 기능에 대한 값
-     */
     @Override
     public void configureFromController(GlobalApplication app, int key, int value) {
         if (app == null)
@@ -49,8 +44,8 @@ public class SpeechInputConnector extends OperationInputConnector implements Spe
                         ((SpeechInputDetector) mRegisteredDetector).setRecognitionMode(SpeechController.MODE_COMMAND);
                         break;
 
-                    case SpeechController.MODE_MEMO:
-                        ((SpeechInputDetector) mRegisteredDetector).setRecognitionMode(SpeechController.MODE_MEMO);
+                    case SpeechController.MODE_TEXT:
+                        ((SpeechInputDetector) mRegisteredDetector).setRecognitionMode(SpeechController.MODE_TEXT);
                         break;
                 }
                 break;

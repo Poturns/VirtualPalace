@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
 using AndroidApi.Controller;
+using System;
 
 public class StateManager : MonoBehaviour
 {
@@ -72,6 +73,11 @@ public class StateManager : MonoBehaviour
 		if(DisposolObj)GameObject.Destroy (DisposolObj);
 		activeState = newState;
 	}
+
+    public void QueueOnMainThread(Action a)
+    {
+        Tasker.QueueOnMainThread(a);
+    }
 
     public static void SwitchScene(string sceneName)
     {

@@ -12,8 +12,8 @@ import java.util.TreeMap;
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
-import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.util.DriveAssistant;
@@ -207,7 +207,8 @@ class PalaceCore {
 
             for (int support : mInputConnectorMapF.keySet()) {
                 if ((support & supportType) == supportType) {
-                    mInputConnectorMapF.get(support).configureFromController(mAppF, SpeechInputConnector.KEY_SWITCH_MODE, 1);
+                    OperationInputConnector connector = mInputConnectorMapF.get(support);
+                    connector.configureFromController(mAppF, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
                     return true;
                 }
             }

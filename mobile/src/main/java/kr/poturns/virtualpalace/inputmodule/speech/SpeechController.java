@@ -7,8 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 음성인식 모듈을 제어하는 인터페이스
  * Created by Myungjin Kim on 2015-10-03.
+ * <p/>
+ * 음성인식 모듈을 제어하는 인터페이스
  */
 public interface SpeechController {
 
@@ -19,13 +20,13 @@ public interface SpeechController {
     /**
      * 음성인식 메모 모드
      */
-    int MODE_MEMO = 1;
+    int MODE_TEXT = 1;
 
 
     /**
      * 음성인식 모드
      */
-    @IntDef(value = {MODE_COMMAND, MODE_MEMO})
+    @IntDef(value = {MODE_COMMAND, MODE_TEXT})
     @Retention(RetentionPolicy.SOURCE)
     @interface RecognitionMode {
     }

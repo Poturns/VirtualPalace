@@ -65,7 +65,6 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     private boolean isBatchProcessing;
 
 
-
     // * * * C O S T R U C T O R S * * * //
     public OperationInputDetector() {
         this(null);
@@ -78,6 +77,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
 
 
     // * * * M E T H O D S * * * //
+
     /**
      * {@link IOperationInputFilter}를 등록한다.
      * Generic Type이 {@link OperationInputDetector}와 일치해야한다.
@@ -120,10 +120,10 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
         // 기존에 등록되어 있던 Connector 처리.
         flushOperationQueue();
 
-        if (connector == null && mConnector != null)
-            mConnector.setRegisteredDetector(null);
-        else
+        if (connector != null)
             connector.setRegisteredDetector(this);
+        if (mConnector != null)
+            mConnector.setRegisteredDetector(null);
 
         mConnector = connector;
     }
@@ -150,8 +150,7 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      * 전달받은 입력 데이터에서 명령을 검출한다.
      *
      * @param unit
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
      */
     public final synchronized boolean detect(InputUnit unit) {
         // 통계적 관점에서 파악한 후, 기본적인 우선순위를 정한다.
@@ -174,12 +173,12 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      * 판별하지 못했을 경우, 수행되지 않았던 나머지 Operation 을 순차적으로 판별하여,
      * 전달받은 입력 데이터에서 명령을 검출한다.
      *
-     * @param unit 입력
+     * @param unit     입력
      * @param expected 예상 Operations (OR 중첩 가능)
      * @return
      */
     public final synchronized boolean detect(InputUnit unit, int expected) {
-        int rest = ((Operation.TERMINATE << 2) -1) ^ expected;
+        int rest = ((Operation.TERMINATE << 2) - 1) ^ expected;
         boolean result = distinguishExpectedFirst(unit, expected) | distinguishExpectedFirst(unit, rest);
 
         onDetected();
@@ -191,13 +190,13 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      * 전달받은 입력 데이터에서 명령을 검출한다.
      * (※ 우선순위 배열에 추가된 Operation 에 한하여 판별작업을 수행한다.)
      *
-     * @param unit 입력
+     * @param unit     입력
      * @param priority 우선순위 배열
      * @return
      */
     public final synchronized boolean detect(InputUnit unit, int[] priority) {
         boolean result = false;
-        for(int operation : priority) {
+        for (int operation : priority) {
             if (result = distinguishOnce(unit, operation))
                 break;
         }
@@ -209,12 +208,12 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     /**
      * 예상되는 Operation 들을 우선적으로 판별한다.
      *
-     * @param unit 입력
+     * @param unit     입력
      * @param expected 예상 Operations (OR 중첩 가능)
      * @return
      */
-    private final synchronized  boolean distinguishExpectedFirst(InputUnit unit, int expected) {
-        for(int picker = 1; picker <= expected; picker = picker << 1) {
+    private final synchronized boolean distinguishExpectedFirst(InputUnit unit, int expected) {
+        for (int picker = 1; picker <= expected; picker = picker << 1) {
             if ((expected & picker) > 0) {
                 if (distinguishOnce(unit, picker))
                     return true;
@@ -244,12 +243,12 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
     /**
      * 대상이 되는 하나의 Operation 에 대해 판별작업을 수행한다.
      *
-     * @param unit 입력
+     * @param unit           입력
      * @param checkOperation 대상 Operation
      * @return
      */
-    private final synchronized  boolean distinguishOnce(InputUnit unit, int checkOperation) {
-        switch(checkOperation) {
+    private final synchronized boolean distinguishOnce(InputUnit unit, int checkOperation) {
+        switch (checkOperation) {
             case Operation.SELECT:
                 return isSelecting(unit);
 
@@ -308,9 +307,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isGoingTo(InputUnit inputUnit) {
@@ -330,9 +328,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isTurningTo(InputUnit inputUnit) {
@@ -352,9 +349,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isFocusingTo(InputUnit inputUnit) {
@@ -374,9 +370,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 방향
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public int isZoomingTo(InputUnit inputUnit) {
@@ -396,9 +391,8 @@ public class OperationInputDetector<InputUnit> implements IOperationInputFilter<
      *
      * @param inputUnit input
      * @return 선택 여부
-     * @throws NullPointerException
-     *          {@link IOperationInputFilter}가 등록되지 않았을 경우
-     *          {@link OperationInputConnector}가 등록되지 않았을 경우
+     * @throws NullPointerException {@link IOperationInputFilter}가 등록되지 않았을 경우
+     *                              {@link OperationInputConnector}가 등록되지 않았을 경우
      */
     @Override
     public boolean isSelecting(InputUnit inputUnit) {
