@@ -44,7 +44,7 @@ public class PalaceMaster extends PalaceCore {
 
 
     // * * * F I E L D S * * * //
-
+    private long mTextResultRequestId = -1;
 
     // * * * C O N S T R U C T O R S * * * //
     private PalaceMaster(PalaceApplication app) {
@@ -114,14 +114,18 @@ public class PalaceMaster extends PalaceCore {
                     break;
 
                 case INPUT_TEXT_RESULT:
-                    String result = null;
+                    String result;
                     try {
+                        String text = (String) msg.obj;
+                        if (text == null)
+                            throw new Exception();
+
                         JSONObject obj = new JSONObject();
-                        obj.put(JsonKey.RECOGNIZE_TEXT_RESULT,  (String) msg.obj);
+                        obj.put(JsonKey.RECOGNIZE_TEXT_RESULT,  text);
                         obj.put(JsonKey.RESULT, "success");
                         result = obj.toString();
 
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         result = "{'result' : 'error'}";
                     }
 
@@ -129,10 +133,10 @@ public class PalaceMaster extends PalaceCore {
                     ThreadUtils.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                         @Override
                         public void run() {
-                            AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(sendResult);
+                            AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(mTextResultRequestId, sendResult);
+                            mTextResultRequestId = -1;
                         }
                     });
-
                     break;
             }
         }
@@ -371,7 +375,12 @@ public class PalaceMaster extends PalaceCore {
                             JSONObject result;
                             try {
                                 result = process(jsonMessage);
-                            } catch (Exception e) {
+
+                            } catch (WaitForCallbackException e1) {
+                                mTextResultRequestId = id;
+                                return;
+
+                            } catch (Exception e2) {
                                 result = new JSONObject();
                             }
 
@@ -394,7 +403,7 @@ public class PalaceMaster extends PalaceCore {
          * @param jsonMessage
          * @return
          */
-        private JSONObject process(String jsonMessage) throws JSONException {
+        private JSONObject process(String jsonMessage) throws JSONException, WaitForCallbackException {
             JSONObject jsonResult = new JSONObject();
             Log.d("PalaceMaster_Request", "Request Message : " + jsonMessage);
 
@@ -445,8 +454,10 @@ public class PalaceMaster extends PalaceCore {
 
                     } else if (RECOGNIZE_TEXT_RESULT.equalsIgnoreCase(key)) {
                         int supportType = IControllerCommands.TYPE_INPUT_SUPPORT_VOICE;
-                        requestTextResultByVoiceRecognition(supportType);
+                        result = requestTextResultByVoiceRecognition(supportType);
 
+                        if (result)
+                            throw new WaitForCallbackException();
                     }
 
 
@@ -467,7 +478,11 @@ public class PalaceMaster extends PalaceCore {
     }
 
 
-    // * * * G E T T E R S & S E T T E R S * * * //
+    private class WaitForCallbackException extends Exception {
+
+    }
+
+    // * * * G E T T E R  S & S E T T E R S * * * //
     public Handler getInputHandler(int supportType) {
         if (mInputConnectorMapF.get(supportType) == null)
             return null;
