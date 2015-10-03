@@ -68,5 +68,9 @@ public class SpeechInputDetector extends OperationInputDetector<ArrayList<String
         detect(speechResults.results);
     }
 
+    @Override
+    public void onError(int cause) {
+    }
+
 
 }

@@ -202,6 +202,8 @@ public class SpeechInputHelper implements RecognitionListener {
     public void onError(int error) {
         Log.e(TAG, "=onError : " + error + "=");
 
+        if (listener != null)
+            listener.onError(error);
         isInRecognizing = false;
 
         if (isContinueRecognizing)
@@ -306,5 +308,13 @@ public class SpeechInputHelper implements RecognitionListener {
          * @param speechResults 음성인식 결과
          */
         void onResult(SpeechResults speechResults);
+
+        /**
+         * 음성인식이 실패하였을 때, 호출된다
+         *
+         * @param cause 실패 이유
+         * @see SpeechRecognizer
+         */
+        void onError(int cause);
     }
 }
