@@ -25,10 +25,20 @@ namespace MyScript.States
 
 			EventSys = GameObject.Find ("EventSystem");
 			UIBookMesh = GameObject.Find ("UIBook");
+
+			//터치시 UI Object 초기화
+			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+			if(DisposolObj)GameObject.Destroy (DisposolObj);
+
 			if (!UIBookMesh)
 				Debug.Log ("Sel Target is Null");
-			UIBookMesh.GetComponent<MeshRenderer> ().enabled = true;
-
+			//UIBookMesh.GetComponent<MeshRenderer> ().enabled = true;
+			GameObject ShowObj = TargetObject.GetComponent<MemoObject> ().UIObject; 
+			GameObject DisposalObj=GameObject.Instantiate (ShowObj
+			                                               ,UIBookMesh.transform.position
+			                                               , TargetObject.transform.rotation) as GameObject;
+			DisposalObj.tag = "Disposol";
+			DisposalObj.transform.SetParent (UIBookMesh.transform);
 			UITitleTextObj = GameObject.Find ("UITitleText");
 			if (!UITitleTextObj)
 				Debug.Log ("Sel Text is Null");
@@ -42,7 +52,6 @@ namespace MyScript.States
 		public void StateUpdate()
 		{
 
-				Debug.Log ("A");
 			// Input
 				
 			//ChangeMemoScene ();

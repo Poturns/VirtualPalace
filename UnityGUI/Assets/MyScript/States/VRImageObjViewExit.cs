@@ -24,7 +24,8 @@ namespace MyScript.States
 				Debug.Log ("ImageSelector is Null");
 
 			// Apply Change Texture
-			TargetObject.gameObject.GetComponent<Renderer> ().materials [1].mainTexture 
+			int MatSize = TargetObject.gameObject.GetComponent<Renderer> ().materials.GetLength (0);
+			TargetObject.gameObject.GetComponent<Renderer> ().materials [MatSize-1].mainTexture 
 				= ImageUI.GetComponent<ImageControl> ().GetTexture ();
 
 			ImageUI.GetComponent<MeshCollider> ().enabled = false;

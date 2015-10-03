@@ -4,6 +4,10 @@ using System.Collections;
 public class PrefabContainer : MonoBehaviour {
 
 	public GameObject BookObj;
-	public GameObject ImgObj;
+	public GameObject AnimalObj;
+	public GameObject HumanStatu;
+	public GameObject DecoObj;
+	public GameObject DishObj;
+	public GameObject NoActionObj;
 
 }
