@@ -121,8 +121,8 @@ public class GazeInputModule : BaseInputModule {
     RaycastedGameObject = go;
    // if(RaycastedGameObject != null)
     //    RaycastedScript = RaycastedGameObject.GetComponent<IRaycastedObject>();
-
-    cursor.SetActive(go != null);
+	cursor.SetActive (go != null);
+	if (go != null)cursor.SetActive (go.CompareTag("InteractiveObject"));
     if (cursor.activeInHierarchy) {
       Camera cam = pointerData.enterEventCamera;
       // Note: rays through screen start at near clipping plane.
