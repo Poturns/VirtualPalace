@@ -71,7 +71,7 @@ public class GestureInputFilter implements IOperationInputFilter<String> {
 
     @Override
     public boolean isSelecting(String s) {
-        return s.equals(OPERATION_CLICK);
+        return s.equals(SPECIAL_OP_SELECT) || s.equals(OPERATION_CLICK);
     }
 
     /**
