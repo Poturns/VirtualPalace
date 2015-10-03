@@ -66,6 +66,9 @@ public class StateManager : MonoBehaviour
 
 	public void SwitchState(IStateBase newState)
 	{
+		//UI SHOW Object Delete
+		GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+		if(DisposolObj)GameObject.Destroy (DisposolObj);
 		activeState = newState;
 	}
 

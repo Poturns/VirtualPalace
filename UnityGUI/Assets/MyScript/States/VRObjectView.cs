@@ -27,8 +27,7 @@ namespace MyScript.States
 			UIBookMesh = GameObject.Find ("UIBook");
 
 			//터치시 UI Object 초기화
-			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
-			if(DisposolObj)GameObject.Destroy (DisposolObj);
+		
 
 			if (!UIBookMesh)
 				Debug.Log ("Sel Target is Null");
@@ -68,7 +67,7 @@ namespace MyScript.States
 			{
 				if(op.Type == Operation.CANCEL)
 				{
-					UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+					//UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
 					UITitleTextObj.GetComponent<TextMesh> ().text = "";
 					manager.SwitchState (new VRSceneIdleState(manager));
 				}

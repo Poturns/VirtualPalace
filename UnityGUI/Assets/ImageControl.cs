@@ -20,6 +20,7 @@ public class ImageControl : MonoBehaviour , IRaycastedObject {
 	}
 	public Texture2D GetTexture()
 	{
+		count = 0;
 		return NowTexture;
 	}
 	public void NextImg ()

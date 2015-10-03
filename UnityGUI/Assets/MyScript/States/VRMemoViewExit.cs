@@ -22,7 +22,7 @@ namespace MyScript.States
 			UIMemoBG = GameObject.Find ("UIBook");
 			if (!UIMemoBG)
 				Debug.Log ("Sel Target is Null");
-			UIMemoBG.GetComponent<SpriteRenderer> ().enabled = true;
+			UIMemoBG.GetComponent<SpriteRenderer> ().enabled = false;
 			
 			UIMemoTxt = GameObject.Find ("UITitleText");
 			if (!UIMemoTxt)

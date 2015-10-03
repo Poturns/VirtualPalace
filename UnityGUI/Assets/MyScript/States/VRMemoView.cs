@@ -56,7 +56,7 @@ namespace MyScript.States
 					break;
 					
 				case Operation.SELECT:
-					
+					//String 전달 받기 
 					break;
 				}
 			}
