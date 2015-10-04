@@ -12,19 +12,21 @@ namespace MyScript.States
 		
 		private GameObject UIMemoBG;
 		private GameObject UIMemoTxt;
-
+		
 		private GameObject TargetObj;
+		private MemoObject MemoObj;
+		private TextMesh TMObject;
 		private GameObject EventSys;
 		
 		public VRMemoView (StateManager managerRef , GameObject TargetObject)
 		{
 			manager = managerRef;
 			TargetObj = TargetObject;
-
+			
 			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
 			if(DisposolObj)GameObject.Destroy (DisposolObj);
 			Debug.Log ("MemoView");
-
+			
 			EventSys = GameObject.Find ("EventSystem");
 			UIMemoBG = GameObject.Find ("MemoView");
 			if (!UIMemoBG)
@@ -35,9 +37,12 @@ namespace MyScript.States
 			if (!UIMemoTxt)
 				Debug.Log ("Sel Text is Null");
 			
+			MemoObj = TargetObject.GetComponent<MemoObject>();
 			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
 			TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
-			StateManager.InputTextMesh (T, UIMemoTxt.GetComponent<MemoObject> ().GetMemo());
+			TMObject = UIMemoTxt.GetComponent<TextMesh>();
+			StateManager.InputTextMesh (T, MemoObj.GetMemo());
+			
 			//T.text = "New Memo Test";
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 		}
@@ -61,20 +66,20 @@ namespace MyScript.States
 					
 				case Operation.SELECT:
 					new SpeechRequest().SendRequest((result) =>
-                    {
-                      		Debug.Log(result);
-                            switch (result.Status)
-                            {
-                             		case RequestResult.STATUS_SUCCESS:
-                                    	TargetObj.InputMemo(result.Speech);
-										manager.QueueOnMainThread(() => UIMemoTxt.text = TargetObj.GetMemo());
-                                        break;
-                    
-                                   	default:
-                                        Debug.Log("SpeechRequest : failed!");
-                                      	break;
-                         	}
-         			});
+					                                {
+						Debug.Log(result);
+						switch (result.Status)
+						{
+						case RequestResult.STATUS_SUCCESS:
+							MemoObj.InputMemo(result.Speech);
+							manager.QueueOnMainThread(() => TMObject.text = MemoObj.GetMemo());
+							break;
+							
+						default:
+							Debug.Log("SpeechRequest : failed!");
+							break;
+						}
+					});
 					break;
 				}
 			}
@@ -88,4 +93,3 @@ namespace MyScript.States
 		}
 	}
 }
-
