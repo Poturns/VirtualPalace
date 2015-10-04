@@ -14,6 +14,8 @@ namespace MyScript.States
 		private GameObject UIMemoTxt;
 
 		private GameObject TargetObj;
+        private MemoObject MemoObj;
+        private TextMesh TMObject;
 		private GameObject EventSys;
 		
 		public VRMemoView (StateManager managerRef , GameObject TargetObject)
@@ -34,13 +36,16 @@ namespace MyScript.States
 			UIMemoTxt = GameObject.Find ("MemoText");
 			if (!UIMemoTxt)
 				Debug.Log ("Sel Text is Null");
-			
-			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
-			TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
-			StateManager.InputTextMesh (T, UIMemoTxt.GetComponent<MemoObject> ().GetMemo());
-			//T.text = "New Memo Test";
-			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
-		}
+
+            MemoObj = TargetObject.GetComponent<MemoObject>();
+            //TargetObject.GetComponent<MemoObject>().MemoPrefab;
+            TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
+            TMObject = UIMemoTxt.GetComponent<TextMesh>();
+            StateManager.InputTextMesh (T, MemoObj.GetMemo());
+            
+            //T.text = "New Memo Test";
+            //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
+        }
 		public void StateUpdate()
 		{
 			if (Input.GetKeyUp (KeyCode.Q))
@@ -66,8 +71,8 @@ namespace MyScript.States
                             switch (result.Status)
                             {
                              		case RequestResult.STATUS_SUCCESS:
-                                    	TargetObj.InputMemo(result.Speech);
-										manager.QueueOnMainThread(() => UIMemoTxt.text = TargetObj.GetMemo());
+                                        MemoObj.InputMemo(result.Speech);
+										manager.QueueOnMainThread(() => TMObject.text = MemoObj.GetMemo());
                                         break;
                     
                                    	default:
