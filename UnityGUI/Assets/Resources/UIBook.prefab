@@ -13,6 +13,7 @@ GameObject:
   - 65: {fileID: 6505534}
   - 114: {fileID: 11425824}
   - 114: {fileID: 11460596}
+  - 114: {fileID: 11473938}
   m_Layer: 0
   m_Name: UIBook
   m_TagString: Disposol
@@ -87,6 +88,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InitTitle: 
+  InitMemo: 
   UIObject: {fileID: 0}
 --- !u!114 &11460596
 MonoBehaviour:
@@ -101,6 +104,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Delegates: []
   delegates: []
+--- !u!114 &11473938
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 190348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25b0ff2b3516c6d44a9afd68a958be60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

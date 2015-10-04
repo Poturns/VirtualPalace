@@ -69,9 +69,22 @@ public class StateManager : MonoBehaviour
 	public void SwitchState(IStateBase newState)
 	{
 		//UI SHOW Object Delete
-		GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
-		if(DisposolObj)GameObject.Destroy (DisposolObj);
+
 		activeState = newState;
+	}
+	public static void InputTextMesh(TextMesh tm ,string T )
+	{
+		int StrSize = T.Length;
+		string S = "";
+		int i = 0 ; 
+		while(i < StrSize)
+		{
+			if(i%17 == 0 && i > 0) S += '\n';
+			S+= T[i];
+			i++;
+		}
+		S += '\n';
+		tm.text = S;
 	}
 
     public void QueueOnMainThread(Action a)

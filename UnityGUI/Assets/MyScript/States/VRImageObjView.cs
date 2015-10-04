@@ -16,7 +16,10 @@ namespace MyScript.States
 		{
 			manager = managerRef;
 			Target = TargetObject;
-			
+
+			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+			if(DisposolObj)GameObject.Destroy (DisposolObj);
+
 			Debug.Log ("VRImageObjectView");
 			SelectModule = GameObject.Find ("EventSystem").GetComponent<GazeInputModule>();
 			ImageUI = GameObject.Find ("ImageView");

@@ -275,6 +275,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InitTitle: 
+  InitMemo: 
+  kind: 1
   UIObject: {fileID: 114010}
 --- !u!114 &11440854
 MonoBehaviour:
@@ -340,6 +343,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_TagString
       value: InteractiveObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: kind
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

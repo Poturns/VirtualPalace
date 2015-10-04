@@ -11,6 +11,8 @@ GameObject:
   - 33: {fileID: 3390840}
   - 23: {fileID: 2333794}
   - 65: {fileID: 6526506}
+  - 114: {fileID: 11410260}
+  - 114: {fileID: 11405774}
   m_Layer: 0
   m_Name: HorizontalBook
   m_TagString: InteractiveObject
@@ -25,7 +27,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 110936}
   m_LocalRotation: {x: 2.27759244e-07, y: 2.27759244e-07, z: .707106829, w: .707106829}
-  m_LocalPosition: {x: -2.89778042, y: 1.77715659, z: -1.02453995}
+  m_LocalPosition: {x: -2.84800005, y: 1.36899996, z: -1.02499998}
   m_LocalScale: {x: .447220653, y: .323837638, z: .323837399}
   m_Children: []
   m_Father: {fileID: 0}
@@ -74,6 +76,50 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: .0863325745, y: .53487432, z: .681730986}
   m_Center: {x: -.0113355396, y: -.0178552084, z: .340865493}
+--- !u!114 &11405774
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 110936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InitTitle: 
+  InitMemo: 
+  UIObject: {fileID: 190348, guid: 9432bbfa92c145a48b00465c2b2704db, type: 2}
+--- !u!114 &11410260
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 110936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 11405774}
+          m_MethodName: OnSelect
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -85,6 +131,10 @@ Prefab:
       propertyPath: m_TagString
       value: InteractiveObject
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: UIObject
+      value: 
+      objectReference: {fileID: 190348, guid: 9432bbfa92c145a48b00465c2b2704db, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 110936}

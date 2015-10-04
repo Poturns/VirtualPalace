@@ -17,6 +17,8 @@ namespace MyScript.States
             Debug.Log("VRSceneState");
             manager = managerRef;
 
+			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+			if(DisposolObj)GameObject.Destroy (DisposolObj);
             EventSys = GameObject.Find("EventSystem");
             if (EventSys == null) Debug.Log("Event System Find Fail");
             //else Debug.Log(EventSys);
