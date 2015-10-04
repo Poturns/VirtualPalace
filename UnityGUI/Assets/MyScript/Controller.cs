@@ -16,7 +16,9 @@ public class Controller : MonoBehaviour {
 	void Update () 
 	{
 		Vector3 forword = Input.GetAxis ("Vertical") * transform.TransformDirection (Vector3.forward) * MoveSpeed;
+		Vector3 VecHori = Input.GetAxis ("Horizontal") * transform.TransformDirection (Vector3.right) * MoveSpeed;
 		cc.Move (forword * Time.deltaTime);
+		cc.Move (VecHori * Time.deltaTime);
 		//cc.SimpleMove (Physics.gravity);
 	}
 }

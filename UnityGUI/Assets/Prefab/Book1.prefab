@@ -87,7 +87,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UIObject: {fileID: 190348}
+  InitTitle: 
+  InitMemo: 
+  UIObject: {fileID: 190348, guid: 9432bbfa92c145a48b00465c2b2704db, type: 2}
 --- !u!114 &11460596
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -164,7 +166,7 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: UIObject
       value: 
-      objectReference: {fileID: 190348}
+      objectReference: {fileID: 190348, guid: 9432bbfa92c145a48b00465c2b2704db, type: 2}
     - target: {fileID: 0}
       propertyPath: m_TagString
       value: InteractiveObject

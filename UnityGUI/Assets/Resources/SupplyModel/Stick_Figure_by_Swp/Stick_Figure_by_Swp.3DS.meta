@@ -1,0 +1,251 @@
+fileFormatVersion: 2
+guid: ffa03c11f08f9564da62268835bb583a
+timeCreated: 1443944383
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Base Hum10
+    100002: Base Hum11
+    100004: Base Hum12
+    100006: Base Hum13
+    100008: Base Hum14
+    100010: Base Hum15
+    100012: Base Hum16
+    100014: Base Hum17
+    100016: Base Hum18
+    100018: Base Hum19
+    100020: Base Hum20
+    100022: Base Hum21
+    100024: Base Hum22
+    100026: Base Hum23
+    100028: Base Hum24
+    100030: Base Hum25
+    100032: Base Hum26
+    100034: Base Hum27
+    100036: Base Hum28
+    100038: Base Hum29
+    100040: Base Hum30
+    100042: Base Hum31
+    100044: Base Hum32
+    100046: Base Huma0
+    100048: Base Huma1
+    100050: Base Huma2
+    100052: Base Huma3
+    100054: Base Huma4
+    100056: Base Huma5
+    100058: Base Huma6
+    100060: Base Huma7
+    100062: Base Huma8
+    100064: Base Huma9
+    100066: Base Human
+    100068: Box001
+    100070: PM3D_ZSphe
+    100072: //RootNode
+    400000: Base Hum10
+    400002: Base Hum11
+    400004: Base Hum12
+    400006: Base Hum13
+    400008: Base Hum14
+    400010: Base Hum15
+    400012: Base Hum16
+    400014: Base Hum17
+    400016: Base Hum18
+    400018: Base Hum19
+    400020: Base Hum20
+    400022: Base Hum21
+    400024: Base Hum22
+    400026: Base Hum23
+    400028: Base Hum24
+    400030: Base Hum25
+    400032: Base Hum26
+    400034: Base Hum27
+    400036: Base Hum28
+    400038: Base Hum29
+    400040: Base Hum30
+    400042: Base Hum31
+    400044: Base Hum32
+    400046: Base Huma0
+    400048: Base Huma1
+    400050: Base Huma2
+    400052: Base Huma3
+    400054: Base Huma4
+    400056: Base Huma5
+    400058: Base Huma6
+    400060: Base Huma7
+    400062: Base Huma8
+    400064: Base Huma9
+    400066: Base Human
+    400068: Box001
+    400070: PM3D_ZSphe
+    400072: //RootNode
+    2300000: Base Hum10
+    2300002: Base Hum11
+    2300004: Base Hum12
+    2300006: Base Hum13
+    2300008: Base Hum14
+    2300010: Base Hum15
+    2300012: Base Hum16
+    2300014: Base Hum17
+    2300016: Base Hum18
+    2300018: Base Hum19
+    2300020: Base Hum20
+    2300022: Base Hum21
+    2300024: Base Hum22
+    2300026: Base Hum23
+    2300028: Base Hum24
+    2300030: Base Hum25
+    2300032: Base Hum26
+    2300034: Base Hum27
+    2300036: Base Hum28
+    2300038: Base Hum29
+    2300040: Base Hum30
+    2300042: Base Hum31
+    2300044: Base Hum32
+    2300046: Base Huma0
+    2300048: Base Huma1
+    2300050: Base Huma2
+    2300052: Base Huma3
+    2300054: Base Huma4
+    2300056: Base Huma5
+    2300058: Base Huma6
+    2300060: Base Huma7
+    2300062: Base Huma8
+    2300064: Base Huma9
+    2300066: Base Human
+    2300068: Box001
+    2300070: PM3D_ZSphe
+    3300000: Base Hum10
+    3300002: Base Hum11
+    3300004: Base Hum12
+    3300006: Base Hum13
+    3300008: Base Hum14
+    3300010: Base Hum15
+    3300012: Base Hum16
+    3300014: Base Hum17
+    3300016: Base Hum18
+    3300018: Base Hum19
+    3300020: Base Hum20
+    3300022: Base Hum21
+    3300024: Base Hum22
+    3300026: Base Hum23
+    3300028: Base Hum24
+    3300030: Base Hum25
+    3300032: Base Hum26
+    3300034: Base Hum27
+    3300036: Base Hum28
+    3300038: Base Hum29
+    3300040: Base Hum30
+    3300042: Base Hum31
+    3300044: Base Hum32
+    3300046: Base Huma0
+    3300048: Base Huma1
+    3300050: Base Huma2
+    3300052: Base Huma3
+    3300054: Base Huma4
+    3300056: Base Huma5
+    3300058: Base Huma6
+    3300060: Base Huma7
+    3300062: Base Huma8
+    3300064: Base Huma9
+    3300066: Base Human
+    3300068: Box001
+    3300070: PM3D_ZSphe
+    4300000: PM3D_ZSphe
+    4300002: Box001
+    4300004: Base Human
+    4300006: Base Huma0
+    4300008: Base Huma1
+    4300010: Base Huma2
+    4300012: Base Huma3
+    4300014: Base Huma4
+    4300016: Base Huma5
+    4300018: Base Huma6
+    4300020: Base Huma7
+    4300022: Base Huma8
+    4300024: Base Huma9
+    4300026: Base Hum10
+    4300028: Base Hum11
+    4300030: Base Hum12
+    4300032: Base Hum13
+    4300034: Base Hum14
+    4300036: Base Hum15
+    4300038: Base Hum16
+    4300040: Base Hum17
+    4300042: Base Hum18
+    4300044: Base Hum19
+    4300046: Base Hum20
+    4300048: Base Hum21
+    4300050: Base Hum22
+    4300052: Base Hum23
+    4300054: Base Hum24
+    4300056: Base Hum25
+    4300058: Base Hum26
+    4300060: Base Hum27
+    4300062: Base Hum28
+    4300064: Base Hum29
+    4300066: Base Hum30
+    4300068: Base Hum31
+    4300070: Base Hum32
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

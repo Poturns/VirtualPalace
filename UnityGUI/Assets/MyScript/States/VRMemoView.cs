@@ -19,7 +19,9 @@ namespace MyScript.States
 		{
 			manager = managerRef;
 			TargetObj = TargetObject;
-			
+
+			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+			if(DisposolObj)GameObject.Destroy (DisposolObj);
 			Debug.Log ("MemoView");
 
 			EventSys = GameObject.Find ("EventSystem");
@@ -34,7 +36,8 @@ namespace MyScript.States
 			
 			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
 			TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
-			T.text = "New Memo Test";
+			StateManager.InputTextMesh (T, UIMemoTxt.GetComponent<MemoObject> ().GetMemo());
+			//T.text = "New Memo Test";
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 		}
 		public void StateUpdate()

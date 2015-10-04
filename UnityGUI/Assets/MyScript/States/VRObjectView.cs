@@ -21,6 +21,8 @@ namespace MyScript.States
 			manager = managerRef;
 			Target = TargetObject;
 
+			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
+			if(DisposolObj)GameObject.Destroy (DisposolObj);
 			Debug.Log ("VRObjectView");
 
 			EventSys = GameObject.Find ("EventSystem");
@@ -33,9 +35,13 @@ namespace MyScript.States
 				Debug.Log ("Sel Target is Null");
 			//UIBookMesh.GetComponent<MeshRenderer> ().enabled = true;
 			GameObject ShowObj = TargetObject.GetComponent<MemoObject> ().UIObject; 
-			GameObject DisposalObj=GameObject.Instantiate (ShowObj
-			                                               ,UIBookMesh.transform.position
-			                                               , TargetObject.transform.rotation) as GameObject;
+			GameObject DisposalObj;
+			if(TargetObject.GetComponent<MemoObject> ().kind == OBJECT_KIND.BOOK)
+				DisposalObj =GameObject.Instantiate (ShowObj ,UIBookMesh.transform.position
+			                                     , UIBookMesh.transform.rotation) as GameObject;
+			else
+				DisposalObj =GameObject.Instantiate (ShowObj ,UIBookMesh.transform.position
+				                                     , TargetObject.transform.rotation) as GameObject;
 			DisposalObj.tag = "Disposol";
 			DisposalObj.transform.SetParent (UIBookMesh.transform);
 			UITitleTextObj = GameObject.Find ("UITitleText");
@@ -45,7 +51,8 @@ namespace MyScript.States
 			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
 			string NewTxt = TargetObject.GetComponent<MemoObject>().Title;
 			TextMesh T = UITitleTextObj.GetComponent<TextMesh> ();
-			T.text = NewTxt;
+			//T.text = NewTxt;
+			StateManager.InputTextMesh (T, NewTxt);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 		}
 		public void StateUpdate()

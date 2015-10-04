@@ -7,11 +7,13 @@ using AndroidApi.Controller;
 
 public class MemoObject : MonoBehaviour ,IRaycastedObject
 {
-
+	public string InitTitle;
+	public string InitMemo;
 	public string Title {
 		get;
 		set;
 	}
+	public OBJECT_KIND kind;
 	private string Memo;
 	public GameObject UIObject;
 
@@ -34,8 +36,8 @@ public class MemoObject : MonoBehaviour ,IRaycastedObject
 
 	// Use this for initialization
 	void Start () {
-		Memo = "Test Memo String";
-		Title = "Test Title";
+		Memo = InitMemo;
+		Title = InitTitle;
 	}
 	
 	// Update is called once per frame
