@@ -18,13 +18,15 @@ namespace MyScript.States
 			
 			
 			Debug.Log ("VRMemoView");
-			
-			UIMemoBG = GameObject.Find ("UIBook");
+            GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
+            if (DisposolObj) GameObject.Destroy(DisposolObj);
+
+            UIMemoBG = GameObject.Find ("MemoView");
 			if (!UIMemoBG)
 				Debug.Log ("Sel Target is Null");
 			UIMemoBG.GetComponent<SpriteRenderer> ().enabled = false;
 			
-			UIMemoTxt = GameObject.Find ("UITitleText");
+			UIMemoTxt = GameObject.Find ("MemoText");
 			if (!UIMemoTxt)
 				Debug.Log ("Sel Text is Null");
 			

@@ -18,8 +18,10 @@ namespace MyScript.States
 			
 			
 			Debug.Log ("VRObjectViewExit");
-			
-			UIBookMesh = GameObject.Find ("UIBook");
+
+            GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
+            if (DisposolObj) GameObject.Destroy(DisposolObj);
+            UIBookMesh = GameObject.Find ("UIBook");
 			if (!UIBookMesh)
 				Debug.Log ("Sel Target is Null");
 		
