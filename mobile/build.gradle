@@ -6,10 +6,11 @@ android {
 
     defaultConfig {
         applicationId "kr.poturns.vp"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -17,17 +18,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile(name: 'utils_recyclerview', ext: 'aar')
 
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile(name: 'utils_recyclerview', ext: 'aar')
     wearApp project(':wear')
     compile 'com.android.support:appcompat-v7:23.0.0'
     compile 'com.android.support:recyclerview-v7:23.0.0'
     compile 'com.google.android.gms:play-services:7.8.0'
-
+    compile 'com.android.support:multidex:1.0.0'
     compile project(':util')
-
 }

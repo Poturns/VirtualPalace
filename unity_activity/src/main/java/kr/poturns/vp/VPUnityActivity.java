@@ -13,7 +13,7 @@ public class VPUnityActivity extends UnityPlayerActivity {
     OnBackPressListener onBackPressListener;
 
     public interface OnBackPressListener{
-        public boolean onBackPressed();
+        boolean onBackPressed();
     }
 
     Toast exitToast;

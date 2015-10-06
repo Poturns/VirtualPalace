@@ -54,5 +54,14 @@
             android:layout_marginBottom="40dp"
             android:layout_marginTop="40dp"
             android:text="video" />
+
+        <Button
+            android:id="@+id/drive2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="40dp"
+            android:layout_marginTop="40dp"
+            android:text="drive2" />
     </LinearLayout>
 </ScrollView>

@@ -24,17 +24,11 @@ android {
 
 dependencies {
     compile 'com.google.android.gms:play-services:7.8.0'
+    compile('com.google.api-client:google-api-client-android:1.20.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-drive:v2-rev170-1.20.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile 'com.google.http-client:google-http-client-gson:1.20.0'
 }
-
-task clearJar(type: Delete) {
-    delete 'build/libs/util.jar'
-}
-
-task makeJar(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('build/libs/')
-    include('classes.jar')
-    rename ('classes.jar', 'util.jar')
-}
-
-makeJar.dependsOn(clearJar, build)

@@ -135,4 +135,22 @@ public class IOUtils {
         }
     }
 
+    public static void writeStreamToFile(InputStream in, File file) throws IOException {
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(file);
+
+            byte[] readByte = new byte[1024];
+            int readLen;
+            while ((readLen = in.read(readByte)) != -1) {
+                fileOutputStream.write(readByte, 0, readLen);
+            }
+        } finally {
+            closeStream(fileOutputStream);
+            closeStream(in);
+        }
+    }
+
+
 }

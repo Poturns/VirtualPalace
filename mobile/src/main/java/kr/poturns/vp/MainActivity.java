@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Speech(R.id.speech, SpeechToTextFragment.class.getName()),
         Drive(R.id.drive, DriveConnectionFragment.class.getName()),
         Gallery(R.id.gallery, GalleryContainerFragment.class.getName()),
-        Video(R.id.video, VideoContainerFragment.class.getName()),;
+        Video(R.id.video, VideoContainerFragment.class.getName()),
+        Drive2(R.id.drive2, Drive2Fragment.class.getName());
 
         final int id;
         final String fname;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     SparseArray<Fragment> fragmentSparseArray = new SparseArray<>();
+    private OnBackPressListener onBackPressListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +54,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Fragment f = fragmentSparseArray.get(v.getId());
 
-        if (f != null)
+        if (f != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, f)
                     .addToBackStack(null)
                     .commit();
+
+            onBackPressListener = null;
+            if (f instanceof OnBackPressListener)
+                onBackPressListener = (OnBackPressListener) f;
+
+        }
 
     }
 
@@ -71,4 +79,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return view;
         }
     };
+
+    @Override
+    public void onBackPressed() {
+        if (onBackPressListener != null && onBackPressListener.onBackPressed())
+            return;
+
+        super.onBackPressed();
+    }
+
+    public interface OnBackPressListener {
+        boolean onBackPressed();
+    }
 }
