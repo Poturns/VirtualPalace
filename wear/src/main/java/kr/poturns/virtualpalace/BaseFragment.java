@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import kr.poturns.virtualpalace.inputcollector.GestureInputCollector;
 import kr.poturns.virtualpalace.inputcollector.SensorInputCollector;
+import kr.poturns.virtualpalace.inputmodule.WearInputConnector;
 
 /**
  * WearableMainActivity 에 attach 되는 Fragment
@@ -55,6 +56,13 @@ public abstract class BaseFragment extends Fragment {
      */
     public final GestureInputCollector getGestureInputCollector() {
         return wearableMainActivity.getGestureInputCollector();
+    }
+
+    /**
+     * WearInputConnector 를 얻는다.
+     */
+    public final WearInputConnector getWearInputConnector(){
+        return wearableMainActivity.getWearInputConnector();
     }
 
 }

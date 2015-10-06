@@ -1,9 +1,11 @@
 package kr.poturns.virtualpalace;
 
+import android.content.Context;
 import android.gesture.GestureOverlayView;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,6 +40,10 @@ public class BasicInputFragment extends BaseFragment {
      */
     private static final int CANCELING_DELAY = 500;
 
+    private static final long DURATION_VIBRATE_INPUT_DETECT = 100;
+
+    private Vibrator mVibrator;
+
     private SensorInputCollector sensorInputCollector;
     private GestureInputCollector gestureInputCollector;
 
@@ -55,6 +61,7 @@ public class BasicInputFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mVibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         mHandler = new BackHandler(this);
 
         gestureInputCollector = getGestureInputCollector();
@@ -62,6 +69,7 @@ public class BasicInputFragment extends BaseFragment {
             @Override
             public void onInputResult(String s) {
                 Toast.makeText(getActivity(), GestureInputFilter.getOperationName(s), Toast.LENGTH_SHORT).show();
+                mVibrator.vibrate(DURATION_VIBRATE_INPUT_DETECT);
             }
         });
         sensorInputCollector = getSensorInputCollector();
@@ -69,7 +77,7 @@ public class BasicInputFragment extends BaseFragment {
         sensorInputCollector.setResultListener(new InputCollector.OnInputResultListener<SensorMovementData>() {
             @Override
             public void onInputResult(SensorMovementData sensorMovementData) {
-               // Toast.makeText(getActivity(), String.format("sensor : [ %s ]", sensorMovementData.toString()), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), String.format("sensor : [ %s ]", sensorMovementData.toString()), Toast.LENGTH_SHORT).show();
                 if (!isInShaking) {
                     if (sensorMovementData.speed > SHAKING_MIN_SPEED) {
                         isInShaking = true;
@@ -121,6 +129,12 @@ public class BasicInputFragment extends BaseFragment {
         gestureOverlayView.removeAllOnGesturePerformedListeners();
     }
 
+    protected void finish() {
+        // TODO getWearInputConnector().transferTextData("exit input menu");
+        mVibrator.vibrate(500);
+        getActivity().onBackPressed();
+    }
+
     private static class BackHandler extends android.os.Handler {
         private WeakReference<BasicInputFragment> fragmentRef;
 
@@ -132,17 +146,20 @@ public class BasicInputFragment extends BaseFragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
+            BasicInputFragment f = fragmentRef.get();
+            if (f == null)
+                return;
+
             switch (msg.what) {
                 case MESSAGE_ANDROID_BACK:
                     removeMessages(MESSAGE_CANCEL_ANDROID_BACK);
-                    if (fragmentRef.get() != null)
-                        fragmentRef.get().getActivity().onBackPressed();
+                    f.finish();
+
                     break;
 
                 case MESSAGE_CANCEL_ANDROID_BACK:
                     removeMessages(MESSAGE_ANDROID_BACK);
-                    if (fragmentRef.get() != null)
-                        fragmentRef.get().isInShaking = false;
+                    f.isInShaking = false;
                     break;
 
                 default:

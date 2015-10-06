@@ -2,6 +2,7 @@
     <string name="app_name">Communication</string>
 
     <array name="android_wear_capabilities">
-        <item>send_data</item>
+        <item>input_data</item>
+        <item>string_message</item>
     </array>
 </resources>

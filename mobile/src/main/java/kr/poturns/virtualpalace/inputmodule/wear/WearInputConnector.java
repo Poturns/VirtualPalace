@@ -56,14 +56,21 @@ public class WearInputConnector extends OperationInputConnector implements Messa
 
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
-        if (!messageEvent.getPath().equals(WearableCommunicator.MESSAGE_PATH_SEND_DATA))
-            return;
+        String messagePath = messageEvent.getPath();
+        if (WearableCommunicator.MESSAGE_PATH_INPUT_DATA.equals(messagePath)) {
+            sendInputMessage(messageEvent.getData());
+        } else if (WearableCommunicator.MESSAGE_PATH_STRING_MESSAGE.equals(messagePath)) {
+            //TODO 다른 메소드 이용하기 - 현재 이 메소드는 음성인식 전용
+            transferTextData(new String(messageEvent.getData()));
+        }
+    }
 
+    private void sendInputMessage(final byte[] wearableMessage) {
         ThreadUtils.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    WearMessageObject messageObject = WearMessageObject.fromBytes(messageEvent.getData());
+                    WearMessageObject messageObject = WearMessageObject.fromBytes(wearableMessage);
                     if (messageObject.dataSet.length > 1)
                         transferDataset(messageObject.dataSet);
 
@@ -79,7 +86,6 @@ public class WearInputConnector extends OperationInputConnector implements Messa
                 }
             }
         });
-
     }
 
 }

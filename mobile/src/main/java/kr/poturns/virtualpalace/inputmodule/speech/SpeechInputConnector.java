@@ -71,11 +71,11 @@ public class SpeechInputConnector extends OperationInputConnector implements Spe
 
     @Override
     public void onResult(SpeechResult speechResult) {
-        transferTextData(speechResult.result, 0);
+        transferTextData(speechResult.result);
     }
 
     @Override
     public void onError(int cause) {
-        transferTextData(null, 0);
+        transferTextData(null);
     }
 }
