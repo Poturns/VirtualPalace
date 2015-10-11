@@ -194,13 +194,16 @@ namespace AndroidApi.Controller.Request.Database
                 queryBuilder.EndWrite();
                 Debug.Log(queryBuilder.ToJsonString());
 
-                try {
+                try
+                {
                     AndroidUnityBridge.GetInstance().RequestToAndroid(this, (requestResult) =>
                     {
                         callback(JsonInterpreter.ParseQueryFromAndroid(requestResult, operation));
                     });
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
+                    Debug.LogException(e);
                 }
 
             }
@@ -363,7 +366,7 @@ namespace AndroidApi.Controller.Request.Database
             }
         }
 
-#endregion Object Impl
+        #endregion Object Impl
 
 
         protected class QueryBuilder
@@ -528,7 +531,7 @@ namespace AndroidApi.Controller.Request.Database
 
     }
 
-#region Interface
+    #region Interface
     public interface ISelect : IDatabaseRequest
     {
         ISelect SetField(params Enum[] fields);
@@ -571,7 +574,7 @@ namespace AndroidApi.Controller.Request.Database
         IValueInsert<T> AddValue(params KeyValuePair<Enum, string>[] pairs);
         T End();
     }
-#endregion Interface
+    #endregion Interface
 
     public class DatabaseConstants
     {
@@ -659,7 +662,7 @@ namespace AndroidApi.Controller.Request.Database
         public const string OPERATION_WHERE_LIKE = "where_like";
 
     }
-#region Database Property
+    #region Database Property
 
     /// <summary>
     /// Database에서 조작할 Table
@@ -812,5 +815,5 @@ namespace AndroidApi.Controller.Request.Database
 
     }
 
-#endregion Database Property
+    #endregion Database Property
 }

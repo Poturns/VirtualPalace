@@ -11,7 +11,7 @@ public class ExternalInput : MonoBehaviour
 
     void Start()
     {
-        AndroidUnityBridge.GetInstance().OnInputReceived += (inputs)=>{
+        AndroidUnityBridge.InputReceivedEvent += (inputs)=>{
             string s = "";
 
             foreach (Operation op in inputs)

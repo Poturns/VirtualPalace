@@ -4,6 +4,7 @@ using MyScript.States;
 using MyScript.Interface;
 using AndroidApi.Controller;
 using System;
+using System.Text;
 
 public class StateManager : MonoBehaviour
 {
@@ -28,14 +29,17 @@ public class StateManager : MonoBehaviour
         {
             instanceRef = this;
             DontDestroyOnLoad(gameObject);
-            AndroidUnityBridge.GetInstance().OnInputReceived += InputControlFunc;
         }
         else
         {
             DestroyImmediate(gameObject);
         }
-        
+
+        AndroidUnityBridge.ClearEventHandler();
+        AndroidUnityBridge.InputReceivedEvent += InputControlFunc;
+
     }
+
     void Start()
     {
         Debug.Log("Start StateM");
@@ -75,16 +79,16 @@ public class StateManager : MonoBehaviour
 	public static void InputTextMesh(TextMesh tm ,string T )
 	{
 		int StrSize = T.Length;
-		string S = "";
+        StringBuilder sb = new StringBuilder();
 		int i = 0 ; 
 		while(i < StrSize)
 		{
-			if(i%17 == 0 && i > 0) S += '\n';
-			S+= T[i];
+			if(i%17 == 0 && i > 0) sb.Append('\n');
+			sb.Append(T[i]);
 			i++;
 		}
-		S += '\n';
-		tm.text = S;
+		sb.Append('\n');
+		tm.text = sb.ToString();
 	}
 
     public void QueueOnMainThread(Action a)

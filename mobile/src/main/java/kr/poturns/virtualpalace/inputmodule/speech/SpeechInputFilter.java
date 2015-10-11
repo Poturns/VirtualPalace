@@ -18,6 +18,7 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
     private static final String WORD_OPERATION_SPECIAL_EXIT = "종료";
     private static final String WORD_OPERATION_SPECIAL_SEARCH = "검색";
     private static final String WORD_OPERATION_SPECIAL_CANCEL = "취소";
+    private static final String WORD_OPERATION_SPECIAL_CANCEL_BACK = "뒤로";
     private static final String WORD_OPERATION_SPECIAL_SWITCH_MODE = "모드";
     private static final String WORD_OPERATION_SPECIAL_MENU = "메뉴";
     private static final String WORD_OPERATION_SPECIAL_SELECT = "선택";
@@ -57,16 +58,12 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
 
     @Override
     public boolean isSelecting(String string) {
-        return checkOneOperation(string, WORD_OPERATION_SPECIAL_SELECT);
+        return WORD_OPERATION_SPECIAL_SELECT.equals(string);
     }
 
     @Override
     public boolean isCanceling(String string) {
-        return checkOneOperation(string, WORD_OPERATION_SPECIAL_CANCEL);
-    }
-
-    private static boolean checkOneOperation(String string, String operation) {
-        return string.equals(operation);
+        return WORD_OPERATION_SPECIAL_CANCEL.equals(string) || WORD_OPERATION_SPECIAL_CANCEL_BACK.equals(string);
     }
 
     @Override
@@ -99,7 +96,7 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
     }
 
     private static int checkSpecialOperation(String s) {
-        if (s.equals(WORD_OPERATION_SPECIAL_CANCEL))
+        if (s.equals(WORD_OPERATION_SPECIAL_CANCEL) || s.equals(WORD_OPERATION_SPECIAL_CANCEL_BACK))
             return Operation.CANCEL;
 
         else if (s.equals(WORD_OPERATION_SPECIAL_EXIT))

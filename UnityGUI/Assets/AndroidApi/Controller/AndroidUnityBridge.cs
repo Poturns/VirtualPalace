@@ -11,6 +11,19 @@ namespace AndroidApi.Controller
     /// </summary>
     public class AndroidUnityBridge
     {
+        static AndroidUnityBridge()
+        {
+            GetInstance();
+        }
+
+        /// <summary>
+        /// Single 메시지를 전달받는 event
+        /// </summary>
+        public static event Action<string> MessageReceivedEvent;
+        /// <summary>
+        /// Input 메시지를 전달받는 event
+        /// </summary>
+        public static event Action<List<Operation>> InputReceivedEvent;
         private static AndroidUnityBridge sInstance;
 
         /// <summary>
@@ -28,30 +41,17 @@ namespace AndroidApi.Controller
             return sInstance;
         }
 
-
-        /// <summary>
-        /// java 형태의 AndroidUnityBridge 객체
-        /// </summary>
-        private AndroidJavaObject javaAndroidUnityBridge;
-        /// <summary>
-        /// Single 메시지를 전달받는 event
-        /// </summary>
-        public event Action<string> OnMessageReceived;
-        /// <summary>
-        /// Input 메시지를 전달받는 event
-        /// </summary>
-        public event Action<List<Operation>> OnInputReceived;
-
-
-
-        private AndroidUnityBridge()
+        public static void ClearEventHandler()
         {
-            javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
-            javaAndroidUnityBridge.Call("setMessageCallback", new InternalIAndroidUnityCallback(OnMessageCallback));
-            javaAndroidUnityBridge.Call("setInputCallback", new InternalIAndroidUnityCallback(OnInputCallback));
+            MessageReceivedEvent = null;
+            InputReceivedEvent = null;
+            RegisterBasicEventHandler();
+        }
 
-            OnMessageReceived += (msg) => Debug.Log("AndroidUnityBridge [OnMessageReceived]: \n" + msg);
-            OnInputReceived += (inputs) =>
+        private static void RegisterBasicEventHandler()
+        {
+            MessageReceivedEvent += (msg) => Debug.Log("AndroidUnityBridge [OnMessageReceived]: \n" + msg);
+            InputReceivedEvent += (inputs) =>
             {
                 string s = "";
 
@@ -61,6 +61,40 @@ namespace AndroidApi.Controller
             };
         }
 
+        public static void InvokeTestInputEvent(Operation op)
+        {
+            List<Operation> operations = new List<Operation>();
+            operations.Add(op);
+            InputReceivedEvent(operations);
+        }
+
+
+        /// <summary>
+        /// java 형태의 AndroidUnityBridge 객체
+        /// </summary>
+        private AndroidJavaObject javaAndroidUnityBridge;
+
+        private AndroidUnityBridge()
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
+                javaAndroidUnityBridge.Call("setMessageCallback", new InternalIAndroidUnityCallback(OnMessageCallback));
+                javaAndroidUnityBridge.Call("setInputCallback", new InternalIAndroidUnityCallback(OnInputCallback));
+                Debug.Log("AndroidUnityBridge - attatched sucessfully.");
+            }
+            else
+            {
+                javaAndroidUnityBridge = null;
+                Debug.LogWarning("AndroidUnityBridge - failed to attatch.");
+            }
+
+            RegisterBasicEventHandler();
+
+        }
+
+
+
         /// <summary>
         /// java AndroidUnityBridge에서 Input이 전달될 때 호출된다.
         /// </summary>
@@ -68,15 +102,15 @@ namespace AndroidApi.Controller
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void OnInputCallback(string json)
         {
-            if (OnInputReceived != null)
-                OnInputReceived(JsonInterpreter.ParseInputCommands(json));
+            if (InputReceivedEvent != null)
+                InputReceivedEvent(JsonInterpreter.ParseInputCommands(json));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void OnMessageCallback(string json)
         {
-            if (OnMessageReceived != null)
-                OnMessageReceived(json);
+            if (MessageReceivedEvent != null)
+                MessageReceivedEvent(json);
         }
 
         /// <summary>
@@ -87,7 +121,10 @@ namespace AndroidApi.Controller
         /// <returns>요청이 접수되었을 경우, TRUE</returns>
         public bool RequestToAndroid(IRequest request, Action<string> callback)
         {
-            return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", request.ToJson(), new InternalIAndroidUnityCallback(callback));
+            if (javaAndroidUnityBridge != null)
+                return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", request.ToJson(), new InternalIAndroidUnityCallback(callback));
+            else
+                return false;
         }
 
         /// <summary>
@@ -97,7 +134,8 @@ namespace AndroidApi.Controller
         /// <param name="jsonResult">요청에 대한 결과값이 Json형태로 기술된 문자열</param>
         public void RespondToAndroid(long id, string jsonResult)
         {
-            javaAndroidUnityBridge.Call("respondCallbackToAndroid", id, jsonResult);
+            if (javaAndroidUnityBridge != null)
+                javaAndroidUnityBridge.Call("respondCallbackToAndroid", id, jsonResult);
         }
 
         /// <summary>
@@ -107,7 +145,10 @@ namespace AndroidApi.Controller
         /// <returns>메시지가 정상적으로 전송되었을 때, TRUE</returns>
         public bool SendSingleMessageToAndroid(string jsonMessage)
         {
-            return javaAndroidUnityBridge.Call<bool>("sendSingleMessageToAndroid", jsonMessage);
+            if (javaAndroidUnityBridge != null)
+                return javaAndroidUnityBridge.Call<bool>("sendSingleMessageToAndroid", jsonMessage);
+            else
+                return false;
         }
 
 

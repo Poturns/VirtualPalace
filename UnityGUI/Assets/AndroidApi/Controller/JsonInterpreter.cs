@@ -48,7 +48,6 @@ namespace AndroidApi.Controller
                 throw new ArgumentException();
 
             Dictionary<int, Direction> dictionary = new Dictionary<int, Direction>();
-            List<Direction> list = new List<Direction>();
             int direction = operation.Value / Direction.SEPARATION;
             int amount = operation.Value % Direction.SEPARATION;
             if (amount % 10 == 0)

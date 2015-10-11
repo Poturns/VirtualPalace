@@ -1,7 +1,6 @@
 using UnityEngine;
 using MyScript.Interface;
 using AndroidApi.Controller;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 namespace MyScript.States
@@ -62,26 +61,26 @@ namespace MyScript.States
                             SelectModule = EventSys.GetComponent<GazeInputModule>();
                         }
 
-                        Debug.Log(SelectModule);
+                        //Debug.Log(SelectModule);
 
                         GameObject SelObj = SelectModule.RaycastedGameObject;
                         if (SelObj != null)
                         {
-                            Debug.Log("SelObj -> " + SelObj.name);
+                           // Debug.Log("SelObj -> " + SelObj.name);
 
                             IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject>();
                             if (raycastedObject != null)
                             {
-                                Debug.Log("IRaycastedObject != null");
+                                //Debug.Log("IRaycastedObject != null");
                                 raycastedObject.OnSelect();
                             }
-                            else
-                                Debug.Log("IRaycastedObject == null");
+                            //else                                Debug.Log("IRaycastedObject == null");
                         }
-                        else
+                       /* else
                         {
                             Debug.Log("SelObj == null");
                         }
+                        */
                         //EventSystem.current.currentSelectedGameObject();
                         break;
                 }

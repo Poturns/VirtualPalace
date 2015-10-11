@@ -3,6 +3,7 @@ package kr.poturns.virtualpalace.controller;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.util.LongSparseArray;
+import android.util.Log;
 
 import kr.poturns.virtualpalace.annotation.UnityApi;
 
@@ -39,6 +40,7 @@ public final class AndroidUnityBridge {
 
 
     // * * * C O N S T A N T S * * * //
+    private static final String TAG = "AndroidUnityBridge";
     public static final String BUNDLE_KEY_ID = "id";
     public static final String BUNDLE_KEY_MESSAGE_JSON = "json";
 
@@ -161,6 +163,8 @@ public final class AndroidUnityBridge {
     public synchronized void sendSingleMessageToUnity(String json) {
         if (mMessageCallback != null) {
             mMessageCallback.onCallback(json);
+        } else {
+            Log.w(TAG, "MessageCallback == null. Sending a message to Unity was failed. Message :\n" + json);
         }
     }
 
@@ -172,6 +176,8 @@ public final class AndroidUnityBridge {
     public synchronized void sendInputMessageToUnity(String json) {
         if (mInputCallback != null) {
             mInputCallback.onCallback(json);
+        } else {
+            Log.w(TAG, "MessageCallback == null. Sending a input message to Unity was failed. Message :\n" + json);
         }
     }
 

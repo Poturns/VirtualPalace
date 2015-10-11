@@ -1,6 +1,7 @@
 ﻿using LitJson;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace AndroidApi.Controller.Request
 {
@@ -27,15 +28,23 @@ namespace AndroidApi.Controller.Request
         private const string ACTIVATE_INPUT = "activate_input";
         private const string DEACTIVATE_INPUT = "deactivate_input";
 
-        private JsonData jData = new JsonData();
+        private JsonWriter writer;
+        private StringBuilder sb;
 
+        public StateNotifyRequest()
+        {
+            writer = new JsonWriter(sb = new StringBuilder());
+        }
         /// <summary>
         /// VirtualPalace 구동 환경을 변경한다.
         /// </summary>
         /// <param name="mode">변경할 구동 환경</param>
         public void SwitchPlayMode(VirtualPalacePlayMode mode)
         {
-            jData[SWITCH_PLAY_MODE] = (int)mode;
+            writer.WriteObjectStart();
+            writer.WritePropertyName(SWITCH_PLAY_MODE);
+            writer.Write((int)mode);
+            writer.WriteObjectEnd();
         }
 
         /// <summary>
@@ -44,7 +53,10 @@ namespace AndroidApi.Controller.Request
         /// <param name="device">활성화 시킬 InputDevice</param>
         public void ActivateInput(InputDevice device)
         {
-            jData[ACTIVATE_INPUT] = (int)device;
+            writer.WriteObjectStart();
+            writer.WritePropertyName(ACTIVATE_INPUT);
+            writer.Write((int)device);
+            writer.WriteObjectEnd();
         }
 
         /// <summary>
@@ -53,7 +65,10 @@ namespace AndroidApi.Controller.Request
         /// <param name="device">비활성화 시킬 InputDevice</param>
         public void DeactivateInput(InputDevice device)
         {
-            jData[DEACTIVATE_INPUT] = (int)device;
+            writer.WriteObjectStart();
+            writer.WritePropertyName(DEACTIVATE_INPUT);
+            writer.Write((int)device);
+            writer.WriteObjectEnd();
         }
 
         public void SendRequest(Action<List<RequestResult>> callback)
@@ -66,7 +81,7 @@ namespace AndroidApi.Controller.Request
 
         public string ToJson()
         {
-            return jData.ToJson();
+            return sb.ToString();
         }
 
     }
