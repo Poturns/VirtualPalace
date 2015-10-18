@@ -2,8 +2,7 @@
     <string name="app_name">VirtualPalace</string>
 
     <string name="icon_text_normal_input">일반 입력</string>
-    <string name="icon_text_special_input">특별 입력</string>
-    <string name="icon_text_streaming_input">터치 제어</string>
+    <string name="icon_text_direction_input">방향 입력</string>
     <string name="icon_text_etc">제스쳐 일람</string>
     <string name="icon_text_exit">종료</string>
 </resources>
