@@ -11,11 +11,12 @@ namespace MyScript.States
 		
 		private GameObject UIMemoBG;
 		private GameObject UIMemoTxt;
+        private GameObject TargetObject;
 
-		public VRMemoViewExit (StateManager managerRef, GameObject TargetObject)
+        public VRMemoViewExit (StateManager managerRef, GameObject TargetObject)
 		{
 			manager = managerRef;
-			
+            this.TargetObject = TargetObject;
 			
 			Debug.Log ("VRMemoView");
             GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
@@ -35,13 +36,13 @@ namespace MyScript.States
 			T.text = "";
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 
-			manager.SwitchState (new VRObjectView (managerRef, TargetObject));
+			//manager.SwitchState (new VRObjectView (managerRef, TargetObject));
 			
 		}
 		public void StateUpdate()
 		{
-
-		}
+            manager.SwitchState(new VRObjectView(manager, TargetObject));
+        }
 		public void ShowIt()
 		{
 			

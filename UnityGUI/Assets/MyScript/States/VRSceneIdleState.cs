@@ -18,6 +18,7 @@ namespace MyScript.States
 
 			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
 			if(DisposolObj)GameObject.Destroy (DisposolObj);
+
             EventSys = GameObject.Find("EventSystem");
             if (EventSys == null) Debug.Log("Event System Find Fail");
             //else Debug.Log(EventSys);
@@ -30,7 +31,8 @@ namespace MyScript.States
 
         public void StateUpdate()
         {
-
+            if (Input.GetKeyUp(KeyCode.Q))
+                ReturnToMainScene();
         }
 
         public void ShowIt()
@@ -45,7 +47,7 @@ namespace MyScript.States
                 switch (op.Type)
                 {
                     case Operation.CANCEL:
-                        StateManager.SwitchScene(StateManager.SCENE_MAIN);
+                        ReturnToMainScene();
                         break;
 
                     case Operation.SELECT:
@@ -94,6 +96,11 @@ namespace MyScript.States
             //manager.SwitchState(new PlayState(manager));
 
 
+        }
+
+        private void ReturnToMainScene()
+        {
+            StateManager.SwitchScene(StateManager.SCENE_MAIN);
         }
 
     }

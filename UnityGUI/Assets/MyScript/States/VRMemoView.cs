@@ -46,15 +46,18 @@ namespace MyScript.States
             //T.text = "New Memo Test";
             //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
         }
+
         public void StateUpdate()
         {
             if (Input.GetKeyUp(KeyCode.Q))
-                manager.SwitchState(new VRMemoViewExit(manager, TargetObj));
+                ExitMemoView();
         }
+
         public void ShowIt()
         {
 
         }
+
         public void InputHandling(List<Operation> InputOp)
         {
             foreach (Operation op in InputOp)
@@ -62,7 +65,7 @@ namespace MyScript.States
                 switch (op.Type)
                 {
                     case Operation.CANCEL:
-                        manager.SwitchState(new VRMemoViewExit(manager, TargetObj));
+                        ExitMemoView();
                         break;
 
                     case Operation.SELECT:
@@ -75,6 +78,7 @@ namespace MyScript.States
                 }
             }
         }
+
         void Switch()
         {
             //Application.LoadLevel("Scene1");
@@ -101,6 +105,12 @@ namespace MyScript.States
                 }
             });
         }
+
+        private void ExitMemoView()
+        {
+            manager.SwitchState(new VRMemoViewExit(manager, TargetObj));
+        }
+
     }
 }
 
