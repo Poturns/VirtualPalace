@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace AndroidApi.Controller.Request
+namespace BridgeApi.Controller.Request
 {
     public class SpeechRequest : IRequest
     {
@@ -18,11 +18,11 @@ namespace AndroidApi.Controller.Request
             return sb.ToString();
         }
 
-        public void SendRequest(Action<SpeechRequestResult> callback)
+        public void SendRequest(IPlatformBridge bridge, Action<SpeechRequestResult> callback)
         {
-            AndroidUnityBridge.GetInstance().RequestToAndroid(this, (result) =>
+            bridge.RequestToPlatform(this, (result) =>
             {
-                callback(JsonInterpreter.ParseSpeechResultFromAndroid(result));
+                callback(JsonInterpreter.ParseSpeechResultFromPlatform(result));
             });
         }
     }

@@ -1,7 +1,7 @@
-﻿namespace AndroidApi.Controller.Request
+﻿namespace BridgeApi.Controller.Request
 {
     /// <summary>
-    /// Android으로의 요청
+    /// 기저 Platform 으로의 요청
     /// </summary>
     public interface IRequest
     {

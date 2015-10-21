@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace AndroidApi.Controller.Request.Database
+namespace BridgeApi.Controller.Request.Database
 {
     /// <summary>
     /// Database관련 처리를 요청하는 IRequest
@@ -16,7 +16,7 @@ namespace AndroidApi.Controller.Request.Database
         /// 요청을 전송한다.
         /// </summary>
         /// <param name="callback">요청에 대한 응답을 전달받을 Callback</param>
-        void SendRequest(Action<QueryRequestResult> callback);
+        void SendRequest(IPlatformBridge bridge,  Action<QueryRequestResult> callback);
     }
 
     /// <summary>
@@ -93,12 +93,12 @@ namespace AndroidApi.Controller.Request.Database
                 writer.WriteObjectEnd();
             }
 
-            public void SendRequest(Action<QueryRequestResult> callback)
+            public void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback)
             {
-                AndroidUnityBridge.GetInstance().RequestToAndroid(this, (requestResult) =>
+                bridge.RequestToPlatform(this, (requestResult) =>
                 {
-                    callback(JsonInterpreter.ParseQueryFromAndroid(requestResult, OPERATION));
-                });
+                    callback(JsonInterpreter.ParseQueryFromPlatform(requestResult, OPERATION));
+                });             
             }
 
             public string ToJson()
@@ -189,16 +189,16 @@ namespace AndroidApi.Controller.Request.Database
                 return queryBuilder.ToJsonString();
             }
 
-            public void SendRequest(Action<QueryRequestResult> callback)
+            public void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback)
             {
                 queryBuilder.EndWrite();
                 Debug.Log(queryBuilder.ToJsonString());
 
                 try
                 {
-                    AndroidUnityBridge.GetInstance().RequestToAndroid(this, (requestResult) =>
+                    bridge.RequestToPlatform(this, (requestResult) =>
                     {
-                        callback(JsonInterpreter.ParseQueryFromAndroid(requestResult, operation));
+                        callback(JsonInterpreter.ParseQueryFromPlatform(requestResult, operation));
                     });
                 }
                 catch (Exception e)

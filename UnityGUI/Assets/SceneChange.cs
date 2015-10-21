@@ -14,8 +14,8 @@ public class SceneChange : MonoBehaviour, IRaycastedObject
 
     public void SceneMove()
     {
+        Debug.Log("SceneMove : " + SceneName);
         StateManager.SwitchScene(SceneName);
-       
     }
 
 }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AndroidApi.Controller.Request
+namespace BridgeApi.Controller.Request
 {
     /// <summary>
     /// Android에 상태를 통지하는 IRequest
@@ -71,11 +71,11 @@ namespace AndroidApi.Controller.Request
             writer.WriteObjectEnd();
         }
 
-        public void SendRequest(Action<List<RequestResult>> callback)
+        public void SendRequest(IPlatformBridge bridge, Action<List<RequestResult>> callback)
         {
-            AndroidUnityBridge.GetInstance().RequestToAndroid(this, (result) =>
+            bridge.RequestToPlatform(this, (result) =>
             {
-                callback(JsonInterpreter.ParseResultFromAndroid(result));
+                callback(JsonInterpreter.ParseResultFromPlatform(result));
             });
         }
 

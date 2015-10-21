@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using AndroidApi.Controller;
 
 public class ExternalInput : MonoBehaviour
 {
@@ -11,13 +10,7 @@ public class ExternalInput : MonoBehaviour
 
     void Start()
     {
-        AndroidUnityBridge.InputReceivedEvent += (inputs)=>{
-            string s = "";
-
-            foreach (Operation op in inputs)
-                s += op.ToString() + "\n";
-            Debug.Log(s);
-        };
+       
     }
 
 	public void TestCode ()

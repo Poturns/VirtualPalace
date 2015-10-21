@@ -1,8 +1,7 @@
 using UnityEngine;
 using MyScript.Interface;
 using System.Collections.Generic;
-using AndroidApi.Controller;
-
+using BridgeApi.Controller;
 
 namespace MyScript.States
 {

@@ -1,7 +1,7 @@
 ﻿using LitJson;
 using System.Collections.Generic;
 
-namespace AndroidApi.Controller
+namespace BridgeApi.Controller
 {
 
     /// <summary>

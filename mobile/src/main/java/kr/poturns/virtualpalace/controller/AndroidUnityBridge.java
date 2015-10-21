@@ -3,7 +3,8 @@ package kr.poturns.virtualpalace.controller;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.util.LongSparseArray;
-import android.util.Log;
+
+import com.unity3d.player.UnityPlayer;
 
 import kr.poturns.virtualpalace.annotation.UnityApi;
 
@@ -51,10 +52,6 @@ public final class AndroidUnityBridge {
     private final LongSparseArray<IAndroidUnityCallback> mCallbackMapF;
 
     // * * * C O N S T A N T S * * * //
-
-
-    private IAndroidUnityCallback mInputCallback;
-    private IAndroidUnityCallback mMessageCallback;
 
 
     // * * * C O N S T R U C T O R S * * * //
@@ -149,8 +146,7 @@ public final class AndroidUnityBridge {
      */
     @UnityApi
     public synchronized boolean sendSingleMessageToAndroid(String jsonMessage) {
-        Message.obtain(mMasterF.getRequestHandler(),
-                REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
+        Message.obtain(mMasterF.getRequestHandler(), REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
 
         return true;
     }
@@ -161,11 +157,7 @@ public final class AndroidUnityBridge {
      * @param json 전송할 메시지
      */
     public synchronized void sendSingleMessageToUnity(String json) {
-        if (mMessageCallback != null) {
-            mMessageCallback.onCallback(json);
-        } else {
-            Log.w(TAG, "MessageCallback == null. Sending a message to Unity was failed. Message :\n" + json);
-        }
+        UnityPlayer.UnitySendMessage("StateScript", "HandleMessageFromController", json);
     }
 
     /**
@@ -174,32 +166,9 @@ public final class AndroidUnityBridge {
      * @param json 전송할 메시지
      */
     public synchronized void sendInputMessageToUnity(String json) {
-        if (mInputCallback != null) {
-            mInputCallback.onCallback(json);
-        } else {
-            Log.w(TAG, "MessageCallback == null. Sending a input message to Unity was failed. Message :\n" + json);
-        }
+        UnityPlayer.UnitySendMessage("StateScript", "HandleInputsFromController", json);
     }
 
-    /**
-     * UNITY에서 SingleMessage를 전달받을 CALLBACK을 등록한다.
-     *
-     * @param callback ANDROID로 부터 SingleMessage를 전달받을 callback
-     */
-    @UnityApi
-    public void setMessageCallback(IAndroidUnityCallback callback) {
-        this.mMessageCallback = callback;
-    }
-
-    /**
-     * UNITY에서 Input을 전달받을 CALLBACK을 등록한다.
-     *
-     * @param callback ANDROID로 부터 Input을 전달받을 callback
-     */
-    @UnityApi
-    public void setInputCallback(IAndroidUnityCallback callback) {
-        mInputCallback = callback;
-    }
 
     // * * * I N N E R  C L A S S E S * * * //
 
@@ -213,7 +182,7 @@ public final class AndroidUnityBridge {
          *
          * @param json 요청에 대한 응답이 Json형태로 기술 된 문자열
          */
-        public void onCallback(String json);
+        void onCallback(String json);
     }
 
 }

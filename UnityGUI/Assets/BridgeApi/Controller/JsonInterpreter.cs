@@ -1,11 +1,11 @@
-﻿using AndroidApi.Controller.Request.Database;
+﻿using BridgeApi.Controller.Request.Database;
 using LitJson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AndroidApi.Controller
+namespace BridgeApi.Controller
 {
     /// <summary>
     /// Android로 부터 전달받은 Json Message를 해석하는 클래스
@@ -104,18 +104,18 @@ namespace AndroidApi.Controller
         }
 
 
-        internal static void ParseRequestFromAndroid(string json)
+        internal static void ParseRequestFromPlatform(string json)
         {
             //TODO 안드로이드를 참고하여 작업하기
         }
 
 
         /// <summary>
-        /// Android에 대해 요청한 결과를 해석한다. 
+        /// 기저 Platform에 요청한 결과를 해석한다. 
         /// </summary>
-        /// <param name="json">Android에 대해 요청한 결과가 기술된 Json Message</param>
+        /// <param name="json">기저 Platform에 요청한 결과가 기술된 Json Message</param>
         /// <returns>요청들에 대한 결과</returns>
-        public static List<RequestResult> ParseResultFromAndroid(string json)
+        public static List<RequestResult> ParseResultFromPlatform(string json)
         {
             //Debug.Log(json);
             JsonData jData = JsonMapper.ToObject(json);
@@ -143,7 +143,7 @@ namespace AndroidApi.Controller
         /// <param name="json">Json으로 표현된 Database 질의 결과</param>
         /// <param name="requestKey">요청 Key</param>
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
-        public static QueryRequestResult ParseQueryFromAndroid(string json, string requestKey)
+        public static QueryRequestResult ParseQueryFromPlatform(string json, string requestKey)
         {
             //Debug.Log(json);
             JsonData jData = JsonMapper.ToObject(json);
@@ -193,9 +193,9 @@ namespace AndroidApi.Controller
         /// <summary>
         /// 음성인식 요청한 결과를 해석한다. 
         /// </summary>
-        /// <param name="json">Android에 대해 요청한 결과가 기술된 Json Message</param>
+        /// <param name="json">기저 Platform에 요청한 결과가 기술된 Json Message</param>
         /// <returns>음성인식 데이터</returns>
-        public static SpeechRequestResult ParseSpeechResultFromAndroid(string json)
+        public static SpeechRequestResult ParseSpeechResultFromPlatform(string json)
         {
             Debug.Log(json);
             JsonData jData = JsonMapper.ToObject(json);

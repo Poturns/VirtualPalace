@@ -1,13 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 using MyScript.Interface;
-using AndroidApi.Controller;
-using UnityEngine.EventSystems;
-using System;
+using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-	public class BeginState : IStateBase
+    public class BeginState : IStateBase
 	{
 		private StateManager manager;
 		private GameObject EventSys;
@@ -43,10 +41,22 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-                        if (SelectModule.RaycastedGameObject != null)
+                        Debug.Log("SelectModule.RaycastedGameObject : " + SelectModule.RaycastedGameObject);
+                       
+                        if (SelectModule == null)
+                        {
+                            if (EventSys == null)
+                            {
+                                EventSys = GameObject.Find("EventSystem");
+                            }
+                            SelectModule = EventSys.GetComponent<GazeInputModule>();
+                        }
+                        
+                        if(SelectModule.RaycastedGameObject != null)
                         {
                             IRaycastedObject obj = SelectModule.RaycastedGameObject.GetComponent<IRaycastedObject>();
 
+                            Debug.Log("obj : " + obj);
                             if (obj != null) {
                                 obj.OnSelect();
                             }
