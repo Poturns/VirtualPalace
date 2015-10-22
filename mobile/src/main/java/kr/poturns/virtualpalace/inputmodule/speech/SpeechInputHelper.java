@@ -125,7 +125,9 @@ public class SpeechInputHelper implements RecognitionListener {
      * 음성인식 객체를 해제한다.
      */
     public void destroy() {
-        mRecognizer.stopListening();
+        cancelListening();
+        stopListening();
+
         mRecognizer.destroy();
         mRecognizer = null;
 

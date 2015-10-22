@@ -35,7 +35,6 @@ public class OperationInputConnector {
     protected OperationInputDetector<?> mRegisteredDetector;
 
 
-
     // * * * F I E L D S * * * //
     /**
      * 사용 가능 플래그 : CONTROLLER 가 제어.
@@ -73,8 +72,8 @@ public class OperationInputConnector {
     /**
      * 단일 명령 메시지를 전송한다.
      *
-     * @param inputRst
-     * @return
+     * @param inputRst 전송할 명령 메시지
+     * @return 전송 결과
      */
     protected boolean transferDataset(int[] inputRst) {
         if (mControllerInputHandlerF == null || !isEnabled)
@@ -87,8 +86,8 @@ public class OperationInputConnector {
     /**
      * 다수의 명령 메시지를 전송한다.
      *
-     * @param inputRstArray
-     * @return
+     * @param inputRstArray 전송할 명령 메시지 배열
+     * @return 전송 결과
      */
     protected boolean transferDataset(int[][] inputRstArray) {
         if (mControllerInputHandlerF == null || !isEnabled)
@@ -101,11 +100,10 @@ public class OperationInputConnector {
     /**
      * 텍스트 결과를 전송한다.
      *
-     * @param text
-     * @param confidence (전송안함)
-     * @return
+     * @param text 전송할 문자열
+     * @return 전송 결과
      */
-    protected boolean transferTextData(String text, float confidence) {
+    protected boolean transferTextData(String text) {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
@@ -145,6 +143,10 @@ public class OperationInputConnector {
         }
     }
 
+    /**
+     * 이 Connector를 통해 메시지를 전송할 {@link OperationInputDetector}를 등록한다.
+     * @param detector OperationInputDetector
+     */
     public void setRegisteredDetector(OperationInputDetector<?> detector) {
         mRegisteredDetector = detector;
     }

@@ -1,4 +1,3 @@
-using AndroidApi.Controller;
 
 namespace MyScript.Interface
 {

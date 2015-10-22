@@ -1,3 +1,8 @@
 <resources>
     <dimen name="btn_height_back">52dp</dimen>
+
+    <dimen name="btn_direction">64dp</dimen>
+
+    <dimen name="btn_size_direction">32dp</dimen>
+    <dimen name="btn_size_direction_pressed">24dp</dimen>
 </resources>

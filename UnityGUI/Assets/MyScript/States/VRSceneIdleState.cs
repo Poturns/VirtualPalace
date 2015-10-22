@@ -1,8 +1,7 @@
 using UnityEngine;
 using MyScript.Interface;
-using AndroidApi.Controller;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using BridgeApi.Controller;
 
 namespace MyScript.States
 {
@@ -19,6 +18,7 @@ namespace MyScript.States
 
 			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
 			if(DisposolObj)GameObject.Destroy (DisposolObj);
+
             EventSys = GameObject.Find("EventSystem");
             if (EventSys == null) Debug.Log("Event System Find Fail");
             //else Debug.Log(EventSys);
@@ -31,7 +31,8 @@ namespace MyScript.States
 
         public void StateUpdate()
         {
-
+            if (Input.GetKeyUp(KeyCode.Q))
+                ReturnToMainScene();
         }
 
         public void ShowIt()
@@ -46,7 +47,7 @@ namespace MyScript.States
                 switch (op.Type)
                 {
                     case Operation.CANCEL:
-                        StateManager.SwitchScene(StateManager.SCENE_MAIN);
+                        ReturnToMainScene();
                         break;
 
                     case Operation.SELECT:
@@ -62,26 +63,26 @@ namespace MyScript.States
                             SelectModule = EventSys.GetComponent<GazeInputModule>();
                         }
 
-                        Debug.Log(SelectModule);
+                        //Debug.Log(SelectModule);
 
                         GameObject SelObj = SelectModule.RaycastedGameObject;
                         if (SelObj != null)
                         {
-                            Debug.Log("SelObj -> " + SelObj.name);
+                           // Debug.Log("SelObj -> " + SelObj.name);
 
                             IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject>();
                             if (raycastedObject != null)
                             {
-                                Debug.Log("IRaycastedObject != null");
+                                //Debug.Log("IRaycastedObject != null");
                                 raycastedObject.OnSelect();
                             }
-                            else
-                                Debug.Log("IRaycastedObject == null");
+                            //else                                Debug.Log("IRaycastedObject == null");
                         }
-                        else
+                       /* else
                         {
                             Debug.Log("SelObj == null");
                         }
+                        */
                         //EventSystem.current.currentSelectedGameObject();
                         break;
                 }
@@ -95,6 +96,11 @@ namespace MyScript.States
             //manager.SwitchState(new PlayState(manager));
 
 
+        }
+
+        private void ReturnToMainScene()
+        {
+            StateManager.SwitchScene(StateManager.SCENE_MAIN);
         }
 
     }

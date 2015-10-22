@@ -19,8 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:src="@{item.drawableRes}"
             android:onClick="@{item.onClickImage}"
+            android:src="@{item.drawableRes}"
             bind:circle_color="@{item.colorRes}"
             bind:circle_radius="56dp"
             bind:circle_radius_pressed="48dp" />
@@ -29,13 +29,13 @@
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/image"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="@{item.textRes}"
             android:textSize="18sp"
-            android:layout_below="@id/image"
-            android:layout_marginTop="10dp"
-            android:layout_centerHorizontal="true"
             android:textStyle="bold" />
     </RelativeLayout>
 </layout>

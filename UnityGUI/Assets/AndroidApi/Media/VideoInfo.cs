@@ -34,6 +34,7 @@ namespace AndroidApi.Media
             }
             catch (InvalidCastException e)
             {
+                Debug.LogException(e);
                 l = (int)jData[key];
             }
 

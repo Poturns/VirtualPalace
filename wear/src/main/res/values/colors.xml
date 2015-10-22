@@ -6,4 +6,8 @@
     <color name="material_light_blue_700">#0288D1</color>
     <color name="material_red_700">#D32F2F</color>
 
+    <color name="material_red_600">#E53935</color>
+    <color name="material_yellow_600">#FDD835</color>
+    <color name="material_green_600">#43A047</color>
+    <color name="material_blue_600">#1E88E5</color>
 </resources>

@@ -105,12 +105,18 @@ public class MainFragment extends Fragment {
          * 일반 입력 모드
          */
         NORMAL_INPUT(
-                R.drawable.ic_action_action_trending_neutral,
-                R.color.material_light_blue_700,
+                R.drawable.ic_gesture,
+                R.color.material_yellow_600,
                 R.string.icon_text_normal_input,
                 BasicInputFragment.class.getName()
         ),
 
+        DIRECTION_INPUT(
+                R.drawable.ic_arrow_up,
+                R.color.material_green_600,
+                R.string.icon_text_direction_input,
+                DirectionInputFragment.class.getName()
+        ),
         /*
         /**
          * 특수 입력 모드
@@ -138,7 +144,7 @@ public class MainFragment extends Fragment {
          */
         ETC(
                 R.drawable.ic_action_action_info,
-                R.color.material_deep_purple_700,
+                R.color.material_blue_600,
                 R.string.icon_text_etc,
                 InfoFragment.class.getName()
         ),
@@ -148,7 +154,7 @@ public class MainFragment extends Fragment {
          */
         EXIT(
                 R.drawable.ic_action_action_exit_to_app,
-                R.color.material_red_700,
+                R.color.material_red_600,
                 R.string.icon_text_exit,
                 null
         );

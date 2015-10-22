@@ -33,7 +33,9 @@ public class WearInputConnector extends OperationInputConnector {
     /**
      * GoogleApiClient 와 연결 해제한다.
      */
+    @Override
     public void disconnect() {
+        super.disconnect();
         mWearableCommunicator.disconnect();
     }
 
@@ -65,5 +67,14 @@ public class WearInputConnector extends OperationInputConnector {
             return false;
         }
 
+    }
+
+    @Override
+    protected boolean transferTextData(String text) {
+        if (!mWearableCommunicator.isConnected())
+            return false;
+
+        mWearableCommunicator.sendMessage(text);
+        return true;
     }
 }

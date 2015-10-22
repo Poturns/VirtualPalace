@@ -1,8 +1,7 @@
 using UnityEngine;
 using MyScript.Interface;
 using System.Collections.Generic;
-using AndroidApi.Controller;
-
+using BridgeApi.Controller;
 
 namespace MyScript.States
 {
@@ -12,7 +11,7 @@ namespace MyScript.States
 
 		private GameObject UIBookMesh;
 		private GameObject UITitleTextObj;
-
+        private TextMesh TMTitle;
 		private GameObject Target;
 		private GameObject EventSys;
 
@@ -51,8 +50,9 @@ namespace MyScript.States
 			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
 			string NewTxt = TargetObject.GetComponent<MemoObject>().Title;
 			TextMesh T = UITitleTextObj.GetComponent<TextMesh> ();
-			//T.text = NewTxt;
-			StateManager.InputTextMesh (T, NewTxt);
+            TMTitle = T;
+            //T.text = NewTxt;
+            StateManager.InputTextMesh (T, NewTxt);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 		}
 		public void StateUpdate()
@@ -74,8 +74,8 @@ namespace MyScript.States
 			{
 				if(op.Type == Operation.CANCEL)
 				{
-					//UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
-					UITitleTextObj.GetComponent<TextMesh> ().text = "";
+                    //UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+                    TMTitle.text = "";
 					manager.SwitchState (new VRSceneIdleState(manager));
 				}
 				else if(op.Type == Operation.SELECT)
@@ -88,7 +88,7 @@ namespace MyScript.States
 		void ChangeMemoScene()
 		{
 			UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
-			UITitleTextObj.GetComponent<TextMesh> ().text = "";
+            TMTitle.text = "";
 			manager.SwitchState (new VRMemoView (manager, Target));
 
 		}

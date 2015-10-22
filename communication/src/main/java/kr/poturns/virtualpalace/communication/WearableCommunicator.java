@@ -19,16 +19,20 @@ import java.util.Set;
 
 /**
  * Created by Myungjin Kim on 2015-07-30.
- * <p>
+ * <p/>
  * Wearable Device 와 Mobile Device 간 통신을 도와주는 클래스
  */
 public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<MessageApi.SendMessageResult> {
     private static final String TAG = "WearableCommunicator";
     //public static final String CAPABILITY_NAME_SEND_DATA = "send_data";
     /**
-     * 일반적으로 데이터를 전송할 때 사용하는 path
+     * Input 데이터를 전송할 때 사용하는 path
      */
-    public static final String MESSAGE_PATH_SEND_DATA = "/send_data";
+    public static final String MESSAGE_PATH_INPUT_DATA = "/input_data";
+    /**
+     * 문자열 데이터를 전송할 때 사용하는 path
+     */
+    public static final String MESSAGE_PATH_STRING_MESSAGE = "/string_message";
 
     private GoogleApiClient mGoogleApiClient;
     private MessageApi.MessageListener mMessageListener;
@@ -202,13 +206,13 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     }
 
     /**
-     * {@link #MESSAGE_PATH_SEND_DATA} path를 이용하여
-     * 상대 Device 에 메시지를 보낸다.
+     * 상대 Device에 일반 문자열 메시지를 보낸다.
      *
      * @param message 보낼 메시지
+     * @see #MESSAGE_PATH_STRING_MESSAGE
      */
     public final void sendMessage(String message) {
-        sendMessage(MESSAGE_PATH_SEND_DATA, message);
+        sendMessage(MESSAGE_PATH_STRING_MESSAGE, message);
     }
 
     /**
@@ -222,13 +226,13 @@ public class WearableCommunicator implements GoogleApiClient.ConnectionCallbacks
     }
 
     /**
-     * {@link #MESSAGE_PATH_SEND_DATA} path를 이용하여
-     * 상대 Device 에 메시지를 보낸다.
+     * 상대 Device 에 Input 데이터를 보낸다.
      *
      * @param message 보낼 메시지
+     * @see #MESSAGE_PATH_INPUT_DATA
      */
     public final void sendMessage(byte[] message) {
-        sendMessage(MESSAGE_PATH_SEND_DATA, message);
+        sendMessage(MESSAGE_PATH_INPUT_DATA, message);
     }
 
     /**
