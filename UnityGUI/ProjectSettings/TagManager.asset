@@ -7,6 +7,7 @@ TagManager:
   - InteractiveObject
   - BookCaseTrigger
   - Disposol
+  - 2DMoveUI
   layers:
   - Default
   - TransparentFX

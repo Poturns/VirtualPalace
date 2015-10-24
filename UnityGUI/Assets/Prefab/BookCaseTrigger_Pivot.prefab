@@ -1,18 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &122602
+--- !u!1 &112164
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 452090}
-  - 33: {fileID: 3322834}
-  - 65: {fileID: 6552356}
-  - 23: {fileID: 2319968}
-  - 114: {fileID: 11496676}
-  - 114: {fileID: 11453814}
+  - 4: {fileID: 405622}
+  - 33: {fileID: 3396874}
+  - 23: {fileID: 2336070}
+  - 114: {fileID: 11419062}
+  - 114: {fileID: 11419218}
+  - 65: {fileID: 6552500}
   m_Layer: 0
   m_Name: BookCaseTrigger
   m_TagString: InteractiveObject
@@ -20,24 +20,53 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &452090
+--- !u!1 &166454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 431424}
+  - 114: {fileID: 11436850}
+  m_Layer: 0
+  m_Name: BookCaseTrigger_Pivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &405622
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 122602}
+  m_GameObject: {fileID: 112164}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.93145156, y: 2.27200007, z: -1.49000001}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: .350770175, y: .10800004, z: .500168443}
+  m_LocalScale: {x: .699999928, y: .215412036, z: 1}
   m_Children: []
+  m_Father: {fileID: 431424}
+  m_RootOrder: 0
+--- !u!4 &431424
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 166454}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: .612185001, y: .666967392, z: .232831478}
+  m_LocalScale: {x: .452327579, y: 1.03171909, z: .834234297}
+  m_Children:
+  - {fileID: 405622}
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!23 &2319968
+--- !u!23 &2336070
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 122602}
+  m_GameObject: {fileID: 112164}
   m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -56,31 +85,46 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!33 &3322834
+--- !u!33 &3396874
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 122602}
+  m_GameObject: {fileID: 112164}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &6552356
+--- !u!65 &6552500
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 122602}
+  m_GameObject: {fileID: 112164}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: .357133299, y: .253488421, z: .845510066}
-  m_Center: {x: .00648403168, y: .013330698, z: -.00614857674}
---- !u!114 &11453814
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11419062
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 122602}
+  m_GameObject: {fileID: 112164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 772b7eacaf25a254581357f379dbb873, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BookPrefab: {fileID: 157826, guid: 70e8d32ab933fdc42a6d0b935e686892, type: 2}
+  Pivot: {fileID: 166454}
+  ZFirstOffset: .0299999993
+  XOffset: 0
+--- !u!114 &11419218
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112164}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
@@ -91,7 +135,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 11496676}
+        - m_Target: {fileID: 11419062}
           m_MethodName: OnSelect
           m_Mode: 1
           m_Arguments:
@@ -105,20 +149,19 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
---- !u!114 &11496676
+--- !u!114 &11436850
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 122602}
+  m_GameObject: {fileID: 166454}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 772b7eacaf25a254581357f379dbb873, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b633d3bab1af2243af72b5784e27bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BookPrefab: {fileID: 190348, guid: 273b53722fd7fc841b6bdac1280bf7fb, type: 2}
-  ZFirstOffset: 0
-  XOffset: 0
+  Size: .100000001
+  Col: {r: 1, g: .921568632, b: .0156862754, a: 1}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -127,14 +170,18 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
-      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnSelect
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: m_TagString
-      value: InteractiveObject
+      propertyPath: Pivot
+      value: 
+      objectReference: {fileID: 166454}
+    - target: {fileID: 0}
+      propertyPath: ZFirstOffset
+      value: .0199999996
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 122602}
+  m_RootGameObject: {fileID: 166454}
   m_IsPrefabParent: 1

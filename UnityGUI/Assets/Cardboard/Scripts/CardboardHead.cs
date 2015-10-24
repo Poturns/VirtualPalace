@@ -28,7 +28,7 @@ public class CardboardHead : MonoBehaviour {
   // object's orientation (or a child's) in their own LateUpdate() functions,
   // e.g. to cast rays.
   public bool updateEarly = false;
-
+	private Quaternion CurrentRot; 
   // Where is this head looking?
   public Ray Gaze {
     get {
@@ -54,8 +54,30 @@ public class CardboardHead : MonoBehaviour {
 
   // Compute new head pose.
   private void UpdateHead() {
-		if (!ViewMoveOn)
+		if (!ViewMoveOn) 
+		{
+			if (updated) {  
+				return;
+			}
+			updated = true;
+			Cardboard.SDK.UpdateState();
+			if (trackRotation)
+			{
+				//회전 성분 검출(y Rot/360 -> UI Pos X+)
+
+				Quaternion NowRot = Cardboard.SDK.HeadPose.Orientation;
+				float YRotVelo = -(CurrentRot.eulerAngles.y - NowRot.eulerAngles.y);
+				Vector3 NewVec = Camera.main.transform.right;
+				NewVec *=YRotVelo*Time.deltaTime;
+				GameObject[] UI2DMoveList = GameObject.FindGameObjectsWithTag("2DMoveUI");
+				foreach(GameObject ui in UI2DMoveList)
+				{
+					ui.transform.position += NewVec;
+				}
+				CurrentRot = NowRot;
+			}
 			return;
+		}
     if (updated) {  // Only one update per frame, please.
       return;
     }
@@ -64,6 +86,7 @@ public class CardboardHead : MonoBehaviour {
 
     if (trackRotation) {
       var rot = Cardboard.SDK.HeadPose.Orientation;
+		CurrentRot = rot;
       if (target == null) {
         transform.localRotation = rot;
       } else {

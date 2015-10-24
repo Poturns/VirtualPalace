@@ -13,7 +13,7 @@ GameObject:
   - 114: {fileID: 11478978}
   m_Layer: 0
   m_Name: The Limited 4 Green
-  m_TagString: Untagged
+  m_TagString: InteractiveObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -209,7 +209,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 103768}
   m_LocalRotation: {x: 0, y: .804403901, z: 0, w: .594082832}
-  m_LocalPosition: {x: -2.82570004, y: 1.64100003, z: -.412999988}
+  m_LocalPosition: {x: .88348484, y: .147967339, z: 1.7308315}
   m_LocalScale: {x: .738330841, y: .618643761, z: .727720857}
   m_Children:
   - {fileID: 425526}
@@ -541,8 +541,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitTitle: 
-  InitMemo: 
+  InitTitle: "\uACFC\uC81C"
+  InitMemo: "\uCEF4\uD4E8\uD130\uD1B5\uC2E0"
   kind: 1
   UIObject: {fileID: 103768}
 --- !u!114 &11478978

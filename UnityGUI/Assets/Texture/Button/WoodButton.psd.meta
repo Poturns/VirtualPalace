@@ -1,0 +1,157 @@
+fileFormatVersion: 2
+guid: 854af07e8ee2c474c867f74e782f83d7
+timeCreated: 1445682762
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: WoodButton_0
+    21300002: WoodButton_1
+    21300004: WoodButton_2
+    21300006: WoodButton_3
+    21300008: WoodButton_4
+    21300010: WoodButton_5
+    21300012: WoodButton_6
+    21300014: WoodButton_7
+    21300016: WoodButton_8
+    21300018: WoodButton_9
+    21300020: WoodButton_10
+    21300022: WoodButton_11
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: WoodButton_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 414
+        width: 320
+        height: 336
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_1
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 414
+        width: 320
+        height: 336
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_2
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 400
+        width: 4
+        height: 6
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_5
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 402
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_6
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 46
+        width: 320
+        height: 336
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_7
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 376
+        width: 27
+        height: 6
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_9
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 33
+        width: 7
+        height: 5
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_10
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 31
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: WoodButton_11
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 34
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
