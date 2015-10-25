@@ -121,16 +121,16 @@ namespace MyScript.States
 
             switch (direction.Value)
             {
-                case Direction.EAST:
+                case Direction.RIGHT:
                     NewVector = Vector3.right;
                     break;
-                case Direction.WEST:
+                case Direction.LEFT:
                     NewVector = -Vector3.right;
                     break;
-                case Direction.SOUTH:
+                case Direction.DOWN:
                     NewVector = -Vector3.forward;
                     break;
-                case Direction.NORTH:
+                case Direction.UP:
                     NewVector = Vector3.forward;
                     break;
                 default:

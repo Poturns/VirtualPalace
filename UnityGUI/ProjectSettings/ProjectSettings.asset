@@ -121,8 +121,8 @@ PlayerSettings:
   AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: C:/Users/byeonghun/Documents/MY/UnityGUI/debug.keystore
-  AndroidKeyaliasName: 
+  AndroidKeystoreName: D:/Git/VirtualPalace/UnityGUI/virtualpalace.keystore
+  AndroidKeyaliasName: virtualpalace
   AndroidTVCompatibility: 0
   AndroidIsGame: 0
   androidEnableBanner: 1
