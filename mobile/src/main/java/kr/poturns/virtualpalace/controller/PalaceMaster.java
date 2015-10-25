@@ -350,8 +350,7 @@ public class PalaceMaster extends PalaceCore {
         public void handleMessage(Message msg) {
             Runnable runnable = null;
             switch (msg.what) {
-                case REQUEST_MESSAGE: {
-                    //case REQUEST_MESSAGE_FROM_UNITY:  // REQUEST_MESSAGE 와 동일.
+                case REQUEST_MESSAGE_FROM_ANDROID: {
                     final String jsonMessage = (String) msg.obj;
 
                     runnable = new Runnable() {
@@ -362,6 +361,10 @@ public class PalaceMaster extends PalaceCore {
                             } catch (Exception e) { }
                         }
                     };
+                } break;
+
+                case REQUEST_MESSAGE_FROM_UNITY: {
+
                 } break;
 
                 case REQUEST_CALLBACK_FROM_UNITY: {

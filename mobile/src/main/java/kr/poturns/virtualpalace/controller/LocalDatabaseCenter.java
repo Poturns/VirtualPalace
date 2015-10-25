@@ -1,5 +1,6 @@
 package kr.poturns.virtualpalace.controller;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -15,6 +16,8 @@ import org.json.JSONObject;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
 
 /**
  * <b> 로컬 저장소의 DATABASE 를 관리한다. </b>
@@ -73,17 +76,31 @@ public class LocalDatabaseCenter {
      * VIRTUAL TABLE 필드 상수
      */
     public enum VIRTUAL_FIELD implements IField {
+        // Virtual Object ID (DB Index)
         _ID,
+        // Object Name (Unity Name)
+        NAME,
+        // Resource ID
         RES_ID,
+        // 오브젝트 타입
         TYPE,
+        // 위치 좌표 값
         POS_X,
         POS_Y,
         POS_Z,
+        // 회전 값
         ROTATE_X,
         ROTATE_Y,
         ROTATE_Z,
+        // 크기 값
+        SIZE_X,
+        SIZE_Y,
+        SIZE_Z,
+        // 본 오브젝트를 포함하는 오브젝트 ID
         CONTAINER,
+        // Conatainer에 포함된 순서
         CONT_ORDER,
+        // Customized Style
         STYLE;
 
         @Override
@@ -101,11 +118,22 @@ public class LocalDatabaseCenter {
      * AUGMENTED TABLE 필드 상수
      */
     public enum AUGMENTED_FIELD implements IField {
+        // Augmented Reality ID
         _ID,
+        // Resource ID
         RES_ID,
+        // 고도
         ALTITUDE,
+        // 위도
         LATITUDE,
-        LONGITUDE;
+        // 경도
+        LONGITUDE,
+        // 입체 보완 좌표 X
+        SUPPORT_X,
+        // 입체 보완 좌표 Y
+        SUPPORT_Y,
+        // 입체 보완 좌표 Z
+        SUPPORT_Z;
 
         @Override
         public String getTableName() {
@@ -181,15 +209,16 @@ public class LocalDatabaseCenter {
                                 "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
                                 // Resource Table 의 _id 값.
                                 // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
-                                "res_id          INTEGER NOT NULL," +
-                                "type           TEXT NOT NULL," +
+                                "res_id         INTEGER NOT NULL," +
+                                "name           TEXT," +
+                                "type           INTEGER NOT NULL," +
                                 "pos_x          REAL NOT NULL," +
                                 "pos_y          REAL NOT NULL," +
                                 "pos_z          REAL NOT NULL," +
                                 "rotate_x       REAL," +
                                 "rotate_y       REAL," +
                                 "rotate_z       REAL," +
-                                "container      INTEGER," +
+                                "container      TEXT," +
                                 "cont_order     INTEGER," +
                                 "style          TEXT" +
                                 ");"
@@ -198,13 +227,17 @@ public class LocalDatabaseCenter {
                 // AR Table
                 db.execSQL(
                         "CREATE TABLE augmented (" +
-                                "_id          INTEGER PRIMARY KEY AUTOINCREMENT,"  +
+                                "_id            INTEGER PRIMARY KEY AUTOINCREMENT,"  +
                                 // Resource Table 의 _id 값.
                                 // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
-                                "res_id        INTEGER NOT NULL," +
-                                "altitude     REAL NOT NULL," +
-                                "latitude     REAL NOT NULL," +
-                                "longitude    REAL NOT NULL)"
+                                "res_id         INTEGER NOT NULL," +
+                                "altitude       REAL," +
+                                "latitude       REAL," +
+                                "longitude      REAL," +
+                                "support_x      REAL," +
+                                "support_y      REAL," +
+                                "support_z      REAL" +
+                                ")"
                 );
             }
 
@@ -240,15 +273,16 @@ public class LocalDatabaseCenter {
                                 "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
                                 // Resource Table 의 _id 값.
                                 // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
-                                "res_id          INTEGER NOT NULL," +
-                                "type           TEXT NOT NULL," +
+                                "res_id         INTEGER NOT NULL," +
+                                "name           TEXT," +
+                                "type           INTEGER NOT NULL," +
                                 "pos_x          REAL NOT NULL," +
                                 "pos_y          REAL NOT NULL," +
                                 "pos_z          REAL NOT NULL," +
                                 "rotate_x       REAL," +
                                 "rotate_y       REAL," +
                                 "rotate_z       REAL," +
-                                "container      INTEGER," +
+                                "container      TEXT," +
                                 "cont_order     INTEGER," +
                                 "style          TEXT" +
                                 ");"
@@ -256,14 +290,18 @@ public class LocalDatabaseCenter {
 
                 // AR Table
                 db.execSQL(
-                        "ALTER TABLE augmented (" +
-                                "_id          INTEGER PRIMARY KEY AUTOINCREMENT,"  +
+                        "CREATE TABLE augmented (" +
+                                "_id            INTEGER PRIMARY KEY AUTOINCREMENT,"  +
                                 // Resource Table 의 _id 값.
                                 // 하나의 Resource 가 다양한 위치에 지정될 수 있음을 고려.
-                                "res_id        INTEGER NOT NULL," +
-                                "altitude     REAL NOT NULL," +
-                                "latitude     REAL NOT NULL," +
-                                "longitude    REAL NOT NULL)"
+                                "res_id         INTEGER NOT NULL," +
+                                "altitude       REAL," +
+                                "latitude       REAL," +
+                                "longitude      REAL," +
+                                "support_x      REAL," +
+                                "support_y      REAL," +
+                                "support_z      REAL" +
+                                ")"
                 );
             }
         };
@@ -281,38 +319,33 @@ public class LocalDatabaseCenter {
      * @param radius 반경
      * @return JSON ARRAY
      */
-    public JSONArray queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
-        JSONArray array = new JSONArray();
+    public ArrayList<AugmentedItem> queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
+        ArrayList<AugmentedItem> mNearItemList = new ArrayList<AugmentedItem>();
 
         Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
-                "SELECT r.name, r.description, r.thumbnail_path, a.resid, a.latitude, a.longitude, a.altitude  FROM resource r, augmented a " +
-                        "WHERE (a.latitude BETWEEN ? AND ?) AND (a.longitude BETWEEN ? AND ?) AND (a.altitude BETWEEN ? AND ?) AND r._id = a.resid;",
-        new String[]{
-                String.valueOf(latitude - radius), String.valueOf(latitude + radius),
-                String.valueOf(longitude - radius), String.valueOf(longitude + radius),
-                String.valueOf(altitude - radius), String.valueOf(altitude + radius)
+                "SELECT * FROM augmented WHERE (latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?) AND (altitude BETWEEN ? AND ?);",
+                new String[]{
+                        String.valueOf(latitude - radius), String.valueOf(latitude + radius),
+                        String.valueOf(longitude - radius), String.valueOf(longitude + radius),
+                        String.valueOf(altitude - radius), String.valueOf(altitude + radius)
         });
 
         while(cursor.moveToNext()) {
-            try {
-                JSONObject row = new JSONObject();
-                row.put(RESOURCE_FIELD.NAME.toString(), cursor.getString(0));
-                row.put(RESOURCE_FIELD.DESCRIPTION.toString(), cursor.getString(1));
-                row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), cursor.getString(2));
-                row.put(AUGMENTED_FIELD.RES_ID.toString(), cursor.getInt(3));
-                row.put(AUGMENTED_FIELD.LATITUDE.toString(), cursor.getDouble(4));
-                row.put(AUGMENTED_FIELD.LONGITUDE.toString(), cursor.getDouble(4));
-                row.put(AUGMENTED_FIELD.ALTITUDE.toString(), cursor.getDouble(4));
+            AugmentedItem item = new AugmentedItem();
+            item.augmentedID = cursor.getInt(cursor.getColumnIndex(AUGMENTED_FIELD._ID.name()));
+            item.resID = cursor.getInt(cursor.getColumnIndex(AUGMENTED_FIELD.RES_ID.name()));
+            item.altitude = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.ALTITUDE.name()));
+            item.latitude = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.LATITUDE.name()));
+            item.longitude = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.LONGITUDE.name()));
+            item.supportX = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.SUPPORT_X.name()));
+            item.supportY = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.SUPPORT_Y.name()));
+            item.supportZ = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.SUPPORT_Z.name()));
 
-                array.put(row);
-
-            } catch (JSONException e) {
-                Log.e("LDB_Field_Exception", e.getMessage());
-            }
+            mNearItemList.add(item);
         }
 
         cursor.close();
-        return array;
+        return mNearItemList;
     }
 
     /**
@@ -333,26 +366,31 @@ public class LocalDatabaseCenter {
         while(cursor.moveToNext()) {
             try {
                 JSONObject row = new JSONObject();
-                row.put(VIRTUAL_FIELD._ID.toString(), VIRTUAL_FIELD._ID.ordinal());
-                row.put(VIRTUAL_FIELD.RES_ID.toString(), VIRTUAL_FIELD.RES_ID.ordinal());
-                row.put(VIRTUAL_FIELD.TYPE.toString(), VIRTUAL_FIELD.TYPE.ordinal());
-                row.put(VIRTUAL_FIELD.POS_X.toString(), VIRTUAL_FIELD.POS_X.ordinal());
-                row.put(VIRTUAL_FIELD.POS_Y.toString(), VIRTUAL_FIELD.POS_Y.ordinal());
-                row.put(VIRTUAL_FIELD.POS_Z.toString(), VIRTUAL_FIELD.POS_Z.ordinal());
-                row.put(VIRTUAL_FIELD.ROTATE_X.toString(), VIRTUAL_FIELD.ROTATE_X.ordinal());
-                row.put(VIRTUAL_FIELD.ROTATE_Y.toString(), VIRTUAL_FIELD.ROTATE_Y.ordinal());
-                row.put(VIRTUAL_FIELD.ROTATE_Z.toString(), VIRTUAL_FIELD.ROTATE_Z.ordinal());
-                row.put(VIRTUAL_FIELD.CONTAINER.toString(), VIRTUAL_FIELD.CONTAINER.ordinal());
-                row.put(VIRTUAL_FIELD.CONT_ORDER.toString(), VIRTUAL_FIELD.CONT_ORDER.ordinal());
-                row.put(VIRTUAL_FIELD.STYLE.toString(), VIRTUAL_FIELD.STYLE.ordinal());
-                row.put(RESOURCE_FIELD.NAME.toString(), length + 0);
-                row.put(RESOURCE_FIELD.DESCRIPTION.toString(), length + 1);
-                row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), length + 2);
+                row.put(VIRTUAL_FIELD._ID.toString(), cursor.getInt(VIRTUAL_FIELD._ID.ordinal()));
+                row.put(VIRTUAL_FIELD.RES_ID.toString(), cursor.getInt(VIRTUAL_FIELD.RES_ID.ordinal()));
+                row.put(VIRTUAL_FIELD.NAME.toString(), cursor.getString(VIRTUAL_FIELD.NAME.ordinal()));
+                row.put(VIRTUAL_FIELD.TYPE.toString(), cursor.getInt(VIRTUAL_FIELD.TYPE.ordinal()));
+                row.put(VIRTUAL_FIELD.POS_X.toString(), cursor.getDouble(VIRTUAL_FIELD.POS_X.ordinal()));
+                row.put(VIRTUAL_FIELD.POS_Y.toString(), cursor.getDouble(VIRTUAL_FIELD.POS_Y.ordinal()));
+                row.put(VIRTUAL_FIELD.POS_Z.toString(), cursor.getDouble(VIRTUAL_FIELD.POS_Z.ordinal()));
+                row.put(VIRTUAL_FIELD.ROTATE_X.toString(), cursor.getDouble(VIRTUAL_FIELD.ROTATE_X.ordinal()));
+                row.put(VIRTUAL_FIELD.ROTATE_Y.toString(), cursor.getDouble(VIRTUAL_FIELD.ROTATE_Y.ordinal()));
+                row.put(VIRTUAL_FIELD.ROTATE_Z.toString(), cursor.getDouble(VIRTUAL_FIELD.ROTATE_Z.ordinal()));
+                row.put(VIRTUAL_FIELD.SIZE_X.toString(), cursor.getDouble(VIRTUAL_FIELD.SIZE_X.ordinal()));
+                row.put(VIRTUAL_FIELD.SIZE_Y.toString(), cursor.getDouble(VIRTUAL_FIELD.SIZE_Y.ordinal()));
+                row.put(VIRTUAL_FIELD.SIZE_Z.toString(), cursor.getDouble(VIRTUAL_FIELD.SIZE_Z.ordinal()));
+                row.put(VIRTUAL_FIELD.CONTAINER.toString(), cursor.getString(VIRTUAL_FIELD.CONTAINER.ordinal()));
+                row.put(VIRTUAL_FIELD.CONT_ORDER.toString(), cursor.getInt(VIRTUAL_FIELD.CONT_ORDER.ordinal()));
+                row.put(VIRTUAL_FIELD.STYLE.toString(), cursor.getString(VIRTUAL_FIELD.STYLE.ordinal()));
+
+                row.put(RESOURCE_FIELD.NAME.toString(), cursor.getString(length++));
+                row.put(RESOURCE_FIELD.DESCRIPTION.toString(), cursor.getString(length++));
+                row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), cursor.getString(length++));
 
                 array.put(row);
 
             } catch (JSONException e) {
-                Log.e("LocalDB_Field_Exception", e.getMessage());
+                Log.e("LocalDB_Field_Exception", "queryAllVirtualRenderings() :: " + e.getMessage());
             }
         }
 
@@ -452,7 +490,7 @@ public class LocalDatabaseCenter {
          *
          * @return true = 성공, false = 실패
          */
-        public boolean insert() {
+        public long insert() {
             StringBuilder builder = new StringBuilder();
             builder.append("INSERT INTO ")
                     .append(mTableName)
@@ -461,6 +499,7 @@ public class LocalDatabaseCenter {
             int length = (TABLE_RESOURCE.equals(mTableName))? RESOURCE_FIELD.values().length :
                     (TABLE_VIRTUAL.equals(mTableName))? VIRTUAL_FIELD.values().length :
                     (TABLE_AUGMENTED.equals(mTableName))? AUGMENTED_FIELD.values().length : 0;
+
 
             for (int i=0; i<length; i++) {
                 Pair<String, String> element = mSetClauseMap.get(i);
@@ -474,11 +513,11 @@ public class LocalDatabaseCenter {
             try {
                 setClear().whereClear();
                 mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
-                return true;
+                return mCenterF.mOpenHelperF.getWritableDatabase().insert(mTableName, null, mSetClauseValues);
 
             } catch (SQLException e) {
                 Log.e("LDB_Insert_Exception", e.getMessage());
-                return false;
+                return 0;
             }
         }
 
@@ -568,11 +607,13 @@ public class LocalDatabaseCenter {
         protected final LocalDatabaseCenter mCenterF;
         protected final ArrayList<String> mWhereClauseList;
         protected final TreeMap<Integer, Pair<String, String>> mSetClauseMap;
+        protected final ContentValues mSetClauseValues;
         protected String mTableName = null;
 
         protected CrudBuilder(LocalDatabaseCenter center) {
             mCenterF = center;
             mSetClauseMap = new TreeMap<Integer, Pair<String, String>>();
+            mSetClauseValues = new ContentValues(MAX);
             mWhereClauseList = new ArrayList<String>(MAX);
         }
 
@@ -607,6 +648,7 @@ public class LocalDatabaseCenter {
             if (field == null)
                 return this;
 
+            mSetClauseValues.put(field.toString(), value);
             mSetClauseMap.put(field.ordinal(), new Pair<String, String>(field.toString(), value));
             return check(field);
         }
