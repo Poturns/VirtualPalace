@@ -120,9 +120,11 @@ public class GazeInputModule : BaseInputModule {
     RaycastedGameObject = go;
 
     if (go != null && go.CompareTag("InteractiveObject")) {
-        cursor.SetActive(true);
-    }
+		cursor.gameObject.GetComponent<GazeCusor>().GazeObject = go.GetComponent<IRaycastedObject>();
+		cursor.SetActive(true);
+	}
     else {
+		cursor.gameObject.GetComponent<GazeCusor>().GazeObject = null;
         cursor.SetActive(false);
     }
     

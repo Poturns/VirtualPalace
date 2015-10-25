@@ -55,7 +55,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     void Update()
     {
         Tasker.OnUpdate();
-
+		
         if (activeState != null)
             activeState.StateUpdate();
     }

@@ -11,7 +11,13 @@ public enum OBJ_LIST
 	NOACT_OBJ,
 	WOOD_OBJ,
 	CAP_OBJ,
-	PICTURE_OBJ
+	PICTURE_OBJ,
+	SOCCER_OBJ,
+	DECO1,
+	STATU_OBJ,
+	CANDLE_OBJ,
+	HUMUN_OBj
+
 };
 public class PrefabContainer : MonoBehaviour 
 {
