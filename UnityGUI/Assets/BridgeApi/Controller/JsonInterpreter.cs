@@ -10,14 +10,14 @@ namespace BridgeApi.Controller
     /// <summary>
     /// Android로 부터 전달받은 Json Message를 해석하는 클래스
     /// </summary>
-    internal sealed class JsonInterpreter
+    public sealed class JsonInterpreter
     {
         /// <summary>
         /// Json Message를 해석해서, InputCommand를 Operation 배열로 변환한다.
         /// </summary>
         /// <param name="json">InputCommand가 기술된 Json Message</param>
         /// <returns>InputCommand가 해석된 Operation 배열</returns>
-        internal static List<Operation> ParseInputCommands(string json)
+        public static List<Operation> ParseInputCommands(string json)
         {
             JsonData jData = JsonMapper.ToObject(json);
 
@@ -104,7 +104,7 @@ namespace BridgeApi.Controller
         }
 
 
-        internal static void ParseRequestFromPlatform(string json)
+        public static void ParseRequestFromPlatform(string json)
         {
             //TODO 안드로이드를 참고하여 작업하기
         }

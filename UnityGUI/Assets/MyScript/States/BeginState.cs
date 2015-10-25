@@ -2,10 +2,11 @@ using UnityEngine;
 using System.Collections.Generic;
 using MyScript.Interface;
 using BridgeApi.Controller;
+using System;
 
 namespace MyScript.States
 {
-    public class BeginState : IStateBase
+    public class BeginState : ISceneChangeState
 	{
 		private StateManager manager;
 		private GameObject EventSys;
@@ -13,14 +14,17 @@ namespace MyScript.States
 
 		public BeginState (StateManager managerRef)
 		{
-			Debug.Log ("BeginState");
-			EventSys = GameObject.Find ("EventSystem");
-			manager = managerRef;
+            manager = managerRef;
+        }
 
-			SelectModule = EventSys.GetComponent<GazeInputModule>();
-		
 
-		}
+        public void OnSceneChanged()
+        {
+            Debug.Log("BeginState");
+            EventSys = GameObject.Find("EventSystem");
+
+            SelectModule = EventSys.GetComponent<GazeInputModule>();
+        }
 
 
         public void StateUpdate()
@@ -41,6 +45,7 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
+                        /*
                         Debug.Log("SelectModule.RaycastedGameObject : " + SelectModule.RaycastedGameObject);
                        
                         if (SelectModule == null)
@@ -51,6 +56,7 @@ namespace MyScript.States
                             }
                             SelectModule = EventSys.GetComponent<GazeInputModule>();
                         }
+                        */
                         
                         if(SelectModule.RaycastedGameObject != null)
                         {
@@ -74,7 +80,6 @@ namespace MyScript.States
 			
 		}
 
-        
     }
 }
 

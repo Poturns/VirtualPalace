@@ -5,7 +5,7 @@ using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-    public class VRSceneIdleState : IStateBase
+    public class VRSceneIdleState : ISceneChangeState
     {
         private StateManager manager;
         GameObject EventSys;
@@ -13,11 +13,14 @@ namespace MyScript.States
 
         public VRSceneIdleState(StateManager managerRef)
         {
-            Debug.Log("VRSceneState");
             manager = managerRef;
+        }
 
-			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
-			if(DisposolObj)GameObject.Destroy (DisposolObj);
+        public void OnSceneChanged()
+        {
+            Debug.Log("VRSceneState");
+            GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
+            if (DisposolObj) GameObject.Destroy(DisposolObj);
 
             EventSys = GameObject.Find("EventSystem");
             if (EventSys == null) Debug.Log("Event System Find Fail");
@@ -26,7 +29,6 @@ namespace MyScript.States
             SelectModule = EventSys.GetComponent<GazeInputModule>();
             if (SelectModule == null) Debug.Log("GazeInputModule == null");
             //else Debug.Log(SelectModule);
-
         }
 
         public void StateUpdate()
@@ -51,10 +53,10 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-
+                        /*
                         if (SelectModule == null)
                         {
-                           // Debug.Log("1. Select Module == null");
+                            // Debug.Log("1. Select Module == null");
                             if (EventSys == null)
                             {
                                 //Debug.Log("2. EventSys == null");
@@ -62,13 +64,13 @@ namespace MyScript.States
                             }
                             SelectModule = EventSys.GetComponent<GazeInputModule>();
                         }
-
+                        */
                         //Debug.Log(SelectModule);
 
                         GameObject SelObj = SelectModule.RaycastedGameObject;
                         if (SelObj != null)
                         {
-                           // Debug.Log("SelObj -> " + SelObj.name);
+                            // Debug.Log("SelObj -> " + SelObj.name);
 
                             IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject>();
                             if (raycastedObject != null)
@@ -78,11 +80,11 @@ namespace MyScript.States
                             }
                             //else                                Debug.Log("IRaycastedObject == null");
                         }
-                       /* else
-                        {
-                            Debug.Log("SelObj == null");
-                        }
-                        */
+                        /* else
+                         {
+                             Debug.Log("SelObj == null");
+                         }
+                         */
                         //EventSystem.current.currentSelectedGameObject();
                         break;
                 }

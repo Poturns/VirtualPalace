@@ -10,13 +10,20 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs {
+        debug {
+            storeFile file(project.getRootDir().getAbsolutePath() + project.property('VirtualPalace.KeyStore'))
+            storePassword "virtualpalace"
+            keyAlias "virtualpalace"
+            keyPassword "virtualpalace"
+        }
+    }
     buildTypes {
         debug{
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

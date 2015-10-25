@@ -43,12 +43,19 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         {
             DestroyImmediate(gameObject);
         }
+
+        if(activeState is ISceneChangeState)
+        {
+            ((ISceneChangeState)activeState).OnSceneChanged();
+        }
+
     }
 
     void Start()
     {
         Debug.Log("Start StateM");
         activeState = new BeginState(this);
+        ((ISceneChangeState)activeState).OnSceneChanged();
     }
 
     // Update is called once per frame
