@@ -44,7 +44,9 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 	}
 	public void OnSelect()
 	{
-		StateManager.GetManager ().SwitchState (new VRObjectSelect (StateManager.GetManager (), gameObject));
+		//StateManager.GetManager ().SwitchState (new VRObjectSelect (StateManager.GetManager (), gameObject));
+		StateManager.GetManager ().SwitchState (new VRModelSelect (StateManager.GetManager (), gameObject));
+
 		//CreateBook ();
 	}
 

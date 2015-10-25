@@ -10,7 +10,7 @@ namespace MyScript.States
         private StateManager manager;
         GameObject EventSys;
         GazeInputModule SelectModule;
-
+		GameObject Player;
         public VRSceneIdleState(StateManager managerRef)
         {
             manager = managerRef;
@@ -28,6 +28,7 @@ namespace MyScript.States
 
             SelectModule = EventSys.GetComponent<GazeInputModule>();
             if (SelectModule == null) Debug.Log("GazeInputModule == null");
+			Player= GameObject.Find ("Player");
             //else Debug.Log(SelectModule);
         }
 
@@ -87,11 +88,28 @@ namespace MyScript.States
                          */
                         //EventSystem.current.currentSelectedGameObject();
                         break;
-                }
+					default:
+						if(op.IsDirection())
+						{
+						    MoveDir(op);
+						}
+					    break;
+				}
 
             }
         }
+		void MoveDir(Operation op)
+		{
+			Dictionary<int, Direction> DirList =JsonInterpreter.ParseDirectionAmount(op);
+            
+			foreach (int key in DirList.Keys) {
 
+				if(key == Direction.DIMENSION_2){
+					Direction direction = DirList[key];
+					MoveCamera(direction);
+				}
+			}
+		}
         void Switch()
         {
             //Application.LoadLevel("Scene1");
@@ -99,6 +117,32 @@ namespace MyScript.States
 
 
         }
+
+		void MoveCamera(Direction direction)
+		{
+
+			Vector3 NewVector;
+
+			switch(direction.Value)
+			{
+			case Direction.EAST:
+				NewVector = Vector3.right;
+				break;
+			case Direction.WEST:
+				NewVector = -Vector3.right;
+				break;
+			case Direction.SOUTH:
+				NewVector = -Vector3.forward;
+				break;
+			case Direction.NORTH:
+				NewVector = Vector3.forward;
+				break;
+			default:
+				NewVector = new Vector3(0,0,0);
+				break;
+			}
+			Player.transform.position += NewVector;
+		}
 
         private void ReturnToMainScene()
         {
