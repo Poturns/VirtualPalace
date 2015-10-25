@@ -7,11 +7,15 @@ import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+import java.util.List;
 
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.augmented.AugmentedOutput;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.util.ThreadUtils;
@@ -61,6 +65,40 @@ public class PalaceMaster extends PalaceCore {
     // * * * M E T H O D S * * * //
     protected void destroy() {
 
+    }
+
+    /**
+     * AR에서 감지한 데이터를 Unity 에서 출력할 수 있도록 전송한다.
+     *
+     * @param list
+     */
+    public void drawAugmentedItems(List<AugmentedOutput> list) {
+        JSONObject message = new JSONObject();
+        try {
+            JSONArray array = new JSONArray();
+
+            for (AugmentedOutput item : list) {
+                try {
+                    JSONObject obj = new JSONObject();
+
+                    obj.put(LocalDatabaseCenter.VIRTUAL_FIELD.RES_ID.toString(), item.resID);
+                    obj.put(IControllerCommands.JsonKey.SCREEN_X, item.screenX);
+                    obj.put(IControllerCommands.JsonKey.SCREEN_Y, item.screenY);
+
+                    array.put(obj);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            message.put(IControllerCommands.JsonKey.DRAWING_AR, array);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(message.toString());
     }
 
 
@@ -428,8 +466,8 @@ public class PalaceMaster extends PalaceCore {
                         table = LocalDatabaseCenter.TABLE_RESOURCE;
 
 
-                    if (QUERY_NEAR_ITEMS.equalsIgnoreCase(key) || QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
-                        result = queryBuildedOperation(key, message.getJSONObject(key), jsonResult);
+                    if (QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
+                        result = executeConstructedQuery(key, message.getJSONObject(key), jsonResult);
 
                     } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
                         result = selectMetadata(message.getJSONObject(key), table, jsonResult);
@@ -481,9 +519,9 @@ public class PalaceMaster extends PalaceCore {
     }
 
 
-    private class WaitForCallbackException extends Exception {
+    private class WaitForCallbackException extends Exception {}
 
-    }
+
 
     // * * * G E T T E R  S & S E T T E R S * * * //
     public Handler getInputHandler(int supportType) {
@@ -494,7 +532,6 @@ public class PalaceMaster extends PalaceCore {
     }
 
     public Handler getRequestHandler() {
-
         return mRequestHandlerF;
     }
 

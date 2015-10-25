@@ -17,6 +17,7 @@ import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
+import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.sensor.LocationSensorAgent;
 import kr.poturns.virtualpalace.util.DriveAssistant;
@@ -81,89 +82,6 @@ class PalaceCore {
 
 
     // * * * M E T H O D S * * * //
-    /**
-     * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
-     *
-     * @return
-     */
-    public ArrayList<AugmentedItem> queryNearAugmentedItems() {
-        double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
-        double radius = 0.0000005;
-
-        return mDBCenterF.queryNearObjectsOnRealLocation(
-                latestData[LocationSensorAgent.DATA_INDEX_LATITUDE],
-                latestData[LocationSensorAgent.DATA_INDEX_LONGITUDE],
-                latestData[LocationSensorAgent.DATA_INDEX_ALTITUDE],
-                radius
-        );
-    }
-
-    /**
-     * 새로운 Augmented Item을 추가한다.
-     * 동시에 간략한 Resource Item을 생성한다.
-     *
-     * @param arItem
-     * @param resItem
-     * @return
-     */
-    public long insertNewAugmentedItem(AugmentedItem arItem, ResourceItem resItem) {
-        long resID = insertSimpleResourceItem(resItem);
-        if (resID <= 0)
-            return -1;
-
-        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD> builder =
-                (LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>)
-                        new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
-
-        builder.set(LocalDatabaseCenter.AUGMENTED_FIELD.RES_ID, String.valueOf(resID))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.LATITUDE, String.valueOf(arItem.latitude))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.LONGITUDE, String.valueOf(arItem.longitude))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.ALTITUDE, String.valueOf(arItem.altitude))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_X, String.valueOf(arItem.supportX))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_Y, String.valueOf(arItem.supportY))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_Z, String.valueOf(arItem.supportZ));
-
-        return builder.insert();
-    }
-
-    /**
-     * 간략한 정보만 담은 Resource Item을 추가한다.
-     *
-     * @param item
-     * @return
-     */
-    long insertSimpleResourceItem(ResourceItem item) {
-        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD> builder =
-                (LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>)
-                        new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
-
-        builder.set(LocalDatabaseCenter.RESOURCE_FIELD.NAME, item.name)
-                .set(LocalDatabaseCenter.RESOURCE_FIELD.DESCRIPTION, item.description);
-
-        long resID = builder.insert();
-        if (resID > 0)
-            insertTemporaryVirtualItem(resID);
-
-        return resID;
-    }
-
-    /**
-     * 처리되지 않은 임시 VirtualItem을 생성한다.
-     *
-     * @param resID
-     * @return
-     */
-    long insertTemporaryVirtualItem(long resID) {
-        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD> builder =
-                (LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>)
-                        new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
-
-        builder.set(LocalDatabaseCenter.VIRTUAL_FIELD.RES_ID, String.valueOf(resID))
-                .set(LocalDatabaseCenter.VIRTUAL_FIELD.TYPE, "0");
-
-        return builder.insert();
-    }
-
     /**
      *
      * @param listener
@@ -323,51 +241,106 @@ class PalaceCore {
     }
 
     /**
+     * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
+     *
+     * @return
+     */
+    public ArrayList<AugmentedItem> queryNearAugmentedItems() {
+        double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
+        double radius = 0.0000005;
+
+        return mDBCenterF.queryNearObjectsOnRealLocation(
+                latestData[LocationSensorAgent.DATA_INDEX_LATITUDE],
+                latestData[LocationSensorAgent.DATA_INDEX_LONGITUDE],
+                latestData[LocationSensorAgent.DATA_INDEX_ALTITUDE],
+                radius
+        );
+    }
+
+    /**
+     * 새로운 Augmented Item을 추가한다.
+     * 동시에 간략한 Resource Item을 생성한다.
+     *
+     * @param arItem
+     * @param resItem
+     * @return
+     */
+    public long insertNewAugmentedItem(AugmentedItem arItem, ResourceItem resItem) {
+        long resID = insertSimpleResourceItem(resItem);
+        if (resID <= 0)
+            return -1;
+
+        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD> builder =
+                new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+
+        builder.set(LocalDatabaseCenter.AUGMENTED_FIELD.RES_ID, String.valueOf(resID))
+                .set(LocalDatabaseCenter.AUGMENTED_FIELD.LATITUDE, String.valueOf(arItem.latitude))
+                .set(LocalDatabaseCenter.AUGMENTED_FIELD.LONGITUDE, String.valueOf(arItem.longitude))
+                .set(LocalDatabaseCenter.AUGMENTED_FIELD.ALTITUDE, String.valueOf(arItem.altitude))
+                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_X, String.valueOf(arItem.supportX))
+                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_Y, String.valueOf(arItem.supportY))
+                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_Z, String.valueOf(arItem.supportZ));
+
+        return builder.insert();
+    }
+
+    /**
+     * 간략한 정보만 담은 Resource Item을 추가한다.
+     *
+     * @param item
+     * @return
+     */
+    long insertSimpleResourceItem(ResourceItem item) {
+        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD> builder =
+                new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+
+        builder.set(LocalDatabaseCenter.RESOURCE_FIELD.NAME, item.name)
+                .set(LocalDatabaseCenter.RESOURCE_FIELD.DESCRIPTION, item.description);
+
+        long resID = builder.insert();
+        if (resID > 0)
+            insertTemporaryVirtualItem(resID);
+
+        return resID;
+    }
+
+    /**
+     * 처리되지 않은 임시 VirtualItem을 생성한다.
+     *
+     * @param resID
+     * @return
+     */
+    long insertTemporaryVirtualItem(long resID) {
+        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD> builder =
+                new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+
+        builder.set(LocalDatabaseCenter.VIRTUAL_FIELD.RES_ID, String.valueOf(resID))
+                .set(LocalDatabaseCenter.VIRTUAL_FIELD.TYPE, "0");
+
+        return builder.insert();
+    }
+
+    /**
      *
      * @param command
      * @param paramObj
      * @param returnObj
      * @return
      */
-    boolean queryBuildedOperation(String command, JSONObject paramObj, JSONObject returnObj) {
+    boolean executeConstructedQuery(String command, JSONObject paramObj, JSONObject returnObj) {
         try {
-            if (JsonKey.QUERY_NEAR_ITEMS.equalsIgnoreCase(command)) {
-                double[] data = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
-                double range = 0.001;
-                //JSONArray rst = mDBCenterF.queryNearObjectsOnRealLocation(data[0], data[1], data[2], range);
-                //returnObj.put(JsonKey.QUERY_RESULT, rst);
-                return false;
-
-            } else if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
+            if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
                 returnObj.put(JsonKey.QUERY_RESULT, mDBCenterF.queryAllVirtualRenderings());
                 return true;
             }
 
-        } catch (Exception e) {  }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 
-    /**
-     *
-     * @param obj
-     * @return
-     */
-    JSONArray searchResource(JSONObject obj) {
-        Iterator<String> keys = obj.keys();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            LocalDatabaseCenter.IField field = getField(LocalDatabaseCenter.TABLE_RESOURCE, key);
-
-            if (field != null) {
-
-            } else if ("".equalsIgnoreCase(key)) {
-
-            }
-
-
-        }
-        return null;
-    }
 
     /**
      * 세부 사항이 담긴 JSON 객체를 읽어 INSERT 작업을 수행한다.
@@ -652,9 +625,8 @@ class PalaceCore {
     /**
      * @return
      */
-    boolean executeBackup() {
-
-        mDriveAssistantF.getAppFolder();
+    boolean executeBackUp() {
+        mDBCenterF.backUp(mDriveAssistantF);
         return false;
     }
 
@@ -670,8 +642,13 @@ class PalaceCore {
      */
     protected double[] getSensorData(int sensorType) {
         InfraDataService service = mAppF.getInfraDataService();
-        if (service != null)
-            return service.getSensorAgent(sensorType).getLatestData();
+
+        if (service != null) {
+            BaseSensorAgent agent = service.getSensorAgent(sensorType);
+
+            if (agent != null)
+                return agent.getLatestData();
+        }
 
         return null;
     }

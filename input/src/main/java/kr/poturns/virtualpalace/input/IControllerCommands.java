@@ -79,6 +79,24 @@ public interface IControllerCommands {
             (response) RESULT : SUCCESS / FAIL / ERROR
         }
      */
+    /**
+     * AR 데이터 전달
+        {
+            DRAWING_AR : {
+                [
+                    {
+                        SCREEN_X : (number),
+                        SCREEN_Y : (number),
+                        RES_ID : (number),
+                        NAME : (string),
+                        DESCRIPTION : (string),
+                        TYPE : (number)
+                    },
+                    ...
+                ]
+            }
+        }
+     */
     /*
      * 데이터 조회
         {
@@ -269,6 +287,16 @@ public interface IControllerCommands {
          * }
          */
         String QUERY_RESULT = "query_result";
+
+        /**
+         * AR 데이터 전달
+         */
+        String DRAWING_AR = "drawing_ar";
+
+        String SCREEN_X = "screen_x";
+
+        String SCREEN_Y = "screen_y";
+
 
         /**
          * VR 테이블 조회 명령.

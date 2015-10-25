@@ -18,4 +18,15 @@ public class AugmentedItem {
     public double supportX;
     public double supportY;
     public double supportZ;
+
+
+    public AugmentedOutput extractOutput(int screenX, int screenY) {
+        AugmentedOutput output = new AugmentedOutput();
+
+        output.screenX = screenX;
+        output.screenY = screenY;
+        output.resID = this.resID;
+
+        return output;
+    }
 }
