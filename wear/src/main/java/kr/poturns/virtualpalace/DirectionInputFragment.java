@@ -165,7 +165,6 @@ public class DirectionInputFragment extends BackShakeFragment {
                     return WEST;
                 case R.id.image_right:
                     return EAST;
-
                 default:
                     return NONE;
             }
