@@ -342,7 +342,6 @@ public class LocalDatabaseCenter {
     }
 
     public void backUp(DriveAssistant assistant) {
-        // TODO : 맞나?
         File dbFile = new File(NAME);
         DriveFolder folder = assistant.getAppFolder();
 
@@ -351,8 +350,7 @@ public class LocalDatabaseCenter {
         DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
 
         String fileName = NAME + "-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
-        DriveFile file = assistant.DriveFolderApi.createFile(folder, contents, fileName, "");
-
+        DriveFile file = assistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
     }
 
 
