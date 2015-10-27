@@ -115,10 +115,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 772b7eacaf25a254581357f379dbb873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BookPrefab: {fileID: 157826, guid: 70e8d32ab933fdc42a6d0b935e686892, type: 2}
+  ObjPrefab: {fileID: 0}
   Pivot: {fileID: 166454}
   ZFirstOffset: .0299999993
-  XOffset: 0
+  XOffset: .200000003
 --- !u!114 &11419218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -180,6 +180,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: ZFirstOffset
       value: .0199999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: XOffset
+      value: .200000003
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

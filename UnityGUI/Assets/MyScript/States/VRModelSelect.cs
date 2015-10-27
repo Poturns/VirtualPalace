@@ -12,17 +12,24 @@ namespace MyScript.States
 		//BookCaseTrigger
 		private GameObject Target;
 		private GameObject EventSys;
+		private GazeInputModule SelectModule;
+
 		private UITransform UITrans;
 		public VRModelSelect (StateManager managerRef , GameObject TargetObject)
 		{
 			manager = managerRef;
 			Target = TargetObject;
-			GameObject UI = GameObject.Find ("ObjModelSelectUI");
-			for (int i = 0; i < UI.transform.childCount; i++) 
-			{
-				UI.transform.GetChild(i).gameObject.SetActive(true);
-				
-			}
+
+			EventSys = GameObject.Find("EventSystem");
+			if (EventSys == null) Debug.Log("Event System Find Fail");
+			
+			SelectModule = EventSys.GetComponent<GazeInputModule>();
+			if (SelectModule == null) Debug.Log("GazeInputModule == null");
+			SelectModule.Mode = 1;
+
+			GameObject UI = GameObject.Find ("ModelSelectUI");
+			UI.GetComponent<UITransform> ().OnOffOUIButton (true);
+
 			UITrans = UI.GetComponent<UITransform> (); 
 			UITrans.LockCameraRot ();
 			Debug.Log ("VRModelSelect");
@@ -40,14 +47,34 @@ namespace MyScript.States
 		{
 			foreach (Operation op in InputOp) 
 			{
-				if(op.Type == Operation.CANCEL)
+				switch (op.Type) 
 				{
+				case Operation.CANCEL:
+					break;
 					
-				}
-				else if(op.Type == Operation.SELECT)
-				{
-					
-					
+				case Operation.SELECT:
+					//Debug.Log(SelectModule);
+					GameObject SelObj = SelectModule.RaycastedGameObject;
+					if (SelObj != null) 
+					{
+						// Debug.Log("SelObj -> " + SelObj.name);
+						
+						IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject> ();
+						if (raycastedObject != null) 
+						{
+							//Debug.Log("IRaycastedObject != null");
+							raycastedObject.OnSelect ();
+						
+						}
+						//else                                Debug.Log("IRaycastedObject == null");
+					}
+					/* else
+                         {
+                             Debug.Log("SelObj == null");
+                         }
+                         */
+					//EventSystem.current.currentSelectedGameObject();
+					break;
 				}
 			}
 		}

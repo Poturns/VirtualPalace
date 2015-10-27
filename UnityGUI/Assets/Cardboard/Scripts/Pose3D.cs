@@ -40,7 +40,10 @@ public class Pose3D {
   public Pose3D(Matrix4x4 matrix) {
     Set(matrix);
   }
-
+	public void SetOrientation( Quaternion q)
+	{
+		Orientation = q;
+	}
   protected void Set(Vector3 position, Quaternion orientation) {
     Position = position;
     Orientation = orientation;

@@ -7,7 +7,7 @@ using MyScript.Interface;
 
 public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 
-	public GameObject BookPrefab;
+	public GameObject ObjPrefab;
 	public GameObject Pivot;
 	public float ZFirstOffset;
 
@@ -16,40 +16,52 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 	private float Ymax;
 	private float ZMax;
 
+	private float ZCurrentPos;
+
 	private float BasicZ;
 	private float BasicY;
 	private int Cnt;
 	private List<GameObject> BookList;
 
-	private void CreateBook()
+	public void CreateBook()
 	{
 
-		GameObject ObjInstance = BookPrefab.transform.GetChild (0).gameObject;
+		GameObject ObjInstance = ObjPrefab.transform.GetChild (0).gameObject;
 		
 		ZOffset = (ObjInstance.GetComponent<BoxCollider>().size.z) * ObjInstance.transform.localScale.z;
 		
-		BasicZ = Pivot.transform.position.z + ZFirstOffset;
+		BasicZ = Pivot.transform.position.z;
 		BasicY = Pivot.transform.position.y;
-		
-		
+		Debug.Log ("BasicZ : " + BasicZ);
+	
 
 		Vector3 NewPos = Pivot.transform.position;
 		NewPos.x += XOffset;
 		NewPos.y = BasicY;
-		NewPos.z = BasicZ +(ZOffset+0.01f) * Cnt; 
-		GameObject NewBook = Instantiate (BookPrefab , NewPos , BookPrefab.transform.rotation) as GameObject;
-	
+		NewPos.z = BasicZ +ZCurrentPos;
+
+		GameObject NewBook = Instantiate (ObjPrefab , NewPos , ObjPrefab.transform.rotation) as GameObject;
+
+		ZCurrentPos += ZOffset;
 		BookList.Add (NewBook);
 		Cnt++;
 	}
 	public void OnSelect()
 	{
-		//StateManager.GetManager ().SwitchState (new VRObjectSelect (StateManager.GetManager (), gameObject));
 		StateManager.GetManager ().SwitchState (new VRModelSelect (StateManager.GetManager (), gameObject));
+		GameObject SelectUI = GameObject.Find ("ObjModelSelectUI");
+		SelectUI.GetComponent<UITransform>().TargetObj=gameObject;
+	
+		//StateManager.GetManager ().SwitchState (new VRModelSelect (StateManager.GetManager (), gameObject));
 
 		//CreateBook ();
 	}
-
+	public void SetCurrentPrefab(OBJ_LIST Kind)
+	{
+		PrefabContainer PrefabStore = GameObject.Find ("PreLoadPrefab").GetComponent<PrefabContainer> ();
+		ObjPrefab = PrefabStore.GetPrefab (Kind);
+		if(ObjPrefab ==null) Debug.Log ("Fail : SetCurrentPrefab");
+	}
 	// Use this for initialization
 	void Start () 
 	{
@@ -58,6 +70,7 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 		ZMax = transform.localScale.z;
 		Cnt = 0;
 		BookList = new List<GameObject> ();
+		ZCurrentPos = 0;//0.01f;
 
 	}
 

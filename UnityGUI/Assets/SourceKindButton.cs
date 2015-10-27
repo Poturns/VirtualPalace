@@ -4,16 +4,20 @@ using MyScript;
 using MyScript.States;
 using MyScript.Interface;
 
-enum KIND_SOURCE
+public enum KIND_SOURCE
 {
 	TEXT,
 	IMAGE,
 	MOVIE
 };
 public class SourceKindButton : MonoBehaviour,IRaycastedObject {
-
+	public KIND_SOURCE ThisType;
 	public void OnSelect()
 	{
-		//StateManager.GetManager().SwitchState(new VRModelSelect(StateManager.GetManager() ,))
+		UITransform ModelUI = GameObject.Find ("ObjModelSelectUI").GetComponent<UITransform> ();
+		ModelUI.CurrentType = ThisType;
+		ModelUI.OnOffOUIButton (true);
+		ModelUI.LockCameraRot ();
+		transform.parent.gameObject.GetComponent<UITransform> ().OnOffOUIButton (false);
 	}
 }

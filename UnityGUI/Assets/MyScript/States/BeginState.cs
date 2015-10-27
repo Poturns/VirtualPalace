@@ -15,6 +15,7 @@ namespace MyScript.States
 		public BeginState (StateManager managerRef)
 		{
             manager = managerRef;
+			OnSceneChanged ();
         }
 
 
@@ -24,6 +25,7 @@ namespace MyScript.States
             EventSys = GameObject.Find("EventSystem");
 
             SelectModule = EventSys.GetComponent<GazeInputModule>();
+			SelectModule.Mode = 0;
         }
 
 
@@ -45,7 +47,7 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-                        /*
+                        
                         Debug.Log("SelectModule.RaycastedGameObject : " + SelectModule.RaycastedGameObject);
                        
                         if (SelectModule == null)
@@ -56,7 +58,7 @@ namespace MyScript.States
                             }
                             SelectModule = EventSys.GetComponent<GazeInputModule>();
                         }
-                        */
+                        
                         
                         if(SelectModule.RaycastedGameObject != null)
                         {

@@ -14,6 +14,7 @@ namespace MyScript.States
         public VRSceneIdleState(StateManager managerRef)
         {
             manager = managerRef;
+			OnSceneChanged ();
         }
 
         public void OnSceneChanged()
@@ -28,14 +29,14 @@ namespace MyScript.States
 
             SelectModule = EventSys.GetComponent<GazeInputModule>();
             if (SelectModule == null) Debug.Log("GazeInputModule == null");
+			SelectModule.Mode = 0;
             Player = GameObject.Find("Player");
             //else Debug.Log(SelectModule);
         }
 
         public void StateUpdate()
         {
-            if (Input.GetKeyUp(KeyCode.Q))
-                ReturnToMainScene();
+
         }
 
         public void ShowIt()
@@ -54,7 +55,7 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-                        /*
+                        
                         if (SelectModule == null)
                         {
                             // Debug.Log("1. Select Module == null");
@@ -65,7 +66,7 @@ namespace MyScript.States
                             }
                             SelectModule = EventSys.GetComponent<GazeInputModule>();
                         }
-                        */
+                        
                         //Debug.Log(SelectModule);
 
                         GameObject SelObj = SelectModule.RaycastedGameObject;

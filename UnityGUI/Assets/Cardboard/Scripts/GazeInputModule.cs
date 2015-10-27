@@ -39,8 +39,10 @@ public class GazeInputModule : BaseInputModule {
   public GameObject cursor;
 
   public GameObject RaycastedGameObject;
-
-  // Time in seconds between the pointer down and up events sent by a magnet click.
+	public int Mode;
+	private string ObjTag = "InteractiveObject";
+	private string ObjTag2 ="2DMoveUI";
+	// Time in seconds between the pointer down and up events sent by a magnet click.
   // Allows time for the UI elements to make their state transitions.
   [HideInInspector]
   public float clickTime = 0.1f;  // Based on default time for a button to animate to Pressed.
@@ -118,8 +120,12 @@ public class GazeInputModule : BaseInputModule {
     var go = pointerData.pointerCurrentRaycast.gameObject;
     
     RaycastedGameObject = go;
-
-    if (go != null && go.CompareTag("InteractiveObject")) {
+		string tag;
+		if (Mode == 0)
+			tag = ObjTag;
+		else
+			tag = ObjTag2;
+		if (go != null && go.CompareTag(tag)) {
 		cursor.gameObject.GetComponent<GazeCusor>().GazeObject = go.GetComponent<IRaycastedObject>();
 		cursor.SetActive(true);
 	}
