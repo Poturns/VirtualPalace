@@ -235,6 +235,56 @@ namespace BridgeApi.Controller
         /// </summary>
         public int Amount;
 
+        public override string ToString()
+        {
+            return "[ Direction : " + GetDirectionName() + " , Amount : " + Amount + " ]";
+        }
+
+        public string GetDirectionName()
+        {
+            switch (Value)
+            {
+                case NONE:
+                    return "NONE";
+
+                case CENTER:
+                    return "CENTER";
+                case RIGHT:
+                    return "RIGHT";
+                case LEFT:
+                    return "LEFT";
+                case UP:
+                    return "UP";
+                case DOWN:
+                    return "DOWN";
+
+                case EAST:
+                    return "EAST";
+                case WEST:
+                    return "WEST";
+                case SOUTH:
+                    return "SOUTH";
+                case NORTH:
+                    return "NORTH";
+
+                case FORWARD:
+                    return "FORWARD";
+                case BACKWARD:
+                    return "BACKWARD";
+                case UPWARD:
+                    return "UPWARD";
+                case DOWNWARD:
+                    return "DOWNWARD";
+                case LEFTWARD:
+                    return "LEFTWARD";
+                case RIGHTWARD:
+                    return "RIGHTWARD";
+                default:
+                    return "";
+            }
+
+        }
+
     }
 
     /// <summary>

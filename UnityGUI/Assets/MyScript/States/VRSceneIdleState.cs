@@ -99,13 +99,7 @@ namespace MyScript.States
             }
         }
 
-        void MoveDir(Operation op)
-        {
-            Dictionary<int, Direction> DirList = JsonInterpreter.ParseDirectionAmount(op);
-            if (DirList.ContainsKey(Direction.DIMENSION_2))
-                MoveCamera(DirList[Direction.DIMENSION_2]);
-        }
-
+   
         void Switch()
         {
             //Application.LoadLevel("Scene1");
@@ -114,28 +108,36 @@ namespace MyScript.States
 
         }
 
+        void MoveDir(Operation op)
+        {
+            Debug.Log("Direction Operation : " + op);
+            Dictionary<int, Direction> DirList = JsonInterpreter.ParseDirectionAmount(op);
+            Debug.Log("Direction Map : " + DirList);
+            if (DirList.ContainsKey(Direction.DIMENSION_2))
+                MoveCamera(DirList[Direction.DIMENSION_2]);
+        }
+
         void MoveCamera(Direction direction)
         {
-
+            Debug.Log("Move to : " + direction.Value);
             Vector3 NewVector;
 
             switch (direction.Value)
             {
-                case Direction.RIGHT:
+                case Direction.EAST:
                     NewVector = Vector3.right;
                     break;
-                case Direction.LEFT:
+                case Direction.WEST:
                     NewVector = -Vector3.right;
                     break;
-                case Direction.DOWN:
+                case Direction.SOUTH:
                     NewVector = -Vector3.forward;
                     break;
-                case Direction.UP:
+                case Direction.NORTH:
                     NewVector = Vector3.forward;
                     break;
                 default:
-                    NewVector = new Vector3(0, 0, 0);
-                    break;
+                    return;
             }
             Player.transform.position += NewVector;
         }
