@@ -8,7 +8,7 @@ public class TestRequest
     public void Test()
     {
 
-        DatabaseRequestFactory.InsertInto(Place.AR)
+        DatabaseRequestFactory.InsertInto(Table.AR)
              .Values(
                  new KeyValuePair<Enum, string>(AUGMENTED_FIELD.RES_ID, "1"),
                  new KeyValuePair<Enum, string>(AUGMENTED_FIELD.ALTITUDE, "1.22"),
@@ -20,14 +20,14 @@ public class TestRequest
                 Debug.Log(queryResults);
             });
 
-        DatabaseRequestFactory.Select(Place.AR)
+        DatabaseRequestFactory.Select(Table.AR)
            .SetField(AUGMENTED_FIELD.ALTITUDE)
            .SendRequest(StateManager.GetManager(), (queryResults) =>
            {
                Debug.Log(queryResults);
            });
 
-        DatabaseRequestFactory.Update(Place.AR)
+        DatabaseRequestFactory.Update(Table.AR)
            .Set(
                  new KeyValuePair<Enum, string>(AUGMENTED_FIELD.ALTITUDE, "7.22"),
                  new KeyValuePair<Enum, string>(AUGMENTED_FIELD.LONGITUDE, "6.22")
@@ -39,7 +39,7 @@ public class TestRequest
            });
 
 
-        DatabaseRequestFactory.Delete(Place.AR)
+        DatabaseRequestFactory.Delete(Table.AR)
            .WhereEqual(AUGMENTED_FIELD.ALTITUDE, "7.22")
            .SendRequest(StateManager.GetManager(), (queryResults) =>
            {

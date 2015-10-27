@@ -37,12 +37,14 @@ import java.util.Date;
  * Created by Myungjin Kim on 2015-07-30.
  * <p/>
  * 구글 드라이브와의 작업을 처리하는 클래스
+ *
+ * App-private한 파일에만 접근할 수 있다.
  */
 public class DriveAssistant {
     private static final String TAG = "DriveAssistant";
 
     private GoogleApiClient mGoogleApiClient;
-    private final Context context;
+    private Context context;
 
     /**
      * DriveFileApi
@@ -123,6 +125,7 @@ public class DriveAssistant {
             mGoogleApiClient.disconnect();
             mGoogleApiClient = null;
         }
+        context = null;
     }
 
     // ****  GoogleApiClient.ConnectionCallback ****
@@ -198,7 +201,9 @@ public class DriveAssistant {
      * Drive의 최상위 폴더를 가져온다.
      *
      * @return Drive의 최상위 폴더
+     * @deprecated 이 Api에서 사용자의 일반 파일에 접근하는 Scope를 추가할 수 없기 때문에 이 메소드는 제대로 동작하지 않는다.
      */
+    @Deprecated
     public DriveFolder getRootFolder() {
         return Drive.DriveApi.getRootFolder(mGoogleApiClient);
     }
