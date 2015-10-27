@@ -41,21 +41,31 @@ task clearUnityAndroidLibs(type: Delete) {
 task copyUnityAndroidLibs(dependsOn: 'copyUnityAndroidLibInput') {
 }
 
+
 /**
- * Mobile Module에서 AndroidManifest.xml를 Unity Plugin Directory에 복사한다.
+ * Unity Module에서 AndroidManifest.xml를 Unity Plugin Directory에 복사한다.
  * */
-task copyUnityAndroidLibMobileXml(type: Copy, dependsOn: 'clearUnityAndroidLibs') {
-    from('/mobile/src/main')
+task copyUnityAndroidLibUnityXml(type: Copy, dependsOn: 'clearUnityAndroidLibs') {
+    from('/unityActivity/src/main')
     into('UnityGUI/Assets/Plugins/Android/')
     include('AndroidManifest.xml')
 }
 
 /**
+ * Unity Module에서 빌드된 aar파일을 Unity Plugin Directory에 복사한다.
+ * */
+task copyUnityAndroidLibUnity(type: Copy, dependsOn: 'copyUnityAndroidLibUnityXml') {
+    from('/unityActivity/build/outputs/aar')
+    into('UnityGUI/Assets/Plugins/Android/')
+    include('unityactivity-debug.aar')
+}
+
+/**
  * Mobile Module에서 빌드된 aar파일을 Unity Plugin Directory에 복사한다.
  * */
-task copyUnityAndroidLibMobile(type: Copy, dependsOn: 'copyUnityAndroidLibMobileXml') {
+task copyUnityAndroidLibMobile(type: Copy, dependsOn: 'copyUnityAndroidLibUnity') {
     from('/mobile/build/outputs/aar')
-    into('UnityGUI/Assets/Plugins/Android/')
+    into('UnityGUI/Assets/Plugins/Android/libs/')
     include('mobile-debug.aar')
 }
 

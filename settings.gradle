@@ -1,2 +1,2 @@
-include ':mobile', ':wear', ':input', ':communication', ':test'
+include ':mobile', ':wear', ':input', ':communication', ':test', ':unityactivity'
 include ':openCVLibrary300'
