@@ -221,7 +221,7 @@ namespace BridgeApi.Controller
         /// <summary>
         /// Direction | Amount, 분리 계수
         /// </summary>
-        public const int SEPARATION = 1000;
+        public const int SEPARATION = 100000;
         #endregion Constants
 
 
@@ -237,7 +237,7 @@ namespace BridgeApi.Controller
 
         public override string ToString()
         {
-            return "[ Direction : " + GetDirectionName() + " , Amount : " + Amount + " ]";
+            return "[ Direction : " + GetDirectionName() + "(" + Value + ")" + " , Amount : " + Amount + " ]";
         }
 
         public string GetDirectionName()
@@ -326,9 +326,9 @@ namespace BridgeApi.Controller
 
         public override string ToString()
         {
-            return "QueryRequestResult : [\nRequest : " + RequestName 
-                + "\nStatus : " + Status 
-                + "\nData : " + (QueryData == null? "null": QueryData.ToString()) 
+            return "QueryRequestResult : [\nRequest : " + RequestName
+                + "\nStatus : " + Status
+                + "\nData : " + (QueryData == null ? "null" : QueryData.ToString())
                 + "\n]";
         }
     }

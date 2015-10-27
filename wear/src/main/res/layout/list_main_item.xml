@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    xmlns:circle="http://schemas.android.com/apk/res-auto">
 
     <data>
 
         <variable
             name="item"
-            type="kr.poturns.virtualpalace.MainFragment.ButtonIcon" />
+            type="kr.poturns.virtualpalace.unity.MainFragment.ButtonIcon" />
     </data>
 
     <RelativeLayout
@@ -21,9 +21,9 @@
             android:layout_centerInParent="true"
             android:onClick="@{item.onClickImage}"
             android:src="@{item.drawableRes}"
-            bind:circle_color="@{item.colorRes}"
-            bind:circle_radius="56dp"
-            bind:circle_radius_pressed="48dp" />
+            circle:circle_color="@{item.colorRes}"
+            circle:circle_radius="56dp"
+            circle:circle_radius_pressed="48dp" />
 
         <TextView
             android:id="@+id/text"

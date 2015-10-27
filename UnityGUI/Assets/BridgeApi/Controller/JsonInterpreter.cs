@@ -97,7 +97,7 @@ namespace BridgeApi.Controller
             }
             else
             {
-                dictionary.Add(Direction.DIMENSION_NONE, new Direction() { Amount = amount / 10, Value = direction });
+                dictionary.Add(Direction.DIMENSION_NONE, new Direction() { Amount = amount / 10, Value = direction});
             }
 
             return dictionary;

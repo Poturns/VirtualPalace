@@ -11,8 +11,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-import kr.poturns.virtualpalace.R;
 import kr.poturns.virtualpalace.inputmodule.GestureInputFilter;
+import kr.poturns.virtualpalace.unity.R;
 
 /**
  * 제스쳐 입력을 수집하여 적절히 걸러내는 InputCollector

@@ -54,39 +54,16 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-                        /*
-                        if (SelectModule == null)
-                        {
-                            // Debug.Log("1. Select Module == null");
-                            if (EventSys == null)
-                            {
-                                //Debug.Log("2. EventSys == null");
-                                EventSys = GameObject.Find("EventSystem");
-                            }
-                            SelectModule = EventSys.GetComponent<GazeInputModule>();
-                        }
-                        */
-                        //Debug.Log(SelectModule);
 
                         GameObject SelObj = SelectModule.RaycastedGameObject;
                         if (SelObj != null)
                         {
-                            // Debug.Log("SelObj -> " + SelObj.name);
-
                             IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject>();
                             if (raycastedObject != null)
                             {
-                                //Debug.Log("IRaycastedObject != null");
                                 raycastedObject.OnSelect();
                             }
-                            //else                                Debug.Log("IRaycastedObject == null");
                         }
-                        /* else
-                         {
-                             Debug.Log("SelObj == null");
-                         }
-                         */
-                        //EventSystem.current.currentSelectedGameObject();
                         break;
                     default:
                         if (op.IsDirection())
@@ -112,9 +89,16 @@ namespace MyScript.States
         {
             Debug.Log("Direction Operation : " + op);
             Dictionary<int, Direction> DirList = JsonInterpreter.ParseDirectionAmount(op);
-            Debug.Log("Direction Map : " + DirList);
-            if (DirList.ContainsKey(Direction.DIMENSION_2))
-                MoveCamera(DirList[Direction.DIMENSION_2]);
+
+            string s = "";
+            foreach(int key in DirList.Keys)
+            {
+                s += "dimension : " + key + ", Direction : " + DirList[key] + "\n";
+                MoveCamera(DirList[key]);
+            }
+            Debug.Log("Direction Map :\n" + s);
+            //if (DirList.ContainsKey(Direction.DIMENSION_2))
+              //  MoveCamera(DirList[Direction.DIMENSION_2]);
         }
 
         void MoveCamera(Direction direction)
@@ -139,7 +123,19 @@ namespace MyScript.States
                 default:
                     return;
             }
-            Player.transform.position += NewVector;
+            if(Player == null)
+            {
+                 Player = GameObject.Find("Player");
+            }
+            if(Player != null)
+            {
+                if (Player.transform != null)
+                    Player.transform.position += NewVector;
+                else
+                    Debug.LogError("Player.transform == null");
+            }
+            else
+                Debug.LogError("Player == null");
         }
 
         private void ReturnToMainScene()

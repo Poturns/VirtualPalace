@@ -6,7 +6,7 @@ android {
     buildToolsVersion '22.0.1'
 
     defaultConfig {
-        applicationId "kr.poturns.virtualpalace"
+        applicationId "kr.poturns.virtualpalace.unity"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 1

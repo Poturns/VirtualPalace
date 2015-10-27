@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace;
+package kr.poturns.virtualpalace.unity;
 
 import android.app.Fragment;
 import android.os.Bundle;
