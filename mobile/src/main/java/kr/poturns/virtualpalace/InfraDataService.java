@@ -1,17 +1,17 @@
 package kr.poturns.virtualpalace;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-
 import kr.poturns.virtualpalace.sensor.AcceleroSensorAgent;
 import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
 import kr.poturns.virtualpalace.sensor.BatterySensorAgent;
 import kr.poturns.virtualpalace.sensor.GyroSensorAgent;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.sensor.LocationSensorAgent;
+import kr.poturns.virtualpalace.sensor.MagneticSensorAgent;
 import kr.poturns.virtualpalace.sensor.NetworkSensorAgent;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 
 /**
  *
@@ -24,6 +24,7 @@ public class InfraDataService extends Service {
     private GyroSensorAgent mGyroAgent;
     private LocationSensorAgent mLocationAgent;
     private NetworkSensorAgent mNetworkAgent;
+    private MagneticSensorAgent mMagneticAgent;
 
     @Override
     public void onCreate() {
@@ -34,6 +35,7 @@ public class InfraDataService extends Service {
         mGyroAgent = new GyroSensorAgent(this);
         mLocationAgent = new LocationSensorAgent(this);
         mNetworkAgent = new NetworkSensorAgent(this);
+        mMagneticAgent = new MagneticSensorAgent(this);
 
         mLocationAgent.setCollaborationWith(mBatteryAgent);
         mLocationAgent.setCollaborationWith(mNetworkAgent);
@@ -61,6 +63,7 @@ public class InfraDataService extends Service {
         mGyroAgent.start();
         mLocationAgent.start();
         mNetworkAgent.start();
+        mMagneticAgent.start();
     }
 
     public void stopListening() {
@@ -69,7 +72,7 @@ public class InfraDataService extends Service {
         mGyroAgent.stop();
         mLocationAgent.stop();
         mNetworkAgent.stop();
-
+        mMagneticAgent.stop();
     }
 
     @Override
@@ -106,6 +109,9 @@ public class InfraDataService extends Service {
 
             case ISensorAgent.TYPE_AGENT_NETWORK:
                 return mNetworkAgent;
+                
+            case ISensorAgent.TYPE_AGENT_MAGNETIC:
+            	return mMagneticAgent;
 
             default:
                 return null;
