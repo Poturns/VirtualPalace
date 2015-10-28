@@ -122,23 +122,26 @@ namespace MyScript.States
 
             switch (direction.Value)
             {
+
                 case Direction.RIGHT:
-                    NewVector = Vector3.right;
+                    NewVector = Camera.main.transform.right;
                     break;
                 case Direction.LEFT:
-                    NewVector = -Vector3.right;
+					NewVector = - Camera.main.transform.right;
                     break;
                 case Direction.DOWN:
-                    NewVector = -Vector3.forward;
-                    break;
+					NewVector = - Camera.main.transform.forward;
+					NewVector.y = 0;
+                 	break;
                 case Direction.UP:
-                    NewVector = Vector3.forward;
-                    break;
+					NewVector =  Camera.main.transform.forward;
+					NewVector.y = 0;
+					break;
                 default:
                     NewVector = new Vector3(0, 0, 0);
                     break;
             }
-            Player.transform.position += NewVector;
+            Player.transform.position += NewVector*Time.deltaTime;
         }
 
         private void ReturnToMainScene()

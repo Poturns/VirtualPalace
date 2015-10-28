@@ -11,8 +11,10 @@ GameObject:
   - 33: {fileID: 3352726}
   - 23: {fileID: 2321904}
   - 64: {fileID: 6484388}
+  - 114: {fileID: 11410984}
   - 114: {fileID: 11491004}
   - 114: {fileID: 11441630}
+  - 114: {fileID: 11497782}
   m_Layer: 0
   m_Name: HumanStatu
   m_TagString: InteractiveObject
@@ -75,6 +77,18 @@ MeshCollider:
   serializedVersion: 2
   m_Convex: 0
   m_Mesh: {fileID: 4300494, guid: 37804a547e6d68c42a1c9b60e866c19b, type: 3}
+--- !u!114 &11410984
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
 --- !u!114 &11441630
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -91,7 +105,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 11491004}
+        - m_Target: {fileID: 11410984}
           m_MethodName: OnSelect
           m_Mode: 1
           m_Arguments:
@@ -120,6 +134,17 @@ MonoBehaviour:
   InitMemo: 
   kind: 1
   UIObject: {fileID: 142554}
+--- !u!114 &11497782
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -158,7 +183,7 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 11491004}
+      objectReference: {fileID: 11410984}
     - target: {fileID: 0}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnSelect

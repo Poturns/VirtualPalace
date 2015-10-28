@@ -60,8 +60,10 @@ GameObject:
   m_Component:
   - 4: {fileID: 482762}
   - 65: {fileID: 6534052}
+  - 114: {fileID: 11459642}
   - 114: {fileID: 11420406}
   - 114: {fileID: 11492356}
+  - 114: {fileID: 11474570}
   m_Layer: 0
   m_Name: DecoObject2
   m_TagString: InteractiveObject
@@ -240,6 +242,29 @@ MonoBehaviour:
   InitMemo: 
   kind: 0
   UIObject: {fileID: 176770}
+--- !u!114 &11459642
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 176770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
+--- !u!114 &11474570
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 176770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11492356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -256,7 +281,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 11420406}
+        - m_Target: {fileID: 11459642}
           m_MethodName: OnSelect
           m_Mode: 1
           m_Arguments:
@@ -292,7 +317,7 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 11420406}
+      objectReference: {fileID: 11459642}
     - target: {fileID: 0}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnSelect

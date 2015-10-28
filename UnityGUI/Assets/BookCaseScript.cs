@@ -23,6 +23,8 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 	private int Cnt;
 	private List<GameObject> BookList;
 
+	public KIND_SOURCE CurrentKind;
+
 	public void CreateBook()
 	{
 
@@ -41,7 +43,10 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 		NewPos.z = BasicZ +ZCurrentPos;
 
 		GameObject NewBook = Instantiate (ObjPrefab , NewPos , ObjPrefab.transform.rotation) as GameObject;
+		GameObject RealData = NewBook.transform.GetChild (0).gameObject;
 
+		RealData.GetComponent<CombineObject> ().SetKind( CurrentKind);
+	
 		ZCurrentPos += ZOffset;
 		BookList.Add (NewBook);
 		Cnt++;
@@ -61,6 +66,10 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 		PrefabContainer PrefabStore = GameObject.Find ("PreLoadPrefab").GetComponent<PrefabContainer> ();
 		ObjPrefab = PrefabStore.GetPrefab (Kind);
 		if(ObjPrefab ==null) Debug.Log ("Fail : SetCurrentPrefab");
+	}
+	public void SetKind(KIND_SOURCE kind)
+	{
+		CurrentKind = kind;
 	}
 	// Use this for initialization
 	void Start () 

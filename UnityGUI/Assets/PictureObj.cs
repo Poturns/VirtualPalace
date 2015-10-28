@@ -3,7 +3,7 @@ using System.Collections;
 using MyScript.States;
 using MyScript.Interface;
 
-public class PictureObj : MonoBehaviour, IRaycastedObject {
+public class PictureObj : MonoBehaviour{
 
 	
 	public string Title {

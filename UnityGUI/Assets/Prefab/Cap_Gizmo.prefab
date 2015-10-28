@@ -152,7 +152,9 @@ GameObject:
   - 4: {fileID: 498196}
   - 65: {fileID: 6506138}
   - 114: {fileID: 11496678}
+  - 114: {fileID: 11470752}
   - 114: {fileID: 11498518}
+  - 114: {fileID: 11491856}
   m_Layer: 0
   m_Name: Cap
   m_TagString: InteractiveObject
@@ -712,6 +714,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Size: .100000001
   Col: {r: 1, g: .921568632, b: .0156862754, a: 1}
+--- !u!114 &11470752
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 162496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
+--- !u!114 &11491856
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 162496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11496678
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -728,7 +753,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 11498518}
+        - m_Target: {fileID: 11470752}
           m_MethodName: OnSelect
           m_Mode: 1
           m_Arguments:
@@ -763,7 +788,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 11470752}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 127046}

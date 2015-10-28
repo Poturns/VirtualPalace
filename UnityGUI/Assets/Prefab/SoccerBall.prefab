@@ -11,8 +11,10 @@ GameObject:
   - 33: {fileID: 3396352}
   - 23: {fileID: 2314174}
   - 135: {fileID: 13545738}
+  - 114: {fileID: 11430132}
   - 114: {fileID: 11498534}
   - 114: {fileID: 11450228}
+  - 114: {fileID: 11409052}
   m_Layer: 0
   m_Name: SoccerBall
   m_TagString: InteractiveObject
@@ -64,6 +66,29 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 171412}
   m_Mesh: {fileID: 4300006, guid: dabc9997b6338df429ab7d647a62d9d8, type: 3}
+--- !u!114 &11409052
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 171412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11430132
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 171412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
 --- !u!114 &11450228
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -80,7 +105,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 11498534}
+        - m_Target: {fileID: 11430132}
           m_MethodName: OnSelect
           m_Mode: 1
           m_Arguments:
@@ -131,7 +156,7 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 11498534}
+      objectReference: {fileID: 11430132}
     - target: {fileID: 0}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnSelect
