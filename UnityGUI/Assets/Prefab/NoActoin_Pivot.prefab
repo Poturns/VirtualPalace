@@ -65,6 +65,7 @@ GameObject:
   - 65: {fileID: 6539404}
   - 114: {fileID: 11453834}
   - 114: {fileID: 11457060}
+  - 114: {fileID: 11434714}
   m_Layer: 0
   m_Name: NonActionObject1
   m_TagString: InteractiveObject
@@ -295,6 +296,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: .144655749, y: .105985232, z: .225772917}
   m_Center: {x: .0216754563, y: .00645197742, z: -.00485423394}
+--- !u!114 &11434714
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 192828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8a28df7fab758478bfe09aa1679a81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IndexMovie: 0
 --- !u!114 &11450598
 MonoBehaviour:
   m_ObjectHideFlags: 1
