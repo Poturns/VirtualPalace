@@ -14,7 +14,7 @@ namespace MyScript.States
         public VRSceneIdleState(StateManager managerRef)
         {
             manager = managerRef;
-          //  OnSceneChanged();
+            OnSceneChanged();
         }
 
         public void OnSceneChanged()
@@ -155,7 +155,7 @@ namespace MyScript.States
             if (Player != null)
             {
                 if (Player.transform != null)
-                    Player.transform.position += NewVector;
+                    Player.transform.position += 0.2f*NewVector;
                 else
                     Debug.LogError("Player.transform == null");
             }
