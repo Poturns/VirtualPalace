@@ -35,13 +35,11 @@ namespace MyScript.States
 			//UIBookMesh.GetComponent<MeshRenderer> ().enabled = true;
 			GameObject ShowObj = TargetObject.GetComponent<MemoObject> ().UIObject; 
 			GameObject DisposalObj;
-			if(TargetObject.GetComponent<MemoObject> ().kind == OBJECT_KIND.BOOK)
-				DisposalObj =GameObject.Instantiate (ShowObj ,UIBookMesh.transform.position
-			                                     , UIBookMesh.transform.rotation) as GameObject;
-			else
-				DisposalObj =GameObject.Instantiate (ShowObj ,UIBookMesh.transform.position
+
+			DisposalObj =GameObject.Instantiate (ShowObj ,UIBookMesh.transform.position
 				                                     , TargetObject.transform.rotation) as GameObject;
-			DisposalObj.tag = "Disposol";
+
+			DisposalObj.transform.GetChild(0).tag = "Disposol";
 			DisposalObj.transform.SetParent (UIBookMesh.transform);
 			UITitleTextObj = GameObject.Find ("UITitleText");
 			if (!UITitleTextObj)

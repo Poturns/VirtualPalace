@@ -32,8 +32,6 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 		
 		ZOffset = (ObjInstance.GetComponent<BoxCollider>().size.z) * ObjInstance.transform.localScale.z;
 		
-		BasicZ = Pivot.transform.position.z;
-		BasicY = Pivot.transform.position.y;
 		Debug.Log ("BasicZ : " + BasicZ);
 	
 
@@ -44,7 +42,8 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 
 		GameObject NewBook = Instantiate (ObjPrefab , NewPos , ObjPrefab.transform.rotation) as GameObject;
 		GameObject RealData = NewBook.transform.GetChild (0).gameObject;
-
+		StateManager.GetManager().ObjCount++;
+		NewBook.name = "UserObj" + StateManager.GetManager ().ObjCount;
 		RealData.GetComponent<CombineObject> ().SetKind( CurrentKind);
 	
 		ZCurrentPos += ZOffset;
@@ -74,6 +73,8 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 	// Use this for initialization
 	void Start () 
 	{
+		BasicZ = Pivot.transform.position.z;
+		BasicY = Pivot.transform.position.y;
 
 		Ymax = transform.localScale.y;
 		ZMax = transform.localScale.z;
