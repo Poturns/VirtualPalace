@@ -1,24 +1,17 @@
 using UnityEngine;
-using System.Collections.Generic;
-using MyScript.Interface;
-using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-    public class VRMemoViewExit : IStateBase
+    public class VRMemoViewExit : AbstractInputHandleState
 	{
-		private StateManager manager;
-		
 		private GameObject UIMemoBG;
 		private GameObject UIMemoTxt;
         private GameObject TargetObject;
 
-        public VRMemoViewExit (StateManager managerRef, GameObject TargetObject)
+        public VRMemoViewExit (StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMemoViewExit")
 		{
-			manager = managerRef;
             this.TargetObject = TargetObject;
 			
-			Debug.Log ("VRMemoView");
             GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
             if (DisposolObj) GameObject.Destroy(DisposolObj);
 
@@ -39,26 +32,19 @@ namespace MyScript.States
 			//manager.SwitchState (new VRObjectView (managerRef, TargetObject));
 			
 		}
-		public void StateUpdate()
-		{
-            manager.SwitchState(new VRObjectView(manager, TargetObject));
-        }
-		public void ShowIt()
-		{
-			
-		}
 
-		public void InputHandling(List<Operation> InputOp)
+		public override void StateUpdate()
 		{
-			
-		}
+            SwitchState(new VRObjectView(Manager, TargetObject));
+        }
+		
 		void Switch()
 		{
 			//Application.LoadLevel("Scene1");
 			//manager.SwitchState(new PlayState(manager));
-			
-			
+					
 		}
+
 	}
 }
 

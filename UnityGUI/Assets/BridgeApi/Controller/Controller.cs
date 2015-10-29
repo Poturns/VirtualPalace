@@ -82,14 +82,13 @@ namespace BridgeApi.Controller
         /// </summary>
         public int Value;
 
-
         /// <summary>
         /// 명령이 방향과 관련된 명령인지 확인한다.
         /// </summary>
         /// <returns>방향과 관련된 명령 (GO, TURN, FOCUS, ZOOM)일 경우 true</returns>
-        public bool IsDirection()
+        public bool IsDirection
         {
-            return Type == GO || Type == TURN || Type == FOCUS || Type == ZOOM;
+            get { return Type == GO || Type == TURN || Type == FOCUS || Type == ZOOM; }
         }
 
         public override string ToString()
