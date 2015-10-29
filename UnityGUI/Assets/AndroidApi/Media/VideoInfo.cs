@@ -81,13 +81,25 @@ namespace AndroidApi.Media
         /// <summary>
         /// 주어진 파일 경로에 비디오의 처음 프레임의 이미지를 생성한다.
         /// </summary>
-        /// <param name="fileName">비디오의 처음 프레임의 이미지가 저장될 파일 경로</param>
+        /// <param name="fileName">비디오의 처음 프레임의 이미지가 저장될 파일 이름</param>
         /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
         public string GetFirstFrameThumbnailPath(string fileName)
         {
             using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
             {
                 return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", fileName, Path);
+            }
+        }
+
+        /// <summary>
+        /// 비디오의 처음 프레임의 이미지를 생성한다.
+        /// </summary>
+        /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
+        public string GetFirstFrameThumbnailPath()
+        {
+            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
+            {
+                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", DirName + "_" + DisplayName, Path);
             }
         }
     }

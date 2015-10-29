@@ -17,7 +17,7 @@ public class DriveTestActivity extends Activity{
         setContentView(R.layout.activity_drive_test);
 
         getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new DriveTestFragment())
+                .replace(R.id.fragment_container, new DriveRestTestFragment())
                 .commit();
     }
 }
