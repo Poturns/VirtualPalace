@@ -5,35 +5,34 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import kr.poturns.virtualpalace.ARActivity;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
 
 public class AugmentedCore {
 	private static final int TIMER_INTERVAL = 40;
 	private final PalaceApplication mAppF;
 	private final CamTracker mTrackerF;
 	private final AugItemManager mManagerF;
-	private ARActivity activity;
+	//private ARActivity activity;
 	
-	private Timer timer;
+	private final Timer timer;
 	private boolean bRunning = false;
 	private boolean bStop = false;
 	private ArrayList<int[]> addItemQueue;
 	
 
-	
+	/*
 	public AugmentedCore(PalaceApplication app, ARActivity activity) {
 		mAppF = app;
 		mTrackerF = new CamTracker();
 		mManagerF = new AugItemManager();
 		this.activity = activity;
-	}
+	}*/
 	
 	public AugmentedCore(PalaceApplication app) {
 		mAppF = app;
 		mTrackerF = new CamTracker();
 		mManagerF = new AugItemManager();
+		timer = new Timer();
 	}
 	
 	/**
@@ -46,7 +45,6 @@ public class AugmentedCore {
 	public void start() {
 		if(addItemQueue==null)
 			addItemQueue = new ArrayList<int[]>();
-		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -69,7 +67,7 @@ public class AugmentedCore {
 					}
 					List<AugmentedOutput> outputList = mManagerF.getOutputList(mTrackerF);
 					//PalaceMaster.getInstance(mAppF).drawAugmentedItems(outputList);
-					activity.addOutputItems(outputList);
+					//activity.addOutputItems(outputList);
 				} else {
 					// end
 					mAppF.getInfraDataService().stopListening();
