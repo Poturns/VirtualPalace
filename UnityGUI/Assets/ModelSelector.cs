@@ -20,7 +20,6 @@ public class ModelSelector : MonoBehaviour,IRaycastedObject {
 			StateManager.GetManager().SwitchState(new VRSceneIdleState(StateManager.GetManager()));
 
 			UItemp.OnOffOUIButton (false);
-
 			UItemp.UnlockCameraRot();
 			//Target.GetComponent<BookCaseScript> ().
 		}

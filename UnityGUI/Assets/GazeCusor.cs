@@ -32,7 +32,7 @@ public class GazeCusor : MonoBehaviour {
 	//	{
 	//		return;
 	//	}
-	
+		return;
 		GazeTime += Time.deltaTime;
 
 		if (GazeTime > GazeTimeMax) 
