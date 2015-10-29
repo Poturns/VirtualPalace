@@ -24,17 +24,19 @@ namespace MyScript.States
         protected override void HandleCancelOperation()
         {
             base.HandleCancelOperation();
+			EndState();
         }
 
 		public void EndState()
 		{
 			UITrans.UnlockCameraRot ();
-			GameObject UI = UITrans.gameObject;
-			for (int i = 0; i < UI.transform.childCount; i++) 
-			{
-				UI.transform.GetChild(i).gameObject.SetActive(false);
-			}
-			
+			UITrans.OnOffOUIButton (false);
+			UITransform ModelUI = GameObject.Find ("ObjModelSelectUI").GetComponent<UITransform>();
+			ModelUI.UnlockCameraRot ();
+			ModelUI.OnOffOUIButton (false);
+			SetGazeInputMode (0);
+			SwitchState (new VRSceneIdleState (Manager));
+		
 		}
 		
 	}
