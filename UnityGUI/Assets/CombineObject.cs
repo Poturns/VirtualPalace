@@ -39,7 +39,7 @@ public class CombineObject : MonoBehaviour , IRaycastedObject {
 	public void SetKind(KIND_SOURCE k)
 	{
 		Kind = k;
-		Debug.Log ("k :" + k);
+		//Debug.Log ("k :" + k);
 		Debug.Log ("CombineObj Kind :" + Kind);
 	}
 	// Update is called once per frame

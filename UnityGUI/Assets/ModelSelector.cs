@@ -10,17 +10,19 @@ public class ModelSelector : MonoBehaviour,IRaycastedObject {
 	public void OnSelect()
 	{
 		Debug.Log ("Call Select");
-		GameObject Target = transform.parent.gameObject.GetComponent<UITransform> ().TargetObj; 
+        UITransform uiTransform = transform.parent.gameObject.GetComponent<UITransform>();
+        GameObject Target = uiTransform.TargetObj; 
 		if (Target != null) 
 		{
-			UITransform UItemp = transform.parent.gameObject.GetComponent<UITransform> ();
-			Target.GetComponent<BookCaseScript> ().SetKind(UItemp.CurrentType);
-			Target.GetComponent<BookCaseScript> ().SetCurrentPrefab (ObjType);
-			Target.GetComponent<BookCaseScript> ().CreateBook(); 
+            //UITransform UItemp = transform.parent.gameObject.GetComponent<UITransform> ();
+            BookCaseScript bookCaseScript = Target.GetComponent<BookCaseScript>();
+            bookCaseScript.SetKind(uiTransform.CurrentType);
+            bookCaseScript.SetCurrentPrefab (ObjType);
+            bookCaseScript.CreateBook(); 
 			StateManager.GetManager().SwitchState(new VRSceneIdleState(StateManager.GetManager()));
 
-			UItemp.OnOffOUIButton (false);
-			UItemp.UnlockCameraRot();
+            uiTransform.OnOffOUIButton (false);
+            uiTransform.UnlockCameraRot();
 
             RestoreGazeSelectMode();
 			//Target.GetComponent<BookCaseScript> ().

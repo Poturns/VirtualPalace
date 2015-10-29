@@ -32,9 +32,9 @@ namespace AndroidApi.Media
             {
                 l = (long)jData[key];
             }
-            catch (InvalidCastException e)
+            catch (InvalidCastException)
             {
-                Debug.LogException(e);
+                //Debug.LogException(e);
                 l = (int)jData[key];
             }
 
@@ -87,7 +87,7 @@ namespace AndroidApi.Media
         {
             using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
             {
-                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", fileName, Path);
+                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", AndroidUtils.GetActivityObject(), fileName, Path);
             }
         }
 

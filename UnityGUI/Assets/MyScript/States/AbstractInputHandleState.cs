@@ -76,9 +76,11 @@ namespace MyScript.States
                     case Operation.SELECT:
                         HandleSelectOperation();
                         break;
-				case Operation.DEEP:
-					HandleDeepOperation();
-					break;
+
+                    case Operation.DEEP:
+                        HandleDeepOperation();
+                        break;
+
                     default:
                         if (operation.IsDirection)
                             HandleDirectionOperation(JsonInterpreter.ParseDirectionAmount(operation));
@@ -95,10 +97,10 @@ namespace MyScript.States
         protected virtual void HandleCancelOperation() { }
 
 
-		/// <summary>
-		/// Deep 명령을 처리한다.
-		/// </summary>
-		protected virtual void HandleDeepOperation() { }
+        /// <summary>
+        /// Deep 명령을 처리한다.
+        /// </summary>
+        protected virtual void HandleDeepOperation() { }
 
 
         /// <summary>
