@@ -1,4 +1,4 @@
-namespace AndroidApi.Media
+﻿namespace AndroidApi.Media
 {
     public abstract class BaseInfo
     {

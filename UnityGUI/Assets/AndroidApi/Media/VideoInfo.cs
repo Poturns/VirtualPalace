@@ -1,4 +1,4 @@
-using LitJson;
+ï»¿using LitJson;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,10 +79,10 @@ namespace AndroidApi.Media
         }
 
         /// <summary>
-        /// ÁÖ¾îÁø ÆÄÀÏ °æ·Î¿¡ ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö¸¦ »ı¼ºÇÑ´Ù.
+        /// ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ë¥¼ ìƒì„±í•œë‹¤.
         /// </summary>
-        /// <param name="fileName">ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö°¡ ÀúÀåµÉ ÆÄÀÏ ÀÌ¸§</param>
-        /// <returns>ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö°¡ ÀúÀåµÈ ÆÄÀÏ °æ·Î</returns>
+        /// <param name="fileName">ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ê°€ ì €ì¥ë˜ëŠ” íŒŒì¼ì˜ ì´ë¦„</param>
+        /// <returns>ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ê°€ ì €ì¥ëœ íŒŒì¼ ê²½ë¡œ</returns>
         public string GetFirstFrameThumbnailPath(string fileName)
         {
             using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
@@ -92,16 +92,15 @@ namespace AndroidApi.Media
         }
 
         /// <summary>
-        /// ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö¸¦ »ı¼ºÇÑ´Ù.
+        /// ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ë¥¼ ìƒì„±í•œë‹¤.
         /// </summary>
-        /// <returns>ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö°¡ ÀúÀåµÈ ÆÄÀÏ °æ·Î</returns>
+        /// <returns>ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ê°€ ì €ì¥ëœ íŒŒì¼ ê²½ë¡œ</returns>
         public string GetFirstFrameThumbnailPath()
         {
-            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
-            {
-                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", DirName + "_" + DisplayName, Path);
-            }
+            return GetFirstFrameThumbnailPath(DirName + "_" + DisplayName);
         }
+
     }
+
 }
 
