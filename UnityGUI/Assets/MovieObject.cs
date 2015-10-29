@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MyScript.States;
 
 public class MovieObject : MonoBehaviour {
 
@@ -8,28 +9,16 @@ public class MovieObject : MonoBehaviour {
 		set;
 	}
 	private Texture2D FirstFrameTex;
-	private string Path;
+	public int IndexMovie = 0;
 	
 	
 	public void OnSelect()
 	{
-		//StateManager.GetManager().SwitchState (new VRImageObjView(StateManager.GetManager(),gameObject));
+		StateManager.GetManager().SwitchState (new VRMovieSelect(StateManager.GetManager(),gameObject));
 	}
 	// Use this for initialization
 	void Start () {
 		//Title = "Image Obj";
 	}
-	public void PlayMovie()
-	{
-		if (Path == null) 
-		{
-			Debug.Log ("Path is Null");
-			return;
-		}
-		Handheld.PlayFullScreenMovie (Path);
-	}
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

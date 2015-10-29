@@ -47,6 +47,7 @@ GameObject:
   - 114: {fileID: 11489522}
   - 114: {fileID: 11458160}
   - 114: {fileID: 11459762}
+  - 114: {fileID: 11427578}
   m_Layer: 0
   m_Name: BookGroup3
   m_TagString: InteractiveObject
@@ -569,13 +570,25 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: -.736474574, y: 1.04818249, z: -.848078012}
   m_Center: {x: -2.82535267, y: -.0240195952, z: -2.58087707}
+--- !u!114 &11427578
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 138168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8a28df7fab758478bfe09aa1679a81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IndexMovie: 0
 --- !u!114 &11458160
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 138168}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
   m_Name: 
@@ -666,6 +679,10 @@ Prefab:
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 11459180}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 178774}
