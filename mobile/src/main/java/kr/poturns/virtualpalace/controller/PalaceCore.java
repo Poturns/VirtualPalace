@@ -1,6 +1,10 @@
 package kr.poturns.virtualpalace.controller;
 
 import android.database.Cursor;
+import android.util.Log;
+
+import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.MetadataBuffer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -238,6 +242,23 @@ class PalaceCore {
         // 5.
 
         return false;
+    }
+
+    public void testDrive() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDriveAssistantF.blockingConnect();
+                MetadataBuffer buffer = mDriveAssistantF.DriveFolderApi.listChildren(mDriveAssistantF.getAppFolder());
+                Iterator<Metadata> iter = buffer.iterator();
+                while(iter.hasNext()) {
+                    Log.d("GoogleDrive_AppFolder", iter.next().toString());
+                }
+
+                mDBCenterF.backUp(mDriveAssistantF);
+                mDriveAssistantF.disconnect();
+            }
+        }).start();
     }
 
     /**

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.android.gms.drive.Drive;
+
 public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,6 +16,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         findViewById(R.id.btn_sensortest).setOnClickListener(this);
         findViewById(R.id.btn_dbtest).setOnClickListener(this);
         findViewById(R.id.btn_controllertest).setOnClickListener(this);
+        findViewById(R.id.btn_drivetest).setOnClickListener(this);
 
     }
 
@@ -31,6 +34,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
           case R.id.btn_controllertest:
               intent = new Intent(this, ControllerTestActivity.class);
+              break;
+
+          case R.id.btn_drivetest:
+              intent = new Intent(this, DriveTestActivity.class);
               break;
       }
 

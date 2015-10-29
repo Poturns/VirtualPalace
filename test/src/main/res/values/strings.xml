@@ -3,4 +3,5 @@
     <string name="title_activity_sensor_test">SensorTestActivity</string>
     <string name="title_activity_database_test">DatabaseTestActivity</string>
     <string name="title_activity_controller_test">ControllerTestActivity</string>
+    <string name="title_activity_drive_test">DriveTestActivity</string>
 </resources>

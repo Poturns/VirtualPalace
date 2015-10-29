@@ -26,6 +26,10 @@
             android:name=".ControllerTestActivity"
             android:label="@string/title_activity_controller_test" >
         </activity>
+        <activity
+            android:name=".DriveTestActivity"
+            android:label="@string/title_activity_drive_test" >
+        </activity>
     </application>
 
 </manifest>
