@@ -3,7 +3,7 @@ using System.Collections;
 using MyScript.States;
 using MyScript.Interface;
 
-public class PictureObj : MonoBehaviour, IRaycastedObject {
+public class PictureObj : MonoBehaviour{
 
 	
 	public string Title {
@@ -11,6 +11,7 @@ public class PictureObj : MonoBehaviour, IRaycastedObject {
 		set;
 	}
 	private Texture2D Tex;
+	public bool TextureUpdateOn = false;
 	private string Path;
 
 
@@ -22,8 +23,15 @@ public class PictureObj : MonoBehaviour, IRaycastedObject {
 	void Start () {
 		Title = "Image Obj";
 	}
+	public void SetPath(string TexPath)
+	{
+		Path = TexPath;
+	}
 	public void PictureUpdate()
 	{
+		if (!TextureUpdateOn)
+			return;
+
 		int Length = GetComponent<Renderer> ().materials.GetLength (0);
 		GetComponent<Renderer>().materials[Length - 1].mainTexture = Utils.Image.Load (Path);
 

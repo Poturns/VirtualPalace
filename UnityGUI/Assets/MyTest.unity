@@ -7856,6 +7856,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 11400008, guid: b8b03d395f5734e98af91ccf44f9bf47, type: 2}
+      propertyPath: ViewMoveOn
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b8b03d395f5734e98af91ccf44f9bf47, type: 2}
   m_IsPrefabParent: 0
@@ -25592,6 +25596,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1940e93561550e4419ec09f14145c54b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ObjCount: 0
 --- !u!4 &616350609
 Transform:
   m_ObjectHideFlags: 0
@@ -45996,6 +46001,7 @@ MonoBehaviour:
   vrModeOnly: 0
   cursor: {fileID: 2103211065}
   RaycastedGameObject: {fileID: 0}
+  Mode: 0
   clickTime: .100000001
   hotspot: {x: .5, y: .5}
 --- !u!114 &1113738067

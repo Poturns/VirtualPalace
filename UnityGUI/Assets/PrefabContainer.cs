@@ -19,18 +19,19 @@ public enum OBJ_LIST
 	HUMUN_OBj
 
 };
+
 public class PrefabContainer : MonoBehaviour 
 {
 
 
-	private GameObject DishObj;
-	private GameObject NoActionObj;
-	private GameObject BookGroup1;
-	private GameObject BookGroup2;
-	private GameObject BookGroup3;
-	private GameObject WoodDoll1;
-	private GameObject CapObj;
-	private GameObject PictureFrameObj;
+	public GameObject DishObj;
+	public GameObject NoActionObj;
+	public GameObject BookGroup1;
+	public GameObject BookGroup2;
+	public GameObject BookGroup3;
+	public GameObject WoodDoll1;
+	public GameObject CapObj;
+	public GameObject PictureFrameObj;
 
 	public static PrefabContainer instanceRef;
 
@@ -48,32 +49,26 @@ public class PrefabContainer : MonoBehaviour
 			DestroyImmediate(gameObject);
 		}
 	}
-	public GameObject GetBookPrefab(int ObjName)
+
+	public GameObject GetPrefab(OBJ_LIST ObjName)
 	{
 		switch (ObjName) 
 		{
-		case (int)OBJ_LIST.BOOK_GROUP_1:
+		case OBJ_LIST.BOOK_GROUP_1:
 			return BookGroup1;
-		case (int)OBJ_LIST.BOOK_GROUP_2:
+		case OBJ_LIST.BOOK_GROUP_2:
 			return BookGroup2;
-		case (int)OBJ_LIST.BOOK_GROUP_3:
+		case OBJ_LIST.BOOK_GROUP_3:
 			return BookGroup3;
-		}
-		return null;
-	}
-	public GameObject GetPrefab(int ObjName)
-	{
-		switch (ObjName) 
-		{
-		case (int)OBJ_LIST.CAP_OBJ:
+		case OBJ_LIST.CAP_OBJ:
 			return CapObj;
-		case (int)OBJ_LIST.DISH_OBJ:
+		case OBJ_LIST.DISH_OBJ:
 			return DishObj;
-		case (int)OBJ_LIST.NOACT_OBJ:
+		case OBJ_LIST.NOACT_OBJ:
 			return NoActionObj;
-		case (int)OBJ_LIST.PICTURE_OBJ:
+		case OBJ_LIST.PICTURE_OBJ:
 			return PictureFrameObj;
-		case (int)OBJ_LIST.WOOD_OBJ:
+		case OBJ_LIST.WOOD_OBJ:
 			return WoodDoll1;
 		default:
 			Debug.Log ("Error : GetPrefab : Can't Find Prefab");

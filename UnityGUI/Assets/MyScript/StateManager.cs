@@ -28,7 +28,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     {
         return instanceRef;
     }
-
+	public int ObjCount;
     void Awake()
     {
         if (instanceRef == null)

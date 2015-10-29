@@ -2,7 +2,7 @@
 using MyScript.States;
 using MyScript.Interface;
 
-public class MemoObject : MonoBehaviour, IRaycastedObject
+public class MemoObject : MonoBehaviour
 {
     public string InitTitle;
     public string InitMemo;

@@ -14,6 +14,7 @@ namespace MyScript.States
         public VRSceneIdleState(StateManager managerRef)
         {
             manager = managerRef;
+			OnSceneChanged ();
         }
 
         public void OnSceneChanged()
@@ -28,14 +29,14 @@ namespace MyScript.States
 
             SelectModule = EventSys.GetComponent<GazeInputModule>();
             if (SelectModule == null) Debug.Log("GazeInputModule == null");
+			SelectModule.Mode = 0;
             Player = GameObject.Find("Player");
             //else Debug.Log(SelectModule);
         }
 
         public void StateUpdate()
         {
-            if (Input.GetKeyUp(KeyCode.Q))
-                ReturnToMainScene();
+
         }
 
         public void ShowIt()
@@ -109,17 +110,19 @@ namespace MyScript.States
             switch (direction.Value)
             {
                 case Direction.EAST:
-                    NewVector = Vector3.right;
-                    break;
+                    NewVector = Camera.main.transform.right;
+                                        break;
                 case Direction.WEST:
-                    NewVector = -Vector3.right;
-                    break;
+                   NewVector = - Camera.main.transform.right;
+                                       break;
                 case Direction.SOUTH:
-                    NewVector = -Vector3.forward;
-                    break;
+                    NewVector = - Camera.main.transform.forward;
+                    					NewVector.y = 0;
+                                     	break;
                 case Direction.NORTH:
-                    NewVector = Vector3.forward;
-                    break;
+                   NewVector =  Camera.main.transform.forward;
+                   					NewVector.y = 0;
+                   					break;
                 default:
                     return;
             }

@@ -23,6 +23,10 @@ public class ImageControl : MonoBehaviour , IRaycastedObject {
 		count = 0;
 		return NowTexture;
 	}
+	public string GetNowPath()
+	{
+		return imageDirInfo [count].FirstInfo.Path;
+	}
 	public void NextImg ()
 	{
 		

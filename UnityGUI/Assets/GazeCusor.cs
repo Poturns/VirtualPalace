@@ -28,20 +28,25 @@ public class GazeCusor : MonoBehaviour {
 	void Update () 
 	{
 
-		if (GazeSelete) 
-		{
-			if(GazeObject != null)
-			{
-				GazeObject.OnSelect();
-				GazeSelete = false;
-			}
-			return;
-		}
+	//	if (GazeSelete) 
+	//	{
+	//		return;
+	//	}
 	
 		GazeTime += Time.deltaTime;
 
 		if (GazeTime > GazeTimeMax) 
-			GazeSelete =true;
+		{
+			if(GazeObject != null)
+			{
+				GazeObject.OnSelect();
+				GazeTime = 0.0f;
+				GazeObject = null;
+	//			GazeSelete = false;
+			}
+	//		GazeSelete =true;
+		}
+			
 		
 	}
 }

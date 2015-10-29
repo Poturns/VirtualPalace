@@ -11,8 +11,10 @@ GameObject:
   - 33: {fileID: 3391714}
   - 23: {fileID: 2396994}
   - 64: {fileID: 6429892}
+  - 114: {fileID: 11464970}
   - 114: {fileID: 11467936}
   - 114: {fileID: 11436480}
+  - 114: {fileID: 11467522}
   m_Layer: 0
   m_Name: "\u9E7F"
   m_TagString: InteractiveObject
@@ -46,8 +48,10 @@ GameObject:
   - 33: {fileID: 3384676}
   - 23: {fileID: 2339634}
   - 64: {fileID: 6412516}
+  - 114: {fileID: 11463036}
   - 114: {fileID: 11449992}
   - 114: {fileID: 11418358}
+  - 114: {fileID: 11481886}
   m_Layer: 0
   m_Name: "\u9E7F01"
   m_TagString: InteractiveObject
@@ -66,8 +70,10 @@ GameObject:
   - 33: {fileID: 3388928}
   - 23: {fileID: 2325716}
   - 64: {fileID: 6403552}
+  - 114: {fileID: 11444844}
   - 114: {fileID: 11416954}
   - 114: {fileID: 11493446}
+  - 114: {fileID: 11486922}
   m_Layer: 0
   m_Name: "\u9E7F02"
   m_TagString: InteractiveObject
@@ -330,6 +336,18 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
+--- !u!114 &11444844
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 191410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
 --- !u!114 &11449992
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -345,6 +363,41 @@ MonoBehaviour:
   InitMemo: 
   kind: 0
   UIObject: {fileID: 185416}
+--- !u!114 &11463036
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
+--- !u!114 &11464970
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 167192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kind: 0
+--- !u!114 &11467522
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 167192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11467936
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -360,6 +413,28 @@ MonoBehaviour:
   InitMemo: 
   kind: 0
   UIObject: {fileID: 167192}
+--- !u!114 &11481886
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11486922
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 191410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11493446
 MonoBehaviour:
   m_ObjectHideFlags: 1
