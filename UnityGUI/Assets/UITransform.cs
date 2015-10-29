@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class UITransform : MonoBehaviour {
-	public Transform BackUpTrans;
+	public Transform BackUpTrans = null;
 	public KIND_SOURCE CurrentType;
 	public GameObject TargetObj;
 	public int UIID; // 0 : ModelUI , 1: ModelObjUI
@@ -15,7 +15,8 @@ public class UITransform : MonoBehaviour {
 	}
 	void RecoverPos()
 	{
-
+		if (BackUpTrans == null)
+			return;
 		//gameObject.transform.position = BackUpTrans.position;
 		gameObject.transform.rotation = BackUpTrans.rotation;
 	}
