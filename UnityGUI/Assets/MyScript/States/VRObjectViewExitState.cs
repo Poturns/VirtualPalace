@@ -1,24 +1,16 @@
 using UnityEngine;
-using MyScript.Interface;
-using System.Collections.Generic;
-using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-	public class VRObjectViewExitState : IStateBase
+    public class VRObjectViewExitState : AbstractInputHandleState
 	{
-		private StateManager manager;
-		
 		private GameObject UIBookMesh;
 		private GameObject UITitleTextObj;
 		
-		public VRObjectViewExitState (StateManager managerRef)
+		public VRObjectViewExitState (StateManager managerRef) : base(managerRef, "VRObjectViewExit")
 		{
-			manager = managerRef;
 			
 			
-			Debug.Log ("VRObjectViewExit");
-
             GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
             if (DisposolObj) GameObject.Destroy(DisposolObj);
             UIBookMesh = GameObject.Find ("UIBook");
@@ -33,29 +25,24 @@ namespace MyScript.States
 				Debug.Log ("Sel Text is Null");
 			
 			UITitleTextObj.GetComponent<TextMesh>().text = "";
-	
+			
+		}
 
-			
-		}
-		public void StateUpdate()
+		public override void StateUpdate()
 		{
-			manager.SwitchState (new VRSceneIdleState (manager));
+			SwitchState (new VRSceneIdleState (Manager));
 		}
-		public void ShowIt()
-		{
-			
-		}
-		public void InputHandling(List<Operation> InputOp)
-		{
-			
-		}
+
+		
+		
 		void Switch()
 		{
 			//Application.LoadLevel("Scene1");
 			//manager.SwitchState(new PlayState(manager));
-			
-			
+					
 		}
+
 	}
+
 }
 

@@ -1,28 +1,21 @@
 using UnityEngine;
-using MyScript.Interface;
-using System.Collections.Generic;
-using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-	public class VRObjectView : IStateBase
+    public class VRObjectView : AbstractInputHandleState
 	{
-		private StateManager manager;
-
 		private GameObject UIBookMesh;
 		private GameObject UITitleTextObj;
         private TextMesh TMTitle;
 		private GameObject Target;
 		private GameObject EventSys;
 
-		public VRObjectView (StateManager managerRef , GameObject TargetObject)
+		public VRObjectView (StateManager managerRef , GameObject TargetObject) : base(managerRef, "VRObjectView")
 		{
-			manager = managerRef;
 			Target = TargetObject;
 
 			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
 			if(DisposolObj)GameObject.Destroy (DisposolObj);
-			Debug.Log ("VRObjectView");
 
 			EventSys = GameObject.Find ("EventSystem");
 			UIBookMesh = GameObject.Find ("UIBook");
@@ -53,43 +46,42 @@ namespace MyScript.States
             StateManager.InputTextMesh (T, NewTxt);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 		}
-		public void StateUpdate()
-		{
 
+		public override void StateUpdate()
+		{
+            base.StateUpdate();
 			// Input
 				
 			//ChangeMemoScene ();
 
 		
 		}
-		public void ShowIt()
-		{
-			
-		}
-		public void InputHandling(List<Operation> InputOp)
-		{
-			foreach (Operation op in InputOp) 
-			{
-				if(op.Type == Operation.CANCEL)
-				{
-                    //UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
-                    TMTitle.text = "";
-					manager.SwitchState (new VRSceneIdleState(manager));
-				}
-				else if(op.Type == Operation.SELECT)
-				{
-					
-					ChangeMemoScene ();
-				}
-			}
-		}
+
+        protected override void HandleCancelOperation()
+        {
+            base.HandleCancelOperation();
+
+            //UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+            TMTitle.text = "";
+            SwitchState(new VRSceneIdleState(Manager));
+        }
+
+        protected override void HandleSelectOperation()
+        {
+            base.HandleSelectOperation();
+
+            ChangeMemoScene();
+        }
+             
 		void ChangeMemoScene()
 		{
 			UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
             TMTitle.text = "";
-			manager.SwitchState (new VRMemoView (manager, Target));
+			SwitchState (new VRMemoView (Manager, Target));
 
 		}
+
 	}
+
 }
 

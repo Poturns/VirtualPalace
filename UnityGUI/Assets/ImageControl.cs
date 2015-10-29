@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.UI;
-using AndroidApi.Controller;
 using MyScript.Interface;
 
 

@@ -25,12 +25,12 @@ namespace Utils
 
         /// <summary>
         /// 큐에 Unity MainThread에서 실행시킬 작업을 등록하여 OnUpdate() 메소드에서 실행시킨다. <para/>
-        /// 메소드를 호출한 Thread가 MainThread라면 그대로 실행시킨다.
         /// </summary>
         /// <param name="a">Unity MainThread에서 실행시킬 작업</param>
-        public void QueueOnMainThread(Action a)
+        /// <param name="runImmediatelyIfMainThread">이 메소드를 호출한 Thread가 MainThread이면 즉각적으로 실행시킬지 여부</param>
+        public void QueueOnMainThread(Action a, bool runImmediatelyIfMainThread)
         {
-            if (mainThread.Equals(Thread.CurrentThread))
+            if (runImmediatelyIfMainThread && mainThread.Equals(Thread.CurrentThread))
             {
                 a();
             }
@@ -41,6 +41,16 @@ namespace Utils
                     actionQueue.Enqueue(a);
                 }
             }
+        }
+
+        /// <summary>
+        /// 큐에 Unity MainThread에서 실행시킬 작업을 등록하여 OnUpdate() 메소드에서 실행시킨다. <para/>
+        /// 이 메소드를 호출한 Thread가 MainThread라면 그대로 실행시킨다.
+        /// </summary>
+        /// <param name="a">Unity MainThread에서 실행시킬 작업</param>
+        public void QueueOnMainThread(Action a)
+        {
+            QueueOnMainThread(a, true);
         }
 
         public void OnUpdate()

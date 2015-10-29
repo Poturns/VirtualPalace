@@ -96,6 +96,21 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         tm.text = sb.ToString();
     }
 
+    /// <summary>
+    /// 작업을 Unity의 MainThread에서 수행한다.<para/>
+    /// </summary>
+    /// <param name="a">Unity MainThread에서 실행시킬 작업</param>
+    /// <param name="runImmediatelyIfMainThread">이 메소드를 호출한 Thread가 MainThread이면 즉각적으로 실행시킬지 여부</param>
+    public void QueueOnMainThread(Action a, bool runImmediatelyIfMainThread)
+    {
+        Tasker.QueueOnMainThread(a, runImmediatelyIfMainThread);
+    }
+
+    /// <summary>
+    /// 작업을 Unity의 MainThread에서 수행한다.<para/>
+    /// 이 메소드를 호출한 Thread가 MainThread라면 그대로 실행시킨다.
+    /// </summary>
+    /// <param name="a">Unity MainThread에서 실행시킬 작업</param>
     public void QueueOnMainThread(Action a)
     {
         Tasker.QueueOnMainThread(a);

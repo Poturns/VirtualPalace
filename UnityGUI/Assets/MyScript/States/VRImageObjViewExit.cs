@@ -1,24 +1,14 @@
 using UnityEngine;
-using System.Collections.Generic;
-using MyScript.Interface;
-using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-    public class VRImageObjViewExit : IStateBase
+    public class VRImageObjViewExit : AbstractInputHandleState
     {
-        private StateManager manager;
-
         private GameObject ImageUI;
 
 
-        public VRImageObjViewExit(StateManager managerRef, GameObject TargetObject)
+        public VRImageObjViewExit(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRImageObjectViewEXIT")
         {
-            manager = managerRef;
-
-
-            Debug.Log("VRImageObjectViewEXIT");
-
             ImageUI = GameObject.Find("ImageView");
             if (!ImageUI)
                 Debug.Log("ImageSelector is Null");
@@ -35,25 +25,18 @@ namespace MyScript.States
             ImageUI.GetComponent<MeshCollider>().enabled = false;
             ImageUI.GetComponent<MeshRenderer>().enabled = false;
         }
-        public void StateUpdate()
-        {
-            manager.SwitchState(new VRSceneIdleState(manager));
-        }
-        public void ShowIt()
-        {
 
-        }
-        public void InputHandling(List<Operation> InputOp)
+        public override void StateUpdate()
         {
-
+            SwitchState(new VRSceneIdleState(Manager));
         }
+
         void Switch()
         {
             //Application.LoadLevel("Scene1");
             //manager.SwitchState(new PlayState(manager));
-
-
         }
+
     }
 }
 

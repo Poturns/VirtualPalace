@@ -1,16 +1,12 @@
 using UnityEngine;
-using System.Collections.Generic;
-using MyScript.Interface;
 using BridgeApi.Controller;
 using BridgeApi.Controller.Request;
 
 namespace MyScript.States
 {
 
-    public class VRMemoView : IStateBase
+    public class VRMemoView : AbstractInputHandleState
     {
-        private StateManager manager;
-
         private GameObject UIMemoBG;
         private GameObject UIMemoTxt;
 
@@ -19,14 +15,12 @@ namespace MyScript.States
         private TextMesh TMObject;
         private GameObject EventSys;
 
-        public VRMemoView(StateManager managerRef, GameObject TargetObject)
+        public VRMemoView(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMemoView")
         {
-            manager = managerRef;
             TargetObj = TargetObject;
 
             GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
             if (DisposolObj) GameObject.Destroy(DisposolObj);
-            Debug.Log("MemoView");
 
             EventSys = GameObject.Find("EventSystem");
             UIMemoBG = GameObject.Find("MemoView");
@@ -48,38 +42,25 @@ namespace MyScript.States
             //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
         }
 
-        public void StateUpdate()
+        public override void StateUpdate()
         {
             if (Input.GetKeyUp(KeyCode.Q))
                 ExitMemoView();
         }
 
-        public void ShowIt()
-        {
 
+        protected override void HandleSelectOperation()
+        {
+            base.HandleSelectOperation();
+            SendSpeechMemoRequest();
         }
 
-        public void InputHandling(List<Operation> InputOp)
+        protected override void HandleCancelOperation()
         {
-            foreach (Operation op in InputOp)
-            {
-                switch (op.Type)
-                {
-                    case Operation.CANCEL:
-                        ExitMemoView();
-                        break;
-
-                    case Operation.SELECT:
-                        SendSpeechMemoRequest();
-                        break;
-
-                    default:
-                        break;
-
-                }
-            }
+            base.HandleCancelOperation();
+            ExitMemoView();
         }
-
+              
         void Switch()
         {
             //Application.LoadLevel("Scene1");
@@ -90,14 +71,14 @@ namespace MyScript.States
 
         private void SendSpeechMemoRequest()
         {
-            new SpeechRequest().SendRequest(manager, (result) =>
+            new SpeechRequest().SendRequest(Manager, (result) =>
             {
                 Debug.Log(result);
                 switch (result.Status)
                 {
                     case RequestResult.STATUS_SUCCESS:
                         MemoObj.InputMemo(result.Speech);
-                        manager.QueueOnMainThread(() => TMObject.text = MemoObj.GetMemo());
+                        QueueOnMainThread(() => TMObject.text = MemoObj.GetMemo());
                         break;
 
                     default:
@@ -109,7 +90,7 @@ namespace MyScript.States
 
         private void ExitMemoView()
         {
-            manager.SwitchState(new VRMemoViewExit(manager, TargetObj));
+            SwitchState(new VRMemoViewExit(Manager, TargetObj));
         }
 
     }
