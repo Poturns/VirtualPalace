@@ -87,10 +87,10 @@ public class LocalDatabaseCenter {
     public enum VIRTUAL_FIELD implements IField {
         // Virtual Object ID (DB Index)
         _ID,
-        // Object Name (Unity Name)
-        NAME,
         // Resource ID
         RES_ID,
+        // Object Name (Unity Name)
+        NAME,
         // 오브젝트 타입
         TYPE,
         // 위치 좌표 값
@@ -176,7 +176,7 @@ public class LocalDatabaseCenter {
     /**
      * 로컬 DB .Version
      */
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
 
     private final Context mContextF;
 
@@ -195,42 +195,45 @@ public class LocalDatabaseCenter {
 
             private final String RESOURCE =
                     "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name           TEXT NOT NULL," +
-                    "type           TEXT NOT NULL," +
-                    "category       TEXT," +
-                    "archive_path   TEXT," +
-                    "archive_key    TEXT," +
-                    "drive_path     TEXT," +
-                    "drive_key      TEXT," +
-                    "thumbnail_path TEXT," +
-                    "description    TEXT," +
-                    "ctime          INTEGER NOT NULL," +
-                    "mtime          INTEGER";
+                            "name           TEXT NOT NULL," +
+                            "type           TEXT NOT NULL," +
+                            "category       TEXT," +
+                            "archive_path   TEXT," +
+                            "archive_key    TEXT," +
+                            "drive_path     TEXT," +
+                            "drive_key      TEXT," +
+                            "thumbnail_path TEXT," +
+                            "description    TEXT," +
+                            "ctime          INTEGER NOT NULL," +
+                            "mtime          INTEGER";
 
             private final String VIRTUAL =
                     "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "res_id         INTEGER NOT NULL," +
-                    "name           TEXT," +
-                    "type           INTEGER NOT NULL," +
-                    "pos_x          REAL NOT NULL," +
-                    "pos_y          REAL NOT NULL," +
-                    "pos_z          REAL NOT NULL," +
-                    "rotate_x       REAL," +
-                    "rotate_y       REAL," +
-                    "rotate_z       REAL," +
-                    "container      TEXT," +
-                    "cont_order     INTEGER," +
-                    "style          TEXT";
+                            "res_id         INTEGER NOT NULL," +
+                            "name           TEXT," +
+                            "type           INTEGER NOT NULL," +
+                            "pos_x          REAL NOT NULL," +
+                            "pos_y          REAL NOT NULL," +
+                            "pos_z          REAL NOT NULL," +
+                            "rotate_x       REAL," +
+                            "rotate_y       REAL," +
+                            "rotate_z       REAL," +
+                            "size_x         REAL," +
+                            "size_y         REAL," +
+                            "size_z         REAL," +
+                            "container      TEXT," +
+                            "cont_order     INTEGER," +
+                            "style          TEXT";
 
             private final String AUGMENTED =
                     "_id            INTEGER PRIMARY KEY AUTOINCREMENT,"  +
-                    "res_id         INTEGER NOT NULL," +
-                    "altitude       REAL," +
-                    "latitude       REAL," +
-                    "longitude      REAL," +
-                    "support_x      REAL," +
-                    "support_y      REAL," +
-                    "support_z      REAL";
+                            "res_id         INTEGER NOT NULL," +
+                            "altitude       REAL," +
+                            "latitude       REAL," +
+                            "longitude      REAL," +
+                            "support_x      REAL," +
+                            "support_y      REAL," +
+                            "support_z      REAL";
 
             @Override
             public void onCreate(SQLiteDatabase db) {
@@ -242,9 +245,15 @@ public class LocalDatabaseCenter {
             @Override
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
                 // TODO : DATA 옮기는 과정 필요 or Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
-                db.execSQL("ALTER TABLE resource (" + RESOURCE + ");");
+                db.execSQL("DROP TABLE resource");
+                db.execSQL("DROP TABLE virtual");
+                db.execSQL("DROP TABLE augmented");
+
+                onCreate(db);
+
+                /*db.execSQL("ALTER TABLE resource (" + RESOURCE + ");");
                 db.execSQL("ALTER TABLE virtual (" + VIRTUAL + ");");
-                db.execSQL("ALTER TABLE augmented (" + AUGMENTED + ");");
+                db.execSQL("ALTER TABLE augmented (" + AUGMENTED + ");");*/
             }
         };
     }
@@ -420,6 +429,8 @@ public class LocalDatabaseCenter {
 
             Log.d("LDB_Select", "LDB Select : " + builder.toString());
             SQLiteDatabase db = mCenterF.mOpenHelperF.getReadableDatabase();
+
+
             try {
                 return db.rawQuery(builder.toString(), null);
 
@@ -429,7 +440,8 @@ public class LocalDatabaseCenter {
 
             } finally {
                 setClear().whereClear();
-                db.close();
+                // 데이터 반환을 위해 close()는 지연시킨다.
+                //db.close();
             }
         }
     }
@@ -611,6 +623,15 @@ public class LocalDatabaseCenter {
                 throw new InvalidParameterException();
 
             return this;
+        }
+
+        /**
+         * TableName을 직접 할당한다.
+         *
+         * @param tableName
+         */
+        public void setTable(String tableName) {
+            mTableName = tableName;
         }
 
         /**
