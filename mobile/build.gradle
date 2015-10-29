@@ -9,7 +9,10 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+
     }
+
+
     signingConfigs {
         debug {
             storeFile file(project.getRootDir().getAbsolutePath() + project.property('VirtualPalace.KeyStore'))
@@ -19,8 +22,11 @@ android {
         }
     }
     buildTypes {
-        debug{
+        debug {
             signingConfig signingConfigs.debug
+            jniDebuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
             minifyEnabled false
@@ -35,9 +41,10 @@ android {
 
 dependencies {
     provided files('libs/unity.jar')
-    provided files('libs/google_cardboard.jar')
+
     compile project(':input')
     compile project(':communication')
+    compile project(':openCVLibrary300')
 
     compile 'com.google.android.gms:play-services-drive:7.8.0'
     compile 'com.google.android.gms:play-services-identity:7.8.0'

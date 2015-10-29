@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace;
+package kr.poturns.virtualpalace.unity;
 
 import android.app.Fragment;
 import android.databinding.BindingAdapter;
@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import java.util.Arrays;
 import java.util.List;
 
-import kr.poturns.virtualpalace.databinding.ListMainItemBinding;
+import kr.poturns.virtualpalace.unity.databinding.ListMainItemBinding;
 
 /**
  * 웨어러블의 주 화면을 구성하는 Fragment

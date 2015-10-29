@@ -71,7 +71,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleIdentifier: kr.poturns.virtualpalace
+  bundleIdentifier: kr.poturns.virtualpalace.unity
   bundleVersion: 1.0
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
@@ -121,7 +121,7 @@ PlayerSettings:
   AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: C:/Users/byeonghun/Documents/MY/UnityGUI/virtualpalace.keystore
+  AndroidKeystoreName: D:/Git/VirtualPalace/UnityGUI/virtualpalace.keystore
   AndroidKeyaliasName: virtualpalace
   AndroidTVCompatibility: 0
   AndroidIsGame: 0

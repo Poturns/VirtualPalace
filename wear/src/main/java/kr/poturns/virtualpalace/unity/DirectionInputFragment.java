@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace;
+package kr.poturns.virtualpalace.unity;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,11 +10,11 @@ import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.inputcollector.TouchInputCollector;
 import kr.poturns.virtualpalace.inputmodule.WearableInputDetector;
 
-import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.DOWN;
-import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.LEFT;
+import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.EAST;
 import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.NONE;
-import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.RIGHT;
-import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.UP;
+import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.NORTH;
+import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.SOUTH;
+import static kr.poturns.virtualpalace.input.IOperationInputFilter.Direction.WEST;
 
 /**
  * 방향 입력을 처리하는 Fragment
@@ -158,14 +158,13 @@ public class DirectionInputFragment extends BackShakeFragment {
         private static int checkMotionDirection(MotionEvent motionEvent) {
             switch (motionEvent.getSource()) {
                 case R.id.image_up:
-                    return UP;
+                    return NORTH;
                 case R.id.image_down:
-                    return DOWN;
+                    return SOUTH;
                 case R.id.image_left:
-                    return LEFT;
+                    return WEST;
                 case R.id.image_right:
-                    return RIGHT;
-
+                    return EAST;
                 default:
                     return NONE;
             }

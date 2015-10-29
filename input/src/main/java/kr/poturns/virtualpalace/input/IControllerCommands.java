@@ -50,9 +50,9 @@ public interface IControllerCommands {
     int INPUT_TEXT_RESULT = 0x13;
 
     /**
-     *
+     * ANDROID 로부터 메시지를 전달받을 때 사용하는 명령 코드.
      */
-    int REQUEST_MESSAGE = 0x10;
+    int REQUEST_MESSAGE_FROM_ANDROID = 0x12;
     /**
      * UNITY 로부터 메시지를 전달받을 때 사용하는 명령 코드.
      */
@@ -77,6 +77,24 @@ public interface IControllerCommands {
             }]*,
 
             (response) RESULT : SUCCESS / FAIL / ERROR
+        }
+     */
+    /**
+     * AR 데이터 전달
+        {
+            DRAWING_AR : {
+                [
+                    {
+                        SCREEN_X : (number),
+                        SCREEN_Y : (number),
+                        RES_ID : (number),
+                        NAME : (string),
+                        DESCRIPTION : (string),
+                        TYPE : (number)
+                    },
+                    ...
+                ]
+            }
         }
      */
     /*
@@ -241,6 +259,7 @@ public interface IControllerCommands {
         /**
          * 현재 위치에서 일정 범위 내 존재하는 데이터를 찾는다.
          */
+        @Deprecated
         String QUERY_NEAR_ITEMS = "query_near_items";
         /**
          * VR 아이템에 렌더링할 아이템 데이터를 찾는다.
@@ -268,6 +287,16 @@ public interface IControllerCommands {
          * }
          */
         String QUERY_RESULT = "query_result";
+
+        /**
+         * AR 데이터 전달
+         */
+        String DRAWING_AR = "drawing_ar";
+
+        String SCREEN_X = "screen_x";
+
+        String SCREEN_Y = "screen_y";
+
 
         /**
          * VR 테이블 조회 명령.

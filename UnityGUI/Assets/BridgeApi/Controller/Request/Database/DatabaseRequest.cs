@@ -41,7 +41,7 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         /// <param name="place"> Select 쿼리 요청을 할 테이블</param>
         /// <returns> Select 쿼리 요청을 전송할 객체</returns>
-        public static ISelect Select(Place place)
+        public static ISelect Select(Table place)
         {
             return new SelectImpl(place);
         }
@@ -51,7 +51,7 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         /// <param name="place"> Insert 쿼리 요청을 할 테이블</param>
         /// <returns> Insert 쿼리 요청을 전송할 객체</returns>
-        public static IInsert InsertInto(Place place)
+        public static IInsert InsertInto(Table place)
         {
             return new InsertImpl(place);
         }
@@ -61,7 +61,7 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         /// <param name="place"> Update 쿼리 요청을 할 테이블</param>
         /// <returns> Delete 쿼리 요청을 전송할 객체</returns>
-        public static IUpdate Update(Place place)
+        public static IUpdate Update(Table place)
         {
             return new UpdateImpl(place);
         }
@@ -71,7 +71,7 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         /// <param name="place"> Delete 쿼리 요청을 할 테이블</param>
         /// <returns> Delete 쿼리 요청을 전송할 객체</returns>
-        public static IDelete Delete(Place place)
+        public static IDelete Delete(Table place)
         {
             return new DeleteImpl(place);
         }
@@ -116,7 +116,7 @@ namespace BridgeApi.Controller.Request.Database
             protected const int OPERATION_DELETE = 3;
             private string operation;
 
-            protected QueryRequest(Place place, int operationCode)
+            protected QueryRequest(Table place, int operationCode)
             {
                 operation = null;
                 switch (operationCode)
@@ -125,13 +125,13 @@ namespace BridgeApi.Controller.Request.Database
                     case OPERATION_SELECT:
                         switch (place)
                         {
-                            case Place.AR:
+                            case Table.AR:
                                 operation = DatabaseConstants.SELECT_AR;
                                 break;
-                            case Place.RES:
+                            case Table.RES:
                                 operation = DatabaseConstants.SELECT_RES;
                                 break;
-                            case Place.VR:
+                            case Table.VR:
                                 operation = DatabaseConstants.SELECT_VR;
                                 break;
                         }
@@ -139,13 +139,13 @@ namespace BridgeApi.Controller.Request.Database
                     case OPERATION_UPDATE:
                         switch (place)
                         {
-                            case Place.AR:
+                            case Table.AR:
                                 operation = DatabaseConstants.UPDATE_AR;
                                 break;
-                            case Place.RES:
+                            case Table.RES:
                                 operation = DatabaseConstants.UPDATE_RES;
                                 break;
-                            case Place.VR:
+                            case Table.VR:
                                 operation = DatabaseConstants.UPDATE_VR;
                                 break;
                         }
@@ -153,13 +153,13 @@ namespace BridgeApi.Controller.Request.Database
                     case OPERATION_INSERT:
                         switch (place)
                         {
-                            case Place.AR:
+                            case Table.AR:
                                 operation = DatabaseConstants.INSERT_AR;
                                 break;
-                            case Place.RES:
+                            case Table.RES:
                                 operation = DatabaseConstants.INSERT_RES;
                                 break;
-                            case Place.VR:
+                            case Table.VR:
                                 operation = DatabaseConstants.INSERT_VR;
                                 break;
                         }
@@ -167,13 +167,13 @@ namespace BridgeApi.Controller.Request.Database
                     case OPERATION_DELETE:
                         switch (place)
                         {
-                            case Place.AR:
+                            case Table.AR:
                                 operation = DatabaseConstants.DELETE_AR;
                                 break;
-                            case Place.RES:
+                            case Table.RES:
                                 operation = DatabaseConstants.DELETE_RES;
                                 break;
-                            case Place.VR:
+                            case Table.VR:
                                 operation = DatabaseConstants.DELETE_VR;
                                 break;
                         }
@@ -212,7 +212,7 @@ namespace BridgeApi.Controller.Request.Database
 
         private class SelectImpl : QueryRequest, ISelect
         {
-            public SelectImpl(Place place) : base(place, OPERATION_SELECT)
+            public SelectImpl(Table place) : base(place, OPERATION_SELECT)
             {
             }
 
@@ -261,7 +261,7 @@ namespace BridgeApi.Controller.Request.Database
 
         private class InsertImpl : QueryRequest, IInsert
         {
-            public InsertImpl(Place place) : base(place, OPERATION_INSERT)
+            public InsertImpl(Table place) : base(place, OPERATION_INSERT)
             {
             }
 
@@ -276,7 +276,7 @@ namespace BridgeApi.Controller.Request.Database
         private class UpdateImpl : QueryRequest, IUpdate
         {
 
-            public UpdateImpl(Place place) : base(place, OPERATION_UPDATE)
+            public UpdateImpl(Table place) : base(place, OPERATION_UPDATE)
             {
             }
 
@@ -325,7 +325,7 @@ namespace BridgeApi.Controller.Request.Database
 
         private class DeleteImpl : QueryRequest, IDelete
         {
-            public DeleteImpl(Place place) : base(place, OPERATION_DELETE)
+            public DeleteImpl(Table place) : base(place, OPERATION_DELETE)
             {
             }
 
@@ -667,7 +667,7 @@ namespace BridgeApi.Controller.Request.Database
     /// <summary>
     /// Database에서 조작할 Table
     /// </summary>
-    public enum Place
+    public enum Table
     {
         VR, AR, RES
     }
@@ -744,7 +744,11 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         RES_ID,
         /// <summary>
-        /// text, not null
+        /// text
+        /// </summary>
+        NAME,
+        /// <summary>
+        /// int, not null
         /// </summary>
         TYPE,
         /// <summary>
@@ -772,7 +776,7 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         ROTATE_Z,
         /// <summary>
-        /// int
+        /// text
         /// </summary>
         CONTAINER,
         /// <summary>
@@ -788,7 +792,7 @@ namespace BridgeApi.Controller.Request.Database
 
     /// <summary>
     /// AUGMENTED TABLE 필드 상수<para/>
-    /// not null : resid, alt, lat, long
+    /// not null : resid
     /// </summary>
     public enum AUGMENTED_FIELD
     {
@@ -801,18 +805,29 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         RES_ID,
         /// <summary>
-        /// real, not null
+        /// real
         /// </summary>
         ALTITUDE,
         /// <summary>
-        /// real, not null
+        /// real
         /// </summary>
         LATITUDE,
         /// <summary>
-        /// real, not null
+        /// real
         /// </summary>
-        LONGITUDE
-
+        LONGITUDE,
+        /// <summary>
+        /// real
+        /// </summary>
+        SUPPORT_X,
+        /// <summary>
+        /// real
+        /// </summary>
+        SUPPORT_Y,
+        /// <summary>
+        /// real
+        /// </summary>
+        SUPPORT_Z
     }
 
     #endregion Database Property

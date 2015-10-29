@@ -5,7 +5,7 @@
 
         <variable
             name="item"
-            type="kr.poturns.virtualpalace.InfoFragment.InfoItem" />
+            type="kr.poturns.virtualpalace.unity.InfoFragment.InfoItem" />
     </data>
 
     <RelativeLayout

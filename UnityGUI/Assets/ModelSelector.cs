@@ -21,6 +21,8 @@ public class ModelSelector : MonoBehaviour,IRaycastedObject {
 
 			UItemp.OnOffOUIButton (false);
 			UItemp.UnlockCameraRot();
+
+            RestoreGazeSelectMode();
 			//Target.GetComponent<BookCaseScript> ().
 		}
 			
@@ -31,4 +33,15 @@ public class ModelSelector : MonoBehaviour,IRaycastedObject {
 		transform.parent.gameObject.GetComponent<UITransform> ().OnOffOUIButton (false);
 */
 	}
+
+    private void RestoreGazeSelectMode()
+    {
+        GameObject EventSys = GameObject.Find("EventSystem");
+        if (EventSys == null) Debug.Log("Event System Find Fail");
+        //else Debug.Log(EventSys);
+
+        GazeInputModule SelectModule = EventSys.GetComponent<GazeInputModule>();
+        if (SelectModule == null) Debug.Log("GazeInputModule == null");
+        SelectModule.Mode = 0;
+    }
 }

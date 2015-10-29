@@ -28,6 +28,10 @@ import java.util.List;
 
 /**
  * Created by Myungjin Kim on 2015-09-08.
+ * <p>
+ * REST API를 활용해 Google Drive에 접근하는 클래스.
+ * <p>
+ * 사용자의 일반 파일에 접근가능하다.
  */
 public class DriveRestAssistant {
     /**
@@ -37,9 +41,9 @@ public class DriveRestAssistant {
     private static final String FOLDER_MIME = "application/vnd.google-apps.folder";
 
     private Drive mDriveService;
-    private Drive.Parents mParentsMethodSet;
-    private Drive.Children mChildrenMethodSet;
-    private Drive.Files mFilesMethodSet;
+    //private Drive.Parents mParentsMethodSet;
+    //private Drive.Children mChildrenMethodSet;
+    //private Drive.Files mFilesMethodSet;
 
     public DriveRestAssistant(Context context) {
         AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
@@ -53,18 +57,18 @@ public class DriveRestAssistant {
                 .setApplicationName(context.getApplicationInfo().name)
                 .build();
 
-        mParentsMethodSet = mDriveService.parents();
-        mChildrenMethodSet = mDriveService.children();
-        mFilesMethodSet = mDriveService.files();
+        //mParentsMethodSet = mDriveService.parents();
+        //mChildrenMethodSet = mDriveService.children();
+        //mFilesMethodSet = mDriveService.files();
     }
 
     /**
      * Drive와의 연결을 종료하고, 자원을 반납한다.
      */
     public void destroy() {
-        mParentsMethodSet = null;
-        mChildrenMethodSet = null;
-        mFilesMethodSet = null;
+        //mParentsMethodSet = null;
+        //mChildrenMethodSet = null;
+        //mFilesMethodSet = null;
         mDriveService = null;
     }
 
@@ -83,7 +87,7 @@ public class DriveRestAssistant {
         for (int i = 0; i < N; i++) {
             ChildReference childReference = childReferences.get(i);
 
-            batchRequest.queue(configureRequest(partialRequest(mFilesMethodSet.get(childReference.getId())).buildHttpRequest()),
+            batchRequest.queue(configureRequest(partialRequest(mDriveService.files().get(childReference.getId())).buildHttpRequest()),
                     File.class, Void.class, new BatchCallback<File, Void>() {
                         @Override
                         public void onSuccess(File file, HttpHeaders responseHeaders) throws IOException {
@@ -136,7 +140,7 @@ public class DriveRestAssistant {
         for (int i = 0; i < N; i++) {
             ParentReference parentReference = parentReferences.get(i);
 
-            batchRequest.queue(configureRequest(partialRequest(mFilesMethodSet.get(parentReference.getId())).buildHttpRequest()),
+            batchRequest.queue(configureRequest(partialRequest(mDriveService.files().get(parentReference.getId())).buildHttpRequest()),
                     File.class, Void.class, new BatchCallback<File, Void>() {
                         @Override
                         public void onSuccess(File file, HttpHeaders responseHeaders) throws IOException {
@@ -173,7 +177,7 @@ public class DriveRestAssistant {
      * @param fileId 검색할 파일의 id
      */
     public List<ParentReference> requestParentReferenceList(String fileId) throws IOException {
-        return mParentsMethodSet.list(fileId).execute().getItems();
+        return mDriveService.parents().list(fileId).execute().getItems();
     }
 
 
@@ -185,7 +189,7 @@ public class DriveRestAssistant {
     private List<ChildReference> requestChildReferenceList(String folderId) throws IOException {
         List<ChildReference> list = new ArrayList<ChildReference>();
 
-        Drive.Children.List request = mChildrenMethodSet.list(folderId);
+        Drive.Children.List request = mDriveService.children().list(folderId);
         do {
             try {
                 ChildList children = request.setFields("nextPageToken,items(id)").execute();
@@ -201,8 +205,14 @@ public class DriveRestAssistant {
         return list;
     }
 
+    /**
+     * 주어진 id로 파일의 정보를 가져온다.
+     *
+     * @param fileId 파일의 id
+     * @return id에 해당하는 파일의 정보
+     */
     public File getFile(String fileId) throws IOException {
-        return partialRequest(mFilesMethodSet.get(fileId)).execute();
+        return partialRequest(mDriveService.files().get(fileId)).execute();
     }
 /*
     public byte[] openFile(String fileId) throws IOException {

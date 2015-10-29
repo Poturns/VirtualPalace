@@ -14,7 +14,7 @@ namespace MyScript.States
         public VRSceneIdleState(StateManager managerRef)
         {
             manager = managerRef;
-			OnSceneChanged ();
+            OnSceneChanged();
         }
 
         public void OnSceneChanged()
@@ -29,7 +29,7 @@ namespace MyScript.States
 
             SelectModule = EventSys.GetComponent<GazeInputModule>();
             if (SelectModule == null) Debug.Log("GazeInputModule == null");
-			SelectModule.Mode = 0;
+            SelectModule.Mode = 0;
             Player = GameObject.Find("Player");
             //else Debug.Log(SelectModule);
         }
@@ -55,7 +55,8 @@ namespace MyScript.States
                         break;
 
                     case Operation.SELECT:
-                        
+                        //Debug.Log("Select");
+
                         if (SelectModule == null)
                         {
                             // Debug.Log("1. Select Module == null");
@@ -72,22 +73,20 @@ namespace MyScript.States
                         GameObject SelObj = SelectModule.RaycastedGameObject;
                         if (SelObj != null)
                         {
-                            // Debug.Log("SelObj -> " + SelObj.name);
-
                             IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject>();
                             if (raycastedObject != null)
                             {
-                                //Debug.Log("IRaycastedObject != null");
                                 raycastedObject.OnSelect();
                             }
-                            //else                                Debug.Log("IRaycastedObject == null");
+                            else
+                            {
+                                Debug.Log(" raycastedObject == null");
+                            }
                         }
-                        /* else
-                         {
-                             Debug.Log("SelObj == null");
-                         }
-                         */
-                        //EventSystem.current.currentSelectedGameObject();
+                        else
+                        {
+                            Debug.Log("selobj == null");
+                        }
                         break;
                     default:
                         if (op.IsDirection())
@@ -100,12 +99,6 @@ namespace MyScript.States
             }
         }
 
-        void MoveDir(Operation op)
-        {
-            Dictionary<int, Direction> DirList = JsonInterpreter.ParseDirectionAmount(op);
-            if (DirList.ContainsKey(Direction.DIMENSION_2))
-                MoveCamera(DirList[Direction.DIMENSION_2]);
-        }
 
         void Switch()
         {
@@ -115,33 +108,59 @@ namespace MyScript.States
 
         }
 
+        void MoveDir(Operation op)
+        {
+            Debug.Log("Direction Operation : " + op);
+            Dictionary<int, Direction> DirList = JsonInterpreter.ParseDirectionAmount(op);
+
+            string s = "";
+            foreach (int key in DirList.Keys)
+            {
+                s += "dimension : " + key + ", Direction : " + DirList[key] + "\n";
+                MoveCamera(DirList[key]);
+            }
+            Debug.Log("Direction Map :\n" + s);
+            //if (DirList.ContainsKey(Direction.DIMENSION_2))
+            //  MoveCamera(DirList[Direction.DIMENSION_2]);
+        }
+
         void MoveCamera(Direction direction)
         {
-
+            Debug.Log("Move to : " + direction.Value);
             Vector3 NewVector;
 
             switch (direction.Value)
             {
-
-                case Direction.RIGHT:
+                case Direction.EAST:
                     NewVector = Camera.main.transform.right;
                     break;
-                case Direction.LEFT:
-					NewVector = - Camera.main.transform.right;
+                case Direction.WEST:
+                    NewVector = -Camera.main.transform.right;
                     break;
-                case Direction.DOWN:
-					NewVector = - Camera.main.transform.forward;
-					NewVector.y = 0;
-                 	break;
-                case Direction.UP:
-					NewVector =  Camera.main.transform.forward;
-					NewVector.y = 0;
-					break;
+                case Direction.SOUTH:
+                    NewVector = -Camera.main.transform.forward;
+                    NewVector.y = 0;
+                    break;
+                case Direction.NORTH:
+                    NewVector = Camera.main.transform.forward;
+                    NewVector.y = 0;
+                    break;
                 default:
-                    NewVector = new Vector3(0, 0, 0);
-                    break;
+                    return;
             }
-            Player.transform.position += NewVector*Time.deltaTime;
+            if (Player == null)
+            {
+                Player = GameObject.Find("Player");
+            }
+            if (Player != null)
+            {
+                if (Player.transform != null)
+                    Player.transform.position += 0.2f*NewVector;
+                else
+                    Debug.LogError("Player.transform == null");
+            }
+            else
+                Debug.LogError("Player == null");
         }
 
         private void ReturnToMainScene()

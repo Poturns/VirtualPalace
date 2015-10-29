@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace;
+package kr.poturns.virtualpalace.unity;
 
 import android.os.Bundle;
 import android.view.KeyEvent;

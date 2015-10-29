@@ -221,7 +221,7 @@ namespace BridgeApi.Controller
         /// <summary>
         /// Direction | Amount, 분리 계수
         /// </summary>
-        public const int SEPARATION = 1000;
+        public const int SEPARATION = 100000;
         #endregion Constants
 
 
@@ -234,6 +234,56 @@ namespace BridgeApi.Controller
         /// 이동/전환할 양
         /// </summary>
         public int Amount;
+
+        public override string ToString()
+        {
+            return "[ Direction : " + GetDirectionName() + "(" + Value + ")" + " , Amount : " + Amount + " ]";
+        }
+
+        public string GetDirectionName()
+        {
+            switch (Value)
+            {
+                case NONE:
+                    return "NONE";
+
+                case CENTER:
+                    return "CENTER";
+                case RIGHT:
+                    return "RIGHT";
+                case LEFT:
+                    return "LEFT";
+                case UP:
+                    return "UP";
+                case DOWN:
+                    return "DOWN";
+
+                case EAST:
+                    return "EAST";
+                case WEST:
+                    return "WEST";
+                case SOUTH:
+                    return "SOUTH";
+                case NORTH:
+                    return "NORTH";
+
+                case FORWARD:
+                    return "FORWARD";
+                case BACKWARD:
+                    return "BACKWARD";
+                case UPWARD:
+                    return "UPWARD";
+                case DOWNWARD:
+                    return "DOWNWARD";
+                case LEFTWARD:
+                    return "LEFTWARD";
+                case RIGHTWARD:
+                    return "RIGHTWARD";
+                default:
+                    return "";
+            }
+
+        }
 
     }
 
@@ -276,9 +326,9 @@ namespace BridgeApi.Controller
 
         public override string ToString()
         {
-            return "QueryRequestResult : [\nRequest : " + RequestName 
-                + "\nStatus : " + Status 
-                + "\nData : " + (QueryData == null? "null": QueryData.ToString()) 
+            return "QueryRequestResult : [\nRequest : " + RequestName
+                + "\nStatus : " + Status
+                + "\nData : " + (QueryData == null ? "null" : QueryData.ToString())
                 + "\n]";
         }
     }

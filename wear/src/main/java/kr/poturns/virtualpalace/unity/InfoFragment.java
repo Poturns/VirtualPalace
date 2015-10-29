@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace;
+package kr.poturns.virtualpalace.unity;
 
 import android.databinding.BindingAdapter;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import kr.poturns.virtualpalace.databinding.ListInfoItemBinding;
+import kr.poturns.virtualpalace.unity.databinding.ListInfoItemBinding;
 
 /**
  * 기타 Fragment
