@@ -155,6 +155,7 @@ GameObject:
   - 114: {fileID: 11470752}
   - 114: {fileID: 11498518}
   - 114: {fileID: 11491856}
+  - 114: {fileID: 11441578}
   m_Layer: 0
   m_Name: Cap
   m_TagString: InteractiveObject
@@ -701,6 +702,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4.42110729, y: 2.37363195, z: 3.09925437}
   m_Center: {x: -.0715804324, y: 1.39013994, z: -1.04970467}
+--- !u!114 &11441578
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 162496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8a28df7fab758478bfe09aa1679a81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IndexMovie: 0
 --- !u!114 &11462852
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -737,6 +750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TextureUpdateOn: 0
 --- !u!114 &11496678
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -781,7 +795,7 @@ MonoBehaviour:
   InitTitle: 
   InitMemo: 
   kind: 0
-  UIObject: {fileID: 162496}
+  UIObject: {fileID: 127046}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -797,6 +811,10 @@ Prefab:
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 11470752}
+    - target: {fileID: 0}
+      propertyPath: UIObject
+      value: 
+      objectReference: {fileID: 127046}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 127046}

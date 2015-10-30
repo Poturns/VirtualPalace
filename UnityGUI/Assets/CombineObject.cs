@@ -8,6 +8,7 @@ public class CombineObject : MonoBehaviour , IRaycastedObject {
 
 	private MemoObject TextData;
 	private PictureObj ImageData;
+	private MovieObject MovieData;
 	public KIND_SOURCE Kind;
 
 	// Use this for initialization
@@ -18,6 +19,7 @@ public class CombineObject : MonoBehaviour , IRaycastedObject {
 	{
 		TextData = gameObject.GetComponent<MemoObject> ();
 		ImageData = gameObject.GetComponent<PictureObj> ();
+		MovieData = gameObject.GetComponent<MovieObject> ();
 	}
 	public void OnSelect()
 	{
@@ -29,12 +31,15 @@ public class CombineObject : MonoBehaviour , IRaycastedObject {
 		case KIND_SOURCE.IMAGE:
 			ImageData.OnSelect();
 			break;
+		case KIND_SOURCE.MOVIE:
+			MovieData.OnSelect();
+			break;
 		}
 	}
 	public void SetKind(KIND_SOURCE k)
 	{
 		Kind = k;
-		Debug.Log ("k :" + k);
+		//Debug.Log ("k :" + k);
 		Debug.Log ("CombineObj Kind :" + Kind);
 	}
 	// Update is called once per frame

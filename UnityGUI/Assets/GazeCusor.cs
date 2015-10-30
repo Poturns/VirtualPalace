@@ -4,6 +4,7 @@ using MyScript.Interface;
 
 [System.Serializable]
 public class GazeCusor : MonoBehaviour {
+    private bool gazeDisable = false;
 
 	public float GazeTime = 0.0f;
 	public bool	GazeSelete =false;
@@ -13,14 +14,18 @@ public class GazeCusor : MonoBehaviour {
 	}
 	void OnEnable()
 	{
-		Debug.Log ("CursorEnalbe");
+        if (gazeDisable)
+            return;
+        Debug.Log ("CursorEnalbe");
 		GazeTime = 0.0f;
 		GazeSelete = false;
 	
 	}
 	void OnDisable()
 	{
-		Debug.Log ("CursorDisalbe");
+        if (gazeDisable)
+            return;
+        Debug.Log ("CursorDisalbe");
 		GazeTime = 0.0f;
 		GazeSelete = false;
 		GazeObject = null;
@@ -28,13 +33,16 @@ public class GazeCusor : MonoBehaviour {
 	void Update () 
 	{
 
-	//	if (GazeSelete) 
-	//	{
-	//		return;
-	//	}
-	
-		GazeTime += Time.deltaTime;
 
+        //	if (GazeSelete) 
+        //	{
+        //		return;
+        //	}
+        if (gazeDisable)
+            return;
+        
+		GazeTime += Time.deltaTime;
+        
 		if (GazeTime > GazeTimeMax) 
 		{
 			if(GazeObject != null)

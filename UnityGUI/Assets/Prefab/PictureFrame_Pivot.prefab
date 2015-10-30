@@ -15,6 +15,7 @@ GameObject:
   - 64: {fileID: 6423570}
   - 114: {fileID: 11460418}
   - 114: {fileID: 11429496}
+  - 114: {fileID: 11464482}
   m_Layer: 0
   m_Name: PictureFrame
   m_TagString: InteractiveObject
@@ -189,6 +190,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TextureUpdateOn: 1
+--- !u!114 &11464482
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 122988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8a28df7fab758478bfe09aa1679a81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IndexMovie: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

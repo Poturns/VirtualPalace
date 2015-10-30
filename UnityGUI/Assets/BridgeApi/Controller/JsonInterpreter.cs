@@ -44,7 +44,7 @@ namespace BridgeApi.Controller
         /// <exception cref="ArgumentException">방향 Operation이 아닌 Operation이 매개변수로 메소드가 호출 된 경우</exception>
         public static Dictionary<int, Direction> ParseDirectionAmount(Operation operation)
         {
-            if (!operation.IsDirection())
+            if (!operation.IsDirection)
                 throw new ArgumentException();
 
             Dictionary<int, Direction> dictionary = new Dictionary<int, Direction>();

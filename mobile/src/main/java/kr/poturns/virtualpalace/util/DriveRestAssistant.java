@@ -9,6 +9,7 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.batch.BatchCallback;
 import com.google.api.client.googleapis.batch.BatchRequest;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
@@ -199,6 +200,9 @@ public class DriveRestAssistant {
             } catch (IOException e) {
                 e.printStackTrace();
                 request.setPageToken(null);
+
+                if(e instanceof UserRecoverableAuthIOException)
+                    throw e;
             }
         } while (request.getPageToken() != null && request.getPageToken().length() > 0);
 

@@ -1,4 +1,4 @@
-using LitJson;
+﻿using LitJson;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,9 +32,9 @@ namespace AndroidApi.Media
             {
                 l = (long)jData[key];
             }
-            catch (InvalidCastException e)
+            catch (InvalidCastException)
             {
-                Debug.LogException(e);
+                //Debug.LogException(e);
                 l = (int)jData[key];
             }
 
@@ -58,9 +58,9 @@ namespace AndroidApi.Media
 
         internal static List<VideoInfo> GetInfoList(AndroidJavaObject activity, string dirName)
         {
-            using (AndroidJavaClass imageInfoClass = new AndroidJavaClass(VideoInfoClassName))
+            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
             {
-                string listJson = imageInfoClass.CallStatic<string>(GetJsonInfoListMethodName, activity, dirName);
+                string listJson = videoInfoClass.CallStatic<string>(GetJsonInfoListMethodName, activity, dirName);
 
                 JsonData jData = JsonMapper.ToObject(listJson);
                 int count = jData.Count;
@@ -78,13 +78,29 @@ namespace AndroidApi.Media
             }
         }
 
+        /// <summary>
+        /// 비디오의 처음 프레임의 이미지를 생성한다.
+        /// </summary>
+        /// <param name="fileName">비디오의 처음 프레임의 이미지가 저장되는 파일의 이름</param>
+        /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
         public string GetFirstFrameThumbnailPath(string fileName)
         {
-            using (AndroidJavaClass imageInfoClass = new AndroidJavaClass(VideoInfoClassName))
+            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
             {
-                return imageInfoClass.CallStatic<string>("getFirstFrameThumbnail", fileName, Path);
+                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", AndroidUtils.GetActivityObject(), fileName, Path);
             }
         }
+
+        /// <summary>
+        /// 비디오의 처음 프레임의 이미지를 생성한다.
+        /// </summary>
+        /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
+        public string GetFirstFrameThumbnailPath()
+        {
+            return GetFirstFrameThumbnailPath(DirName + "_" + DisplayName);
+        }
+
     }
+
 }
 
