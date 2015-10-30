@@ -45,7 +45,7 @@ public class SensorTestActivity extends Activity {
 
         InfraDataService service = ((PalaceApplication) getApplication()).getInfraDataService();
         if (service != null)
-            service.startListening();
+            service.startListeningActivated();
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -90,7 +90,7 @@ public class SensorTestActivity extends Activity {
 
         InfraDataService service = ((PalaceApplication) getApplication()).getInfraDataService();
         if (service != null)
-            service.stopListening();
+            service.stopListeningActivated();
 
         super.onPause();
     }

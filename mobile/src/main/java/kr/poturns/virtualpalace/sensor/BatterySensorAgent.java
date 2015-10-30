@@ -35,8 +35,7 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
                 mBatteryLevel = intent.getIntExtra("level", 0);
                 mTemperature = intent.getIntExtra("temperature", 0) / 10.0;
 
-            } else
-            if(Intent.ACTION_BATTERY_LOW.equals(action)) {
+            } else if(Intent.ACTION_BATTERY_LOW.equals(action)) {
 
             }
 
@@ -73,7 +72,6 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
     @Override
     public void stopListening() {
         super.stopListening();
-
         mContextF.unregisterReceiver(mReceiverF);
     }
 
@@ -103,10 +101,12 @@ public class BatterySensorAgent extends BaseSensorAgent implements BaseSensorAge
      */
     @Override
     public void onCollaboration(int thisType, int targetType, double[] thisData, double[] targetData) {
-        switch (targetType) {
-
-        }
+        // Battery Agent 는 다른 Sensor Agent로 부터 데이터를 전달받아 Collaboration 을 수행하지 않는다.
     }
 
-
+    @Override
+    @Deprecated
+    public void setCollaborationWith(BaseSensorAgent agent, OnDataCollaborationListener listener) {
+        // Battery Agent 는 다른 Sensor Agent 로부터 데이터를 전달받아 Collaboration 을 수행하지 않는다.
+    }
 }

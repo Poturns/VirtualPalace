@@ -17,6 +17,7 @@ public class MagneticSensorAgent extends BaseSensorAgent implements SensorEventL
     public static final int DATA_INDEX_AXIS_X = 1;
     public static final int DATA_INDEX_AXIS_Y = 2;
     public static final int DATA_INDEX_AXIS_Z = 3;
+    public static final int DATA_INDEX_ACCURACY = 4;
 
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
@@ -26,6 +27,7 @@ public class MagneticSensorAgent extends BaseSensorAgent implements SensorEventL
     private float axisX;
     private float axisY;
     private float axisZ;
+    private int accuracy;
 
 
 
@@ -42,14 +44,12 @@ public class MagneticSensorAgent extends BaseSensorAgent implements SensorEventL
     @Override
     public void startListening() {
         super.startListening();
-
         mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
     public void stopListening() {
         super.stopListening();
-
         mSensorManagerF.unregisterListener(this);
     }
 
@@ -62,7 +62,8 @@ public class MagneticSensorAgent extends BaseSensorAgent implements SensorEventL
                 mLatestMeasuredTimestamp,
                 axisX,
                 axisY,
-                axisZ
+                axisZ,
+                accuracy
         };
     }
 
@@ -88,12 +89,13 @@ public class MagneticSensorAgent extends BaseSensorAgent implements SensorEventL
         axisX = event.values[DATA_INDEX_AXIS_X -1];
         axisY = event.values[DATA_INDEX_AXIS_Y -1];
         axisZ = event.values[DATA_INDEX_AXIS_Z -1];
+        accuracy = event.accuracy;
 
         onDataMeasured();
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        this.accuracy = accuracy;
     }
 }

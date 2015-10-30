@@ -25,7 +25,16 @@ public class NetworkSensorAgent extends BaseSensorAgent {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
             mLatestMeasuredTimestamp = System.currentTimeMillis();
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                // TODO :
+
+            } else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(action)) {
+                // TODO :
+            }
+
 
         }
     };
@@ -70,6 +79,7 @@ public class NetworkSensorAgent extends BaseSensorAgent {
     public double[] getLatestData() {
         return new double[] {
             mLatestMeasuredTimestamp
+                // TODO:
         };
     }
 

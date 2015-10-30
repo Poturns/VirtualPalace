@@ -50,7 +50,7 @@ public class AugmentedCore {
 			public void run() {
 				if(!bRunning) {
 					// initial routine
-					mAppF.getInfraDataService().startListening();
+					mAppF.getInfraDataService().startListeningActivated();
 					bStop = false;
 					bRunning = true;
 					return;
@@ -70,7 +70,7 @@ public class AugmentedCore {
 					//activity.addOutputItems(outputList);
 				} else {
 					// end
-					mAppF.getInfraDataService().stopListening();
+					mAppF.getInfraDataService().stopListeningActivated();
 					mManagerF.SaveCreated(mAppF);
 					bRunning = false;
 				}

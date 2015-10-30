@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import kr.poturns.virtualpalace.controller.PalaceApplication;
+import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.mobiletest.R;
 import kr.poturns.virtualpalace.util.DriveAssistant;
 import kr.poturns.virtualpalace.util.IOUtils;
@@ -37,7 +39,7 @@ import kr.poturns.virtualpalace.util.IOUtils;
  *
  * DriveAssistant test Fragment
  */
-public class DriveTestFragment extends Fragment {
+public class DriveTestFragment extends Fragment implements View.OnClickListener{
     private DriveAssistant mDriveAssistant;
 
     ProgressDialog dialog;
@@ -74,6 +76,8 @@ public class DriveTestFragment extends Fragment {
         ListView listView = (ListView) v.findViewById(R.id.listview);
         listView.setAdapter(adapter = new MetadataAdapter(getActivity()));
         adapter.setNotifyOnChange(false);
+
+        v.findViewById(R.id.button).setOnClickListener(this);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -193,6 +197,19 @@ public class DriveTestFragment extends Fragment {
                 });
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.button:
+                PalaceApplication app = (PalaceApplication) getActivity().getApplication();
+                PalaceMaster master = PalaceMaster.getInstance(app);
+                master.testDrive(mDriveAssistant);
+
+                break;
+        }
     }
 
     private static class MetadataAdapter extends DataBufferAdapter<Metadata> {

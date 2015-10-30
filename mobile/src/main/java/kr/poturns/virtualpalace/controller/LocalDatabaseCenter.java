@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.Pair;
@@ -170,7 +171,7 @@ public class LocalDatabaseCenter {
 
     /**
      * DB 저장 위치 : Local App 디렉토리에 위치하여, App 삭제시 DB도 자동으로 삭제될 수 있도록 한다.
-     *      /sdcard/data/data/kr.poturns.virtualpalace/databases/LocalDB
+     *      /data/data/kr.poturns.virtualpalace/databases/LocalDB
      */
     private static final String NAME = "LocalDB";
     /**
@@ -351,7 +352,7 @@ public class LocalDatabaseCenter {
     }
 
     public void backUp(DriveAssistant assistant) {
-        File dbFile = new File(NAME);
+        File dbFile = new File(Environment.getDataDirectory(), "kr.poturns.virtualpalace/databases/LocalDB");
         DriveFolder folder = assistant.getAppFolder();
 
         // Drive Contents 생성
