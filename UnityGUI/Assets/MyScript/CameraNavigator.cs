@@ -48,7 +48,7 @@ namespace MyScript
             if (player.transform != null)
             {
                 /* * direction.Amount*/
-				player.GetComponent<CharacterController>().Move(Time.deltaTime *  0.2f*NewVector);
+				player.GetComponent<CharacterController>().Move(Time.deltaTime *NewVector);
 				return true;
             }
             else
