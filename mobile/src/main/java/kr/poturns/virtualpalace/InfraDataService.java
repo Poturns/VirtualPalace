@@ -22,15 +22,16 @@ import java.util.HashMap;
  */
 public class InfraDataService extends Service {
 
-    private HashMap<Integer, BaseSensorAgent> mSensorAgentMap;
+    private final LocalBinder ServiceBinder = new LocalBinder();
+
+    private final HashMap<Integer, BaseSensorAgent> SensorAgentMap = new HashMap<Integer, BaseSensorAgent>(ISensorAgent.TYPE_TOTAL_COUNT);
 
     private int agentActivation = 0;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        mSensorAgentMap = new HashMap<Integer, BaseSensorAgent>(ISensorAgent.TYPE_TOTAL_COUNT);
 
         // Default Agent Activation
         agentActivation =
@@ -40,45 +41,10 @@ public class InfraDataService extends Service {
         initSensorAgents();
     }
 
-    private void initSensorAgents() {
-        int agentType;
-
-        AcceleroSensorAgent acceleroAgent = new AcceleroSensorAgent(this);
-        agentType = acceleroAgent.getAgentType();
-        acceleroAgent.setActivation(isActivatedAgent(agentType));
-        mSensorAgentMap.put(agentType, acceleroAgent);
-
-        BatterySensorAgent batteryAgent = new BatterySensorAgent(this);
-        agentType = batteryAgent.getAgentType();
-        batteryAgent.setActivation(isActivatedAgent(agentType));
-        mSensorAgentMap.put(agentType, batteryAgent);
-
-        GyroSensorAgent gyroAgent = new GyroSensorAgent(this);
-        agentType = gyroAgent.getAgentType();
-        gyroAgent.setActivation(isActivatedAgent(agentType));
-        mSensorAgentMap.put(agentType, gyroAgent);
-
-        LocationSensorAgent locationAgent = new LocationSensorAgent(this);
-        agentType = locationAgent.getAgentType();
-        locationAgent.setActivation(isActivatedAgent(agentType));
-        mSensorAgentMap.put(agentType, locationAgent);
-
-        NetworkSensorAgent networkAgent = new NetworkSensorAgent(this);
-        agentType = networkAgent.getAgentType();
-        networkAgent.setActivation(isActivatedAgent(agentType));
-        mSensorAgentMap.put(agentType, networkAgent);
-
-        MagneticSensorAgent magneticAgent = new MagneticSensorAgent(this);
-        agentType = magneticAgent.getAgentType();
-        magneticAgent.setActivation(isActivatedAgent(agentType));
-        mSensorAgentMap.put(agentType, magneticAgent);
-
-        // Collaboration 등록
-        acceleroAgent.setCollaborationWith(magneticAgent);
-        locationAgent.setCollaborationWith(batteryAgent);
-        locationAgent.setCollaborationWith(networkAgent);
+    @Override
+    public IBinder onBind(Intent intent) {
+        return ServiceBinder;
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -86,20 +52,60 @@ public class InfraDataService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-
     @Override
     public void onDestroy() {
         stopListeningActivated();
         super.onDestroy();
     }
 
+
+    private void initSensorAgents() {
+        SensorAgentMap.clear();
+        int agentType;
+
+        AcceleroSensorAgent acceleroAgent = new AcceleroSensorAgent(this);
+        agentType = acceleroAgent.getAgentType();
+        acceleroAgent.setActivation(isActivatedAgent(agentType));
+        SensorAgentMap.put(agentType, acceleroAgent);
+
+        BatterySensorAgent batteryAgent = new BatterySensorAgent(this);
+        agentType = batteryAgent.getAgentType();
+        batteryAgent.setActivation(isActivatedAgent(agentType));
+        SensorAgentMap.put(agentType, batteryAgent);
+
+        GyroSensorAgent gyroAgent = new GyroSensorAgent(this);
+        agentType = gyroAgent.getAgentType();
+        gyroAgent.setActivation(isActivatedAgent(agentType));
+        SensorAgentMap.put(agentType, gyroAgent);
+
+        LocationSensorAgent locationAgent = new LocationSensorAgent(this);
+        agentType = locationAgent.getAgentType();
+        locationAgent.setActivation(isActivatedAgent(agentType));
+        SensorAgentMap.put(agentType, locationAgent);
+
+        NetworkSensorAgent networkAgent = new NetworkSensorAgent(this);
+        agentType = networkAgent.getAgentType();
+        networkAgent.setActivation(isActivatedAgent(agentType));
+        SensorAgentMap.put(agentType, networkAgent);
+
+        MagneticSensorAgent magneticAgent = new MagneticSensorAgent(this);
+        agentType = magneticAgent.getAgentType();
+        magneticAgent.setActivation(isActivatedAgent(agentType));
+        SensorAgentMap.put(agentType, magneticAgent);
+
+        // Collaboration 등록
+        acceleroAgent.setCollaborationWith(magneticAgent);
+        locationAgent.setCollaborationWith(batteryAgent);
+        locationAgent.setCollaborationWith(networkAgent);
+    }
+
     public void startListeningActivated() {
-        for (BaseSensorAgent agent : mSensorAgentMap.values())
+        for (BaseSensorAgent agent : SensorAgentMap.values())
             agent.start();
     }
 
     public void stopListeningActivated() {
-        for (BaseSensorAgent agent : mSensorAgentMap.values())
+        for (BaseSensorAgent agent : SensorAgentMap.values())
             agent.stop();
     }
 
@@ -130,21 +136,8 @@ public class InfraDataService extends Service {
         };
 
         for (int agentType : arSensorArray) {
-            activateSensorAgent(agentType);
+            deactivateSensorAgent(agentType);
             getSensorAgent(agentType).stop();
-        }
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinderF;
-    }
-
-    private final LocalBinder mBinderF  = new LocalBinder();
-
-    public class LocalBinder extends Binder {
-        public InfraDataService getService() {
-            return InfraDataService.this;
         }
     }
 
@@ -203,6 +196,13 @@ public class InfraDataService extends Service {
      * @return {@link BaseSensorAgent}; agentType이 일치하지 않을 경우, NULL
      */
     public BaseSensorAgent getSensorAgent(int agentType) {
-        return mSensorAgentMap.get(agentType);
+        return SensorAgentMap.get(agentType);
+    }
+
+
+    public class LocalBinder extends Binder {
+        public InfraDataService getService() {
+            return InfraDataService.this;
+        }
     }
 }

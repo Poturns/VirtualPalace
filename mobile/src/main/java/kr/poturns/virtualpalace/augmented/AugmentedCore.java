@@ -22,7 +22,7 @@ public class AugmentedCore {
 
 	/*
 	public AugmentedCore(PalaceApplication app, ARActivity activity) {
-		mAppF = app;
+		App = app;
 		mTrackerF = new CamTracker();
 		mManagerF = new AugItemManager();
 		this.activity = activity;
@@ -66,7 +66,7 @@ public class AugmentedCore {
 						mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
 					}
 					List<AugmentedOutput> outputList = mManagerF.getOutputList(mTrackerF);
-					//PalaceMaster.getInstance(mAppF).drawAugmentedItems(outputList);
+					//PalaceMaster.getInstance(App).drawAugmentedItems(outputList);
 					//activity.addOutputItems(outputList);
 				} else {
 					// end

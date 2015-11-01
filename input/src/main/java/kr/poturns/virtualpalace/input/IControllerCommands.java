@@ -8,25 +8,29 @@ public interface IControllerCommands {
 
     // * * * S U P P O R T  F L A G S * * * //
     /**
-     * 스크린 터치 기능을 지원하는 INPUT TYPE 을 의미한다.
+     * 은 0x10 보다 작은 값만 Major Input 으로 처리한다.
+     */
+    int TYPE_INPUT_SUPPORT_MAJOR_LIMIT = 0x10;
+    /**
+     * [Major] 스크린 터치 기능을 지원하는 INPUT TYPE 을 의미한다.
      */
     int TYPE_INPUT_SUPPORT_SCREENTOUCH = 0x1;
     /**
-     * 스크린 포커싱 기능을 지원하는 INPUT TYPE 을 의미한다.
+     * [Major] 스크린 게이징 기능을 지원하는 INPUT TYPE 을 의미한다.
      */
-    int TYPE_INPUT_SUPPORT_SCREENFOCUS = 0x2;
+    int TYPE_INPUT_SUPPORT_GAZE = 0x2;
     /**
-     * 모션 인식 기능을 지원하는 INPUT TYPE 을 의미한다.
+     * [Major] 모션 인식 기능을 지원하는 INPUT TYPE 을 의미한다.
      */
     int TYPE_INPUT_SUPPORT_MOTION = 0x4;
     /**
-     * 음성 인식 기능을 지원하는 INPUT TYPE 을 의미한다.
+     * [Major] 음성 인식 기능을 지원하는 INPUT TYPE 을 의미한다.
      */
-    int TYPE_INPUT_SUPPORT_VOICE = 0x10;
+    int TYPE_INPUT_SUPPORT_VOICE = 0x8;
     /**
-     * SMART WATCH 에서 지원하는 INPUT TYPE 을 의미한다.
+     * [Minor] SMART WATCH 에서 지원하는 INPUT TYPE 을 의미한다.
      */
-    int TYPE_INPUT_SUPPORT_WATCH = 0x20;
+    int TYPE_INPUT_SUPPORT_WATCH = 0x10;
 
 
 

@@ -24,7 +24,7 @@ import kr.poturns.virtualpalace.input.OperationInputConnector;
 public class PalaceApplication extends GlobalApplication {
 
     // * * * C O N S T A N T S * * * //
-    private final ServiceConnection mConnectionF = new ServiceConnection() {
+    private final ServiceConnection Connection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -33,13 +33,11 @@ public class PalaceApplication extends GlobalApplication {
             }
         }
 
-
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mInfraService = null;
         }
     };
-
 
 
     // * * * F I E L D S * * * //
@@ -54,13 +52,12 @@ public class PalaceApplication extends GlobalApplication {
         super.onCreate();
 
         mInfraServiceIntent = new Intent(this, InfraDataService.class);
-        bindService(mInfraServiceIntent, mConnectionF, Context.BIND_AUTO_CREATE );
+        bindService(mInfraServiceIntent, Connection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onTerminate() {
-
-        unbindService(mConnectionF);
+        unbindService(Connection);
 
         super.onTerminate();
     }
@@ -70,10 +67,7 @@ public class PalaceApplication extends GlobalApplication {
     @Override
     public Handler getInputHandler(int supportType) {
         PalaceMaster master = PalaceMaster.getInstance(this);
-        if (master != null)
-            return master.getInputHandler(supportType);
-
-        return null;
+        return (master != null)? master.getInputHandler(supportType) : null;
     }
 
     @Override
