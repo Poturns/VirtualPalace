@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using MyScript.Interface;
+using MyScript;
 
 
-public class ImageControl : MonoBehaviour , IRaycastedObject {
+public class ImageControl : AbstractBasicObject {
 
 	private List<AndroidApi.Media.ImageDirInfo> imageDirInfo;
 	private int count = 0;
@@ -12,7 +13,7 @@ public class ImageControl : MonoBehaviour , IRaycastedObject {
 	{
 
 	}
-	public void OnSelect()
+	public override void OnSelect()
 	{
 		NextImg ();
 	}

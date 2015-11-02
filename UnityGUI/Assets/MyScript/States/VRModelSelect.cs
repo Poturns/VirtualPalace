@@ -12,7 +12,7 @@ namespace MyScript.States
 		{
 			Target = TargetObject;
 
-            SetGazeInputMode(1);
+            SetGazeInputMode(GAZE_MODE.UI);
 
 			GameObject UI = GameObject.Find ("ModelSelectUI");
 			UI.GetComponent<UITransform> ().OnOffOUIButton (true);

@@ -177,7 +177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Kind: 1
+  SourceKind: 1
+  ModelKind: 8
 --- !u!114 &11462750
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -216,6 +217,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: TextureUpdateOn
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: SourceKind
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ModelKind
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

@@ -2,23 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum OBJ_LIST
-{
-	BOOK_GROUP_1 = 1,
-	BOOK_GROUP_2,
-	BOOK_GROUP_3,
-	DISH_OBJ,
-	NOACT_OBJ,
-	WOOD_OBJ,
-	CAP_OBJ,
-	PICTURE_OBJ,
-	SOCCER_OBJ,
-	DECO1,
-	STATU_OBJ,
-	CANDLE_OBJ,
-	HUMUN_OBj
 
-};
 
 public class PrefabContainer : MonoBehaviour 
 {

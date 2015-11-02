@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MyScript.States
 {
-    public class VRObjectView : AbstractInputHandleState
+    public class VRObjectView : AbstractGazeInputState
 	{
 		private GameObject UIBookMesh;
 		private GameObject UITitleTextObj;
@@ -45,6 +45,8 @@ namespace MyScript.States
             //T.text = NewTxt;
             StateManager.InputTextMesh (T, NewTxt);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
+			SetGazeInputMode (GAZE_MODE.OFF);
+			SetCameraLock (true);
 		}
 
 		public override void StateUpdate()
@@ -68,7 +70,8 @@ namespace MyScript.States
 
         protected override void HandleSelectOperation()
         {
-            base.HandleSelectOperation();
+			//base 호출 필요 없음 무조건 메모씬으로 진입 
+            //base.HandleSelectOperation();
 
             ChangeMemoScene();
         }

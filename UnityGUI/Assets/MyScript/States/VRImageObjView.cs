@@ -21,8 +21,17 @@ namespace MyScript.States
 
             ImageUI.GetComponent<MeshCollider>().enabled = true;
             ImageUI.GetComponent<MeshRenderer>().enabled = true;
-        }
+			SetGazeInputMode (GAZE_MODE.OFF);
+			SetCameraLock (true);
 
+        }
+		protected override void HandleSelectOperation()
+		{
+			if (ImageUI == null)
+				GameObject.Find ("ImageView");
+
+			ImageUI.GetComponent<AbstractBasicObject>().OnSelect();
+		}
         protected override void HandleCancelOperation()
         {
             base.HandleCancelOperation();

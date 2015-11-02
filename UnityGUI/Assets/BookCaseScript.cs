@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
+using MyScript;
 
 
-public class BookCaseScript : MonoBehaviour , IRaycastedObject {
+public class BookCaseScript : AbstractBasicObject {
 
 	public GameObject ObjPrefab;
 	public GameObject Pivot;
@@ -24,7 +25,11 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 	private List<GameObject> BookList;
 
 	public KIND_SOURCE CurrentKind;
-
+	private void Init()
+	{
+		SourceKind = KIND_SOURCE.BOOK_CASE;
+		ModelKind = OBJ_LIST.NO_MODEL;
+	}
 	public void CreateBook()
 	{
 
@@ -44,13 +49,13 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 		GameObject RealData = NewBook.transform.GetChild (0).gameObject;
 		StateManager.GetManager().ObjCount++;
 		NewBook.name = "UserObj" + StateManager.GetManager ().ObjCount;
-		RealData.GetComponent<CombineObject> ().SetKind( CurrentKind);
+		RealData.GetComponent<CombineObject> ().Init( CurrentKind);
 	
 		ZCurrentPos += ZOffset;
 		BookList.Add (NewBook);
 		Cnt++;
 	}
-	public void OnSelect()
+	public override void OnSelect()
 	{
 		StateManager.GetManager ().SwitchState (new VRModelSelect (StateManager.GetManager (), gameObject));
 		GameObject SelectUI = GameObject.Find ("ObjModelSelectUI");
@@ -73,6 +78,7 @@ public class BookCaseScript : MonoBehaviour , IRaycastedObject {
 	// Use this for initialization
 	void Start () 
 	{
+		Init ();
 		BasicZ = Pivot.transform.position.z;
 		BasicY = Pivot.transform.position.y;
 

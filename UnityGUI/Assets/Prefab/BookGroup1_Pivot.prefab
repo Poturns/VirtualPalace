@@ -787,7 +787,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Kind: 0
+  SourceKind: 0
+  ModelKind: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -805,6 +806,10 @@ Prefab:
       objectReference: {fileID: 11466800}
     - target: {fileID: 0}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ModelKind
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

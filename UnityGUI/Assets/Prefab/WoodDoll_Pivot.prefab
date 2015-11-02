@@ -924,7 +924,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Kind: 0
+  SourceKind: 0
+  ModelKind: 6
 --- !u!114 &11412144
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -936,8 +937,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitTitle: "\uB2E4\uC774\uC5B4\uD2B8"
-  InitMemo: "\uD30C\uC774\uD305"
+  InitTitle: 
+  InitMemo: 
   kind: 1
   UIObject: {fileID: 184736}
 --- !u!114 &11437588
@@ -1013,6 +1014,18 @@ Prefab:
       propertyPath: UIObject
       value: 
       objectReference: {fileID: 184736}
+    - target: {fileID: 0}
+      propertyPath: InitTitle
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: InitMemo
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ModelKind
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 184736}

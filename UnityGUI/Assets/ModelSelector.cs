@@ -4,10 +4,10 @@ using MyScript;
 using MyScript.States;
 using MyScript.Interface;
 
-public class ModelSelector : MonoBehaviour,IRaycastedObject {
+public class ModelSelector : AbstractBasicObject {
 
 	public OBJ_LIST ObjType;
-	public void OnSelect()
+	public override void OnSelect()
 	{
 		Debug.Log ("Call Select");
 		GameObject Target = transform.parent.gameObject.GetComponent<UITransform> ().TargetObj; 
@@ -36,12 +36,12 @@ public class ModelSelector : MonoBehaviour,IRaycastedObject {
 
     private void RestoreGazeSelectMode()
     {
-        GameObject EventSys = GameObject.Find("EventSystem");
-        if (EventSys == null) Debug.Log("Event System Find Fail");
+        GameObject Gaze = GameObject.Find("GazePointer");
+		if (Gaze == null) Debug.Log("GazePointer Find Fail");
         //else Debug.Log(EventSys);
 
-        GazeInputModule SelectModule = EventSys.GetComponent<GazeInputModule>();
-        if (SelectModule == null) Debug.Log("GazeInputModule == null");
-        SelectModule.Mode = 0;
+		GazeCusor cursor = Gaze.GetComponent<GazeCusor>();
+		if (cursor == null) Debug.Log("GazeCusor == null");
+		cursor.Mode = GAZE_MODE.OBJECT;
     }
 }

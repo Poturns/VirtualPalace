@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using MyScript.Interface;
+using MyScript;
 
-
-public class MovieControl : MonoBehaviour, IRaycastedObject  {
+public class MovieControl : AbstractBasicObject  {
 
 	private List<AndroidApi.Media.VideoDirInfo> VideoDirInfoList;
 	private int Index = 0;
@@ -12,7 +12,7 @@ public class MovieControl : MonoBehaviour, IRaycastedObject  {
 	private string ThumnailPath;
 	public string MoviePath;
 
-	public void OnSelect()
+	public override void OnSelect()
 	{
 		PlayMovie ();
 	}

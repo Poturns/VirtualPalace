@@ -8,6 +8,7 @@ TagManager:
   - BookCaseTrigger
   - Disposol
   - 2DMoveUI
+  - NotUsed
   layers:
   - Default
   - TransparentFX
