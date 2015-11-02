@@ -11,14 +11,14 @@ namespace MyScript.States
         
         public void OnSceneChanged()
         {
-            Debug.Log(Name + " : Scene changed");
+            Debug.Log("=============== " + Name + " : Scene changed");
             Init();
         }
 
         protected override void Init()
         {
             base.Init();
-            SetGazeInputMode(0);
+            SetGazeInputMode(GAZE_MODE.OBJECT);
         }
 
         void Switch()

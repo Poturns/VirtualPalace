@@ -3,7 +3,6 @@ using MyScript.States;
 using MyScript.Interface;
 using AndroidApi.Controller;
 using System;
-using System.Text;
 using BridgeApi.Controller;
 using BridgeApi.Controller.Request;
 
@@ -82,21 +81,6 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         activeState = newState;
     }
 
-    public static void InputTextMesh(TextMesh tm, string T)
-    {
-        int StrSize = T.Length;
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        while (i < StrSize)
-        {
-            if (i % 17 == 0 && i > 0) sb.Append('\n');
-            sb.Append(T[i]);
-            i++;
-        }
-        sb.Append('\n');
-        tm.text = sb.ToString();
-    }
-
     /// <summary>
     /// 작업을 Unity의 MainThread에서 수행한다.<para/>
     /// </summary>
@@ -150,12 +134,12 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         if (Application.platform == RuntimePlatform.Android)
         {
             bridgeDelegate = new AndroidUnityBridge();
-            Debug.Log("UnityBridge - AndroidUnityBridge attatched sucessfully.");
+            Debug.Log("=============== UnityBridge - AndroidUnityBridge attatched sucessfully.");
         }
         else
         {
             bridgeDelegate = null;
-            Debug.LogWarning("UnityBridge - failed to attatch.");
+            Debug.LogWarning("=============== UnityBridge - failed to attatch.");
         }
     }
 
@@ -166,15 +150,15 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// <param name="json">Controller에서 전달된 Input Message json</param>
     public void HandleInputsFromController(string json)
     {
-        Debug.Log(json);
+        Debug.Log("=============== " + json);
         if (activeState != null)
         {
-            Debug.Log("Current ActiveState : " + activeState);
+            Debug.Log("=============== Current ActiveState : " + activeState);
             activeState.InputHandling(JsonInterpreter.ParseInputCommands(json));
         }
         else
         {
-            Debug.LogWarning("activeState == null !!!");
+            Debug.LogWarning("=============== ActiveState == null !!!");
         }
     }
 
@@ -184,7 +168,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// <param name="json">Controller에서 전달된 일반 Message json</param>
     public void HandleMessageFromController(string json)
     {
-        Debug.Log(json);
+        Debug.Log("=============== " + json);
 
         //TODO handle message
     }

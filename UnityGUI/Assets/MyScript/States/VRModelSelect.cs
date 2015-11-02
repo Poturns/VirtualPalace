@@ -34,7 +34,7 @@ namespace MyScript.States
 			UITransform ModelUI = GameObject.Find ("ObjModelSelectUI").GetComponent<UITransform>();
 			ModelUI.UnlockCameraRot ();
 			ModelUI.OnOffOUIButton (false);
-			SetGazeInputMode (0);
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SwitchState (new VRSceneIdleState (Manager));
 		
 		}

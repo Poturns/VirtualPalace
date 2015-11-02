@@ -25,7 +25,7 @@ namespace MyScript.States
             ImageUI.GetComponent<MeshCollider>().enabled = false;
             ImageUI.GetComponent<MeshRenderer>().enabled = false;
 		
-			SetGazeInputMode (0);
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SetCameraLock (false);
         }
 

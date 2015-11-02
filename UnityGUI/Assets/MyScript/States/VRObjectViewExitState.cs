@@ -25,7 +25,7 @@ namespace MyScript.States
 				Debug.Log ("Sel Text is Null");
 			
 			UITitleTextObj.GetComponent<TextMesh>().text = "";
-			SetGazeInputMode (0);
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SetCameraLock (false);
 		}
 

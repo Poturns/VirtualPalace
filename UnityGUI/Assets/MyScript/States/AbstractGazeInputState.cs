@@ -30,17 +30,16 @@ namespace MyScript.States
         }
 
         /// <summary>
-        /// GazeCurosr의 SelectMode를 변경한다.
+        /// GazeCursor의 SelectMode를 변경한다.
         /// </summary>
         /// <param name="selectMode">변경할 모드</param>
-		/// Mode 0 : Interactive 1 : 2dMoveUI 2: Disable Cursor
         protected void SetGazeInputMode(GAZE_MODE selectMode)
         {
 			gazecusor.Mode = selectMode;
         }
 
 
-		// <summary>
+		/// <summary>
 		/// CameraHead를  고정한다.
 		///  </summary>
 		protected void SetCameraLock(bool LockOn)
@@ -89,7 +88,7 @@ namespace MyScript.States
             GameObject SelObj = selectModule.RaycastedGameObject;
             if (SelObj != null)
             {
-				AbstractBasicObject raycastedObject = SelObj.GetComponent<AbstractBasicObject>();
+                IRaycastedObject raycastedObject = SelObj.GetComponent<IRaycastedObject>();
                 if (raycastedObject != null)
                 {
                     raycastedObject.OnSelect();

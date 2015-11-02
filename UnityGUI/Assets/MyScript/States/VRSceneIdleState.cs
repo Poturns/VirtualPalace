@@ -11,7 +11,7 @@ namespace MyScript.States
 		
 		public void OnSceneChanged()
 		{
-			Debug.Log(Name + " : Scene changed");
+			Debug.Log("=============== " + Name + " : Scene changed");
 			Init();
 		}
 		
@@ -21,7 +21,7 @@ namespace MyScript.States
 			GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
 			if (DisposolObj != null) GameObject.Destroy(DisposolObj);
 			
-			SetGazeInputMode(0);
+			SetGazeInputMode(GAZE_MODE.OBJECT);
 		}
 		
 		void Switch()

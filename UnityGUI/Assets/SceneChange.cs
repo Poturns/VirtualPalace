@@ -19,7 +19,7 @@ public class SceneChange :  AbstractBasicObject
 
     public void SceneMove()
     {
-        Debug.Log("SceneMove to : " + SceneName);
+        Debug.Log("=============== SceneMove to : " + SceneName);
         StateManager.SwitchScene(SceneName);
     }
 

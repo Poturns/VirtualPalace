@@ -28,7 +28,7 @@ namespace MyScript.States
 			TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
 			T.text = "";
 
-			SetGazeInputMode (0);
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SetCameraLock (false);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 

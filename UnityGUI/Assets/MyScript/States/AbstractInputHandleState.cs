@@ -22,7 +22,7 @@ namespace MyScript.States
         {
             manager = managerRef;
             this.stateName = stateName;
-            Debug.Log(stateName);
+            Debug.Log("=============== " + stateName);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace MyScript.States
         /// <summary>
         /// Cancel, Select, Direction 이외의 다른 명령을 처리한다.
         /// </summary>
-        /// <param name="operation">Cancel, Select, Direction 이외의 다른 명령</param>
+        /// <param name="operation">Cancel, Select, Direction, Deep 이외의 다른 명령</param>
         protected virtual void HandleOtherOperation(Operation operation) { }
     }
 

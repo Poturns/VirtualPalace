@@ -3,10 +3,22 @@ using System.Collections;
 using MyScript.Interface;
 using MyScript;
 
+/// <summary>
+/// GazeCursor의 SelectMode
+/// </summary>
 public enum GAZE_MODE
 {
+    /// <summary>
+    /// Interactive
+    /// </summary>
 	OBJECT,
+    /// <summary>
+    /// MoveUI
+    /// </summary>
 	UI,
+    /// <summary>
+    /// Disable Cursor
+    /// </summary>
 	OFF
 };
 

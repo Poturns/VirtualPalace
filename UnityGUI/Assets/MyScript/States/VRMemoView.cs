@@ -14,7 +14,7 @@ namespace MyScript.States
         private MemoObject MemoObj;
         private TextMesh TMObject;
 		private GameObject VoiceIcon;
-        private GameObject EventSys;
+        private MeshRenderer IconRenderer;
 
         public VRMemoView(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMemoView")
         {
@@ -23,7 +23,6 @@ namespace MyScript.States
             GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
             if (DisposolObj) GameObject.Destroy(DisposolObj);
 
-            EventSys = GameObject.Find("EventSystem");
             UIMemoBG = GameObject.Find("MemoView");
             if (!UIMemoBG)
                 Debug.Log("Sel Target is Null");
@@ -37,17 +36,20 @@ namespace MyScript.States
             //TargetObject.GetComponent<MemoObject>().MemoPrefab;
             TextMesh T = UIMemoTxt.GetComponent<TextMesh>();
             TMObject = UIMemoTxt.GetComponent<TextMesh>();
-            StateManager.InputTextMesh(T, MemoObj.GetMemo());
+            Utils.Text.InputTextMesh(T, MemoObj.GetMemo());
 
 			VoiceIcon = GameObject.Find("VoiceIcon");
 			if(VoiceIcon == null) Debug.Log ("Voice Icon is NULL");
 
-			SetGazeInputMode (GAZE_MODE.OFF);
+            IconRenderer = VoiceIcon.GetComponent<MeshRenderer>();
+
+            SetGazeInputMode (GAZE_MODE.OFF);
 			SetCameraLock (true);
 
             //T.text = "New Memo Test";
             //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
         }
+
 
         public override void StateUpdate()
         {
@@ -80,7 +82,7 @@ namespace MyScript.States
 
         private void SendSpeechMemoRequest()
         {
-			MeshRenderer IconRenderer = VoiceIcon.GetComponent<MeshRenderer> ();
+			//MeshRenderer IconRenderer = VoiceIcon.GetComponent<MeshRenderer> ();
 			if(IconRenderer == null) Debug.Log("VoiceIcon is Null");
 			IconRenderer.enabled = true;
             new SpeechRequest().SendRequest(Manager, (result) =>
