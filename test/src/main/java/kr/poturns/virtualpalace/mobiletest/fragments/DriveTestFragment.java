@@ -21,25 +21,15 @@ import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.widget.DataBufferAdapter;
 
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
-import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.mobiletest.R;
 import kr.poturns.virtualpalace.util.DriveAssistant;
-import kr.poturns.virtualpalace.util.IOUtils;
 
 /**
  * Created by Myungjin Kim on 2015-10-30.
- *
+ * <p>
  * DriveAssistant test Fragment
  */
-public class DriveTestFragment extends Fragment implements View.OnClickListener{
+public class DriveTestFragment extends Fragment {
     private DriveAssistant mDriveAssistant;
 
     ProgressDialog dialog;
@@ -76,8 +66,6 @@ public class DriveTestFragment extends Fragment implements View.OnClickListener{
         ListView listView = (ListView) v.findViewById(R.id.listview);
         listView.setAdapter(adapter = new MetadataAdapter(getActivity()));
         adapter.setNotifyOnChange(false);
-
-        v.findViewById(R.id.button).setOnClickListener(this);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -199,19 +187,6 @@ public class DriveTestFragment extends Fragment implements View.OnClickListener{
         });
     }
 
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-            case R.id.button:
-                PalaceApplication app = (PalaceApplication) getActivity().getApplication();
-                PalaceMaster master = PalaceMaster.getInstance(app);
-                master.testDrive(mDriveAssistant);
-
-                break;
-        }
-    }
-
     private static class MetadataAdapter extends DataBufferAdapter<Metadata> {
         LayoutInflater inflater;
 
@@ -300,14 +275,9 @@ public class DriveTestFragment extends Fragment implements View.OnClickListener{
                     return;
                 }
 
-                FileDescriptor fileDescriptor = contents.getParcelFileDescriptor().getFileDescriptor();
-                FileInputStream fs = new FileInputStream(fileDescriptor);
-                String content;
-                try {
-                    content = IOUtils.readStringContent(fs, "utf-8");
-                } catch (final IOException e) {
-                    logOnUiThread("+reading a dummy file has failed\ncause:" + e.toString() + "\n", true);
-                    e.printStackTrace();
+                String content = DriveAssistant.IDriveContentsApi.openStringContents(contents, "utf-8");
+                if (content == null) {
+                    logOnUiThread("+reading a dummy file has failed\n", true);
                     return;
                 }
 
@@ -317,27 +287,20 @@ public class DriveTestFragment extends Fragment implements View.OnClickListener{
                                 "+appending \'hello world\' to Dummy File\n"
                         , false);
 
-                try {
-                    FileOutputStream fileOutputStream = new FileOutputStream(fileDescriptor);
-                    Writer writer = new OutputStreamWriter(fileOutputStream);
-                    writer.write("hello world\n");
-
-                    writer.close();
-                    fileOutputStream.close();
-                    fs.close();
-
-                    if (mDriveAssistant.DriveContentsApi.commit(contents).isSuccess()) {
-                        logOnUiThread("+appending success\n", true);
-                    } else {
-                        logOnUiThread("+appending has failed\n", true);
-                    }
-
-                } catch (final IOException e) {
-                    logOnUiThread("+appending has failed\ncause:" + e.toString() + "\n", true);
-                    e.printStackTrace();
-                } finally {
+                boolean writeResult = DriveAssistant.IDriveContentsApi.writeStringContents(contents, "hello world\n");
+                if (!writeResult) {
+                    logOnUiThread("+appending has failed\n", true);
                     metadataBuffer.release();
+                    return;
                 }
+
+                if (mDriveAssistant.DriveContentsApi.commit(contents).isSuccess()) {
+                    logOnUiThread("+appending success\n", true);
+                } else {
+                    logOnUiThread("+appending has failed\n", true);
+                }
+
+                metadataBuffer.release();
             }
         });
 

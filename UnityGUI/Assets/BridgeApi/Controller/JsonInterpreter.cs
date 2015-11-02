@@ -203,7 +203,11 @@ namespace BridgeApi.Controller
 
             result.RequestName = SpeechRequestResult.SPEECH_REQUEST_KEY;
             result.Status = (string)jData[RequestResult.RESULT];
-            result.Speech = (string)jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
+
+            if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_REQUEST_KEY))
+                result.Speech = (string)jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
+            else
+                result.Speech = "";
 
             return result;
         }

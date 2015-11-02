@@ -28,7 +28,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     {
         return instanceRef;
     }
-	public int ObjCount;
+    public int ObjCount;
     void Awake()
     {
         if (instanceRef == null)
@@ -37,40 +37,41 @@ public class StateManager : MonoBehaviour, IPlatformBridge
             Tasker = new Utils.AsyncTasker();
             instanceRef = this;
             DontDestroyOnLoad(gameObject);
-
         }
         else
         {
             DestroyImmediate(gameObject);
         }
 
-        if(activeState is ISceneChangeState)
+    }
+
+    void OnLevelWasLoaded(int level)
+    {
+        if (activeState is ISceneChangeState)
         {
             ((ISceneChangeState)activeState).OnSceneChanged();
         }
-
     }
 
     void Start()
     {
         Debug.Log("Start StateM");
-        activeState = new BeginState(this);
-        ((ISceneChangeState)activeState).OnSceneChanged();
+        BeginState beginState = new BeginState(this);
+        beginState.OnSceneChanged();
+        activeState = beginState;
     }
 
     // Update is called once per frame
     void Update()
     {
         Tasker.OnUpdate();
-		
-        if (activeState != null)
-            activeState.StateUpdate();
+
+        if (activeState != null) activeState.StateUpdate();
     }
 
     void OnGUI()
     {
-        if (activeState != null)
-            activeState.ShowIt();
+        if (activeState != null) activeState.ShowIt();
     }
 
 
