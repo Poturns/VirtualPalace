@@ -2,12 +2,17 @@
 using System.Collections;
 using MyScript.States;
 using MyScript.Interface;
+using MyScript;
 
-public class SceneChange : MonoBehaviour, IRaycastedObject
+public class SceneChange :  AbstractBasicObject
 {
     public string SceneName;
-
-    public void OnSelect()
+	void Awake()
+	{
+		SourceKind = KIND_SOURCE.UI_BUTTON;
+		ModelKind = OBJ_LIST.NO_MODEL;
+	}
+	public override void OnSelect()
     {
         SceneMove();
     }

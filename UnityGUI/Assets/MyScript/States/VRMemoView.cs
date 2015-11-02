@@ -5,7 +5,7 @@ using BridgeApi.Controller.Request;
 namespace MyScript.States
 {
 
-    public class VRMemoView : AbstractInputHandleState
+    public class VRMemoView : AbstractGazeInputState
     {
         private GameObject UIMemoBG;
         private GameObject UIMemoTxt;
@@ -13,6 +13,7 @@ namespace MyScript.States
         private GameObject TargetObj;
         private MemoObject MemoObj;
         private TextMesh TMObject;
+		private GameObject VoiceIcon;
         private GameObject EventSys;
 
         public VRMemoView(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMemoView")
@@ -38,6 +39,12 @@ namespace MyScript.States
             TMObject = UIMemoTxt.GetComponent<TextMesh>();
             StateManager.InputTextMesh(T, MemoObj.GetMemo());
 
+			VoiceIcon = GameObject.Find("VoiceIcon");
+			if(VoiceIcon == null) Debug.Log ("Voice Icon is NULL");
+
+			SetGazeInputMode (GAZE_MODE.OFF);
+			SetCameraLock (true);
+
             //T.text = "New Memo Test";
             //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
         }
@@ -48,11 +55,13 @@ namespace MyScript.States
                 ExitMemoView();
         }
 
-
+		// 현재상태에서의 선택은 충돌체크가 아니라 바로 음성인식 실행 
         protected override void HandleSelectOperation()
         {
-            base.HandleSelectOperation();
-            SendSpeechMemoRequest();
+			//
+            //base.HandleSelectOperation();
+            
+			SendSpeechMemoRequest();
         }
 
         protected override void HandleCancelOperation()
@@ -71,6 +80,9 @@ namespace MyScript.States
 
         private void SendSpeechMemoRequest()
         {
+			MeshRenderer IconRenderer = VoiceIcon.GetComponent<MeshRenderer> ();
+			if(IconRenderer == null) Debug.Log("VoiceIcon is Null");
+			IconRenderer.enabled = true;
             new SpeechRequest().SendRequest(Manager, (result) =>
             {
                 Debug.Log(result);
@@ -86,6 +98,7 @@ namespace MyScript.States
                         break;
                 }
             });
+			IconRenderer.enabled = false;
         }
 
         private void ExitMemoView()

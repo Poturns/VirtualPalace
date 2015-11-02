@@ -54,24 +54,24 @@ public class CardboardHead : MonoBehaviour {
 
   // Compute new head pose.
   private void UpdateHead() {
-		if (ViewMoveOn >0) 
-		{
+		if (ViewMoveOn > 0) {
 			if (updated) {  
 				return;
 			}
 			updated = true;
 			//Cardboard.SDK.UpdateState();
-			if (trackRotation)
-			{
+			if (trackRotation) {
 				//회전 성분 검출(y Rot/360 -> UI Pos X+)
 
 				Quaternion NowRot = Cardboard.SDK.HeadPose.Orientation;
 				float YRotVelo = -(CurrentRot.eulerAngles.y - NowRot.eulerAngles.y);
 				Vector3 NewVec = Camera.main.transform.right;
-				NewVec *=YRotVelo*Time.deltaTime;
+				NewVec *= YRotVelo * Time.deltaTime;
 				GameObject UI2DMove;
-				if(ViewMoveOn == 1) UI2DMove = GameObject.Find("ModelSelectUI");
-				else UI2DMove = GameObject.Find("ObjModelSelectUI");
+				if (ViewMoveOn == 1)
+					UI2DMove = GameObject.Find ("ModelSelectUI");
+				else
+					UI2DMove = GameObject.Find ("ObjModelSelectUI");
 				
 				UI2DMove.transform.position += NewVec;
 
@@ -79,7 +79,8 @@ public class CardboardHead : MonoBehaviour {
 
 			}
 			return;
-		}
+		} else if (ViewMoveOn < 0)
+			return;
     if (updated) {  // Only one update per frame, please.
       return;
     }

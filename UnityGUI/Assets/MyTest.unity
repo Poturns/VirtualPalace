@@ -5984,6 +5984,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7b03eb679c8cb440b89abfb44a4ec59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SourceKind: 0
+  ModelKind: 0
   SceneName: VRWorld
 --- !u!1 &156869427
 GameObject:
@@ -8444,6 +8446,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7b03eb679c8cb440b89abfb44a4ec59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SourceKind: 0
+  ModelKind: 0
   SceneName: ARScene
 --- !u!23 &215716107
 MeshRenderer:
@@ -46001,7 +46005,6 @@ MonoBehaviour:
   vrModeOnly: 0
   cursor: {fileID: 2103211065}
   RaycastedGameObject: {fileID: 0}
-  Mode: 0
   clickTime: .100000001
   hotspot: {x: .5, y: .5}
 --- !u!114 &1113738067
@@ -84139,6 +84142,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7b03eb679c8cb440b89abfb44a4ec59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SourceKind: 0
+  ModelKind: 0
   SceneName: ARScene
 --- !u!1 &2080008358
 GameObject:
@@ -85148,6 +85153,11 @@ MonoBehaviour:
   GazeTime: 0
   GazeSelete: 0
   GazeTimeMax: 5
+  TextTex: {fileID: 2800000, guid: 7d76a6b572d070b4d9ed9f58e42dc944, type: 3}
+  ImageTex: {fileID: 2800000, guid: 30a3070bf955483499e0083f17195689, type: 3}
+  MovieTex: {fileID: 2800000, guid: 5fb7f49993105f5478ded0a131cd7ce8, type: 3}
+  NormalTex: {fileID: 2800000, guid: 74df22d8801058a48a29c5888ef9c63f, type: 3}
+  Mode: 0
 --- !u!33 &2103211068
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -85163,7 +85173,7 @@ Transform:
   m_GameObject: {fileID: 2103211065}
   m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106709}
   m_LocalPosition: {x: 0, y: -.99000001, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: -2, y: -2, z: 2}
   m_Children: []
   m_Father: {fileID: 1133015247}
   m_RootOrder: 0
@@ -86001,6 +86011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7b03eb679c8cb440b89abfb44a4ec59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SourceKind: 0
+  ModelKind: 0
   SceneName: VRWorld
 --- !u!111 &2127746319
 Animation:

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MyScript.States
 {
-    public class VRImageObjViewExit : AbstractInputHandleState
+    public class VRImageObjViewExit : AbstractGazeInputState
     {
         private GameObject ImageUI;
 
@@ -24,6 +24,9 @@ namespace MyScript.States
             TargetObject.gameObject.GetComponent<PictureObj>().SetPath(ImageUI.GetComponent<ImageControl>().GetNowPath());
             ImageUI.GetComponent<MeshCollider>().enabled = false;
             ImageUI.GetComponent<MeshRenderer>().enabled = false;
+		
+			SetGazeInputMode (0);
+			SetCameraLock (false);
         }
 
         public override void StateUpdate()

@@ -4,15 +4,10 @@ using MyScript;
 using MyScript.States;
 using MyScript.Interface;
 
-public enum KIND_SOURCE
-{
-	TEXT,
-	IMAGE,
-	MOVIE
-};
-public class SourceKindButton : MonoBehaviour,IRaycastedObject {
+
+public class SourceKindButton : AbstractBasicObject {
 	public KIND_SOURCE ThisType;
-	public void OnSelect()
+	public override void OnSelect()
 	{
 		UITransform ModelUI = GameObject.Find ("ObjModelSelectUI").GetComponent<UITransform> ();
 		ModelUI.CurrentType = ThisType;

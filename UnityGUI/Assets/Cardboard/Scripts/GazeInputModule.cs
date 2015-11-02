@@ -20,10 +20,11 @@
 //   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //   THE SOFTWARE.
 
-using MyScript.Interface;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
-
+using MyScript.Interface;
+using MyScript;
 // An implementation of the BaseInputModule that uses the player's gaze and the magnet trigger
 // as a raycast generator.  To use, attach to the scene's EventSystem object.  Set the Canvas
 // object's Render Mode to World Space, and set its Event Camera to a (mono) camera that is
@@ -39,9 +40,6 @@ public class GazeInputModule : BaseInputModule {
   public GameObject cursor;
 
   public GameObject RaycastedGameObject;
-	public int Mode;
-	private string ObjTag = "InteractiveObject";
-	private string ObjTag2 ="2DMoveUI";
 	// Time in seconds between the pointer down and up events sent by a magnet click.
   // Allows time for the UI elements to make their state transitions.
   [HideInInspector]
@@ -120,16 +118,19 @@ public class GazeInputModule : BaseInputModule {
     var go = pointerData.pointerCurrentRaycast.gameObject;
     
     RaycastedGameObject = go;
-		string tag;
-		if (Mode == 0)
-			tag = ObjTag;
-		else
-			tag = ObjTag2;
-		if (go != null && go.CompareTag(tag)) {
-		cursor.gameObject.GetComponent<GazeCusor>().GazeObject = go.GetComponent<IRaycastedObject>();
+	
+	if (	go != null 
+		    && go.GetComponent<AbstractBasicObject> () != null 
+		    && cursor.gameObject.GetComponent<GazeCusor>().GazeModeCheck(go.GetComponent<AbstractBasicObject> ())
+		) 
+	{
+		
+		//cursor.gameObject.GetComponent<GazeCusor>().GazeObject = go.GetComponent<AbstractBasicObject>();
+		cursor.gameObject.GetComponent<GazeCusor>().SetTextureCursor(go.GetComponent<AbstractBasicObject>().SourceKind);
 		cursor.SetActive(true);
 	}
-    else {
+    else 
+	{
 		cursor.gameObject.GetComponent<GazeCusor>().GazeObject = null;
         cursor.SetActive(false);
     }

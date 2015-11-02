@@ -3,14 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
+using MyScript;
 
-public class CombineObject : MonoBehaviour , IRaycastedObject {
+public class CombineObject : AbstractBasicObject {
 
 	private MemoObject TextData;
 	private PictureObj ImageData;
 	private MovieObject MovieData;
-	public KIND_SOURCE Kind;
 
+	public void Init(KIND_SOURCE kind)
+	{
+		SetKind (kind);
+
+	}
 	// Use this for initialization
 	void Start () {
 	
@@ -21,9 +26,9 @@ public class CombineObject : MonoBehaviour , IRaycastedObject {
 		ImageData = gameObject.GetComponent<PictureObj> ();
 		MovieData = gameObject.GetComponent<MovieObject> ();
 	}
-	public void OnSelect()
+	public override void OnSelect()
 	{
-		switch (Kind) 
+		switch (SourceKind) 
 		{
 		case KIND_SOURCE.TEXT:
 			TextData.OnSelect();
@@ -38,9 +43,9 @@ public class CombineObject : MonoBehaviour , IRaycastedObject {
 	}
 	public void SetKind(KIND_SOURCE k)
 	{
-		Kind = k;
+		SourceKind = k;
 		//Debug.Log ("k :" + k);
-		Debug.Log ("CombineObj Kind :" + Kind);
+		Debug.Log ("CombineObj Kind :" + SourceKind);
 	}
 	// Update is called once per frame
 	void Update () {

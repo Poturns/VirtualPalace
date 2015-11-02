@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MyScript.States
 {
-    public class VRObjectViewExitState : AbstractInputHandleState
+    public class VRObjectViewExitState : AbstractGazeInputState
 	{
 		private GameObject UIBookMesh;
 		private GameObject UITitleTextObj;
@@ -25,7 +25,8 @@ namespace MyScript.States
 				Debug.Log ("Sel Text is Null");
 			
 			UITitleTextObj.GetComponent<TextMesh>().text = "";
-			
+			SetGazeInputMode (0);
+			SetCameraLock (false);
 		}
 
 		public override void StateUpdate()

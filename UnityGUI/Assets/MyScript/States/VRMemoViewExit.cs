@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MyScript.States
 {
-    public class VRMemoViewExit : AbstractInputHandleState
+    public class VRMemoViewExit : AbstractGazeInputState
 	{
 		private GameObject UIMemoBG;
 		private GameObject UIMemoTxt;
@@ -27,6 +27,9 @@ namespace MyScript.States
 			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
 			TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
 			T.text = "";
+
+			SetGazeInputMode (0);
+			SetCameraLock (false);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 
 			//manager.SwitchState (new VRObjectView (managerRef, TargetObject));
