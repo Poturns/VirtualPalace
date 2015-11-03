@@ -1,5 +1,7 @@
 package kr.poturns.virtualpalace;
 
+import kr.poturns.virtualpalace.controller.PalaceApplication;
+import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.sensor.AcceleroSensorAgent;
 import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
 import kr.poturns.virtualpalace.sensor.BatterySensorAgent;

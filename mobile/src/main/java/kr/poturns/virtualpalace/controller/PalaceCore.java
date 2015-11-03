@@ -1,6 +1,7 @@
 package kr.poturns.virtualpalace.controller;
 
 import android.database.Cursor;
+import android.os.Handler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,12 +14,13 @@ import java.util.TreeMap;
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
+import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceItem;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
-import kr.poturns.virtualpalace.input.IControllerCommands;
-import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
@@ -78,8 +80,8 @@ abstract class PalaceCore {
 
         // INPUT Part.
         AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
-        mActivatedConnectorSupportFlag = IControllerCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
-                | IControllerCommands.TYPE_INPUT_SUPPORT_VOICE ;
+        mActivatedConnectorSupportFlag = IProcessorCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
+                | IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE ;
 
         PlayModeListeners = new TreeMap<Long, OnPlayModeListener>();
         PlayModeListeners.put(0L, new OnPlayModeListener() {
@@ -185,10 +187,10 @@ abstract class PalaceCore {
 
             JSONObject content = new JSONObject();
             try {
-                content.put("type", "success");
-                content.put("message", "입력[" + supportType + "]가 준비되었습니다.");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_TYPE, "success");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_MSG, "입력[" + supportType + "]가 준비되었습니다.");
 
-                dispatchEvent("onToastMessage", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_TOAST_MESSAGE, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -210,10 +212,10 @@ abstract class PalaceCore {
 
             JSONObject content = new JSONObject();
             try {
-                content.put("type", "fail");
-                content.put("message", "입력[" + supportType + "]가 연결 해제되었습니다.");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_TYPE, "fail");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_MSG, "입력[" + supportType + "]가 연결 해제되었습니다.");
 
-                dispatchEvent("onToastMessage", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_TOAST_MESSAGE, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -235,8 +237,8 @@ abstract class PalaceCore {
 
         boolean result = (connector != null);
         if (result) {
-            if (supportType < IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
-                int activatedType = mActivatedConnectorSupportFlag % IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
+            if (supportType < IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
+                int activatedType = mActivatedConnectorSupportFlag % IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
                 // 기존 활성화되어 있던 Major Support Type 비활성화.
                 deactivateInputConnector(activatedType);
             }
@@ -247,7 +249,7 @@ abstract class PalaceCore {
             JSONObject content = new JSONObject();
             try {
                 content.put(String.valueOf(supportType), true);
-                dispatchEvent("onInputModeChanged", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_INPUTMODE_CHANGED, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -273,7 +275,7 @@ abstract class PalaceCore {
             JSONObject content = new JSONObject();
             try {
                 content.put(String.valueOf(supportType), false);
-                dispatchEvent("onInputModeChanged", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_INPUTMODE_CHANGED, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -294,6 +296,7 @@ abstract class PalaceCore {
                 if ((support & supportType) == supportType) {
                     OperationInputConnector connector = AttachedInputConnectorMap.get(support);
                     connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
+
                     return true;
                 }
             }
@@ -322,6 +325,8 @@ abstract class PalaceCore {
         return false;
     }
 
+    @Deprecated
+    // 임시 테스트 코드
     public void testDrive(final DriveAssistant assistant) {
         new Thread(new Runnable() {
             @Override
@@ -482,7 +487,7 @@ abstract class PalaceCore {
             }
             cursor.close();
 
-            result.put(IControllerCommands.JsonKey.QUERY_RESULT, array);
+            result.put(IProcessorCommands.JsonKey.QUERY_RESULT, array);
             return true;
 
         } catch (Exception e) {
@@ -566,7 +571,7 @@ abstract class PalaceCore {
                         builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
                 } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
-                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    // IProcessorCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
                 }
                 // OTHER CLAUSES
@@ -647,7 +652,7 @@ abstract class PalaceCore {
                         builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
                 } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
-                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    // IProcessorCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
                 }
 

@@ -3,7 +3,7 @@ package kr.poturns.virtualpalace.inputmodule.speech;
 import android.content.Context;
 
 import kr.poturns.virtualpalace.input.GlobalApplication;
-import kr.poturns.virtualpalace.input.IControllerCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.input.OperationInputDetector;
 
@@ -18,7 +18,7 @@ public class SpeechInputConnector extends OperationInputConnector implements Spe
     public static final int KEY_ACTIVE_RECOGNIZE = 0x4;
 
     public SpeechInputConnector(Context context) {
-        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_VOICE);
+        super(context, IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE);
     }
 
     @Override

@@ -4,7 +4,7 @@ package kr.poturns.virtualpalace.input;
  *
  * @author Yeonho.Kim
  */
-public interface IControllerCommands {
+public interface IProcessorCommands {
 
     // * * * S U P P O R T  F L A G S * * * //
     /**
@@ -54,18 +54,17 @@ public interface IControllerCommands {
     int INPUT_TEXT_RESULT = 0x13;
 
     /**
-     * ANDROID 로부터 메시지를 전달받을 때 사용하는 명령 코드.
-     */
-    int REQUEST_MESSAGE_FROM_ANDROID = 0x12;
-    /**
      * UNITY 로부터 메시지를 전달받을 때 사용하는 명령 코드.
      */
-    int REQUEST_MESSAGE_FROM_UNITY = 0x10;
+    int REQUEST_MESSAGE_FROM_UNITY = 0x20;
     /**
      * UNITY 로부터 CALLBACK RESPONSE 를 요청받을 때 사용하는 명령 코드.
      */
-    int REQUEST_CALLBACK_FROM_UNITY = 0x11;
-
+    int REQUEST_CALLBACK_FROM_UNITY = 0x21;
+    /**
+     * ANDROID 로부터 메시지를 전달받을 때 사용하는 명령 코드.
+     */
+    int REQUEST_MESSAGE_FROM_ANDROID = 0x22;
 
 
     // * * * J S O N  C O M M A N D S * * * //

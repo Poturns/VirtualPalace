@@ -79,7 +79,7 @@ public class OperationInputConnector {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IProcessorCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
         return true;
     }
 
@@ -93,7 +93,7 @@ public class OperationInputConnector {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IProcessorCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
         return true;
     }
 
@@ -107,7 +107,7 @@ public class OperationInputConnector {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_TEXT_RESULT, text).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IProcessorCommands.INPUT_TEXT_RESULT, text).sendToTarget();
         return true;
     }
 

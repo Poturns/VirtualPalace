@@ -3,6 +3,8 @@ package kr.poturns.virtualpalace.controller;
 import android.app.Instrumentation;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.util.Pair;
@@ -16,16 +18,21 @@ import java.util.Iterator;
 import java.util.List;
 
 import kr.poturns.virtualpalace.augmented.AugmentedOutput;
+import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
-import kr.poturns.virtualpalace.input.IControllerCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
  * <b> EXTERNAL CONTROLLER : 컨트롤러의 중개 기능을 다룬다 </b>
- * <p> 프로토콜 및 통신 작업에 대한 Router 역할을 수행한다.</p>
+ * <p>
+ *     프로토콜 및 통신 작업에 대한 Router 역할을 수행한다.
+ *     다른 모듈들과 별도로 프로세싱하기 위하여 별도 Thread 에서 Handler 를 운영한다.
+ * </p>
+ *
  *
  * @author Yeonho.Kim
  */
@@ -35,17 +42,18 @@ public class PalaceMaster extends PalaceEngine {
     private static PalaceMaster sInstance;
 
     public static PalaceMaster getInstance(PalaceApplication app) {
-        if (sInstance == null)
+        if (sInstance == null) {
             sInstance = new PalaceMaster(app);
+        }
         return sInstance;
     }
 
 
     // * * * C O N S T A N T S * * * //
-    private final InputHandler mInputHandlerF;
-    private final RequestHandler mRequestHandlerF;
-   // private final ThreadGroup mOperationGroupF;
-    //private final GoogleServiceAssistant mGoogleServiceAssistantF;
+    private final HandlerThread ControllerThread;
+    private final EventProcessor EventProcessHandler;
+    private final InputProcessor InputProcessHandler;
+    private final RequestProcessor RequestProcessHandler;
 
 
     // * * * F I E L D S * * * //
@@ -55,19 +63,25 @@ public class PalaceMaster extends PalaceEngine {
     private PalaceMaster(PalaceApplication app) {
         super(app);
 
-        mInputHandlerF = new InputHandler();
-        mRequestHandlerF = new RequestHandler();
+        ControllerThread = new HandlerThread(getClass().getName());
+        ControllerThread.start();
 
-       // mOperationGroupF = new ThreadGroup("PalaceMaster");
-        //mGoogleServiceAssistantF = new GoogleServiceAssistant(app, mLocalArchiveF.getSystemStringValue(LocalArchive.ISystem.ACCOUNT));
+        EventProcessHandler = new EventProcessor(ControllerThread.getLooper());
+        InputProcessHandler = new InputProcessor(ControllerThread.getLooper());
+        RequestProcessHandler = new RequestProcessor(ControllerThread.getLooper());
     }
 
 
     // * * * M E T H O D S * * * //
+    @Override
     protected void destroy() {
-        sInstance = null;
+        ControllerThread.quit();
 
+        // 순차적 destroy
         super.destroy();
+
+        // Singleton Release
+        sInstance = null;
     }
 
     @Override
@@ -77,9 +91,9 @@ public class PalaceMaster extends PalaceEngine {
         try {
             event.put(eventName, contents);
 
-        } catch (JSONException e) { ; }
+            Message.obtain(EventProcessHandler, 0, event).sendToTarget();
 
-        AndroidUnityBridge.getInstance(App).sendSingleMessageToUnity(event.toString());
+        } catch (JSONException e) { ; }
     }
 
     /**
@@ -104,8 +118,8 @@ public class PalaceMaster extends PalaceEngine {
                     JSONObject obj = new JSONObject();
 
                     obj.put(VirtualTable.RES_ID.toString(), item.resID);
-                    obj.put(IControllerCommands.JsonKey.SCREEN_X, item.screenX);
-                    obj.put(IControllerCommands.JsonKey.SCREEN_Y, item.screenY);
+                    obj.put(IProcessorCommands.JsonKey.SCREEN_X, item.screenX);
+                    obj.put(IProcessorCommands.JsonKey.SCREEN_Y, item.screenY);
 
                     array.put(obj);
 
@@ -113,7 +127,7 @@ public class PalaceMaster extends PalaceEngine {
                     e.printStackTrace();
                 }
             }
-            message.put(IControllerCommands.JsonKey.DRAWING_AR, array);
+            message.put(IProcessorCommands.JsonKey.DRAWING_AR, array);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -129,20 +143,21 @@ public class PalaceMaster extends PalaceEngine {
     /**
      * <b><INPUT 명령을 처리하는 핸들러.</b>
      * <p>
-     * INPUT 명령이 다양한 출처 및 스레드로부터 발생하기 때문에,
-     * {@link Handler}의 Message-Queue 를 이용한다.
+     * INPUT 명령이 다양한 출처 및 스레드로부터 발생하기 때문에,{@link Handler}의 Message-Queue 를 이용한다.
+     * INPUT 처리는 PalaceMaster 스레드가 자체적으로 처리한다.
      * </p>
      *
      * @author Yeonho.Kim
      */
-    private final class InputHandler extends Handler implements IControllerCommands, IOperationInputFilter.Operation {
+    private final class InputProcessor extends Handler implements IProtocolKeywords.Input, IProcessorCommands, IOperationInputFilter.Operation {
         private static final long INTERVAL = 400;   // ms : 2.5 FPS
 
         private final Object inputLock = new Object();
         private JSONObject singleMessage;
         private long mExpectedFlushTime;
 
-        private InputHandler() {
+        private InputProcessor(Looper looper) {
+            super(looper);
             init();
         }
 
@@ -221,6 +236,18 @@ public class PalaceMaster extends PalaceEngine {
 
             String cmdStr = String.valueOf(cmd);
             switch (cmd) {
+                case KEY_COMMAND_DRAW:
+                    try {
+                        JSONObject obj = new JSONObject();
+
+
+                        singleMessage.put(cmdStr, obj);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+
+                    } break;
+
                 // 하드웨어 버튼은 안드로이드에서 처리하도록 한다.
                 //case KEY_OK:      // SELECT 로 처리
                 //case KEY_BACK:    // CANCEL 로 처리
@@ -398,19 +425,23 @@ public class PalaceMaster extends PalaceEngine {
     /**
      * <b><REQUEST 명령을 처리하는 핸들러.</b>
      * <p>
-     * REQUEST 명령이 연쇄적인 콜백메소드 호출을 통해 이뤄지므로,
-     * {@link Handler}의 Message-Queue 를 이용한다.
+     * REQUEST 명령이 연쇄적인 콜백메소드 호출을 통해 이뤄지므로, {@link Handler}의 Message-Queue 를 이용한다.
      * </p>
      *
      * @author Yeonho.Kim
      */
-    private final class RequestHandler extends Handler implements IControllerCommands, IControllerCommands.JsonKey {
+    private final class RequestProcessor extends Handler implements IProcessorCommands, IProcessorCommands.JsonKey, IProtocolKeywords.Request {
+
+        private RequestProcessor(Looper looper) {
+            super(looper);
+        }
 
         @Override
         public void handleMessage(Message msg) {
             Runnable runnable = null;
             switch (msg.what) {
-                case REQUEST_MESSAGE_FROM_ANDROID: {
+                case REQUEST_MESSAGE_FROM_ANDROID:
+                case REQUEST_MESSAGE_FROM_UNITY: {
                     final String jsonMessage = (String) msg.obj;
 
                     runnable = new Runnable() {
@@ -421,10 +452,6 @@ public class PalaceMaster extends PalaceEngine {
                             } catch (Exception e) { }
                         }
                     };
-                } break;
-
-                case REQUEST_MESSAGE_FROM_UNITY: {
-
                 } break;
 
                 case REQUEST_CALLBACK_FROM_UNITY: {
@@ -475,73 +502,118 @@ public class PalaceMaster extends PalaceEngine {
 
             while (keys.hasNext()) {
                 String key = keys.next();
-                JSONObject rstEach = new JSONObject();
+                JSONObject eachResult = new JSONObject();
                 boolean result = false;
 
                 try {
-                    String table = null;
-                    if (key.endsWith("_ar") || key.endsWith("_AR"))
-                        table = ITable.TABLE_AUGMENTED;
-                    else if (key.endsWith("_vr") || key.endsWith("_VR"))
-                        table = ITable.TABLE_VIRTUAL;
-                    else if (key.endsWith("_res") || key.endsWith("_RES"))
-                        table = ITable.TABLE_RESOURCE;
+                    if (COMMAND_LIFECYCLE.equalsIgnoreCase(key)) {
+                        JSONObject obj = message.getJSONObject(key);
+                        String scene = obj.keys().next();
+                        onLifeCycle(scene, SceneLifeCycle.valueOf(obj.getString(scene)));
 
+                    } else if (COMMAND_SWITCH_INPUTMODE.equalsIgnoreCase(key)) {
+                        JSONArray array = message.getJSONArray(key);
+                        for (int i=0; i<array.length(); i++) {
+                            JSONObject obj = array.getJSONObject(i);
+                            String inputName = obj.keys().next();
+                            int inputType = Integer.parseInt(inputName);
 
-                    if (QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
-                        result = executeConstructedQuery(key, message.getJSONObject(key), jsonResult);
+                            result = obj.getBoolean(inputName)?
+                                    activateInputConnector(inputType) :
+                                    deactivateInputConnector(inputType);
+                        }
 
-                    } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
-                        result = selectLocalData(message.getJSONObject(key), table, jsonResult);
+                    } else if (COMMAND_USE_SPEECH.equalsIgnoreCase(key)) {
+                        JSONObject obj = message.getJSONObject(key);
+                        String mode = obj.getString(KEY_USE_SPEECH_MODE);
+                        String action = obj.getString(KEY_USE_SPEECH_ACTION);
 
-                    } else if (INSERT_AR.equalsIgnoreCase(key) || INSERT_VR.equalsIgnoreCase(key) || INSERT_RES.equalsIgnoreCase(key)) {
-                        result = insertNewLocalData(message.getJSONObject(key), table);
-
-                    } else if (UPDATE_AR.equalsIgnoreCase(key) || UPDATE_VR.equalsIgnoreCase(key) || UPDATE_RES.equalsIgnoreCase(key)) {
-                        result = updateLocalData(message.getJSONObject(key), table);
-
-                    } else if (DELETE_AR.equalsIgnoreCase(key) || DELETE_VR.equalsIgnoreCase(key) || DELETE_RES.equalsIgnoreCase(key)) {
-                        result = deleteLocalData(message.getJSONObject(key), table);
-
-                    } else if (SWITCH_PLAY_MODE.equalsIgnoreCase(key)) {
-                        int mode = message.getInt(key);
-                        result = switchMode(OnPlayModeListener.PlayMode.values()[Math.abs(mode)], mode > 0);
-
-                    } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                        int supportType = message.getInt(key);
-                        result = activateInputConnector(supportType);
-
-                    } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
-                        int supportType = message.getInt(key);
-                        result = deactivateInputConnector(supportType);
-
-                    } else if (RECOGNIZE_TEXT_RESULT.equalsIgnoreCase(key)) {
-                        int supportType = IControllerCommands.TYPE_INPUT_SUPPORT_VOICE;
+                        int supportType = IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE;
                         result = requestTextResultByVoiceRecognition(supportType);
 
                         if (result)
                             throw new WaitForCallbackException();
+
+
+                    } else {
+                        // FIND TABLE
+                        String table = null;
+                        if (key.endsWith("_ar") || key.endsWith("_AR"))
+                            table = ITable.TABLE_AUGMENTED;
+                        else if (key.endsWith("_vr") || key.endsWith("_VR"))
+                            table = ITable.TABLE_VIRTUAL;
+                        else if (key.endsWith("_res") || key.endsWith("_RES"))
+                            table = ITable.TABLE_RESOURCE;
+                        else if (key.endsWith("_bookcase") || key.endsWith("_BOOKCASE"))
+                            table = ITable.TABLE_VR_CONTAINER;
+                        else
+                            continue;
+
+                        // DO SQL
+                        String keyLowerCase = key.toLowerCase();
+                        if (keyLowerCase.startsWith(COMMAND_DB_SELECT)) {
+                            result = selectLocalData(message.getJSONObject(key), table, jsonResult);
+
+                        } else if (keyLowerCase.startsWith(COMMAND_DB_INSERT)) {
+                            result = insertNewLocalData(message.getJSONObject(key), table);
+
+                        } else if (keyLowerCase.startsWith(COMMAND_DB_UPDATE)) {
+                            result = updateLocalData(message.getJSONObject(key), table);
+
+                        } else if (keyLowerCase.startsWith(COMMAND_DB_DELETE)) {
+                            result = deleteLocalData(message.getJSONObject(key), table);
+                        }
                     }
-                    rstEach.put(RESULT, result? "success" : "fail");
+
+                    eachResult.put(RESULT, result ? "success" : "fail");
 
                 } catch (JSONException e){
                     try {
-                        rstEach.put(RESULT, "error");
+                        eachResult.put(RESULT, "error");
 
                     } catch (JSONException e2) { }
                 }
 
-                jsonResult.put(key, rstEach);
+                jsonResult.put(key, eachResult);
             }
 
             return jsonResult;
         }
     }
 
-    public JSONObject testProcess(String json) throws Exception {
-        return mRequestHandlerF.process(json);
+
+    /**
+     *
+     */
+    private final class EventProcessor extends Handler implements IProtocolKeywords.Event {
+
+        private EventProcessor(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put(IProtocolKeywords.CATEGORY_EVENT, (JSONObject) msg.obj);
+
+                AndroidUnityBridge.getInstance(App).sendSingleMessageToUnity(obj.toString());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
+    @Deprecated
+    // 임시 TEST 코드
+    public JSONObject testProcess(String json) throws Exception {
+        return RequestProcessHandler.process(json);
+    }
+
+    /**
+     * Callback Exception
+     */
     private class WaitForCallbackException extends Exception {}
 
 
@@ -551,11 +623,11 @@ public class PalaceMaster extends PalaceEngine {
         if (AttachedInputConnectorMap.get(supportType) == null)
             return null;
 
-        return mInputHandlerF;
+        return InputProcessHandler;
     }
 
     public Handler getRequestHandler() {
-        return mRequestHandlerF;
+        return RequestProcessHandler;
     }
 
 }

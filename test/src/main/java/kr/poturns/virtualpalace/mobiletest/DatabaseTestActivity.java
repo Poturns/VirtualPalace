@@ -17,10 +17,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
-import kr.poturns.virtualpalace.input.IControllerCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
 
 public class DatabaseTestActivity extends Activity implements View.OnClickListener{
 
@@ -164,10 +162,13 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
                    }
                     try {
                         adapter.jsonResultList.clear();
-                        JSONObject rst_obj = master.testProcess(json);
-                        adapter.jsonResultList.add("=== ===");
-                        adapter.jsonResultList.add(rst_obj.toString());
-                        adapter.notifyDataSetChanged();
+
+                        Message.obtain(master.getRequestHandler(), IControllerCommands.REQUEST_MESSAGE_FROM_ANDROID, json).sendToTarget();
+
+                        //JSONObject rst_obj = master.testProcess(json);
+                        //adapter.jsonResultList.add("=== ===");
+                        //adapter.jsonResultList.add(rst_obj.toString());
+                        //adapter.notifyDataSetChanged();
 
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -197,10 +198,14 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
                     }
                     try {
                         adapter.jsonResultList.clear();
-                        JSONObject rst_obj = master.testProcess(json);
-                        adapter.jsonResultList.add("=== ===");
-                        adapter.jsonResultList.add(rst_obj.toString());
-                        adapter.notifyDataSetChanged();
+
+                        Message.obtain(master.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_ANDROID, json).sendToTarget();
+
+//                        JSONObject rst_obj = master.testProcess(json);
+//                        adapter.jsonResultList.add("=== ===");
+//                        adapter.jsonResultList.add(rst_obj.toString());
+//                        adapter.notifyDataSetChanged();
+
 
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();

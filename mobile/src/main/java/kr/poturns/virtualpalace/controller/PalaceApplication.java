@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 import java.security.InvalidParameterException;
 
@@ -51,15 +52,51 @@ public class PalaceApplication extends GlobalApplication {
     public void onCreate() {
         super.onCreate();
 
+        // Controller 생성.
+        PalaceMaster.getInstance(this);
+
         mInfraServiceIntent = new Intent(this, InfraDataService.class);
         bindService(mInfraServiceIntent, Connection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onTerminate() {
-        unbindService(Connection);
-
         super.onTerminate();
+        Log.d("PalaceApplication", "onTerminate");
+        destroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        Log.d("PalaceApplication", "onLowMemory");
+        destroy();
+    }
+
+
+    @Override
+    public void onTrimMemory(int level) {
+        switch (level) {
+            case TRIM_MEMORY_RUNNING_CRITICAL:
+                break;
+        }
+
+        super.onTrimMemory(level);
+
+    }
+
+    void destroy() {
+        try {
+            unbindService(Connection);
+            stopService(mInfraServiceIntent);
+
+            PalaceMaster master = PalaceMaster.getInstance(this);
+            if (master != null)
+                master.destroy();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

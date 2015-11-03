@@ -7,6 +7,7 @@ import android.util.Pair;
 import java.security.InvalidParameterException;
 import java.util.Stack;
 
+import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.augmented.AugmentedCore;
 import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
 
@@ -31,6 +32,7 @@ abstract class PalaceEngine extends PalaceCore {
     }
 
 
+    @Override
     protected void destroy() {
 
         UnitySceneStack.clear();
@@ -59,6 +61,9 @@ abstract class PalaceEngine extends PalaceCore {
                 } else if (SceneLifeCycle.AR.equalsIgnoreCase(scene)) {
                     // Sensor 데이터 수집 시작
                     App.getInfraDataService().startListeningForAR();
+                    mAugmentedModule = new AugmentedCore(App);
+                    mAugmentedModule.init(1280, 960);
+
 
                 } else if (SceneLifeCycle.VR.equalsIgnoreCase(scene)) {
                     // Google App-Drive Connect
@@ -73,8 +78,6 @@ abstract class PalaceEngine extends PalaceCore {
                     //
 
                 } else if (SceneLifeCycle.AR.equalsIgnoreCase(scene)) {
-                    mAugmentedModule = new AugmentedCore(App);
-                    // mAugmentedModule.init();
                     mAugmentedModule.start();
 
                 } else if (SceneLifeCycle.VR.equalsIgnoreCase(scene)) {
@@ -101,7 +104,7 @@ abstract class PalaceEngine extends PalaceCore {
                 UnitySceneStack.remove(new Pair<String, SceneLifeCycle>(scene, SceneLifeCycle.onCreate));
 
                 if (SceneLifeCycle.LOBBY.equalsIgnoreCase(scene)) {
-                    //
+                    destroy();
 
                 } else if (SceneLifeCycle.AR.equalsIgnoreCase(scene)) {
                     // Sensor 데이터 수집 중지

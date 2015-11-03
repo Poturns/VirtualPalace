@@ -7,6 +7,9 @@ import android.view.View;
 
 import com.google.android.gms.drive.Drive;
 
+import kr.poturns.virtualpalace.controller.PalaceApplication;
+import kr.poturns.virtualpalace.controller.PalaceMaster;
+
 public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,5 +46,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         if (intent != null)
             startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

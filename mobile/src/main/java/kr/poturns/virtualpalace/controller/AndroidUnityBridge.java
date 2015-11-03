@@ -7,9 +7,7 @@ import android.support.v4.util.LongSparseArray;
 import com.unity3d.player.UnityPlayer;
 
 import kr.poturns.virtualpalace.annotation.UnityApi;
-
-import static kr.poturns.virtualpalace.input.IControllerCommands.REQUEST_CALLBACK_FROM_UNITY;
-import static kr.poturns.virtualpalace.input.IControllerCommands.REQUEST_MESSAGE_FROM_UNITY;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
 
 /**
  * <b> ANDROID - UNITY 간 통신 클래스 </b>
@@ -85,7 +83,7 @@ public final class AndroidUnityBridge {
         bundle.putString(BUNDLE_KEY_MESSAGE_JSON, jsonMessage);
 
         Message.obtain(mMasterF.getRequestHandler(),
-                REQUEST_CALLBACK_FROM_UNITY, bundle).sendToTarget();
+                IProcessorCommands.REQUEST_CALLBACK_FROM_UNITY, bundle).sendToTarget();
 
         return true;
     }
@@ -146,7 +144,7 @@ public final class AndroidUnityBridge {
      */
     @UnityApi
     public synchronized boolean sendSingleMessageToAndroid(String jsonMessage) {
-        Message.obtain(mMasterF.getRequestHandler(), REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
+        Message.obtain(mMasterF.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
 
         return true;
     }

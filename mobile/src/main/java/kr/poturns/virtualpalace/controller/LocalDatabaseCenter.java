@@ -26,6 +26,7 @@ import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VRContainerTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
 import kr.poturns.virtualpalace.util.DriveAssistant;
 
@@ -94,10 +95,27 @@ public class LocalDatabaseCenter {
                     vrBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
                 vrBuilder.deleteCharAt(vrBuilder.length()-1).append(");");
 
+                StringBuilder vrContainerBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_VR_CONTAINER + " (");
+                for (VRContainerTable field : VRContainerTable.values())
+                    vrContainerBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
+                vrContainerBuilder.deleteCharAt(vrBuilder.length()-1).append(");");
+
 
                 db.execSQL(resBuilder.toString());
                 db.execSQL(arBuilder.toString());
                 db.execSQL(vrBuilder.toString());
+                db.execSQL(vrContainerBuilder.toString());
+
+                initVRContainer(db);
+            }
+
+            private void initVRContainer(SQLiteDatabase db) {
+                for (int i=0; i<18; i++) {
+                    ContentValues values = new ContentValues();
+                    values.put(VRContainerTable.NAME.toString(), ("BookCaseTrigger" + i));
+
+                    db.insert(ITable.TABLE_VR_CONTAINER, null, values);
+                }
             }
 
             @Override
@@ -105,6 +123,7 @@ public class LocalDatabaseCenter {
                 db.execSQL("DROP TABLE " + ITable.TABLE_RESOURCE);
                 db.execSQL("DROP TABLE " + ITable.TABLE_AUGMENTED);
                 db.execSQL("DROP TABLE " + ITable.TABLE_VIRTUAL);
+                db.execSQL("DROP TABLE " + ITable.TABLE_VR_CONTAINER);
 
                 onCreate(db);
                 // TODO : DATA 옮기는 과정 필요 or Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
