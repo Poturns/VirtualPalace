@@ -6,23 +6,18 @@ public class MemoObject : MonoBehaviour
 {
     public string InitTitle;
     public string InitMemo;
-    public string Title
-    {
-        get;
-        set;
-    }
+
+    public string Title { get; set; }
+
     public OBJECT_KIND kind;
-    private string Memo;
+
+    /// <summary>
+    /// 메모 내용
+    /// </summary>
+    public string Memo { get; set; }
+
     public GameObject UIObject;
 
-    public void InputMemo(string Text)
-    {
-        Memo = Text;
-    }
-    public string GetMemo()
-    {
-        return Memo;
-    }
     public void ObjectViewExit()
     {
         StateManager.GetManager().SwitchState(new VRObjectViewExitState(StateManager.GetManager()));

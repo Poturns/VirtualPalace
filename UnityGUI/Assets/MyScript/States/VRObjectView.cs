@@ -28,7 +28,7 @@ namespace MyScript.States
 			GameObject DisposalObj = GameObject.Instantiate (ShowObj, UIBookMesh.transform.position
 				                                     , TargetObject.transform.rotation) as GameObject;
 
-			DisposalObj.transform.GetChild(0).tag = "Disposol";
+			DisposalObj.transform.GetChild(0).tag = DESTROY_MARK;
 			DisposalObj.transform.SetParent (UIBookMesh.transform);
 			UITitleTextObj = GameObject.Find ("UITitleText");
 			if (!UITitleTextObj)
@@ -48,18 +48,13 @@ namespace MyScript.States
 
 		public override void StateUpdate()
 		{
-            base.StateUpdate();
+            //base.StateUpdate();
 			// Input
-				
-			//ChangeMemoScene ();
-
-		
 		}
 
         protected override void HandleCancelOperation()
         {
-            base.HandleCancelOperation();
-
+            //base.HandleCancelOperation();
             //UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
             TMTitle.text = "";
             SwitchState(new VRSceneIdleState(Manager));

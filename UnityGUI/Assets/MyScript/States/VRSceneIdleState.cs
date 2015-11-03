@@ -20,8 +20,7 @@ namespace MyScript.States
 		protected override void Init()
 		{
 			base.Init();
-			GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
-			if (DisposolObj != null) GameObject.Destroy(DisposolObj);
+            DestroyMarkedObject();
 			
 			SetGazeInputMode(GAZE_MODE.OBJECT);
             SetCameraLock(false);

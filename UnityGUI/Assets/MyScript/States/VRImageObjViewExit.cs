@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 
 namespace MyScript.States
 {
+    [Obsolete()]
     public class VRImageObjViewExit : AbstractGazeInputState
     {
         private GameObject ImageUI;
-
+       
 
         public VRImageObjViewExit(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRImageObjectViewEXIT")
         {

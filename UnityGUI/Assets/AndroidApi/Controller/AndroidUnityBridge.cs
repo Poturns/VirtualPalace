@@ -24,7 +24,7 @@ namespace AndroidApi.Controller
             {
                 if (javaAndroidUnityBridge == null)
                 {
-                    AndroidJNIHelper.debug = true;
+                    //AndroidJNIHelper.debug = true;
                     javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
                     Debug.Log("============== Java Android Unity Bridge initialized.");
                 }
