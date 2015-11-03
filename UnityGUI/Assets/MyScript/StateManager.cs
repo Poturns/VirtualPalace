@@ -6,13 +6,66 @@ using System;
 using BridgeApi.Controller;
 using BridgeApi.Controller.Request;
 
-public class StateManager : MonoBehaviour, IPlatformBridge
+public enum UnityLifeCycle
 {
+    onCreate,
+    onLoaded,
+    onPaused,
+    onDestroy
+}
 
-    public const string SCENE_MAIN = "MyTest";
+
+public enum UnityScene
+{
+    Lobby,
+    VR,
+    AR
+}
+
+public static class UnitySceneExtend
+{
+    public const string SCENE_LOBBY = "MyTest";
     public const string SCENE_VR = "VRWorld";
     public const string SCENE_AR = "ARScene";
 
+    public static string SceneName(this UnityScene scene)
+    {
+        switch (scene)
+        {
+            case UnityScene.Lobby:
+                return SCENE_LOBBY;
+
+            case UnityScene.VR:
+                return SCENE_VR;
+
+            case UnityScene.AR:
+                return SCENE_AR;
+
+            default:
+                return "";
+        }
+    }
+
+
+    public static UnityScene GetByName(string name)
+    {
+        switch (name)
+        {
+            default:
+            case SCENE_LOBBY:
+                return UnityScene.Lobby;
+            case SCENE_AR:
+                return UnityScene.AR;
+            case SCENE_VR:
+                return UnityScene.VR;
+        }
+    }
+}
+
+
+
+public class StateManager : MonoBehaviour, IPlatformBridge
+{
 
     private static StateManager instanceRef;
 
@@ -30,6 +83,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     public int ObjCount;
     void Awake()
     {
+        Debug.Log("=== Awake ===");
         if (instanceRef == null)
         {
             InitPlatformBridge();
@@ -46,18 +100,22 @@ public class StateManager : MonoBehaviour, IPlatformBridge
 
     void OnLevelWasLoaded(int level)
     {
-        if (activeState is ISceneChangeState)
+        ISceneChangeState currentSceneState = activeState as ISceneChangeState;
+        if (currentSceneState != null)
         {
-            ((ISceneChangeState)activeState).OnSceneChanged();
+            currentSceneState.OnSceneChanged();
+            SendLifeCyleMessage(currentSceneState, UnityLifeCycle.onLoaded);
         }
     }
 
     void Start()
     {
-        Debug.Log("Start StateM");
+        Debug.Log("=== Start StateManager ===");
         BeginState beginState = new BeginState(this);
-        beginState.OnSceneChanged();
         activeState = beginState;
+
+        SendLifeCyleMessage(beginState, UnityLifeCycle.onCreate);
+        OnLevelWasLoaded(0);
     }
 
     // Update is called once per frame
@@ -101,28 +159,44 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         Tasker.QueueOnMainThread(a);
     }
 
-    public static void SwitchScene(string sceneName)
+    public static void SwitchScene(UnityScene unityScene)
     {
-        switch (sceneName)
+        StateManager manager = GetManager();
+        ISceneChangeState newSceneState;
+        switch (unityScene)
         {
-            case SCENE_MAIN:
-                GetManager().SwitchState(new BeginState(GetManager()));
-
+            case UnityScene.Lobby:
+                newSceneState = new BeginState(manager);
                 break;
 
-            case SCENE_VR:
-                GetManager().SwitchState(new VRSceneIdleState(GetManager()));
+            case UnityScene.VR:
+                newSceneState = new VRSceneIdleState(manager);
                 break;
 
-            case SCENE_AR:
-                //GetManager().SwitchState(new AR(GetManager()));
-                break;
+            case UnityScene.AR:
+                //GetManager().SwitchState(new AR(manager));
+                return;
             default:
                 return;
-
         }
 
-        Application.LoadLevel(sceneName);
+
+        ISceneChangeState currentState = manager.activeState as ISceneChangeState;
+        if (currentState != null)
+            manager.SendLifeCyleMessage(currentState, UnityLifeCycle.onPaused);
+
+        manager.SendLifeCyleMessage(newSceneState, UnityLifeCycle.onCreate);
+        manager.SwitchState(newSceneState);
+
+        //Application.LoadLevel(unityScene.SceneName());
+        Application.LoadLevel((int)unityScene);
+    }
+
+    internal void SendLifeCyleMessage(ISceneChangeState sceneState, UnityLifeCycle lifeCycle)
+    {
+        string json = JsonInterpreter.MakeUnityLifeCycleMessage(sceneState.UnitySceneID, lifeCycle);
+        Debug.Log("=============== LifeCycle : " + json);
+        SendSingleMessageToPlatform(json);
     }
 
     #region Base Platform Method (Android, IOS, ....)
@@ -200,9 +274,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// </summary>
     /// <param name="jsonMessage">전송할 Json 메시지</param>
     /// <returns>메시지가 정상적으로 전송되었을 때, TRUE</returns>
-    public bool SendSingleMessageToPlatform(string jsonMessage)
+    public void SendSingleMessageToPlatform(string jsonMessage)
     {
-        return bridgeDelegate != null && bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
+        if (bridgeDelegate != null) bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
     }
 
     #endregion Base Platform Method (Android, IOS, ....)

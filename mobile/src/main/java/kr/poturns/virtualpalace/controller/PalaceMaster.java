@@ -457,7 +457,8 @@ public class PalaceMaster extends PalaceEngine {
             }
 
             // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
-            ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
+            if(runnable != null)
+                ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
         }
 
         /**

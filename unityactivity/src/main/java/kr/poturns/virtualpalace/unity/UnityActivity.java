@@ -15,7 +15,7 @@ import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputDetector;
 import kr.poturns.virtualpalace.inputmodule.wear.WearInputConnector;
 
 /**
- * VirtualPalace 어플리케이션의 SensorTestActivity.
+ * VirtualPalace 어플리케이션의 Activity.
  */
 public class UnityActivity extends GoogleUnityActivity {
 

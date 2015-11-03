@@ -15,18 +15,35 @@ namespace AndroidApi.Controller
 
         public AndroidUnityBridge()
         {
+            InitJavaAndroidUnityBridgeReference();
+        }
+
+        private void InitJavaAndroidUnityBridgeReference()
+        {
             if (Application.platform == RuntimePlatform.Android)
             {
-                javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
+                if (javaAndroidUnityBridge == null)
+                {
+                    AndroidJNIHelper.debug = true;
+                    javaAndroidUnityBridge = AndroidUtils.GetActivityObject().Call<AndroidJavaObject>("getAndroidUnityBridge");
+                    Debug.Log("============== Java Android Unity Bridge initialized.");
+                }
+                else
+                {
+                    Debug.Log("============== Java Android Unity Bridge already initialized.");
+                }
             }
             else
             {
                 javaAndroidUnityBridge = null;
+                Debug.Log("============== Java Android Unity Bridge  -- current platform != Android.");
             }
         }
 
         public bool RequestToPlatform(IRequest request, Action<string> callback)
         {
+            // InitJavaAndroidUnityBridgeReference();
+
             if (javaAndroidUnityBridge != null)
                 return javaAndroidUnityBridge.Call<bool>("requestCallbackToAndroid", request.ToJson(), new InternalIAndroidUnityCallback(callback));
             else
@@ -35,16 +52,22 @@ namespace AndroidApi.Controller
 
         public void RespondToPlatform(long id, string jsonResult)
         {
+            //InitJavaAndroidUnityBridgeReference();
+
             if (javaAndroidUnityBridge != null)
                 javaAndroidUnityBridge.Call("respondCallbackToAndroid", id, jsonResult);
         }
 
-        public bool SendSingleMessageToPlatform(string jsonMessage)
+        public void SendSingleMessageToPlatform(string jsonMessage)
         {
+            // InitJavaAndroidUnityBridgeReference();
+
             if (javaAndroidUnityBridge != null)
-                return javaAndroidUnityBridge.Call<bool>("sendSingleMessageToAndroid", jsonMessage);
-            else
-                return false;
+            {
+                // Debug.Log("============== Sending Single Message : " + jsonMessage);
+                javaAndroidUnityBridge.Call("sendSingleMessageToAndroid", jsonMessage);
+            }
+
         }
 
     }

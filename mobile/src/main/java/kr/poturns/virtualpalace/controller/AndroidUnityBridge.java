@@ -120,7 +120,9 @@ public final class AndroidUnityBridge {
         }
 
         //TODO id를 반영하게 만들기
-        return sendSingleMessageToAndroid(jsonMessage);
+
+        sendSingleMessageToAndroid(jsonMessage);
+        return true;
     }
 
     /**
@@ -130,7 +132,7 @@ public final class AndroidUnityBridge {
      * @param jsonResult 요청에 대한 결과값이 Json형태로 기술된 문자열
      */
     @UnityApi
-    public synchronized void respondCallbackToAndroid(long id, String jsonResult) {
+    public void respondCallbackToAndroid(long id, String jsonResult) {
         IAndroidUnityCallback callback = mCallbackMapF.get(id);
         if (callback != null) {
             callback.onCallback(jsonResult);
@@ -142,13 +144,14 @@ public final class AndroidUnityBridge {
      * UNITY 에서 단일 메시지를 ANDROID 로 전송한다.
      *
      * @param jsonMessage 전송할 Json 메시지
-     * @return 메시지가 정상적으로 전송되었을 때, TRUE
      */
     @UnityApi
-    public synchronized boolean sendSingleMessageToAndroid(String jsonMessage) {
-        Message.obtain(mMasterF.getRequestHandler(), REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
-
-        return true;
+    public void sendSingleMessageToAndroid(String jsonMessage) {
+        try {
+            Message.obtain(mMasterF.getRequestHandler(), REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

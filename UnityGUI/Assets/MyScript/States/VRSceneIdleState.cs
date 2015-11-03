@@ -3,13 +3,15 @@ using MyScript.Interface;
 
 namespace MyScript.States
 {
-	public class VRSceneIdleState : AbstractCameraNavigateState, ISceneChangeState
+    public class VRSceneIdleState : AbstractCameraNavigateState, ISceneChangeState
 	{
 		public VRSceneIdleState(StateManager managerRef) : base(managerRef, "VRSceneState")
 		{
 		}
-		
-		public void OnSceneChanged()
+
+        public UnityScene UnitySceneID { get { return UnityScene.VR; } }
+
+        public void OnSceneChanged()
 		{
 			Debug.Log("=============== " + Name + " : Scene changed");
 			Init();
@@ -23,25 +25,20 @@ namespace MyScript.States
 			
 			SetGazeInputMode(GAZE_MODE.OBJECT);
 		}
-		
-		void Switch()
+
+        protected override void HandleCancelOperation()
 		{
-			//Application.LoadLevel("Scene1");
-			//manager.SwitchState(new PlayState(manager));
-		}
-		
-		protected override void HandleCancelOperation()
-		{
-			ReturnToMainScene();
+			ReturnToLobbyScene();
 		}
 		
 		
-		private void ReturnToMainScene()
+		private void ReturnToLobbyScene()
 		{
-			StateManager.SwitchScene(StateManager.SCENE_MAIN);
+			StateManager.SwitchScene(UnityScene.Lobby);
 		}
-		
-	}
+
+
+    }
 	
 }
 
