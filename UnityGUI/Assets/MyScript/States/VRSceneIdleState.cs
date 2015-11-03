@@ -24,6 +24,7 @@ namespace MyScript.States
 			if (DisposolObj != null) GameObject.Destroy(DisposolObj);
 			
 			SetGazeInputMode(GAZE_MODE.OBJECT);
+            SetCameraLock(false);
 		}
 
         protected override void HandleCancelOperation()

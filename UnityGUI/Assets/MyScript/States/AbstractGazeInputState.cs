@@ -11,10 +11,11 @@ namespace MyScript.States
     {
         private GameObject eventSystem;
         private GazeInputModule selectModule;
-		private GazeCusor gazecusor;
+        private GazeCusor gazecusor;
         public GameObject EventSystem { get { return eventSystem; } }
         public GazeInputModule SelectModule { get { return selectModule; } }
-		public GazeCusor GCursor {get {return gazecusor;}}
+        public GazeCusor GCursor { get { return gazecusor; } }
+        private CardboardHead cameraHead;
 
         public AbstractGazeInputState(StateManager managerRef, string stateName) : base(managerRef, stateName)
         {
@@ -35,27 +36,28 @@ namespace MyScript.States
         /// <param name="selectMode">변경할 모드</param>
         protected void SetGazeInputMode(GAZE_MODE selectMode)
         {
-			gazecusor.Mode = selectMode;
+            gazecusor.Mode = selectMode;
         }
 
 
-		/// <summary>
-		/// CameraHead를  고정한다.
-		///  </summary>
-		protected void SetCameraLock(bool LockOn)
-		{
-			CardboardHead TempHead = GameObject.Find ("Head").GetComponent<CardboardHead> ();
-			if (LockOn)
-				TempHead.ViewMoveOn = -1;
-			else
-				TempHead.ViewMoveOn = 0;
-		}
+        /// <summary>
+        /// CameraHead를  고정한다.
+        ///  </summary>
+        protected void SetCameraLock(bool LockOn)
+        {
+            //cameraHead.ViewMoveOn = LockOn ? -1 : 0;
+            if (LockOn)
+                cameraHead.ViewMoveOn = -1;
+            else
+                cameraHead.ViewMoveOn = 0;
+        }
 
-		/// <summary>
+        /// <summary>
         /// EventSystem과 SelectModule을 찾아서 할당한다.
         /// </summary>
         protected virtual void FindEventSystemAndSelectModule()
         {
+
             if (selectModule == null)
             {
                 if (eventSystem == null)
@@ -65,19 +67,22 @@ namespace MyScript.States
                 if (eventSystem != null)
                 {
                     selectModule = eventSystem.GetComponent<GazeInputModule>();
-					if (selectModule == null)
+                    if (selectModule == null)
                     {
                         Debug.LogError("Cannot find GazeInputModule");
                     }
-					gazecusor = selectModule.cursor.GetComponent<GazeCusor>();
-					if(gazecusor == null)
-					{
-						Debug.LogError("Cannot find GazeCursor");
-					}
+                    gazecusor = selectModule.cursor.GetComponent<GazeCusor>();
+                    if (gazecusor == null)
+                    {
+                        Debug.LogError("Cannot find GazeCursor");
+                    }
                 }
                 else
                     Debug.LogError("Cannot find EventSystem");
             }
+
+            if (cameraHead == null)
+                cameraHead = GameObject.Find("Head").GetComponent<CardboardHead>();
 
         }
 
