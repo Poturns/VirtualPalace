@@ -24,7 +24,6 @@ namespace BridgeApi.Controller.Request
             Watch = 0x20
         }
 
-        private const string SWITCH_PLAY_MODE = "switch_play_mode";
         private const string ACTIVATE_INPUT = "activate_input";
         private const string DEACTIVATE_INPUT = "deactivate_input";
 
@@ -34,17 +33,6 @@ namespace BridgeApi.Controller.Request
         public StateNotifyRequest()
         {
             writer = new JsonWriter(sb = new StringBuilder());
-        }
-        /// <summary>
-        /// VirtualPalace 구동 환경을 변경한다.
-        /// </summary>
-        /// <param name="mode">변경할 구동 환경</param>
-        public void SwitchPlayMode(VirtualPalacePlayMode mode)
-        {
-            writer.WriteObjectStart();
-            writer.WritePropertyName(SWITCH_PLAY_MODE);
-            writer.Write((int)mode);
-            writer.WriteObjectEnd();
         }
 
         /// <summary>

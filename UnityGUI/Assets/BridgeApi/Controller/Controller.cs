@@ -349,13 +349,3 @@ namespace BridgeApi.Controller
         }
     }
 }
-
-/// <summary>
-/// VirtualPalace가 동작하는 형태
-/// </summary>
-public enum VirtualPalacePlayMode
-{
-    STANDARD,
-    AR,
-    VR
-}
