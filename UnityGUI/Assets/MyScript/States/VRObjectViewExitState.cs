@@ -25,13 +25,14 @@ namespace MyScript.States
 				Debug.Log ("Sel Text is Null");
 			
 			UITitleTextObj.GetComponent<TextMesh>().text = "";
-			SetGazeInputMode (0);
-			SetCameraLock (false);
+
 		}
 
 		public override void StateUpdate()
 		{
 			SwitchState (new VRSceneIdleState (Manager));
+			SetGazeInputMode (0);
+			SetCameraLock (false);
 		}
 
 		

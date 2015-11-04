@@ -13,7 +13,7 @@ public enum GAZE_MODE
 
 [System.Serializable]
 public class GazeCusor : MonoBehaviour {
-    private bool gazeDisable = true;
+    private bool gazeDisable = false;
 
 	public float GazeTime = 0.0f;
 	public bool	GazeSelete =false;
