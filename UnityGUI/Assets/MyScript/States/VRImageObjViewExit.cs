@@ -33,7 +33,7 @@ namespace MyScript.States
 
         public override void StateUpdate()
         {
-            SwitchState(new VRSceneIdleState(Manager));
+            SwitchState(VRSceneIdleState.CopyFromCurrentState(this));
         }
 
         void Switch()

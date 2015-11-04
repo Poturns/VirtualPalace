@@ -122,7 +122,7 @@ namespace MyScript.States
 
             LockCameraAndMesh(false);
 
-            SwitchState(new VRSceneIdleState(Manager));
+            SwitchState(VRSceneIdleState.CopyFromCurrentState(this));
             
         }
 

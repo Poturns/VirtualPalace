@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace MyScript.States
 {
+    [System.Obsolete()]
     public class VRObjectViewExitState : AbstractGazeInputState
     {
         private GameObject UIBookMesh;
@@ -27,7 +28,7 @@ namespace MyScript.States
 
         public override void StateUpdate()
         {
-            SwitchState(new VRSceneIdleState(Manager));
+            SwitchState(VRSceneIdleState.CopyFromCurrentState(this));
         }
 
 

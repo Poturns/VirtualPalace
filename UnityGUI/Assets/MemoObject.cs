@@ -20,7 +20,7 @@ public class MemoObject : MonoBehaviour
 
     public void ObjectViewExit()
     {
-        StateManager.GetManager().SwitchState(new VRObjectViewExitState(StateManager.GetManager()));
+       // StateManager.GetManager().SwitchState(new VRObjectViewExitState(StateManager.GetManager()));
     }
     public void OnSelect()
     {

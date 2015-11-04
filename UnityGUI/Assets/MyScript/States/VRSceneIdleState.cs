@@ -5,9 +5,19 @@ namespace MyScript.States
 {
     public class VRSceneIdleState : AbstractCameraNavigateState, ISceneChangeState
 	{
-		public VRSceneIdleState(StateManager managerRef) : base(managerRef, "VRSceneState")
+        public static VRSceneIdleState CopyFromCurrentState(AbstractGazeInputState otherStateInVRScene)
+        {
+            return new VRSceneIdleState(otherStateInVRScene);
+        }
+
+        public VRSceneIdleState(StateManager managerRef) : base(managerRef, "VRSceneState")
 		{
 		}
+
+        public VRSceneIdleState(AbstractGazeInputState otherStateInVRScene) : base(otherStateInVRScene.Manager, "VRSceneState")
+        {
+        }
+
 
         public UnityScene UnitySceneID { get { return UnityScene.VR; } }
 
@@ -18,8 +28,8 @@ namespace MyScript.States
 		}
 		public override void StateUpdate()
 		{
-			if (Input.GetKeyUp (KeyCode.K))
-				ReturnToMainScene ();
+            if (Input.GetKeyUp(KeyCode.K))
+                ReturnToLobbyScene();
 			if (Input.GetKeyUp (KeyCode.J))
 				TestCode ();
 		}
