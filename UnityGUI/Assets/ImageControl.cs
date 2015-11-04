@@ -9,7 +9,19 @@ public class ImageControl : AbstractBasicObject {
 	private int Index = 0;
 	private Texture2D NowTexture;
     private Renderer imageRenderer;
-
+	private string path;
+	public string Path
+	{
+		set
+		{
+			path = value;
+			UpDateImageByCurrentPath();
+		}
+		get
+		{
+			return path;
+		}
+	}
     void Start()
 	{
 
@@ -59,7 +71,19 @@ public class ImageControl : AbstractBasicObject {
         imageRenderer.material.mainTexture = newTexture;
         NowTexture = newTexture;
     }
+	//가지고 있는 Path를 이용해 텍스쳐만 업데이트
+	//LOAD 된 이미지 객체 초기화용 메소드
+	private void UpDateImageByCurrentPath()
+	{
+		if (path == null)
+			return;
+		if (imageRenderer == null)
+			imageRenderer = gameObject.GetComponent<Renderer>();
 
+		Texture2D newTexture = Utils.Image.Load(path);
+		imageRenderer.material.mainTexture = newTexture;
+		NowTexture = newTexture;
+	}
     private void CheckIndexValidity()
     {
         if (imageDirInfo == null)

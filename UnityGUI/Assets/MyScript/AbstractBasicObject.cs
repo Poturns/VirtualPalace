@@ -57,17 +57,19 @@ namespace MyScript
 			//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
 			Transform tr = gameObject.transform.parent;
 			ForSave.InitData(tr.name,tr.position , tr.rotation
-			                 ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null);
+			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null);
 			return ForSave;
 		}
-
+		public virtual void UpdateContents(string Con)
+		{
+		}
 		//SaveData 받아서 그 데이터를 바탕으로 속성값 갱신
 		public virtual void UpdateWithSaveData(SaveData sData)
 		{
 			//gameObject.transform.position =  sData.Pos;
 			//gameObject.transform.rotation = sData.Rot;
 			//gameObject.transform.localScale = sData.Scale;
-			gameObject.name = sData.ObjName;
+			gameObject.transform.parent.name = sData.ObjName;
 			SourceKind = sData.Source;
 			ModelKind = sData.ObjKind;
 		}

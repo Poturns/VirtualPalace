@@ -28,8 +28,8 @@ namespace MyScript.States
 		}
 		public override void StateUpdate()
 		{
-            if (Input.GetKeyUp(KeyCode.K))
-                ReturnToLobbyScene();
+			if (Input.GetKeyUp (KeyCode.K))
+				ReturnToLobbyScene ();
 			if (Input.GetKeyUp (KeyCode.J))
 				TestCode ();
 		}

@@ -11,8 +11,8 @@ using System.Reflection;
 [Serializable ()]
 public class SaveDataForBookCase : SaveData 
 {
-	protected float CurZOffest;
-	protected int	Cnt;
+	public float CurZOffest;
+	public int	Cnt;
 
 	public void InitData(string Name , Vector3 _Pos , Quaternion _Rot , Vector3 _Scale ,
 	                     int _sourcce , int _model  , string _Parent ,string ContentsText, float ZOff , int cnt)

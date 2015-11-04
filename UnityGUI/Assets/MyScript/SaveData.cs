@@ -30,7 +30,10 @@ public class SaveData : ISerializable {
 	protected int Sourcekind;
 	protected int ModelKind;
 
-	protected string Contents;
+	public string ObjName;
+	public string ParentName;
+
+	public string Contents;
 
 	public KIND_SOURCE Source
 	{
@@ -46,8 +49,7 @@ public class SaveData : ISerializable {
 			return (OBJ_LIST)ModelKind;
 		}
 	}
-	public string ObjName;
-	protected string ParentName;
+
 
 	public Vector3 Pos
 	{

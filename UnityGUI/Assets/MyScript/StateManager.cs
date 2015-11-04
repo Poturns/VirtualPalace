@@ -106,6 +106,15 @@ public class StateManager : MonoBehaviour, IPlatformBridge
             currentSceneState.OnSceneChanged();
             SendLifeCyleMessage(currentSceneState, UnityLifeCycle.onLoaded);
         }
+
+		if (level == 1) 
+		{
+			SaveLoader Saver = GameObject.Find ("_Script").GetComponent<SaveLoader> ();
+			if (Saver == null)
+				Debug.Log ("SaveLoaderFindFail");
+			else
+				Saver.LoadToFile ();
+		}
     }
 
     void Start()
