@@ -44,7 +44,6 @@ dependencies {
 
     compile project(':input')
     compile project(':communication')
-    compile project(':openCVLibrary300')
 
     compile 'com.google.android.gms:play-services-drive:7.8.0'
     compile 'com.google.android.gms:play-services-identity:7.8.0'

@@ -500,8 +500,6 @@ public class PalaceMaster extends PalaceCore {
                         if (result)
                             throw new WaitForCallbackException();
                     }
-
-
                     rstEach.put(RESULT, result? "success" : "fail");
 
                 } catch (JSONException e){
@@ -518,6 +516,9 @@ public class PalaceMaster extends PalaceCore {
         }
     }
 
+    public JSONObject testProcess(String json) throws Exception {
+        return mRequestHandlerF.process(json);
+    }
 
     private class WaitForCallbackException extends Exception {}
 

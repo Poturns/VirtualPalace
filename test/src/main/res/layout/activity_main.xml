@@ -1,12 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:opencv="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.opencv.android.JavaCameraView
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/camera_view"
-        opencv:show_fps="true" />
+        android:layout_height="wrap_content"
+        android:text="Sensor Test"
+        android:id="@+id/btn_sensortest"
+        android:layout_gravity="center_horizontal" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Database Test"
+        android:id="@+id/btn_dbtest" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Controller Test"
+        android:id="@+id/btn_controllertest"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

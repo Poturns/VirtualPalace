@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace;
+package kr.poturns.virtualpalace.mobiletest;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,11 +10,12 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 
 
-public class MainActivity extends Activity {
+public class SensorTestActivity extends Activity {
 
     Intent mInfraServiceIntent;
 
@@ -22,7 +23,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sensor_test);
 
 
         mInfraServiceIntent = new Intent(this, InfraDataService.class);

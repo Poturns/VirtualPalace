@@ -394,6 +394,7 @@ class PalaceCore {
             return true;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -444,6 +445,7 @@ class PalaceCore {
         if (builder == null || elements == null)
             return null;
 
+        builder.setTable(table);
 
         Iterator<String> elementIterator = elements.keys();
         while (elementIterator.hasNext()) {
