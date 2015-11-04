@@ -56,10 +56,10 @@ public abstract class BackShakeFragment extends BaseFragment implements InputCol
         if (!isInShaking) {
             if (sensorMovementData.speed > SHAKING_MIN_SPEED) {
                 isInShaking = true;
-                Toast.makeText(getActivity(), "2초동안 흔들면 이전 화면으로 돌아갑니다.", Toast.LENGTH_SHORT).show();
-                // 2초 뒤에 '뒤로가기' 명령을 실행하도록 하고,
+                Toast.makeText(getActivity(), "1초동안 흔들면 이전 화면으로 돌아갑니다.", Toast.LENGTH_SHORT).show();
+                // 1초 뒤에 '뒤로가기' 명령을 실행하도록 하고,
                 // CANCELING_DELAY 동안 흔들림이 감지되지 않으면 '뒤로가기' 명령을 취소함.
-                mHandler.sendEmptyMessageDelayed(MESSAGE_ANDROID_BACK, 2000);
+                mHandler.sendEmptyMessageDelayed(MESSAGE_ANDROID_BACK, 1000);
                 mHandler.sendEmptyMessageDelayed(MESSAGE_CANCEL_ANDROID_BACK, CANCELING_DELAY);
             }
         } else {

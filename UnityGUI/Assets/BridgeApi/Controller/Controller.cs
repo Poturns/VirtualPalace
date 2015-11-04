@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BridgeApi.Controller
 {
-
+   
     /// <summary>
     /// Input Module을 통해 전송되는 명령
     /// </summary>
@@ -348,14 +348,4 @@ namespace BridgeApi.Controller
                 + "\n]";
         }
     }
-}
-
-/// <summary>
-/// VirtualPalace가 동작하는 형태
-/// </summary>
-public enum VirtualPalacePlayMode
-{
-    STANDARD,
-    AR,
-    VR
 }

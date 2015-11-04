@@ -25,6 +25,7 @@ public class WearInputConnector extends OperationInputConnector implements Messa
 
     public WearInputConnector(Context context) {
         super(context, IProcessorCommands.TYPE_INPUT_SUPPORT_WATCH | IProcessorCommands.TYPE_INPUT_SUPPORT_MOTION);
+        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_WATCH);
         mWearableCommunicator = new WearableCommunicator(context);
     }
 

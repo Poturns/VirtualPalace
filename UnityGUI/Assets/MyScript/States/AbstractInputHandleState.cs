@@ -15,14 +15,24 @@ namespace MyScript.States
         private readonly string stateName;
         public string Name { get { return stateName; } }
 
-        protected StateManager Manager { get { return manager; } }
+        protected internal StateManager Manager { get { return manager; } }
 
+        public const string DESTROY_MARK = "Disposol";
 
         public AbstractInputHandleState(StateManager managerRef, string stateName)
         {
             manager = managerRef;
             this.stateName = stateName;
             Debug.Log("=============== " + stateName);
+        }
+
+        /// <summary>
+        /// DESTROY_MARK (Disposol) tag가 붙은 GameObject를 destory한다.
+        /// </summary>
+        protected internal static void DestroyMarkedObject()
+        {
+            GameObject DisposolObj = GameObject.FindGameObjectWithTag(DESTROY_MARK);
+            if (DisposolObj != null) UnityEngine.Object.Destroy(DisposolObj);
         }
 
         /// <summary>

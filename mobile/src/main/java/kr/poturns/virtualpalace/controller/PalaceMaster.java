@@ -169,7 +169,7 @@ public class PalaceMaster extends PalaceEngine {
         public void handleMessage(Message msg) {
             // 활성화되지 않은 InputConnector 로부터 전달된 메시지는 처리하지 않는다.
             int from = msg.arg1;
-            if ((mActivatedConnectorSupportFlag & from) != from)
+            if (from < IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT && (mActivatedConnectorSupportFlag & from) != from)
                 return;
 
             switch(msg.what) {
@@ -484,7 +484,8 @@ public class PalaceMaster extends PalaceEngine {
             }
 
             // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
-            ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
+            if(runnable != null)
+                ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
         }
 
         /**

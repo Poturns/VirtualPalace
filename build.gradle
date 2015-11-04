@@ -26,13 +26,14 @@ task clearUnityAndroidLibs(type: Delete) {
     String unityPluginDir = 'UnityGUI/Assets/Plugins/Android/'
 
     delete unityPluginDir + 'AndroidManifest.xml'
-    delete unityPluginDir + 'mobile-debug.aar'
+    delete unityPluginDir + 'unityactivity-debug.aar'
 
 
     String unityPluginLibsDir = unityPluginDir + 'libs/'
 
     delete unityPluginLibsDir + 'communication-debug.aar'
     delete unityPluginLibsDir + 'input-debug.aar'
+    delete unityPluginLibsDir + 'mobile-debug.aar'
 }
 
 /**

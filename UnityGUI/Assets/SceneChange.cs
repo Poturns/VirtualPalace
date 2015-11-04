@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using MyScript.States;
-using MyScript.Interface;
 using MyScript;
 
 public class SceneChange :  AbstractBasicObject
@@ -19,8 +16,19 @@ public class SceneChange :  AbstractBasicObject
 
     public void SceneMove()
     {
-        Debug.Log("=============== SceneMove to : " + SceneName);
-        StateManager.SwitchScene(SceneName);
+        //Debug.Log("=============== SceneMove to : " + SceneName);
+        //StateManager.SwitchScene(SceneName);
+
+        UnityScene scene;
+        if (name.Contains("VR"))
+            scene = UnityScene.VR;
+        else if (name.Contains("AR"))
+            scene = UnityScene.AR;
+        else
+            scene = UnityScene.Lobby;
+
+        Debug.Log("=============== SceneMove to : [" + scene + "]");
+        StateManager.SwitchScene(scene);
     }
 
 }

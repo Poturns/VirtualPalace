@@ -19,12 +19,16 @@ namespace MyScript.States
         {
         }
 
+        public AbstractCameraNavigateState(AbstractCameraNavigateState otherStateInSameScene, string stateName) : base(otherStateInSameScene.Manager, stateName)
+        {
+        }
+
         protected override void Init()
         {
             base.Init();
             InitPlayer();
         }
-        
+
         protected void InitPlayer()
         {
             if (player == null)

@@ -5,6 +5,11 @@ namespace BridgeApi.Controller.Request
 {
     public class SpeechRequest : IRequest
     {
+        public static SpeechRequest NewRequest()
+        {
+            return new SpeechRequest();
+        }
+
         public string ToJson()
         {
             StringBuilder sb = new StringBuilder();

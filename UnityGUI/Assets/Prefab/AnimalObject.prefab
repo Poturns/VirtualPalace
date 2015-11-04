@@ -32,7 +32,7 @@ GameObject:
   - 4: {fileID: 405884}
   m_Layer: 0
   m_Name: AnimalObject
-  m_TagString: InteractiveObject
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -347,7 +347,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Kind: 0
+  SourceKind: 0
+  ModelKind: 0
 --- !u!114 &11449992
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -374,7 +375,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Kind: 0
+  SourceKind: 0
+  ModelKind: 0
 --- !u!114 &11464970
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -386,7 +388,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392fb3475fe665240babd8aa24a8c269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Kind: 0
+  SourceKind: 0
+  ModelKind: 0
 --- !u!114 &11467522
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -398,6 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TextureUpdateOn: 0
 --- !u!114 &11467936
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -424,6 +428,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TextureUpdateOn: 0
 --- !u!114 &11486922
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -435,6 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5440d8603b752bb47a75ccb926912193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TextureUpdateOn: 0
 --- !u!114 &11493446
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -498,7 +504,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_TagString
-      value: InteractiveObject
+      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using BridgeApi.Controller;
 using UnityEngine;
 
 namespace MyScript.States
@@ -7,41 +9,134 @@ namespace MyScript.States
         private GameObject ImageUI;
         private GameObject Target;
 
+        private ImageControl imageControl;
+
+        private MeshCollider imageMeshCollider;
+        private MeshRenderer imageMeshRenderer;
+
         public VRImageObjView(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRImageObjectView")
         {
             Target = TargetObject;
 
-            GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
-            if (DisposolObj) GameObject.Destroy(DisposolObj);
+            DestroyMarkedObject();
 
-            ImageUI = GameObject.Find("ImageView");
-            if (!ImageUI)
-                Debug.Log("ImageSelector is Null");
+            FindImageView();
 
+            imageControl = ImageUI.GetComponent<ImageControl>();
 
-            ImageUI.GetComponent<MeshCollider>().enabled = true;
-            ImageUI.GetComponent<MeshRenderer>().enabled = true;
-			SetGazeInputMode (GAZE_MODE.OFF);
-			SetCameraLock (true);
+            imageMeshCollider = ImageUI.GetComponent<MeshCollider>();
+            imageMeshRenderer = ImageUI.GetComponent<MeshRenderer>();
+
+            LockCameraAndMesh(true);
 
         }
+
+        private void FindImageView()
+        {
+            if (ImageUI == null)
+            {
+                ImageUI = GameObject.Find("ImageView");
+                if (ImageUI == null)
+                    Debug.LogWarning("ImageSelector is Null");
+            }
+        }
+
 		protected override void HandleSelectOperation()
 		{
-			if (ImageUI == null)
-				GameObject.Find ("ImageView");
+            // FindImageView();
 
-			ImageUI.GetComponent<AbstractBasicObject>().OnSelect();
-		}
-        protected override void HandleCancelOperation()
-        {
-            base.HandleCancelOperation();
-            ExitImageState();
+            //ImageUI.GetComponent<AbstractBasicObject>().OnSelect();
+            ExitImageState(true);
         }
 
-        void ExitImageState()
+        protected override void HandleDirectionOperation(Dictionary<int, Direction> directionDictionary)
         {
-            Debug.Log("Exit Image");
-            SwitchState(new VRImageObjViewExit(Manager, Target));
+            //base.HandleDirectionOperation(directionDictionary);
+            foreach (int key in directionDictionary.Keys)
+            {
+                //ChooseMovie(directionDictionary[key])
+                // 명령이 여러번 오는 경우 썸네일 로딩 낭비를 막기 위하여 한번만 썸네일 변경을 실시한다.
+                if (NavigateImages(directionDictionary[key]))
+                    return;
+            }
+        }
+
+        private bool NavigateImages(Direction direction)
+        {
+            switch (direction.Value)
+            {
+                case Direction.EAST:
+                    imageControl.ShowNextImageThumbnail();
+                    break;
+                case Direction.WEST:
+                    imageControl.ShowPrevImageThumbnail();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+
+        protected override void HandleCancelOperation()
+        {
+            //base.HandleCancelOperation();
+            ExitImageState(false);
+        }
+
+        private void ApplyImageTexture()
+        {
+
+        }
+
+        void ExitImageState(bool applyImageTexture)
+        {
+            Debug.Log("=============== Exit VRImageObjectView");
+
+            // Legacy code
+            // SwitchState(new VRImageObjViewExit(Manager, Target));
+
+
+            FindImageView();
+            
+            // Apply Change Texture
+            if (applyImageTexture)
+            {
+                Renderer renderer = Target.gameObject.GetComponent<Renderer>();
+                ImageControl imageControl = ImageUI.GetComponent<ImageControl>();
+
+                if (renderer != null && renderer.materials != null)
+                {
+                    int MatSize = renderer.materials.GetLength(0);
+                    renderer.materials[MatSize - 1].mainTexture = imageControl.GetTexture();
+                }
+
+                Target.gameObject.GetComponent<PictureObj>().SetPath(imageControl.GetNowPath());
+
+                Debug.Log("=============== Apply Image Texture");
+            }
+            else
+            {
+                Debug.Log("=============== Discard Image Texture");
+            }
+
+            LockCameraAndMesh(false);
+
+            SwitchState(VRSceneIdleState.CopyFromCurrentState(this));
+            
+        }
+
+        private void LockCameraAndMesh(bool isLock)
+        {
+            ChangeMeshState(isLock);
+            SetGazeInputMode(isLock? GAZE_MODE.OFF: GAZE_MODE.OBJECT);
+            SetCameraLock(isLock);
+        }
+
+        private void ChangeMeshState(bool enable)
+        {
+            imageMeshRenderer.enabled = enable;
+            imageMeshCollider.enabled = enable;
         }
 
     }

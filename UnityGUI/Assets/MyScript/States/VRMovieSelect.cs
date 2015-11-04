@@ -4,71 +4,99 @@ using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-	public class VRMovieSelect : AbstractGazeInputState
-	{
-		private MovieControl MovieUI;
-		private GameObject Target;
-		
-		public VRMovieSelect(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMovieSelect")
-		{
-			Target = TargetObject;
-			
-			GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
-			if (DisposolObj) GameObject.Destroy(DisposolObj);
-			
-			MovieUI = GameObject.Find("MovieFirstFrameView").GetComponent<MovieControl>();
-			if (!MovieUI)
-				Debug.Log("MovieSelector is Null");
+    public class VRMovieSelect : AbstractGazeInputState
+    {
+        private GameObject Target;
 
-			// StartIndex(선택 되있는거 부터 시작하도록)
+        private MovieControl MovieUI;
+        private MovieObject movieObject;
 
-			MovieUI.gameObject.GetComponent<MeshCollider>().enabled = true;
-			MovieUI.gameObject.GetComponent<MeshRenderer>().enabled = true;
+        private MeshCollider movieUiMeshCollider;
+        private MeshRenderer movieUiMeshRenderer;
 
-			MovieUI.SetIndex (Target.GetComponent<MovieObject> ().IndexMovie);
-			MovieUI.UpdateMovie ();
-		}
-		
-		protected override void HandleCancelOperation()
-		{
-			base.HandleCancelOperation();
-			ExitMovieState();
-		}
-		protected override void HandleDirectionOperation(Dictionary<int, Direction> directionDictionary)
-		{
-			base.HandleDirectionOperation (directionDictionary);
 
-			foreach (int key in directionDictionary.Keys)
-			{
+        public VRMovieSelect(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMovieSelect")
+        {
+            Target = TargetObject;
 
-				ChooseMovie(directionDictionary[key]);
-					
-			}
-		}
-		private bool ChooseMovie(Direction direction)
-		{
-			switch (direction.Value)
-			{
-			case Direction.EAST:
-				MovieUI.ChangeMovie(1);
-				break;
-			case Direction.WEST:
-				MovieUI.ChangeMovie(-1);
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-		void ExitMovieState()
-		{
-			Debug.Log("Exit MovieState");
-			MovieUI.gameObject.GetComponent<MeshCollider>().enabled = false;
-			MovieUI.gameObject.GetComponent<MeshRenderer>().enabled = false;
-			Target.GetComponent<MovieObject> ().IndexMovie = MovieUI.GetIndex ();
-			SwitchState(new VRSceneIdleState(Manager));
-		}
-		
-	}
+            DestroyMarkedObject();
+
+            MovieUI = GameObject.Find("MovieFirstFrameView").GetComponent<MovieControl>();
+            if (!MovieUI)
+                Debug.Log("MovieSelector is Null");
+
+            // StartIndex(선택 되있는거 부터 시작하도록)
+
+            movieUiMeshCollider = MovieUI.gameObject.GetComponent<MeshCollider>();
+            movieUiMeshRenderer = MovieUI.gameObject.GetComponent<MeshRenderer>();
+
+
+            LockCameraAndMesh(true);
+
+            movieObject = Target.GetComponent<MovieObject>();
+            MovieUI.SetIndex(movieObject.IndexMovie);
+            MovieUI.UpdateMovie();
+        }
+
+        protected override void HandleCancelOperation()
+        {
+            //base.HandleCancelOperation();
+            ExitMovieState();
+        }
+
+        protected override void HandleDirectionOperation(Dictionary<int, Direction> directionDictionary)
+        {
+            //base.HandleDirectionOperation(directionDictionary);
+
+            foreach (int key in directionDictionary.Keys)
+            {
+                //ChooseMovie(directionDictionary[key])
+                // 명령이 여러번 오는 경우 썸네일 로딩 낭비를 막기 위하여 한번만 썸네일 변경을 실시한다.
+                if (ChooseMovie(directionDictionary[key]))
+                    return;
+            }
+        }
+
+        private bool ChooseMovie(Direction direction)
+        {
+            switch (direction.Value)
+            {
+                case Direction.EAST:
+                    MovieUI.ShowNextMovieThumbnail();
+                    break;
+                case Direction.WEST:
+                    MovieUI.ShowPrevMovieThumbnail();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+        void ExitMovieState()
+        {
+            Debug.Log("=============== Exit VRMovieSelect");
+
+            LockCameraAndMesh(false);
+
+            movieObject.IndexMovie = MovieUI.GetIndex();
+
+            SwitchState(new VRSceneIdleState(Manager));
+        }
+
+        private void LockCameraAndMesh(bool isLock)
+        {
+            ChangeMeshState(isLock);
+            SetGazeInputMode(isLock ? GAZE_MODE.OFF : GAZE_MODE.OBJECT);
+            SetCameraLock(isLock);
+        }
+
+        private void ChangeMeshState(bool enable)
+        {
+            movieUiMeshRenderer.enabled = enable;
+            movieUiMeshCollider.enabled = enable;
+        }
+
+    }
 }
 
