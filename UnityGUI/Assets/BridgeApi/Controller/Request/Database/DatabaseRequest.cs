@@ -776,6 +776,18 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         ROTATE_Z,
         /// <summary>
+        /// real
+        /// </summary>
+        SIZE_X,
+        /// <summary>
+        /// real
+        /// </summary>
+        SIZE_Y,
+        /// <summary>
+        /// real
+        /// </summary>
+        SIZE_Z,
+        /// <summary>
         /// text
         /// </summary>
         CONTAINER,

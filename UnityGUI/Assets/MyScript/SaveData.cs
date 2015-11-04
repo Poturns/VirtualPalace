@@ -1,4 +1,4 @@
-﻿using UnityEngine; 
+﻿using UnityEngine;
 
 using System.Text;
 using System.IO;
@@ -7,6 +7,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System;
 using System.Runtime.Serialization;
 using System.Reflection;
+using System.Collections.Generic;
+using BridgeApi.Controller.Request.Database;
 
 [Serializable ()]
 public class SaveData : ISerializable {
@@ -127,5 +129,33 @@ public class SaveData : ISerializable {
 		info.AddValue ("ParentName", ParentName);
 		info.AddValue ("Contents", Contents);
 	}
-	
+
+    public KeyValuePair<Enum, string>[] ConvertVRMetadataToPairs()
+    {
+        KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[15];
+        int i = 0;
+
+        //GetType().GetMembers()
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.RES_ID, Sourcekind.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.NAME, ObjName);
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.TYPE, ObjKind.ToString());
+
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_X, Posx.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_Y, Posy.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_Z, Posz.ToString());
+
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_X, Rotx.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Y, Roty.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Z, Rotx.ToString());
+
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_X, Scalex.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Y, Scaley.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Z, Scalez.ToString());
+
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.CONTAINER, "");
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.CONT_ORDER, "");
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.STYLE, Contents);
+
+        return pairs;
+    }
 }
