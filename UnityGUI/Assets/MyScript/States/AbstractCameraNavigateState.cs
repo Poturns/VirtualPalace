@@ -9,8 +9,11 @@ namespace MyScript.States
     /// </summary>
     public class AbstractCameraNavigateState : AbstractGazeInputState
     {
-        private GameObject player;
         public GameObject Player { get { return player; } }
+
+        private GameObject player;
+        private CharacterController characterController;
+
 
         public AbstractCameraNavigateState(StateManager managerRef, string stateName) : base(managerRef, stateName)
         {
@@ -26,6 +29,7 @@ namespace MyScript.States
         {
             if (player == null)
                 player = GameObject.Find("Player");
+            characterController = player.GetComponent<CharacterController>();
         }
 
         protected override void HandleDirectionOperation(Dictionary<int, Direction> directionDictionary)
@@ -45,7 +49,7 @@ namespace MyScript.States
             foreach (int key in directionDictionary.Keys)
             {
                 //s += "dimension : " + key + ", Direction : " + DirList[key] + "\n";
-                CameraNavigator.MoveCamera(player, directionDictionary[key]);
+                CameraNavigator.MoveCamera(characterController, directionDictionary[key]);
             }
             //Debug.Log("Direction Map :\n" + s);
         }

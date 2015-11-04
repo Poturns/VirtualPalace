@@ -22,4 +22,11 @@
         android:text="Controller Test"
         android:id="@+id/btn_controllertest"
         android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Google Drive Test"
+        android:id="@+id/btn_drivetest"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

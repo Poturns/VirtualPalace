@@ -3,15 +3,17 @@ using MyScript.Interface;
 
 namespace MyScript.States
 {
-	public class VRSceneIdleState : AbstractCameraNavigateState, ISceneChangeState
+    public class VRSceneIdleState : AbstractCameraNavigateState, ISceneChangeState
 	{
 		public VRSceneIdleState(StateManager managerRef) : base(managerRef, "VRSceneState")
 		{
 		}
-		
-		public void OnSceneChanged()
+
+        public UnityScene UnitySceneID { get { return UnityScene.VR; } }
+
+        public void OnSceneChanged()
 		{
-			Debug.Log(Name + " : Scene changed");
+			Debug.Log("=============== " + Name + " : Scene changed");
 			Init();
 		}
 		public override void StateUpdate()
@@ -33,35 +35,32 @@ namespace MyScript.States
 		protected override void Init()
 		{
 			base.Init();
-			GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
-			if (DisposolObj != null) GameObject.Destroy(DisposolObj);
+            DestroyMarkedObject();
 			
-			SetGazeInputMode(0);
+			SetGazeInputMode(GAZE_MODE.OBJECT);
+            SetCameraLock(false);
 		}
-		
-		void Switch()
+
+        protected override void HandleCancelOperation()
 		{
-			//Application.LoadLevel("Scene1");
-			//manager.SwitchState(new PlayState(manager));
-		}
-		
-		protected override void HandleCancelOperation()
-		{
-			ReturnToMainScene();
+			ReturnToLobbyScene();
 		}
 		
 		
-		private void ReturnToMainScene()
+		private void ReturnToLobbyScene()
 		{
+
 			SaveLoader Saver = GameObject.Find ("_Script").GetComponent<SaveLoader> ();
 			if (Saver == null)
 				Debug.Log ("SaveLoaderFindFail");
 			else
 				Saver.SavetoFile ();
-			StateManager.SwitchScene(StateManager.SCENE_MAIN);
+			StateManager.SwitchScene(UnityScene.Lobby);
+
 		}
-		
-	}
+
+
+    }
 	
 }
 

@@ -1,7 +1,4 @@
-﻿using BridgeApi.Controller.Request;
-using System;
-
-namespace BridgeApi.Controller
+﻿namespace BridgeApi.Controller
 {
     public interface IPlatformBridge : IPlatformBridgeDelegate
     {

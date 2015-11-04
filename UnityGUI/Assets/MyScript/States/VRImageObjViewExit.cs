@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 
 namespace MyScript.States
 {
+    [Obsolete()]
     public class VRImageObjViewExit : AbstractGazeInputState
     {
         private GameObject ImageUI;
-
+       
 
         public VRImageObjViewExit(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRImageObjectViewEXIT")
         {
@@ -25,7 +27,7 @@ namespace MyScript.States
             ImageUI.GetComponent<MeshCollider>().enabled = false;
             ImageUI.GetComponent<MeshRenderer>().enabled = false;
 		
-			SetGazeInputMode (0);
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SetCameraLock (false);
         }
 

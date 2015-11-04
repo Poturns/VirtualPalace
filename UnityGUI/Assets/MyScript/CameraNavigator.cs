@@ -9,16 +9,16 @@ namespace MyScript
     public class CameraNavigator
     {
         /// <summary>
-        /// 주어진 direction에 적절하게 player를 이동시킨다.
+        /// 주어진 direction에 적절하게 시점을 이동시킨다.
         /// </summary>
-        /// <param name="player">이동할 player</param>
+        /// <param name="characterController">시점을 조정하는 객체</param>
         /// <param name="direction">이동할 방향</param>
         /// <returns>이동이 처리되었는지 여부</returns>
-        public static bool MoveCamera(GameObject player, Direction direction)
+        public static bool MoveCamera(CharacterController characterController, Direction direction)
         {
-            if (player == null)
+            if (characterController == null)
             {
-                Debug.Log("Player == null");
+                Debug.Log("characterController == null");
                 return false;
             }
 
@@ -45,17 +45,10 @@ namespace MyScript
                     return false;
             }
 
-            if (player.transform != null)
-            {
-                /* * direction.Amount*/
-				player.GetComponent<CharacterController>().Move(Time.deltaTime *NewVector);
-				return true;
-            }
-            else
-            {
-                Debug.LogError("Player.transform == null");
-                return false;
-            }
+
+            characterController.Move(Time.deltaTime * 5f * direction.Amount * NewVector);
+            return true;
+
 
         }
 

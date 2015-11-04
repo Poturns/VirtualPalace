@@ -15,15 +15,15 @@ namespace MyScript.States
             SetGazeInputMode(GAZE_MODE.UI);
 
 			GameObject UI = GameObject.Find ("ModelSelectUI");
-			UI.GetComponent<UITransform> ().OnOffOUIButton (true);
-
-			UITrans = UI.GetComponent<UITransform> (); 
-			UITrans.LockCameraRot ();
+            
+			UITrans = UI.GetComponent<UITransform> ();
+            UITrans.OnOffOUIButton(true);
+            UITrans.LockCameraRot ();
 		}
 
         protected override void HandleCancelOperation()
         {
-            base.HandleCancelOperation();
+            //base.HandleCancelOperation();
 			EndState();
         }
 
@@ -31,12 +31,13 @@ namespace MyScript.States
 		{
 			UITrans.UnlockCameraRot ();
 			UITrans.OnOffOUIButton (false);
+
 			UITransform ModelUI = GameObject.Find ("ObjModelSelectUI").GetComponent<UITransform>();
 			ModelUI.UnlockCameraRot ();
 			ModelUI.OnOffOUIButton (false);
-			SetGazeInputMode (0);
+
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SwitchState (new VRSceneIdleState (Manager));
-		
 		}
 		
 	}

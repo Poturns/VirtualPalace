@@ -39,6 +39,9 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
 
                     break;
 
+                case TYPE_AGENT_NETWORK:
+
+                    break;
             }
         }
     };
@@ -68,6 +71,7 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
         Criteria criteria = new Criteria();
         criteria.setSpeedRequired(true);
         criteria.setAltitudeRequired(true);
+
         mLocationManagerF.requestSingleUpdate(criteria, this, mContextF.getMainLooper());
     }
 
@@ -81,9 +85,6 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
         return TYPE_AGENT_LOCATION;
     }
 
-    /**
-     * @return
-     */
     @Override
     public double[] getLatestData() {
         if (mLatestLocation == null)
@@ -97,6 +98,10 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
         };
     }
 
+    /**
+     * {@link #setCollaborationWith(BaseSensorAgent, OnDataCollaborationListener)} with Default-Listener
+     * @param agent
+     */
     public void setCollaborationWith(BaseSensorAgent agent) {
         setCollaborationWith(agent, mCollaborationListenerF);
     }
@@ -112,19 +117,13 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
 
     @Override
-    public void onProviderEnabled(String provider) {
-
-    }
+    public void onProviderEnabled(String provider) { }
 
     @Override
-    public void onProviderDisabled(String provider) {
-
-    }
+    public void onProviderDisabled(String provider) { }
 
 
 
@@ -153,6 +152,7 @@ public class LocationSensorAgent extends BaseSensorAgent implements LocationList
     }
 
     private void analyseBestLocation(Location location) {
+        // TODO :
         location.getAccuracy();
         location.getLatitude();
         location.getLongitude();

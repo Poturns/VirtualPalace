@@ -12,6 +12,11 @@ import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.controller.data.AugmentedTable;
+import kr.poturns.virtualpalace.controller.data.ITable;
+import kr.poturns.virtualpalace.controller.data.ResourceItem;
+import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VirtualTable;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
@@ -21,51 +26,72 @@ import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.sensor.LocationSensorAgent;
 import kr.poturns.virtualpalace.util.DriveAssistant;
+import kr.poturns.virtualpalace.util.DriveRestAssistant;
 
 
 /**
  * <b> INTERNAL CONTROLLER : 컨트롤러의 관리 기능을 다룬다 </b>
- * <p>
- *     - 데이터 처리 (DB + Archive + Drive)
- *     -
- * <p/>
+ * <p>데이터 처리 (DB + Archive + Drive)
  * </p>
+ *
+ * <p>Input Connector 관리
+ * <ol>
+ *  <li>각 Input Connector에서 GlobalApplication을 통해 Controller에 Connector 등록 요청을 한다. {@link #attachInputConnector(int, OperationInputConnector)}</li>
+ *  <li>Controller에서 해당 Input Connector를 활성화하여 Input 전달을 처리한다. {@link #activateInputConnector(int)}</li>
+ *  <li>연결되었으나 활성화되지 않았을 경우, 해당 Input Connector로부터 발생하는 Input은 처리되지 않는다.</li>
+ *  <li>{@link #deactivateInputConnector(int)}를 통해 해당 Input Connector는 비활성화 될 수 있다.</li>
+ *  <li>{@link #detachInputConnector(int)}를 통해 해당 Input Connector는 등록해제 될 수 있다.</li>
+ * </ol>
+ * </p>
+ *
  *
  * @author Yeonho.Kim
  */
-class PalaceCore {
+abstract class PalaceCore {
 
     // * * * C O N S T A N T S * * * //
-    protected final PalaceApplication mAppF;
-    protected final TreeMap<Integer, OperationInputConnector> mInputConnectorMapF;
+    protected final PalaceApplication App;
+    protected final TreeMap<Integer, OperationInputConnector> AttachedInputConnectorMap;
 
-    private final LocalArchive mLocalArchiveF;
-    private final LocalDatabaseCenter mDBCenterF;
-    private final DriveAssistant mDriveAssistantF;
-    private final TreeMap<Long, OnPlayModeListener> mPlayModeListenersF;
+    private final LocalArchive Archive;
+    protected final LocalDatabaseCenter DBCenter;
+    protected final DriveAssistant AppDriveAssistant;
+    protected final DriveRestAssistant GlobalDriveAssistant;
+    private final TreeMap<Long, OnPlayModeListener> PlayModeListeners;
 
 
     // * * * F I E L D S * * * //
     protected OnPlayModeListener.PlayMode mCurrentMode;
     protected boolean isOnCardboard;
-    protected int mSupportsFlag;
+    protected int mActivatedConnectorSupportFlag;
 
 
     // * * * C O N S T R U C T O R S * * * //
     protected PalaceCore(PalaceApplication application) {
-        mAppF = application;
-        mLocalArchiveF = LocalArchive.getInstance(application);
-        mDBCenterF = LocalDatabaseCenter.getInstance(application);
-        mDriveAssistantF = new DriveAssistant(application);
+        App = application;
 
-        mInputConnectorMapF = new TreeMap<Integer, OperationInputConnector>();
-        mPlayModeListenersF = new TreeMap<Long, OnPlayModeListener>();
-        mPlayModeListenersF.put(0L, new OnPlayModeListener() {
+        // DATA Part.
+        Archive = LocalArchive.getInstance(application);
+        DBCenter = LocalDatabaseCenter.getInstance(application);
+        AppDriveAssistant = new DriveAssistant(application);
+        GlobalDriveAssistant = new DriveRestAssistant(application);
+
+        // INPUT Part.
+        AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
+        mActivatedConnectorSupportFlag = IControllerCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
+                | IControllerCommands.TYPE_INPUT_SUPPORT_VOICE ;
+
+        PlayModeListeners = new TreeMap<Long, OnPlayModeListener>();
+        PlayModeListeners.put(0L, new OnPlayModeListener() {
             @Override
-            public void onAttached(Long attachedKey) {;}
+            public void onAttached(Long attachedKey) {
+                ;
+            }
 
             @Override
-            public void onDetached() {;}
+            public void onDetached() {
+                ;
+            }
 
             @Override
             public void onPlayModeChanged(PlayMode mode, boolean onCardboard) {
@@ -76,9 +102,21 @@ class PalaceCore {
 
         mCurrentMode = OnPlayModeListener.PlayMode.STANDARD;
         isOnCardboard = false;
-        mSupportsFlag = IControllerCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
-                        | IControllerCommands.TYPE_INPUT_SUPPORT_VOICE ;
     }
+
+    protected void destroy() {
+
+    }
+
+
+    // * * * A B S T R A C T * * * //
+    /**
+     * Unity 에 발생한 이벤트를 전달한다.
+     *
+     * @param event 발생시킬 이벤트 명
+     * @param contents 이벤트 세부 내용
+     */
+    protected abstract void dispatchEvent(String event, Object contents);
 
 
     // * * * M E T H O D S * * * //
@@ -86,12 +124,13 @@ class PalaceCore {
      *
      * @param listener
      */
+    @Deprecated
     void attachOnPlayModeChangedListener(OnPlayModeListener listener) {
         if (listener == null)
             return ;
 
         long key = System.currentTimeMillis();
-        mPlayModeListenersF.put(key, listener);
+        PlayModeListeners.put(key, listener);
         listener.onAttached(key);
     }
 
@@ -99,85 +138,122 @@ class PalaceCore {
      *
      * @param key
      */
+    @Deprecated
     void detachOnPlayModeChangedListener(long key) {
         if (key == 0)
             return ;
 
-        mPlayModeListenersF.remove(key).onDetached();
+        PlayModeListeners.remove(key).onDetached();
     }
 
     /**
      *
      * @param mode
      */
+    @Deprecated
     boolean switchMode(OnPlayModeListener.PlayMode mode, boolean onCardboard) {
         if (mCurrentMode == mode && isOnCardboard == onCardboard)
             return false;
 
-        for(OnPlayModeListener listener : mPlayModeListenersF.values()) {
+        for(OnPlayModeListener listener : PlayModeListeners.values()) {
             listener.onPlayModeChanged(mode, onCardboard);
         }
         return true;
     }
 
+
+
+    // * * * I N P U T _ P A R T . * * * //
     /**
-     * {@link OperationInputConnector}를 Controller 에 연결한다.
-     * 연결할 경우, 자동으로 활성화된다.
+     * {@link OperationInputConnector}를 Controller 에 등록한다.
+     * 연결할 경우, 자동으로 활성화 하지 않는다.
      *
      * @param connector Connector Support Type
      * @param supportType Connector Instance
      */
     void attachInputConnector(int supportType, OperationInputConnector connector) {
         // 동일 SupportType 에서 이미 연결되어 있는 경우, 해제한다.
-        OperationInputConnector attached = mInputConnectorMapF.get(supportType);
+        OperationInputConnector attached = AttachedInputConnectorMap.get(supportType);
         if (attached != null) {
-            attached.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
+            attached.configureFromController(App, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
         }
 
-        // 동일 SupportType 은 새로운 Connector 로 연결되고, 활성화 된다.
+        // 동일 SupportType 은 새로운 Connector 로 연결된다.
         if (connector != null) {
-            mSupportsFlag |= supportType;
-            mInputConnectorMapF.put(supportType, connector);
-            connector.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_TRUE);
-            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
+            AttachedInputConnectorMap.put(supportType, connector);
+            connector.configureFromController(App, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_TRUE);
+
+            JSONObject content = new JSONObject();
+            try {
+                content.put("type", "success");
+                content.put("message", "입력[" + supportType + "]가 준비되었습니다.");
+
+                dispatchEvent("onToastMessage", content);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
-     * {@link OperationInputConnector}를 Controller 에서 해제한다.
-     * 해제할 경우, 자동으로 비활성화된다.
+     * {@link OperationInputConnector}를 Controller 에서 등록해제한다.
+     * 해제할 경우, 자동으로 비활성화 한다.
      *
      * @param supportType Connector Support Type
      */
     void detachInputConnector(int supportType) {
-        OperationInputConnector connector = mInputConnectorMapF.remove(supportType);
+        if (deactivateInputConnector(supportType)) {
+            // 연결해제 작업을 수행하도록 한다.
+            OperationInputConnector connector = AttachedInputConnectorMap.remove(supportType);
+            connector.configureFromController(App, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
 
-        if (connector != null) {
-            mSupportsFlag = 0;
-            for(int type : mInputConnectorMapF.keySet())
-                mSupportsFlag |= type;
+            JSONObject content = new JSONObject();
+            try {
+                content.put("type", "fail");
+                content.put("message", "입력[" + supportType + "]가 연결 해제되었습니다.");
 
-            connector.configureFromController(mAppF, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_FALSE);
-            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
-        }
+                dispatchEvent("onToastMessage", content);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        };
     }
 
     /**
      * 연결되어 있는 supportType {@link OperationInputConnector}를 활성화한다.
      * 활성화된 Input Connector 에서 전달된 Input 데이터만 처리된다.
      *
+     * Major Input 타입에서는 동시에 하나의 Support Type 만 활성화된다.
+     * 따라서 기존에 활성화되어 있던 SupportType 은 비활성되고, 새로운 SupportType 이 활성화된다.
+     *
      * @param supportType
      */
-    boolean activateInputConector(int supportType) {
-        OperationInputConnector connector = mInputConnectorMapF.get(supportType);
+    boolean activateInputConnector(int supportType) {
+        OperationInputConnector connector = AttachedInputConnectorMap.get(supportType);
 
-        if (connector != null) {
-            mSupportsFlag |= supportType;
-            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
-            return true;
+        boolean result = (connector != null);
+        if (result) {
+            if (supportType < IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
+                int activatedType = mActivatedConnectorSupportFlag % IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
+                // 기존 활성화되어 있던 Major Support Type 비활성화.
+                deactivateInputConnector(activatedType);
+            }
+
+            mActivatedConnectorSupportFlag |= supportType;
+            connector.configureFromController(App, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
+
+            JSONObject content = new JSONObject();
+            try {
+                content.put(String.valueOf(supportType), true);
+                dispatchEvent("onInputModeChanged", content);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
-        return false;
+        return result;
     }
 
     /**
@@ -187,19 +263,23 @@ class PalaceCore {
      * @param supportType
      */
     boolean deactivateInputConnector(int supportType) {
-        OperationInputConnector connector = mInputConnectorMapF.get(supportType);
+        OperationInputConnector connector = AttachedInputConnectorMap.get(supportType);
 
-        if (connector != null) {
-            mSupportsFlag ^= supportType;
-            for(int type : mInputConnectorMapF.keySet())
-                if (type != supportType)
-                    mSupportsFlag |= type;
+        boolean result = (connector != null);
+        if (result) {
+            mActivatedConnectorSupportFlag ^= supportType;
+            connector.configureFromController(App, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
 
-            connector.configureFromController(mAppF, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_FALSE);
-            return true;
+            JSONObject content = new JSONObject();
+            try {
+                content.put(String.valueOf(supportType), false);
+                dispatchEvent("onInputModeChanged", content);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
-        return false;
+        return result;
     }
 
     /**
@@ -208,12 +288,12 @@ class PalaceCore {
      * @return
      */
     boolean requestTextResultByVoiceRecognition(int supportType) {
-        if ((mSupportsFlag & supportType) == supportType) {
+        if ((mActivatedConnectorSupportFlag & supportType) == supportType) {
 
-            for (int support : mInputConnectorMapF.keySet()) {
+            for (int support : AttachedInputConnectorMap.keySet()) {
                 if ((support & supportType) == supportType) {
-                    OperationInputConnector connector = mInputConnectorMapF.get(support);
-                    connector.configureFromController(mAppF, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
+                    OperationInputConnector connector = AttachedInputConnectorMap.get(support);
+                    connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
                     return true;
                 }
             }
@@ -221,6 +301,8 @@ class PalaceCore {
         return false;
     }
 
+
+    // * * * D A T A _ P A R T . * * * //
     /**
      * 로컬저장소 & 로컬 DB & 구글 드라이브 간의 데이터 동기화 상태를 체크한다.
      * (동기적 비동기화)
@@ -240,6 +322,15 @@ class PalaceCore {
         return false;
     }
 
+    public void testDrive(final DriveAssistant assistant) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DBCenter.backUp(assistant);
+            }
+        }).start();
+    }
+
     /**
      * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
      *
@@ -249,7 +340,7 @@ class PalaceCore {
         double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
         double radius = 0.0000005;
 
-        return mDBCenterF.queryNearObjectsOnRealLocation(
+        return DBCenter.queryNearObjectsOnRealLocation(
                 latestData[LocationSensorAgent.DATA_INDEX_LATITUDE],
                 latestData[LocationSensorAgent.DATA_INDEX_LONGITUDE],
                 latestData[LocationSensorAgent.DATA_INDEX_ALTITUDE],
@@ -270,16 +361,16 @@ class PalaceCore {
         if (resID <= 0)
             return -1;
 
-        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD> builder =
-                new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+        LocalDatabaseCenter.WriteBuilder<AugmentedTable> builder =
+                new LocalDatabaseCenter.WriteBuilder<AugmentedTable>(DBCenter);
 
-        builder.set(LocalDatabaseCenter.AUGMENTED_FIELD.RES_ID, String.valueOf(resID))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.LATITUDE, String.valueOf(arItem.latitude))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.LONGITUDE, String.valueOf(arItem.longitude))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.ALTITUDE, String.valueOf(arItem.altitude))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_X, String.valueOf(arItem.supportX))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_Y, String.valueOf(arItem.supportY))
-                .set(LocalDatabaseCenter.AUGMENTED_FIELD.SUPPORT_Z, String.valueOf(arItem.supportZ));
+        builder.set(AugmentedTable.RES_ID, String.valueOf(resID))
+                .set(AugmentedTable.LATITUDE, String.valueOf(arItem.latitude))
+                .set(AugmentedTable.LONGITUDE, String.valueOf(arItem.longitude))
+                .set(AugmentedTable.ALTITUDE, String.valueOf(arItem.altitude))
+                .set(AugmentedTable.SUPPORT_X, String.valueOf(arItem.supportX))
+                .set(AugmentedTable.SUPPORT_Y, String.valueOf(arItem.supportY))
+                .set(AugmentedTable.SUPPORT_Z, String.valueOf(arItem.supportZ));
 
         return builder.insert();
     }
@@ -291,11 +382,11 @@ class PalaceCore {
      * @return
      */
     long insertSimpleResourceItem(ResourceItem item) {
-        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD> builder =
-                new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+        LocalDatabaseCenter.WriteBuilder<ResourceTable> builder =
+                new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
-        builder.set(LocalDatabaseCenter.RESOURCE_FIELD.NAME, item.name)
-                .set(LocalDatabaseCenter.RESOURCE_FIELD.DESCRIPTION, item.description);
+        builder.set(ResourceTable.NAME, item.name)
+                .set(ResourceTable.DESCRIPTION, item.description);
 
         long resID = builder.insert();
         if (resID > 0)
@@ -311,14 +402,16 @@ class PalaceCore {
      * @return
      */
     long insertTemporaryVirtualItem(long resID) {
-        LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD> builder =
-                new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+        LocalDatabaseCenter.WriteBuilder<VirtualTable> builder =
+                new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
 
-        builder.set(LocalDatabaseCenter.VIRTUAL_FIELD.RES_ID, String.valueOf(resID))
-                .set(LocalDatabaseCenter.VIRTUAL_FIELD.TYPE, "0");
+        builder.set(VirtualTable.RES_ID, String.valueOf(resID))
+                .set(VirtualTable.TYPE, "0");
 
         return builder.insert();
     }
+
+
 
     /**
      *
@@ -330,7 +423,7 @@ class PalaceCore {
     boolean executeConstructedQuery(String command, JSONObject paramObj, JSONObject returnObj) {
         try {
             if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
-                returnObj.put(JsonKey.QUERY_RESULT, mDBCenterF.queryAllVirtualRenderings());
+                returnObj.put(JsonKey.QUERY_RESULT, DBCenter.queryAllVirtualRenderings());
                 return true;
             }
 
@@ -349,7 +442,7 @@ class PalaceCore {
      * @param table
      * @return
      */
-    boolean insertNewMetadata(JSONObject insert, String table) {
+    boolean insertNewLocalData(JSONObject insert, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, insert);
         return (builder == null)? false : (builder.insert() > 0);
     }
@@ -360,7 +453,7 @@ class PalaceCore {
      * @param table
      * @return
      */
-    boolean selectMetadata(JSONObject select, String table, JSONObject result) {
+    boolean selectLocalData(JSONObject select, String table, JSONObject result) {
         LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(table, select);
 
         try {
@@ -370,22 +463,21 @@ class PalaceCore {
             while (cursor.moveToNext()) {
                 JSONObject row = new JSONObject();
 
-                if (LocalDatabaseCenter.TABLE_RESOURCE.equalsIgnoreCase(table)) {
-                    LocalDatabaseCenter.RESOURCE_FIELD[] fields = LocalDatabaseCenter.RESOURCE_FIELD.values();
+                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
+                    ResourceTable[] fields = ResourceTable.values();
                     for (int i=0; i<fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
 
-                } else if (LocalDatabaseCenter.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
-                    LocalDatabaseCenter.AUGMENTED_FIELD[] fields = LocalDatabaseCenter.AUGMENTED_FIELD.values();
+                } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
+                    AugmentedTable[] fields = AugmentedTable.values();
                     for (int i=0; i<fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
 
-                } else if (LocalDatabaseCenter.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
-                    LocalDatabaseCenter.VIRTUAL_FIELD[] fields = LocalDatabaseCenter.VIRTUAL_FIELD.values();
+                } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
+                    VirtualTable[] fields = VirtualTable.values();
                     for (int i=0; i<fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
                 }
-
                 array.put(row);
             }
             cursor.close();
@@ -406,7 +498,7 @@ class PalaceCore {
      * @param table
      * @return
      */
-    boolean updateMetadata(JSONObject update, String table) {
+    boolean updateLocalData(JSONObject update, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, update);
         return (builder == null)? false : builder.modify();
     }
@@ -418,7 +510,7 @@ class PalaceCore {
      * @param table
      * @return
      */
-    boolean deleteMetadata(JSONObject delete, String table) {
+    boolean deleteLocalData(JSONObject delete, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, delete);
         return (builder == null)? false : builder.delete();
     }
@@ -433,14 +525,14 @@ class PalaceCore {
      */
     private LocalDatabaseCenter.ReadBuilder makeReadBuilder(String table, JSONObject elements) {
         LocalDatabaseCenter.ReadBuilder builder = null;
-        if (LocalDatabaseCenter.TABLE_VIRTUAL.equals(table))
-            builder = new LocalDatabaseCenter.ReadBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+        if (ITable.TABLE_VIRTUAL.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<VirtualTable>(DBCenter);
 
-        else if (LocalDatabaseCenter.TABLE_AUGMENTED.equals(table))
-            builder = new LocalDatabaseCenter.ReadBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+        else if (ITable.TABLE_AUGMENTED.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<AugmentedTable>(DBCenter);
 
-        else if (LocalDatabaseCenter.TABLE_RESOURCE.equals(table))
-            builder = new LocalDatabaseCenter.ReadBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+        else if (ITable.TABLE_RESOURCE.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<ResourceTable>(DBCenter);
 
         if (builder == null || elements == null)
             return null;
@@ -455,7 +547,7 @@ class PalaceCore {
                 if (JsonKey.SET.equalsIgnoreCase(element)) {
                     JSONArray array = elements.getJSONArray(element);
                     for (int i=0; i<array.length(); i++) {
-                        LocalDatabaseCenter.IField field = getField(table, array.getString(i));
+                        ITable field = getField(table, array.getString(i));
                         builder.set(field, null);
                     }
                     continue;
@@ -483,7 +575,7 @@ class PalaceCore {
                     while (itemIterator.hasNext()) {
                         String item = itemIterator.next();
 
-                        LocalDatabaseCenter.IField field = getField(table, item);
+                        ITable field = getField(table, item);
                         if (field == null)
                             // 찾을 수 없는 필드명은 제외.
                             continue;
@@ -524,14 +616,14 @@ class PalaceCore {
      */
     private LocalDatabaseCenter.WriteBuilder makeWriteBuilder(String table, JSONObject elements) {
         LocalDatabaseCenter.WriteBuilder builder = null;
-        if (LocalDatabaseCenter.TABLE_VIRTUAL.equals(table))
-            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.VIRTUAL_FIELD>(mDBCenterF);
+        if (ITable.TABLE_VIRTUAL.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
 
-        else if (LocalDatabaseCenter.TABLE_AUGMENTED.equals(table))
-            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.AUGMENTED_FIELD>(mDBCenterF);
+        else if (ITable.TABLE_AUGMENTED.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<AugmentedTable>(DBCenter);
 
-        else if (LocalDatabaseCenter.TABLE_RESOURCE.equals(table))
-            builder = new LocalDatabaseCenter.WriteBuilder<LocalDatabaseCenter.RESOURCE_FIELD>(mDBCenterF);
+        else if (ITable.TABLE_RESOURCE.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
         if (builder == null || elements == null)
             return null;
@@ -565,7 +657,7 @@ class PalaceCore {
                     while (itemIterator.hasNext()) {
                         String item = itemIterator.next();
 
-                        LocalDatabaseCenter.IField field = getField(table, item);
+                        ITable field = getField(table, item);
                         if (field == null)
                             // 찾을 수 없는 필드명은 제외.
                             continue;
@@ -607,17 +699,17 @@ class PalaceCore {
      * @param name
      * @return
      */
-    private LocalDatabaseCenter.IField getField(String table, String name) {
+    private ITable getField(String table, String name) {
         final String NAME = name.toUpperCase();
         try {
-            if (LocalDatabaseCenter.TABLE_VIRTUAL.equals(table)) {
-                return LocalDatabaseCenter.VIRTUAL_FIELD.valueOf(NAME);
+            if (ITable.TABLE_VIRTUAL.equals(table)) {
+                return VirtualTable.valueOf(NAME);
 
-            } else if (LocalDatabaseCenter.TABLE_AUGMENTED.equals(table)) {
-                return LocalDatabaseCenter.AUGMENTED_FIELD.valueOf(NAME);
+            } else if (ITable.TABLE_AUGMENTED.equals(table)) {
+                return AugmentedTable.valueOf(NAME);
 
-            } else if (LocalDatabaseCenter.TABLE_RESOURCE.equals(table)) {
-                return LocalDatabaseCenter.RESOURCE_FIELD.valueOf(NAME);
+            } else if (ITable.TABLE_RESOURCE.equals(table)) {
+                return ResourceTable.valueOf(NAME);
             }
 
         } catch (IllegalArgumentException e) { ; }
@@ -628,30 +720,26 @@ class PalaceCore {
      * @return
      */
     boolean executeBackUp() {
-        mDBCenterF.backUp(mDriveAssistantF);
+        DBCenter.backUp(AppDriveAssistant);
         return false;
     }
 
 
 
-
     // * * * G E T T E R S & S E T T E R S * * * //
-
     /**
      *
      * @param sensorType
      * @return
      */
     protected double[] getSensorData(int sensorType) {
-        InfraDataService service = mAppF.getInfraDataService();
-
+        InfraDataService service = App.getInfraDataService();
         if (service != null) {
             BaseSensorAgent agent = service.getSensorAgent(sensorType);
 
             if (agent != null)
                 return agent.getLatestData();
         }
-
         return null;
     }
 
@@ -659,9 +747,10 @@ class PalaceCore {
      *
      * @return
      */
-    protected Integer[] listEnabledInputType() {
-        Integer[] list = new Integer[mInputConnectorMapF.size()];
-        mInputConnectorMapF.keySet().toArray(list);
+    public Integer[] getAttachedInputTypeArray() {
+        Integer[] list = new Integer[AttachedInputConnectorMap.size()];
+        AttachedInputConnectorMap.keySet().toArray(list);
+
         return list;
     }
 
@@ -671,7 +760,7 @@ class PalaceCore {
      * @return
      */
     protected boolean isActivatedInputType(int inputType) {
-        return (mSupportsFlag & inputType) == inputType;
+        return (mActivatedConnectorSupportFlag & inputType) > 0;
     }
 
 }

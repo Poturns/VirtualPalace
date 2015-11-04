@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import kr.poturns.virtualpalace.util.LogShard;
+
 /**
  * <b> 로컬 저장소에 파일로서 데이터를 관리한다. </b>
  * <p>
@@ -90,40 +92,40 @@ public class LocalArchive  {
         systemDir.mkdirs();
     }
 
-    /**
-     *
-     * @param logShard
-     */
-    public synchronized void appendLog(LogShard logShard) {
-        if (logShard == null)
-            return;
-
-        File logDir = new File(Environment.getExternalStorageDirectory(), LOG_DIR);
-        File logFile = new File(logDir, DateFormat.format("yyyy-MM-dd", logShard.time).toString());
-
-        BufferedWriter writer = null;
-        try {
-            if (!logFile.exists())
-                logFile.createNewFile();
-
-            writer = new BufferedWriter(new FileWriter(logFile, true));
-            writer.append(logShard.toString());
-            writer.newLine();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+//    /**
+//     *
+//     * @param logShard
+//     */
+//    public synchronized void appendLog(LogShard logShard) {
+//        if (logShard == null)
+//            return;
+//
+//        File logDir = new File(Environment.getExternalStorageDirectory(), LOG_DIR);
+//        File logFile = new File(logDir, DateFormat.format("yyyy-MM-dd", logShard.time).toString());
+//
+//        BufferedWriter writer = null;
+//        try {
+//            if (!logFile.exists())
+//                logFile.createNewFile();
+//
+//            writer = new BufferedWriter(new FileWriter(logFile, true));
+//            writer.append(logShard.toString());
+//            writer.newLine();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//
+//        } finally {
+//            if (writer != null) {
+//                try {
+//                    writer.close();
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
     /**
      *

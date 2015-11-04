@@ -52,7 +52,7 @@ public class CombineObject : AbstractBasicObject {
 	public void SetKind(KIND_SOURCE k)
 	{
 		SourceKind = k;
-		Debug.Log ("k :" + k);
+		//Debug.Log ("k :" + k);
 		Debug.Log ("CombineObj Kind :" + SourceKind);
 	}
 	// Update is called once per frame

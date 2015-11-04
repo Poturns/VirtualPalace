@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 
 import org.json.JSONArray;
@@ -14,21 +15,21 @@ import org.json.JSONObject;
 import java.util.Iterator;
 import java.util.List;
 
-import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.augmented.AugmentedOutput;
+import kr.poturns.virtualpalace.controller.data.ITable;
+import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
+import kr.poturns.virtualpalace.controller.data.VirtualTable;
 import kr.poturns.virtualpalace.input.IControllerCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
  * <b> EXTERNAL CONTROLLER : 컨트롤러의 중개 기능을 다룬다 </b>
- * <p>
- *
- * </p>
+ * <p> 프로토콜 및 통신 작업에 대한 Router 역할을 수행한다.</p>
  *
  * @author Yeonho.Kim
  */
-public class PalaceMaster extends PalaceCore {
+public class PalaceMaster extends PalaceEngine {
 
     // * * * S I N G L E T O N * * * //
     private static PalaceMaster sInstance;
@@ -64,7 +65,21 @@ public class PalaceMaster extends PalaceCore {
 
     // * * * M E T H O D S * * * //
     protected void destroy() {
+        sInstance = null;
 
+        super.destroy();
+    }
+
+    @Override
+    protected void dispatchEvent(String eventName, Object contents) {
+        // TODO : Accumulate
+        JSONObject event = new JSONObject();
+        try {
+            event.put(eventName, contents);
+
+        } catch (JSONException e) { ; }
+
+        AndroidUnityBridge.getInstance(App).sendSingleMessageToUnity(event.toString());
     }
 
     /**
@@ -73,6 +88,13 @@ public class PalaceMaster extends PalaceCore {
      * @param list
      */
     public void drawAugmentedItems(List<AugmentedOutput> list) {
+        Pair<String, SceneLifeCycle> current = getCurrentLifeCycle();
+        if (!SceneLifeCycle.AR.equalsIgnoreCase(current.first) ||
+                SceneLifeCycle.onLoaded != current.second) {
+            // AR Scene이 준비되지 않았을 경우엔 Item Drawing 요청이 전달되지 않는다.
+            return;
+        }
+
         JSONObject message = new JSONObject();
         try {
             JSONArray array = new JSONArray();
@@ -81,7 +103,7 @@ public class PalaceMaster extends PalaceCore {
                 try {
                     JSONObject obj = new JSONObject();
 
-                    obj.put(LocalDatabaseCenter.VIRTUAL_FIELD.RES_ID.toString(), item.resID);
+                    obj.put(VirtualTable.RES_ID.toString(), item.resID);
                     obj.put(IControllerCommands.JsonKey.SCREEN_X, item.screenX);
                     obj.put(IControllerCommands.JsonKey.SCREEN_Y, item.screenY);
 
@@ -98,7 +120,7 @@ public class PalaceMaster extends PalaceCore {
             return;
         }
 
-        AndroidUnityBridge.getInstance(mAppF).sendSingleMessageToUnity(message.toString());
+        AndroidUnityBridge.getInstance(App).sendSingleMessageToUnity(message.toString());
     }
 
 
@@ -132,7 +154,7 @@ public class PalaceMaster extends PalaceCore {
         public void handleMessage(Message msg) {
             // 활성화되지 않은 InputConnector 로부터 전달된 메시지는 처리하지 않는다.
             int from = msg.arg1;
-            if ((mSupportsFlag & from) != from)
+            if ((mActivatedConnectorSupportFlag & from) != from)
                 return;
 
             switch(msg.what) {
@@ -171,7 +193,7 @@ public class PalaceMaster extends PalaceCore {
                     ThreadUtils.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                         @Override
                         public void run() {
-                            AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(mTextResultRequestId, sendResult);
+                            AndroidUnityBridge.getInstance(App).respondCallbackToUnity(mTextResultRequestId, sendResult);
                             mTextResultRequestId = -1;
                         }
                     });
@@ -362,7 +384,7 @@ public class PalaceMaster extends PalaceCore {
                 @Override
                 public void run() {
                     synchronized (inputLock) {
-                        AndroidUnityBridge.getInstance(mAppF).sendInputMessageToUnity(singleMessage.toString());
+                        AndroidUnityBridge.getInstance(App).sendInputMessageToUnity(singleMessage.toString());
 
                         // Send 후 JsonMessage 초기화.
                         init();
@@ -425,7 +447,7 @@ public class PalaceMaster extends PalaceCore {
                                 result = new JSONObject();
                             }
 
-                            AndroidUnityBridge.getInstance(mAppF).respondCallbackToUnity(id, result.toString());
+                            AndroidUnityBridge.getInstance(App).respondCallbackToUnity(id, result.toString());
                         }
                     };
                 } break;
@@ -435,7 +457,8 @@ public class PalaceMaster extends PalaceCore {
             }
 
             // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
-            ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
+            if(runnable != null)
+                ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
         }
 
         /**
@@ -459,27 +482,27 @@ public class PalaceMaster extends PalaceCore {
                 try {
                     String table = null;
                     if (key.endsWith("_ar") || key.endsWith("_AR"))
-                        table = LocalDatabaseCenter.TABLE_AUGMENTED;
+                        table = ITable.TABLE_AUGMENTED;
                     else if (key.endsWith("_vr") || key.endsWith("_VR"))
-                        table = LocalDatabaseCenter.TABLE_VIRTUAL;
+                        table = ITable.TABLE_VIRTUAL;
                     else if (key.endsWith("_res") || key.endsWith("_RES"))
-                        table = LocalDatabaseCenter.TABLE_RESOURCE;
+                        table = ITable.TABLE_RESOURCE;
 
 
                     if (QUERY_ALL_VR_ITEMS.equalsIgnoreCase(key)) {
                         result = executeConstructedQuery(key, message.getJSONObject(key), jsonResult);
 
                     } else if (SELECT_AR.equalsIgnoreCase(key) || SELECT_VR.equalsIgnoreCase(key) || SELECT_RES.equalsIgnoreCase(key)) {
-                        result = selectMetadata(message.getJSONObject(key), table, jsonResult);
+                        result = selectLocalData(message.getJSONObject(key), table, jsonResult);
 
                     } else if (INSERT_AR.equalsIgnoreCase(key) || INSERT_VR.equalsIgnoreCase(key) || INSERT_RES.equalsIgnoreCase(key)) {
-                        result = insertNewMetadata(message.getJSONObject(key), table);
+                        result = insertNewLocalData(message.getJSONObject(key), table);
 
                     } else if (UPDATE_AR.equalsIgnoreCase(key) || UPDATE_VR.equalsIgnoreCase(key) || UPDATE_RES.equalsIgnoreCase(key)) {
-                        result = updateMetadata(message.getJSONObject(key), table);
+                        result = updateLocalData(message.getJSONObject(key), table);
 
                     } else if (DELETE_AR.equalsIgnoreCase(key) || DELETE_VR.equalsIgnoreCase(key) || DELETE_RES.equalsIgnoreCase(key)) {
-                        result = deleteMetadata(message.getJSONObject(key), table);
+                        result = deleteLocalData(message.getJSONObject(key), table);
 
                     } else if (SWITCH_PLAY_MODE.equalsIgnoreCase(key)) {
                         int mode = message.getInt(key);
@@ -487,7 +510,7 @@ public class PalaceMaster extends PalaceCore {
 
                     } else if (ACTIVATE_INPUT.equalsIgnoreCase(key)) {
                         int supportType = message.getInt(key);
-                        result = activateInputConector(supportType);
+                        result = activateInputConnector(supportType);
 
                     } else if (DEACTIVATE_INPUT.equalsIgnoreCase(key)) {
                         int supportType = message.getInt(key);
@@ -526,7 +549,7 @@ public class PalaceMaster extends PalaceCore {
 
     // * * * G E T T E R  S & S E T T E R S * * * //
     public Handler getInputHandler(int supportType) {
-        if (mInputConnectorMapF.get(supportType) == null)
+        if (AttachedInputConnectorMap.get(supportType) == null)
             return null;
 
         return mInputHandlerF;

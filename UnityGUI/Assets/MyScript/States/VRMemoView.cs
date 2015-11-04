@@ -13,41 +13,41 @@ namespace MyScript.States
         private GameObject TargetObj;
         private MemoObject MemoObj;
         private TextMesh TMObject;
-		private GameObject VoiceIcon;
-        private GameObject EventSys;
+        private GameObject VoiceIcon;
+        private MeshRenderer IconRenderer;
+
+        private SpriteRenderer MemoBackgroundSpriteRenderer;
 
         public VRMemoView(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMemoView")
         {
             TargetObj = TargetObject;
 
-            GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
-            if (DisposolObj) GameObject.Destroy(DisposolObj);
+            DestroyMarkedObject();
 
-            EventSys = GameObject.Find("EventSystem");
             UIMemoBG = GameObject.Find("MemoView");
-            if (!UIMemoBG)
-                Debug.Log("Sel Target is Null");
-            UIMemoBG.GetComponent<SpriteRenderer>().enabled = true;
+            if (!UIMemoBG) Debug.Log("Sel Target is Null");
+
+            MemoBackgroundSpriteRenderer = UIMemoBG.GetComponent<SpriteRenderer>();
 
             UIMemoTxt = GameObject.Find("MemoText");
-            if (!UIMemoTxt)
-                Debug.Log("Sel Text is Null");
+            if (!UIMemoTxt) Debug.Log("Sel Text is Null");
 
             MemoObj = TargetObject.GetComponent<MemoObject>();
+
             //TargetObject.GetComponent<MemoObject>().MemoPrefab;
-            TextMesh T = UIMemoTxt.GetComponent<TextMesh>();
+            //TextMesh T = UIMemoTxt.GetComponent<TextMesh>();
+
             TMObject = UIMemoTxt.GetComponent<TextMesh>();
-            StateManager.InputTextMesh(T, MemoObj.GetMemo());
+            Utils.Text.InputTextMesh(TMObject, MemoObj.Memo);
 
-			VoiceIcon = GameObject.Find("VoiceIcon");
-			if(VoiceIcon == null) Debug.Log ("Voice Icon is NULL");
+            VoiceIcon = GameObject.Find("VoiceIcon");
+            if (VoiceIcon == null) Debug.Log("Voice Icon is NULL");
 
-			SetGazeInputMode (GAZE_MODE.OFF);
-			SetCameraLock (true);
+            IconRenderer = VoiceIcon.GetComponent<MeshRenderer>();
 
-            //T.text = "New Memo Test";
-            //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
+            LockCameraAndMesh(true);
         }
+
 
         public override void StateUpdate()
         {
@@ -55,56 +55,82 @@ namespace MyScript.States
                 ExitMemoView();
         }
 
-		// 현재상태에서의 선택은 충돌체크가 아니라 바로 음성인식 실행 
+        // 현재상태에서의 선택은 충돌체크가 아니라 바로 음성인식 실행 
         protected override void HandleSelectOperation()
         {
-			//
             //base.HandleSelectOperation();
-            
-			SendSpeechMemoRequest();
+
+            SendSpeechMemoRequest();
         }
 
         protected override void HandleCancelOperation()
         {
-            base.HandleCancelOperation();
+            // base.HandleCancelOperation();
             ExitMemoView();
         }
-              
-        void Switch()
-        {
-            //Application.LoadLevel("Scene1");
-            //manager.SwitchState(new PlayState(manager));
 
-
-        }
 
         private void SendSpeechMemoRequest()
         {
-			MeshRenderer IconRenderer = VoiceIcon.GetComponent<MeshRenderer> ();
-			if(IconRenderer == null) Debug.Log("VoiceIcon is Null");
-			IconRenderer.enabled = true;
-            new SpeechRequest().SendRequest(Manager, (result) =>
+            //MeshRenderer IconRenderer = VoiceIcon.GetComponent<MeshRenderer> ();
+            //if(IconRenderer == null) Debug.Log("VoiceIcon is Null");
+
+            IconRenderer.enabled = true;
+
+            SpeechRequest.NewRequest().SendRequest(Manager, result =>
             {
                 Debug.Log(result);
+                System.Action action;
                 switch (result.Status)
                 {
                     case RequestResult.STATUS_SUCCESS:
-                        MemoObj.InputMemo(result.Speech);
-                        QueueOnMainThread(() => TMObject.text = MemoObj.GetMemo());
+                        MemoObj.Memo = result.Speech;
+                        action = () =>
+                         {
+                             TMObject.text = MemoObj.Memo;
+                             IconRenderer.enabled = false;
+                         };
                         break;
 
                     default:
                         Debug.Log("SpeechRequest : failed!");
+                        action = () => IconRenderer.enabled = false;
                         break;
                 }
+
+                QueueOnMainThread(action);
+
             });
-			IconRenderer.enabled = false;
+
+
         }
 
         private void ExitMemoView()
         {
-            SwitchState(new VRMemoViewExit(Manager, TargetObj));
+            // Legacy code
+            //SwitchState(new VRMemoViewExit(Manager, TargetObj));
+
+            DestroyMarkedObject();
+
+            TMObject.text = "";
+
+            LockCameraAndMesh(false);
+
+            SwitchState(new VRObjectView(Manager, TargetObj));
         }
+
+        private void LockCameraAndMesh(bool isLock)
+        {
+            ChangeMeshState(isLock);
+            SetGazeInputMode(isLock ? GAZE_MODE.OFF : GAZE_MODE.OBJECT);
+            SetCameraLock(isLock);
+        }
+
+        private void ChangeMeshState(bool enable)
+        {
+            MemoBackgroundSpriteRenderer.enabled = enable;
+        }
+
 
     }
 

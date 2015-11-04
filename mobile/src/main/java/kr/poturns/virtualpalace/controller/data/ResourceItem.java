@@ -1,4 +1,4 @@
-package kr.poturns.virtualpalace.controller;
+package kr.poturns.virtualpalace.controller.data;
 
 /**
  * Created by Yeonho on 2015-10-25.

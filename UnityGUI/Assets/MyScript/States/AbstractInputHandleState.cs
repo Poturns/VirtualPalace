@@ -17,12 +17,22 @@ namespace MyScript.States
 
         protected StateManager Manager { get { return manager; } }
 
+        public const string DESTROY_MARK = "Disposol";
 
         public AbstractInputHandleState(StateManager managerRef, string stateName)
         {
             manager = managerRef;
             this.stateName = stateName;
-            Debug.Log(stateName);
+            Debug.Log("=============== " + stateName);
+        }
+
+        /// <summary>
+        /// DESTROY_MARK (Disposol) tag가 붙은 GameObject를 destory한다.
+        /// </summary>
+        protected internal static void DestroyMarkedObject()
+        {
+            GameObject DisposolObj = GameObject.FindGameObjectWithTag(DESTROY_MARK);
+            if (DisposolObj != null) UnityEngine.Object.Destroy(DisposolObj);
         }
 
         /// <summary>
@@ -76,9 +86,11 @@ namespace MyScript.States
                     case Operation.SELECT:
                         HandleSelectOperation();
                         break;
-				case Operation.DEEP:
-					HandleDeepOperation();
-					break;
+
+                    case Operation.DEEP:
+                        HandleDeepOperation();
+                        break;
+
                     default:
                         if (operation.IsDirection)
                             HandleDirectionOperation(JsonInterpreter.ParseDirectionAmount(operation));
@@ -95,10 +107,10 @@ namespace MyScript.States
         protected virtual void HandleCancelOperation() { }
 
 
-		/// <summary>
-		/// Deep 명령을 처리한다.
-		/// </summary>
-		protected virtual void HandleDeepOperation() { }
+        /// <summary>
+        /// Deep 명령을 처리한다.
+        /// </summary>
+        protected virtual void HandleDeepOperation() { }
 
 
         /// <summary>
@@ -115,7 +127,7 @@ namespace MyScript.States
         /// <summary>
         /// Cancel, Select, Direction 이외의 다른 명령을 처리한다.
         /// </summary>
-        /// <param name="operation">Cancel, Select, Direction 이외의 다른 명령</param>
+        /// <param name="operation">Cancel, Select, Direction, Deep 이외의 다른 명령</param>
         protected virtual void HandleOtherOperation(Operation operation) { }
     }
 

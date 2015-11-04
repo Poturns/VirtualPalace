@@ -20,6 +20,7 @@ public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventL
     public static final int DATA_INDEX_ORIENTATION_X = 4;
     public static final int DATA_INDEX_ORIENTATION_Y = 5;
     public static final int DATA_INDEX_ORIENTATION_Z = 6;
+    public static final int DATA_INDEX_ACCURACY = 7;
 
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
@@ -63,6 +64,7 @@ public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventL
     private float orientationX;
     private float orientationY;
     private float orientationZ;
+    private int accuracy;
 
 
 
@@ -102,7 +104,8 @@ public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventL
                 axisZ,
                 orientationX,
                 orientationY,
-                orientationZ
+                orientationZ,
+                accuracy
         };
     }
 
@@ -127,13 +130,14 @@ public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventL
         axisX = event.values[DATA_INDEX_AXIS_X -1];
         axisY = event.values[DATA_INDEX_AXIS_Y -1];
         axisZ = event.values[DATA_INDEX_AXIS_Z -1];
+        accuracy = event.accuracy;
 
         onDataMeasured();
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        this.accuracy = accuracy;
     }
 
     @Override
@@ -142,6 +146,10 @@ public class AcceleroSensorAgent extends BaseSensorAgent implements SensorEventL
             setOrientationEnabled((MagneticSensorAgent) agent, true);
         else
             super.setCollaborationWith(agent, listener);
+    }
+
+    public void setCollaborationWith(BaseSensorAgent agent) {
+        this.setCollaborationWith(agent, null);
     }
 
     // * * * S E T T E R S & G E T T E R S * * * //

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.IO;
+using System.Text;
 
 namespace Utils
 {
@@ -31,4 +32,29 @@ namespace Utils
 		}
 		
 	}
+
+    public sealed class Text
+    {
+        private Text() { }
+
+        /// <summary>
+        /// TextMesh에 주어진 string을 입힌다.
+        /// </summary>
+        /// <param name="tm">문자열이 기록될 TextMesh</param>
+        /// <param name="T">TextMesh에 기록할 문자열</param>
+        public static void InputTextMesh(TextMesh tm, string T)
+        {
+            int StrSize = T.Length;
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            while (i < StrSize)
+            {
+                if (i % 17 == 0 && i > 0) sb.Append('\n');
+                sb.Append(T[i]);
+                i++;
+            }
+            sb.Append('\n');
+            tm.text = sb.ToString();
+        }
+    }
 }

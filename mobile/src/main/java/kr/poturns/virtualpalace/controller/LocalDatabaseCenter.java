@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.util.Pair;
 
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
@@ -21,11 +21,12 @@ import org.json.JSONObject;
 import java.io.File;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.controller.data.AugmentedTable;
+import kr.poturns.virtualpalace.controller.data.ITable;
+import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VirtualTable;
 import kr.poturns.virtualpalace.util.DriveAssistant;
 
 /**
@@ -54,123 +55,8 @@ public class LocalDatabaseCenter {
 
     // * * * C O N S T A N T S * * * //
     /**
-     * RESOURCE TABLE 필드 상수
-     */
-    public enum RESOURCE_FIELD implements IField {
-        _ID,
-        NAME,
-        TYPE,
-        CATEGORY,
-        ARCHIVE_PATH,
-        ARCHIVE_KEY,
-        DRIVE_PATH,
-        DRIVE_KEY,
-        THUMBNAIL_PATH,
-        DESCRIPTION,
-        CTIME,
-        MTIME;
-
-        @Override
-        public String getTableName() {
-            return TABLE_RESOURCE;
-        }
-
-        @Override
-        public boolean equalString(String str) {
-            return this.name().equalsIgnoreCase(str);
-        }
-    }
-
-    /**
-     * VIRTUAL TABLE 필드 상수
-     */
-    public enum VIRTUAL_FIELD implements IField {
-        // Virtual Object ID (DB Index)
-        _ID,
-        // Resource ID
-        RES_ID,
-        // Object Name (Unity Name)
-        NAME,
-        // 오브젝트 타입
-        TYPE,
-        // 위치 좌표 값
-        POS_X,
-        POS_Y,
-        POS_Z,
-        // 회전 값
-        ROTATE_X,
-        ROTATE_Y,
-        ROTATE_Z,
-        // 크기 값
-        SIZE_X,
-        SIZE_Y,
-        SIZE_Z,
-        // 본 오브젝트를 포함하는 오브젝트 ID
-        CONTAINER,
-        // Conatainer에 포함된 순서
-        CONT_ORDER,
-        // Customized Style
-        STYLE;
-
-        @Override
-        public String getTableName() {
-            return TABLE_VIRTUAL;
-        }
-
-        @Override
-        public boolean equalString(String str) {
-            return this.name().equalsIgnoreCase(str);
-        }
-    }
-
-    /**
-     * AUGMENTED TABLE 필드 상수
-     */
-    public enum AUGMENTED_FIELD implements IField {
-        // Augmented Reality ID
-        _ID,
-        // Resource ID
-        RES_ID,
-        // 고도
-        ALTITUDE,
-        // 위도
-        LATITUDE,
-        // 경도
-        LONGITUDE,
-        // 입체 보완 좌표 X
-        SUPPORT_X,
-        // 입체 보완 좌표 Y
-        SUPPORT_Y,
-        // 입체 보완 좌표 Z
-        SUPPORT_Z;
-
-        @Override
-        public String getTableName() {
-            return TABLE_AUGMENTED;
-        }
-
-        @Override
-        public boolean equalString(String str) {
-            return this.name().equalsIgnoreCase(str);
-        }
-    }
-
-    /**
-     * RESOURE TABLE 명
-     */
-    static final String TABLE_RESOURCE = "resource";
-    /**
-     * VIRTUAL TABLE 명
-     */
-    static final String TABLE_VIRTUAL = "virtual";
-    /**
-     * AUGMENTED TABLE 명
-     */
-    static final String TABLE_AUGMENTED = "augmented";
-
-    /**
      * DB 저장 위치 : Local App 디렉토리에 위치하여, App 삭제시 DB도 자동으로 삭제될 수 있도록 한다.
-     *      /sdcard/data/data/kr.poturns.virtualpalace/databases/LocalDB
+     *      /data/data/kr.poturns.virtualpalace/databases/LocalDB
      */
     private static final String NAME = "LocalDB";
     /**
@@ -178,10 +64,9 @@ public class LocalDatabaseCenter {
      */
     private static final int VERSION = 4;
 
-    private final Context mContextF;
+    private final Context InContext;
 
-    private final SQLiteOpenHelper mOpenHelperF;
-
+    private final SQLiteOpenHelper OpenHelper;
 
 
     // * * * F I E L D S * * * //
@@ -190,70 +75,39 @@ public class LocalDatabaseCenter {
 
     // * * * C O N S T R U C T O R S * * * //
     private LocalDatabaseCenter(Context context) {
-        mContextF = context;
-        mOpenHelperF = new SQLiteOpenHelper(context, NAME, null, VERSION) {
-
-            private final String RESOURCE =
-                    "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            "name           TEXT NOT NULL," +
-                            "type           TEXT NOT NULL," +
-                            "category       TEXT," +
-                            "archive_path   TEXT," +
-                            "archive_key    TEXT," +
-                            "drive_path     TEXT," +
-                            "drive_key      TEXT," +
-                            "thumbnail_path TEXT," +
-                            "description    TEXT," +
-                            "ctime          INTEGER NOT NULL," +
-                            "mtime          INTEGER";
-
-            private final String VIRTUAL =
-                    "_id            INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            "res_id         INTEGER NOT NULL," +
-                            "name           TEXT," +
-                            "type           INTEGER NOT NULL," +
-                            "pos_x          REAL NOT NULL," +
-                            "pos_y          REAL NOT NULL," +
-                            "pos_z          REAL NOT NULL," +
-                            "rotate_x       REAL," +
-                            "rotate_y       REAL," +
-                            "rotate_z       REAL," +
-                            "size_x         REAL," +
-                            "size_y         REAL," +
-                            "size_z         REAL," +
-                            "container      TEXT," +
-                            "cont_order     INTEGER," +
-                            "style          TEXT";
-
-            private final String AUGMENTED =
-                    "_id            INTEGER PRIMARY KEY AUTOINCREMENT,"  +
-                            "res_id         INTEGER NOT NULL," +
-                            "altitude       REAL," +
-                            "latitude       REAL," +
-                            "longitude      REAL," +
-                            "support_x      REAL," +
-                            "support_y      REAL," +
-                            "support_z      REAL";
-
+        InContext = context;
+        OpenHelper = new SQLiteOpenHelper(context, NAME, null, VERSION) {
             @Override
             public void onCreate(SQLiteDatabase db) {
-                db.execSQL("CREATE TABLE resource (" + RESOURCE  + ");");
-                db.execSQL("CREATE TABLE virtual (" + VIRTUAL + ");");
-                db.execSQL("CREATE TABLE augmented (" + AUGMENTED + ");");
+                StringBuilder resBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_RESOURCE + " (");
+                for (ResourceTable field : ResourceTable.values())
+                    resBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
+                resBuilder.deleteCharAt(resBuilder.length() - 1).append(");");
+
+                StringBuilder arBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_AUGMENTED + " (");
+                for (AugmentedTable field : AugmentedTable.values())
+                    arBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
+                arBuilder.deleteCharAt(arBuilder.length()-1).append(");");
+
+                StringBuilder vrBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_VIRTUAL + " (");
+                for (VirtualTable field : VirtualTable.values())
+                    vrBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
+                vrBuilder.deleteCharAt(vrBuilder.length()-1).append(");");
+
+
+                db.execSQL(resBuilder.toString());
+                db.execSQL(arBuilder.toString());
+                db.execSQL(vrBuilder.toString());
             }
 
             @Override
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-                // TODO : DATA 옮기는 과정 필요 or Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
-                db.execSQL("DROP TABLE resource");
-                db.execSQL("DROP TABLE virtual");
-                db.execSQL("DROP TABLE augmented");
+                db.execSQL("DROP TABLE " + ITable.TABLE_RESOURCE);
+                db.execSQL("DROP TABLE " + ITable.TABLE_AUGMENTED);
+                db.execSQL("DROP TABLE " + ITable.TABLE_VIRTUAL);
 
                 onCreate(db);
-
-                /*db.execSQL("ALTER TABLE resource (" + RESOURCE + ");");
-                db.execSQL("ALTER TABLE virtual (" + VIRTUAL + ");");
-                db.execSQL("ALTER TABLE augmented (" + AUGMENTED + ");");*/
+                // TODO : DATA 옮기는 과정 필요 or Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
             }
         };
     }
@@ -273,7 +127,7 @@ public class LocalDatabaseCenter {
     public ArrayList<AugmentedItem> queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
         ArrayList<AugmentedItem> mNearItemList = new ArrayList<AugmentedItem>();
 
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
+        Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
                 "SELECT * FROM augmented " +
                         "WHERE (latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?) AND (altitude BETWEEN ? AND ?);",
                 new String[]{
@@ -285,14 +139,14 @@ public class LocalDatabaseCenter {
         while(cursor.moveToNext()) {
             AugmentedItem item = new AugmentedItem();
 
-            item.augmentedID = cursor.getInt(cursor.getColumnIndex(AUGMENTED_FIELD._ID.name()));
-            item.resID = cursor.getInt(cursor.getColumnIndex(AUGMENTED_FIELD.RES_ID.name()));
-            item.altitude = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.ALTITUDE.name()));
-            item.latitude = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.LATITUDE.name()));
-            item.longitude = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.LONGITUDE.name()));
-            item.supportX = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.SUPPORT_X.name()));
-            item.supportY = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.SUPPORT_Y.name()));
-            item.supportZ = cursor.getDouble(cursor.getColumnIndex(AUGMENTED_FIELD.SUPPORT_Z.name()));
+            item.augmentedID = cursor.getInt(cursor.getColumnIndex(AugmentedTable._ID.name()));
+            item.resID = cursor.getInt(cursor.getColumnIndex(AugmentedTable.RES_ID.name()));
+            item.altitude = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.ALTITUDE.name()));
+            item.latitude = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.LATITUDE.name()));
+            item.longitude = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.LONGITUDE.name()));
+            item.supportX = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.SUPPORT_X.name()));
+            item.supportY = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.SUPPORT_Y.name()));
+            item.supportZ = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.SUPPORT_Z.name()));
 
             mNearItemList.add(item);
         }
@@ -309,35 +163,35 @@ public class LocalDatabaseCenter {
     public synchronized JSONArray queryAllVirtualRenderings() {
         JSONArray array = new JSONArray();
 
-        Cursor cursor = mOpenHelperF.getReadableDatabase().rawQuery(
+        Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
                 "SELECT v.*, r.name, r.description, r.thumbnail_path " +
                         "FROM virtual v, resource r WHERE v.res_id = r._id;", null);
 
-        int length = VIRTUAL_FIELD.values().length;
+        int length = VirtualTable.values().length;
         while(cursor.moveToNext()) {
             try {
                 JSONObject row = new JSONObject();
 
-                row.put(VIRTUAL_FIELD._ID.toString(), cursor.getInt(VIRTUAL_FIELD._ID.ordinal()));
-                row.put(VIRTUAL_FIELD.RES_ID.toString(), cursor.getInt(VIRTUAL_FIELD.RES_ID.ordinal()));
-                row.put(VIRTUAL_FIELD.NAME.toString(), cursor.getString(VIRTUAL_FIELD.NAME.ordinal()));
-                row.put(VIRTUAL_FIELD.TYPE.toString(), cursor.getInt(VIRTUAL_FIELD.TYPE.ordinal()));
-                row.put(VIRTUAL_FIELD.POS_X.toString(), cursor.getDouble(VIRTUAL_FIELD.POS_X.ordinal()));
-                row.put(VIRTUAL_FIELD.POS_Y.toString(), cursor.getDouble(VIRTUAL_FIELD.POS_Y.ordinal()));
-                row.put(VIRTUAL_FIELD.POS_Z.toString(), cursor.getDouble(VIRTUAL_FIELD.POS_Z.ordinal()));
-                row.put(VIRTUAL_FIELD.ROTATE_X.toString(), cursor.getDouble(VIRTUAL_FIELD.ROTATE_X.ordinal()));
-                row.put(VIRTUAL_FIELD.ROTATE_Y.toString(), cursor.getDouble(VIRTUAL_FIELD.ROTATE_Y.ordinal()));
-                row.put(VIRTUAL_FIELD.ROTATE_Z.toString(), cursor.getDouble(VIRTUAL_FIELD.ROTATE_Z.ordinal()));
-                row.put(VIRTUAL_FIELD.SIZE_X.toString(), cursor.getDouble(VIRTUAL_FIELD.SIZE_X.ordinal()));
-                row.put(VIRTUAL_FIELD.SIZE_Y.toString(), cursor.getDouble(VIRTUAL_FIELD.SIZE_Y.ordinal()));
-                row.put(VIRTUAL_FIELD.SIZE_Z.toString(), cursor.getDouble(VIRTUAL_FIELD.SIZE_Z.ordinal()));
-                row.put(VIRTUAL_FIELD.CONTAINER.toString(), cursor.getString(VIRTUAL_FIELD.CONTAINER.ordinal()));
-                row.put(VIRTUAL_FIELD.CONT_ORDER.toString(), cursor.getInt(VIRTUAL_FIELD.CONT_ORDER.ordinal()));
-                row.put(VIRTUAL_FIELD.STYLE.toString(), cursor.getString(VIRTUAL_FIELD.STYLE.ordinal()));
+                row.put(VirtualTable._ID.toString(), cursor.getInt(VirtualTable._ID.ordinal()));
+                row.put(VirtualTable.RES_ID.toString(), cursor.getInt(VirtualTable.RES_ID.ordinal()));
+                row.put(VirtualTable.NAME.toString(), cursor.getString(VirtualTable.NAME.ordinal()));
+                row.put(VirtualTable.TYPE.toString(), cursor.getInt(VirtualTable.TYPE.ordinal()));
+                row.put(VirtualTable.POS_X.toString(), cursor.getDouble(VirtualTable.POS_X.ordinal()));
+                row.put(VirtualTable.POS_Y.toString(), cursor.getDouble(VirtualTable.POS_Y.ordinal()));
+                row.put(VirtualTable.POS_Z.toString(), cursor.getDouble(VirtualTable.POS_Z.ordinal()));
+                row.put(VirtualTable.ROTATE_X.toString(), cursor.getDouble(VirtualTable.ROTATE_X.ordinal()));
+                row.put(VirtualTable.ROTATE_Y.toString(), cursor.getDouble(VirtualTable.ROTATE_Y.ordinal()));
+                row.put(VirtualTable.ROTATE_Z.toString(), cursor.getDouble(VirtualTable.ROTATE_Z.ordinal()));
+                row.put(VirtualTable.SIZE_X.toString(), cursor.getDouble(VirtualTable.SIZE_X.ordinal()));
+                row.put(VirtualTable.SIZE_Y.toString(), cursor.getDouble(VirtualTable.SIZE_Y.ordinal()));
+                row.put(VirtualTable.SIZE_Z.toString(), cursor.getDouble(VirtualTable.SIZE_Z.ordinal()));
+                row.put(VirtualTable.CONTAINER.toString(), cursor.getString(VirtualTable.CONTAINER.ordinal()));
+                row.put(VirtualTable.CONT_ORDER.toString(), cursor.getInt(VirtualTable.CONT_ORDER.ordinal()));
+                row.put(VirtualTable.STYLE.toString(), cursor.getString(VirtualTable.STYLE.ordinal()));
 
-                row.put(RESOURCE_FIELD.NAME.toString(), cursor.getString(length+0));
-                row.put(RESOURCE_FIELD.DESCRIPTION.toString(), cursor.getString(length+1));
-                row.put(RESOURCE_FIELD.THUMBNAIL_PATH.toString(), cursor.getString(length+2));
+                row.put(ResourceTable.NAME.toString(), cursor.getString(length+0));
+                row.put(ResourceTable.DESCRIPTION.toString(), cursor.getString(length+1));
+                row.put(ResourceTable.THUMBNAIL_PATH.toString(), cursor.getString(length+2));
 
                 array.put(row);
 
@@ -351,7 +205,7 @@ public class LocalDatabaseCenter {
     }
 
     public void backUp(DriveAssistant assistant) {
-        File dbFile = new File(NAME);
+        File dbFile = getDatabaseFile();
         DriveFolder folder = assistant.getAppFolder();
 
         // Drive Contents 생성
@@ -362,34 +216,14 @@ public class LocalDatabaseCenter {
         DriveFile file = assistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
     }
 
+    final File getDatabaseFile() {
+        File appDirectory = new File(Environment.getDataDirectory(), InContext.getPackageName());
+        return new File(appDirectory, ("databases/" + NAME));
+    }
+
 
 
     // * * * I N N E R  C L A S S E S * * * //
-    /**
-     * 테이블 필드 상수를 묶기 위한 인터페이스.
-     */
-    protected interface IField {
-        /**
-         * 해당 필드가 소속되어 있는 테이블 명을 반환한다.
-         * @return
-         */
-        String getTableName();
-
-        /**
-         * toString() + equalsIgnoreCase()
-         * @param str
-         * @return
-         */
-        boolean equalString(String str);
-
-        /**
-         * 해당 필드의 DB 내 순서 값을 반환한다.
-         * @return
-         */
-        // enum 키워드 내에 이미 구현되어 있으나, 인터페이스로 호출하기 위해 선언.
-        int ordinal();
-    }
-
 
     /**
      * DB에 데이터를 조회하는 작업을 수행할 시,
@@ -397,7 +231,7 @@ public class LocalDatabaseCenter {
      *
      * @param <E>
      */
-    public static class ReadBuilder<E extends IField> extends CrudBuilder<E> {
+    public static class ReadBuilder<E extends ITable> extends CrudBuilder<E> {
 
         public ReadBuilder(LocalDatabaseCenter center) {
             super(center);
@@ -428,7 +262,7 @@ public class LocalDatabaseCenter {
             }
 
             Log.d("LDB_Select", "LDB Select : " + builder.toString());
-            SQLiteDatabase db = mCenterF.mOpenHelperF.getReadableDatabase();
+            SQLiteDatabase db = mCenterF.OpenHelper.getReadableDatabase();
 
 
             try {
@@ -452,7 +286,7 @@ public class LocalDatabaseCenter {
      *
      * @param <E>
      */
-    public static class WriteBuilder<E extends IField> extends CrudBuilder<E> {
+    public static class WriteBuilder<E extends ITable> extends CrudBuilder<E> {
 
         public WriteBuilder(LocalDatabaseCenter center) {
             super(center);
@@ -470,9 +304,9 @@ public class LocalDatabaseCenter {
 //                    .append(mTableName)
 //                    .append(" VALUES( ");
 
-//            int length = (TABLE_RESOURCE.equals(mTableName))? RESOURCE_FIELD.values().length :
-//                    (TABLE_VIRTUAL.equals(mTableName))? VIRTUAL_FIELD.values().length :
-//                    (TABLE_AUGMENTED.equals(mTableName))? AUGMENTED_FIELD.values().length : 0;
+//            int length = (TABLE_RESOURCE.equals(mTableName))? ResourceTable.values().length :
+//                    (TABLE_VIRTUAL.equals(mTableName))? VirtualTable.values().length :
+//                    (TABLE_AUGMENTED.equals(mTableName))? AugmentedTable.values().length : 0;
 
 
 //            for (int i=0; i<length; i++) {
@@ -483,9 +317,9 @@ public class LocalDatabaseCenter {
 //            builder.append(" )");
 
             Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
-            SQLiteDatabase db = mCenterF.mOpenHelperF.getWritableDatabase();
+            SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-//                mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+//                mCenterF.OpenHelper.getWritableDatabase().execSQL(builder.toString());
                 return db.insert(mTableName, null, mSetClauseValues);
 
             } catch (SQLException e) {
@@ -528,9 +362,9 @@ public class LocalDatabaseCenter {
 
 
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
-            SQLiteDatabase db = mCenterF.mOpenHelperF.getWritableDatabase();
+            SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-//                mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+//                mCenterF.OpenHelper.getWritableDatabase().execSQL(builder.toString());
                 int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
                 return (affectedRows > 0);
 
@@ -562,9 +396,9 @@ public class LocalDatabaseCenter {
             builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
             Log.d("LDB_Delete", "LDB Delete : " + builder.toString());
-            SQLiteDatabase db = mCenterF.mOpenHelperF.getWritableDatabase();
+            SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-//                mCenterF.mOpenHelperF.getWritableDatabase().execSQL(builder.toString());
+//                mCenterF.OpenHelper.getWritableDatabase().execSQL(builder.toString());
                 int affectedRows = db.delete(mTableName, builder.toString(), null);
                 return (affectedRows > 0);
 
@@ -581,14 +415,14 @@ public class LocalDatabaseCenter {
 
     /**
      * 테이블 필드 상수 (
-     * {@link LocalDatabaseCenter.RESOURCE_FIELD},
-     * {@link LocalDatabaseCenter.VIRTUAL_FIELD},
-     * {@link LocalDatabaseCenter.AUGMENTED_FIELD})를
+     * {@link ResourceTable},
+     * {@link VirtualTable},
+     * {@link AugmentedTable})를
      * 제네릭 변수로 입력받아, SQL 구문을 작성한다.
      *
      * @param <E>
      */
-    protected static abstract class CrudBuilder<E extends IField> {
+    protected static abstract class CrudBuilder<E extends ITable> {
         // NOTICE >  DB 내 필드 개수가 많아질 경우, 크기를 늘릴 것.
         protected final int MAX = 16;
 

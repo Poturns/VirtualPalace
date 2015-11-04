@@ -15,27 +15,28 @@ public interface ISensorAgent {
     /**
      * Agent Type : 가속도
      */
-    int TYPE_AGENT_ACCELEROMETER = 1;
+    int TYPE_AGENT_ACCELEROMETER = 0x1;
     /**
      * Agent Type : 배터리
      */
-    int TYPE_AGENT_BATTERY = 2;
+    int TYPE_AGENT_BATTERY = 0x2;
     /**
      * Agent Type : 자이로
      */
-    int TYPE_AGENT_GYROSCOPE = 3;
+    int TYPE_AGENT_GYROSCOPE = 0x4;
     /**
      * Agent Type : 위치
      */
-    int TYPE_AGENT_LOCATION = 4;
+    int TYPE_AGENT_LOCATION = 0x8;
     /**
      * Agent Type : 자기장
      */
-    int TYPE_AGENT_MAGNETIC = 5;
+    int TYPE_AGENT_MAGNETIC = 0x10;
     /**
      * Agent Type : 네트워크
      */
-    int TYPE_AGENT_NETWORK = 6;
+    int TYPE_AGENT_NETWORK = 0x20;
+
 
     // * * * M E T H O D S * * * //
     // TODO:

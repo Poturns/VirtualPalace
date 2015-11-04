@@ -1,4 +1,6 @@
 ﻿
+using BridgeApi.Controller;
+
 namespace MyScript.Interface
 {
     /// <summary>
@@ -6,6 +8,11 @@ namespace MyScript.Interface
     /// </summary>
     public interface ISceneChangeState : IStateBase
     {
+        /// <summary>
+        /// ISceneChangeState의 Scene 식별자
+        /// </summary>
+        UnityScene UnitySceneID { get; }
+
         /// <summary>
         /// Scene이 변경 완료되었을 때 호출된다.
         /// </summary>

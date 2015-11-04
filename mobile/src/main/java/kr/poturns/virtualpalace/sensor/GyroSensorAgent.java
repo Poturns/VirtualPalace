@@ -17,6 +17,7 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
     public static final int DATA_INDEX_AXIS_X = 1;
     public static final int DATA_INDEX_AXIS_Y = 2;
     public static final int DATA_INDEX_AXIS_Z = 3;
+    public static final int DATA_INDEX_ACCURACY = 4;
 
     private final SensorManager mSensorManagerF;
     private final Sensor mSensorF;
@@ -26,6 +27,7 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
     private float axisX;
     private float axisY;
     private float axisZ;
+    private int accuracy;
 
 
     // * * * C O N S T R U C T O R S * * * //
@@ -40,14 +42,12 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
     @Override
     public void startListening() {
         super.startListening();
-
         mSensorManagerF.registerListener(this, mSensorF, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
     public void stopListening() {
         super.stopListening();
-
         mSensorManagerF.unregisterListener(this);
     }
 
@@ -66,6 +66,7 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
                 axisX,
                 axisY,
                 axisZ,
+                accuracy
         };
     }
 
@@ -85,6 +86,8 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
         axisY = event.values[DATA_INDEX_AXIS_Y -1];
         // Angular speed around the z-axis
         axisZ = event.values[DATA_INDEX_AXIS_Z -1];
+        // Accuracy
+        accuracy = event.accuracy;
 
     }
 
@@ -100,7 +103,7 @@ public class GyroSensorAgent extends BaseSensorAgent implements SensorEventListe
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        this.accuracy = accuracy;
     }
 
 }

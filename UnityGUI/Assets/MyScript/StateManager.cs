@@ -1,19 +1,71 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using MyScript.States;
 using MyScript.Interface;
 using AndroidApi.Controller;
 using System;
-using System.Text;
 using BridgeApi.Controller;
 using BridgeApi.Controller.Request;
 
-public class StateManager : MonoBehaviour, IPlatformBridge
+public enum UnityLifeCycle
 {
+    onCreate,
+    onLoaded,
+    onPaused,
+    onDestroy
+}
 
-    public const string SCENE_MAIN = "MyTest";
+
+public enum UnityScene
+{
+    Lobby,
+    VR,
+    AR
+}
+
+public static class UnitySceneExtend
+{
+    public const string SCENE_LOBBY = "MyTest";
     public const string SCENE_VR = "VRWorld";
     public const string SCENE_AR = "ARScene";
 
+    public static string SceneName(this UnityScene scene)
+    {
+        switch (scene)
+        {
+            case UnityScene.Lobby:
+                return SCENE_LOBBY;
+
+            case UnityScene.VR:
+                return SCENE_VR;
+
+            case UnityScene.AR:
+                return SCENE_AR;
+
+            default:
+                return "";
+        }
+    }
+
+
+    public static UnityScene GetByName(string name)
+    {
+        switch (name)
+        {
+            default:
+            case SCENE_LOBBY:
+                return UnityScene.Lobby;
+            case SCENE_AR:
+                return UnityScene.AR;
+            case SCENE_VR:
+                return UnityScene.VR;
+        }
+    }
+}
+
+
+
+public class StateManager : MonoBehaviour, IPlatformBridge
+{
 
     private static StateManager instanceRef;
 
@@ -28,49 +80,55 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     {
         return instanceRef;
     }
-	public int ObjCount;
+    public int ObjCount;
     void Awake()
     {
+        Debug.Log("=== Awake ===");
         if (instanceRef == null)
         {
             InitPlatformBridge();
             Tasker = new Utils.AsyncTasker();
             instanceRef = this;
             DontDestroyOnLoad(gameObject);
-
         }
         else
         {
             DestroyImmediate(gameObject);
         }
 
-        if(activeState is ISceneChangeState)
-        {
-            ((ISceneChangeState)activeState).OnSceneChanged();
-        }
+    }
 
+    void OnLevelWasLoaded(int level)
+    {
+        ISceneChangeState currentSceneState = activeState as ISceneChangeState;
+        if (currentSceneState != null)
+        {
+            currentSceneState.OnSceneChanged();
+            SendLifeCyleMessage(currentSceneState, UnityLifeCycle.onLoaded);
+        }
     }
 
     void Start()
     {
-        Debug.Log("Start StateM");
-        activeState = new BeginState(this);
-        ((ISceneChangeState)activeState).OnSceneChanged();
+        Debug.Log("=== Start StateManager ===");
+        BeginState beginState = new BeginState(this);
+        activeState = beginState;
+
+        SendLifeCyleMessage(beginState, UnityLifeCycle.onCreate);
+        OnLevelWasLoaded(0);
     }
 
     // Update is called once per frame
     void Update()
     {
         Tasker.OnUpdate();
-		
-        if (activeState != null)
-            activeState.StateUpdate();
+
+        if (activeState != null) activeState.StateUpdate();
     }
 
     void OnGUI()
     {
-        if (activeState != null)
-            activeState.ShowIt();
+        if (activeState != null) activeState.ShowIt();
     }
 
 
@@ -81,63 +139,64 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         activeState = newState;
     }
 
-    public static void InputTextMesh(TextMesh tm, string T)
-    {
-        int StrSize = T.Length;
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        while (i < StrSize)
-        {
-            if (i % 17 == 0 && i > 0) sb.Append('\n');
-            sb.Append(T[i]);
-            i++;
-        }
-        sb.Append('\n');
-        tm.text = sb.ToString();
-    }
-
     /// <summary>
-    /// ÀÛ¾÷À» UnityÀÇ MainThread¿¡¼­ ¼öÇàÇÑ´Ù.<para/>
+    /// ì‘ì—…ì„ Unityì˜ MainThreadì—ì„œ ìˆ˜í–‰í•œë‹¤.<para/>
     /// </summary>
-    /// <param name="a">Unity MainThread¿¡¼­ ½ÇÇà½ÃÅ³ ÀÛ¾÷</param>
-    /// <param name="runImmediatelyIfMainThread">ÀÌ ¸Ş¼Òµå¸¦ È£ÃâÇÑ Thread°¡ MainThreadÀÌ¸é Áï°¢ÀûÀ¸·Î ½ÇÇà½ÃÅ³Áö ¿©ºÎ</param>
+    /// <param name="a">Unity MainThreadì—ì„œ ì‹¤í–‰ì‹œí‚¬ ì‘ì—…</param>
+    /// <param name="runImmediatelyIfMainThread">ì´ ë©”ì†Œë“œë¥¼ í˜¸ì¶œí•œ Threadê°€ MainThreadì´ë©´ ì¦‰ê°ì ìœ¼ë¡œ ì‹¤í–‰ì‹œí‚¬ì§€ ì—¬ë¶€</param>
     public void QueueOnMainThread(Action a, bool runImmediatelyIfMainThread)
     {
         Tasker.QueueOnMainThread(a, runImmediatelyIfMainThread);
     }
 
     /// <summary>
-    /// ÀÛ¾÷À» UnityÀÇ MainThread¿¡¼­ ¼öÇàÇÑ´Ù.<para/>
-    /// ÀÌ ¸Ş¼Òµå¸¦ È£ÃâÇÑ Thread°¡ MainThread¶ó¸é ±×´ë·Î ½ÇÇà½ÃÅ²´Ù.
+    /// ì‘ì—…ì„ Unityì˜ MainThreadì—ì„œ ìˆ˜í–‰í•œë‹¤.<para/>
+    /// ì´ ë©”ì†Œë“œë¥¼ í˜¸ì¶œí•œ Threadê°€ MainThreadë¼ë©´ ê·¸ëŒ€ë¡œ ì‹¤í–‰ì‹œí‚¨ë‹¤.
     /// </summary>
-    /// <param name="a">Unity MainThread¿¡¼­ ½ÇÇà½ÃÅ³ ÀÛ¾÷</param>
+    /// <param name="a">Unity MainThreadì—ì„œ ì‹¤í–‰ì‹œí‚¬ ì‘ì—…</param>
     public void QueueOnMainThread(Action a)
     {
         Tasker.QueueOnMainThread(a);
     }
 
-    public static void SwitchScene(string sceneName)
+    public static void SwitchScene(UnityScene unityScene)
     {
-        switch (sceneName)
+        StateManager manager = GetManager();
+        ISceneChangeState newSceneState;
+        switch (unityScene)
         {
-            case SCENE_MAIN:
-                GetManager().SwitchState(new BeginState(GetManager()));
-
+            case UnityScene.Lobby:
+                newSceneState = new BeginState(manager);
                 break;
 
-            case SCENE_VR:
-                GetManager().SwitchState(new VRSceneIdleState(GetManager()));
+            case UnityScene.VR:
+                newSceneState = new VRSceneIdleState(manager);
                 break;
 
-            case SCENE_AR:
-                //GetManager().SwitchState(new AR(GetManager()));
-                break;
+            case UnityScene.AR:
+                //GetManager().SwitchState(new AR(manager));
+                return;
             default:
                 return;
-
         }
 
-        Application.LoadLevel(sceneName);
+
+        ISceneChangeState currentState = manager.activeState as ISceneChangeState;
+        if (currentState != null)
+            manager.SendLifeCyleMessage(currentState, UnityLifeCycle.onPaused);
+
+        manager.SendLifeCyleMessage(newSceneState, UnityLifeCycle.onCreate);
+        manager.SwitchState(newSceneState);
+
+        //Application.LoadLevel(unityScene.SceneName());
+        Application.LoadLevel((int)unityScene);
+    }
+
+    internal void SendLifeCyleMessage(ISceneChangeState sceneState, UnityLifeCycle lifeCycle)
+    {
+        string json = JsonInterpreter.MakeUnityLifeCycleMessage(sceneState.UnitySceneID, lifeCycle);
+        Debug.Log("=============== LifeCycle : " + json);
+        SendSingleMessageToPlatform(json);
     }
 
     #region Base Platform Method (Android, IOS, ....)
@@ -149,75 +208,75 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         if (Application.platform == RuntimePlatform.Android)
         {
             bridgeDelegate = new AndroidUnityBridge();
-            Debug.Log("UnityBridge - AndroidUnityBridge attatched sucessfully.");
+            Debug.Log("=============== UnityBridge - AndroidUnityBridge attatched sucessfully.");
         }
         else
         {
             bridgeDelegate = null;
-            Debug.LogWarning("UnityBridge - failed to attatch.");
+            Debug.LogWarning("=============== UnityBridge - failed to attatch.");
         }
     }
 
 
     /// <summary>
-    /// ±âÀú ÇÃ·§ÆûÀÇ Controller·ÎºÎÅÍ Àü´ŞµÇ¾î¿Â Input Message¸¦ Ã³¸®ÇÑ´Ù.
+    /// ê¸°ì € í”Œë«í¼ì˜ Controllerë¡œë¶€í„° ì „ë‹¬ë˜ì–´ì˜¨ Input Messageë¥¼ ì²˜ë¦¬í•œë‹¤.
     /// </summary>
-    /// <param name="json">Controller¿¡¼­ Àü´ŞµÈ Input Message json</param>
+    /// <param name="json">Controllerì—ì„œ ì „ë‹¬ëœ Input Message json</param>
     public void HandleInputsFromController(string json)
     {
-        Debug.Log(json);
+        Debug.Log("=============== " + json);
         if (activeState != null)
         {
-            Debug.Log("activeState : " + activeState);
+            Debug.Log("=============== Current ActiveState : " + activeState);
             activeState.InputHandling(JsonInterpreter.ParseInputCommands(json));
         }
         else
         {
-            Debug.LogWarning("activeState == null !!!");
+            Debug.LogWarning("=============== ActiveState == null !!!");
         }
     }
 
     /// <summary>
-    /// ±âÀú ÇÃ·§ÆûÀÇ Controller·Î ºÎÅÍ Àü´ŞµÇ¾î¿Â ÀÏ¹İ Message¸¦ Ã³¸®ÇÑ´Ù.
+    /// ê¸°ì € í”Œë«í¼ì˜ Controllerë¡œ ë¶€í„° ì „ë‹¬ë˜ì–´ì˜¨ ì¼ë°˜ Messageë¥¼ ì²˜ë¦¬í•œë‹¤.
     /// </summary>
-    /// <param name="json">Controller¿¡¼­ Àü´ŞµÈ ÀÏ¹İ Message json</param>
+    /// <param name="json">Controllerì—ì„œ ì „ë‹¬ëœ ì¼ë°˜ Message json</param>
     public void HandleMessageFromController(string json)
     {
-        Debug.Log(json);
+        Debug.Log("=============== " + json);
 
         //TODO handle message
     }
 
-    //TODO ÀÌÇÏ ¸Ş¼Òµå´Â Delegate °´Ã¼·Î Ã³¸®ÇÏ±â
+    //TODO ì´í•˜ ë©”ì†Œë“œëŠ” Delegate ê°ì²´ë¡œ ì²˜ë¦¬í•˜ê¸°
     /// <summary>
-    /// UNITY¿¡¼­ ±âÀú Platform¿¡ ¿äÃ»À» º¸³½´Ù.
+    /// UNITYì—ì„œ ê¸°ì € Platformì— ìš”ì²­ì„ ë³´ë‚¸ë‹¤.
     /// </summary>
-    /// <param name="jsonMessage">¿äÃ»ÀÇ ¼¼ºÎ »çÇ×ÀÌ JsonÇüÅÂ·Î ±â¼úµÇ¾î ÀÖ´Â ¹®ÀÚ¿­</param>
-    /// <param name="callback">¿äÃ»¿¡ ´ëÇÑ ÀÀ´äÀ» ¹ŞÀ» Äİ¹é</param>
-    /// <returns>¿äÃ»ÀÌ Á¢¼öµÇ¾úÀ» °æ¿ì, TRUE</returns>
+    /// <param name="jsonMessage">ìš”ì²­ì˜ ì„¸ë¶€ ì‚¬í•­ì´ Jsoní˜•íƒœë¡œ ê¸°ìˆ ë˜ì–´ ìˆëŠ” ë¬¸ìì—´</param>
+    /// <param name="callback">ìš”ì²­ì— ëŒ€í•œ ì‘ë‹µì„ ë°›ì„ ì½œë°±</param>
+    /// <returns>ìš”ì²­ì´ ì ‘ìˆ˜ë˜ì—ˆì„ ê²½ìš°, TRUE</returns>
     public bool RequestToPlatform(IRequest request, Action<string> callback)
     {
         return bridgeDelegate != null && bridgeDelegate.RequestToPlatform(request, callback);
     }
 
     /// <summary>
-    /// ±âÀú Platform¿¡¼­ ¿äÃ»ÇÑ ID ¿¡ ÇØ´çÇÏ´Â °á°ú¸¦ Äİ¹é¸Ş¼Òµå·Î ¹İÈ¯ÇÑ´Ù.
+    /// ê¸°ì € Platformì—ì„œ ìš”ì²­í•œ ID ì— í•´ë‹¹í•˜ëŠ” ê²°ê³¼ë¥¼ ì½œë°±ë©”ì†Œë“œë¡œ ë°˜í™˜í•œë‹¤.
     /// </summary>
-    /// <param name="id">Äİ¹éÀÇ id</param>
-    /// <param name="jsonResult">¿äÃ»¿¡ ´ëÇÑ °á°ú°ªÀÌ JsonÇüÅÂ·Î ±â¼úµÈ ¹®ÀÚ¿­</param>
+    /// <param name="id">ì½œë°±ì˜ id</param>
+    /// <param name="jsonResult">ìš”ì²­ì— ëŒ€í•œ ê²°ê³¼ê°’ì´ Jsoní˜•íƒœë¡œ ê¸°ìˆ ëœ ë¬¸ìì—´</param>
     public void RespondToPlatform(long id, string jsonResult)
     {
         if (bridgeDelegate != null) bridgeDelegate.RespondToPlatform(id, jsonResult);
     }
 
     /// <summary>
-    /// UNITY ¿¡¼­ ´ÜÀÏ ¸Ş½ÃÁö¸¦ ±âÀú PlatformÀ¸·Î Àü¼ÛÇÑ´Ù.
+    /// UNITY ì—ì„œ ë‹¨ì¼ ë©”ì‹œì§€ë¥¼ ê¸°ì € Platformìœ¼ë¡œ ì „ì†¡í•œë‹¤.
     /// </summary>
-    /// <param name="jsonMessage">Àü¼ÛÇÒ Json ¸Ş½ÃÁö</param>
-    /// <returns>¸Ş½ÃÁö°¡ Á¤»óÀûÀ¸·Î Àü¼ÛµÇ¾úÀ» ¶§, TRUE</returns>
-    public bool SendSingleMessageToPlatform(string jsonMessage)
+    /// <param name="jsonMessage">ì „ì†¡í•  Json ë©”ì‹œì§€</param>
+    /// <returns>ë©”ì‹œì§€ê°€ ì •ìƒì ìœ¼ë¡œ ì „ì†¡ë˜ì—ˆì„ ë•Œ, TRUE</returns>
+    public void SendSingleMessageToPlatform(string jsonMessage)
     {
-        return bridgeDelegate != null && bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
+        if (bridgeDelegate != null) bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
     }
 
     #endregion Base Platform Method (Android, IOS, ....)

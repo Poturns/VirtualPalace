@@ -2,18 +2,18 @@ using UnityEngine;
 
 namespace MyScript.States
 {
+    [System.Obsolete()]
     public class VRMemoViewExit : AbstractGazeInputState
 	{
 		private GameObject UIMemoBG;
 		private GameObject UIMemoTxt;
         private GameObject TargetObject;
-
+     
         public VRMemoViewExit (StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRMemoViewExit")
 		{
             this.TargetObject = TargetObject;
-			
-            GameObject DisposolObj = GameObject.FindGameObjectWithTag("Disposol");
-            if (DisposolObj) GameObject.Destroy(DisposolObj);
+
+            DestroyMarkedObject();
 
             UIMemoBG = GameObject.Find ("MemoView");
 			if (!UIMemoBG)
@@ -28,7 +28,7 @@ namespace MyScript.States
 			TextMesh T = UIMemoTxt.GetComponent<TextMesh> ();
 			T.text = "";
 
-			SetGazeInputMode (0);
+			SetGazeInputMode (GAZE_MODE.OBJECT);
 			SetCameraLock (false);
 			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
 
@@ -40,14 +40,7 @@ namespace MyScript.States
 		{
             SwitchState(new VRObjectView(Manager, TargetObject));
         }
-		
-		void Switch()
-		{
-			//Application.LoadLevel("Scene1");
-			//manager.SwitchState(new PlayState(manager));
-					
-		}
-
+				
 	}
 }
 

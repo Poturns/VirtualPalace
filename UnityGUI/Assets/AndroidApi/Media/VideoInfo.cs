@@ -1,4 +1,4 @@
-using LitJson;
+ï»¿using LitJson;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,9 +32,9 @@ namespace AndroidApi.Media
             {
                 l = (long)jData[key];
             }
-            catch (InvalidCastException e)
+            catch (InvalidCastException)
             {
-                Debug.LogException(e);
+                //Debug.LogException(e);
                 l = (int)jData[key];
             }
 
@@ -79,17 +79,28 @@ namespace AndroidApi.Media
         }
 
         /// <summary>
-        /// ÁÖ¾îÁø ÆÄÀÏ °æ·Î¿¡ ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö¸¦ »ı¼ºÇÑ´Ù.
+        /// ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ë¥¼ ìƒì„±í•œë‹¤.
         /// </summary>
-        /// <param name="fileName">ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö°¡ ÀúÀåµÉ ÆÄÀÏ °æ·Î</param>
-        /// <returns>ºñµğ¿ÀÀÇ Ã³À½ ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö°¡ ÀúÀåµÈ ÆÄÀÏ °æ·Î</returns>
+        /// <param name="fileName">ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ê°€ ì €ì¥ë˜ëŠ” íŒŒì¼ì˜ ì´ë¦„</param>
+        /// <returns>ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ê°€ ì €ì¥ëœ íŒŒì¼ ê²½ë¡œ</returns>
         public string GetFirstFrameThumbnailPath(string fileName)
         {
             using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
             {
-                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", fileName, Path);
+                return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", AndroidUtils.GetActivityObject(), fileName, Path);
             }
         }
+
+        /// <summary>
+        /// ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ë¥¼ ìƒì„±í•œë‹¤.
+        /// </summary>
+        /// <returns>ë¹„ë””ì˜¤ì˜ ì²˜ìŒ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ê°€ ì €ì¥ëœ íŒŒì¼ ê²½ë¡œ</returns>
+        public string GetFirstFrameThumbnailPath()
+        {
+            return GetFirstFrameThumbnailPath(DirName + "_" + DisplayName);
+        }
+
     }
+
 }
 

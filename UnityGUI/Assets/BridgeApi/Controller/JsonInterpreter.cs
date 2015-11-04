@@ -3,6 +3,7 @@ using LitJson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace BridgeApi.Controller
@@ -203,10 +204,33 @@ namespace BridgeApi.Controller
 
             result.RequestName = SpeechRequestResult.SPEECH_REQUEST_KEY;
             result.Status = (string)jData[RequestResult.RESULT];
-            result.Speech = (string)jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
+
+            if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_REQUEST_KEY))
+                result.Speech = (string)jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
+            else
+                result.Speech = "";
 
             return result;
         }
+
+
+        public static string MakeUnityLifeCycleMessage(UnityScene scene, UnityLifeCycle lifeCycle)
+        {
+            StringBuilder builder = new StringBuilder();
+            JsonWriter writer = new JsonWriter(builder);
+
+            writer.WriteObjectStart();
+            writer.WritePropertyName("lifecycle");
+
+            writer.WriteObjectStart();
+            writer.WritePropertyName(scene.ToString());
+            writer.Write(lifeCycle.ToString());
+            writer.WriteObjectEnd();
+
+            writer.WriteObjectEnd();
+            return builder.ToString();
+        }
+
     }
 
 }
