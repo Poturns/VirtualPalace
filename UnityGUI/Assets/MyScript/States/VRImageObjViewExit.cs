@@ -23,7 +23,7 @@ namespace MyScript.States
                 renderer.materials[MatSize - 1].mainTexture = ImageUI.GetComponent<ImageControl>().GetTexture();
             }
 
-            TargetObject.gameObject.GetComponent<PictureObj>().SetPath(ImageUI.GetComponent<ImageControl>().GetNowPath());
+            TargetObject.gameObject.GetComponent<PictureObj>().Path =ImageUI.GetComponent<ImageControl>().GetNowPath();
             ImageUI.GetComponent<MeshCollider>().enabled = false;
             ImageUI.GetComponent<MeshRenderer>().enabled = false;
 		

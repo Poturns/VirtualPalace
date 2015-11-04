@@ -10,7 +10,12 @@ public class MovieObject : MonoBehaviour {
 	}
 	private Texture2D FirstFrameTex;
 	public int IndexMovie = 0;
-	
+	public string Path
+	{
+		set;
+		get;
+	}
+
 	
 	public void OnSelect()
 	{

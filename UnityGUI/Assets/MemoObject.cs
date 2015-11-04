@@ -14,7 +14,7 @@ public class MemoObject : MonoBehaviour
     /// <summary>
     /// 메모 내용
     /// </summary>
-    public string Memo { get; set; }
+	public string Memo;
 
     public GameObject UIObject;
 

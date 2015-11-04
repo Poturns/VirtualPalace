@@ -80,7 +80,7 @@ namespace MyScript.States
             LockCameraAndMesh(false);
 
             movieObject.IndexMovie = MovieUI.GetIndex();
-
+			movieObject.Path = MovieUI.MoviePath;
             SwitchState(new VRSceneIdleState(Manager));
         }
 

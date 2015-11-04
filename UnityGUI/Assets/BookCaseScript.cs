@@ -35,12 +35,15 @@ public class BookCaseScript : AbstractBasicObject {
 		SaveDataForBookCase sData = new SaveDataForBookCase ();
 		Transform tr = gameObject.transform.parent;
 		sData.InitData(tr.gameObject.name,tr.position , tr.rotation
-		               ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name,null,ZCurrentPos,tr.childCount );
+		               ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name,"",ZCurrentPos,tr.GetChild(0).childCount );
 		return sData;
 	}
-
-
-
+	public override void UpdateWithSaveData(SaveData sData)
+	{
+		SaveDataForBookCase sCaseData = (SaveDataForBookCase)sData;
+		ZCurrentPos = sCaseData.CurZOffest;
+		Cnt = sCaseData.Cnt;
+	}	
 	public void CreateBook()
 	{
 

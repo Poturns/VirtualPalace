@@ -29,6 +29,16 @@ namespace MyScript.States
 
             LockCameraAndMesh(true);
 
+			//Load? ????? Image UI ?? ?? ?? 
+			PictureObj PicObj = Target.GetComponent<PictureObj> ();
+			if (PicObj != null) 
+			{
+				if(PicObj.Path != null && PicObj.Path == "")
+				{
+					//????? ???? ???
+					imageControl.Path = PicObj.Path;
+				}
+			}
         }
 
         private void FindImageView()
@@ -111,7 +121,7 @@ namespace MyScript.States
                     renderer.materials[MatSize - 1].mainTexture = imageControl.GetTexture();
                 }
 
-                Target.gameObject.GetComponent<PictureObj>().SetPath(imageControl.GetNowPath());
+                Target.gameObject.GetComponent<PictureObj>().Path = imageControl.GetNowPath();
 
                 Debug.Log("=============== Apply Image Texture");
             }
