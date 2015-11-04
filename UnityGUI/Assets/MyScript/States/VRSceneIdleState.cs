@@ -39,6 +39,8 @@ namespace MyScript.States
 			
 			SetGazeInputMode(GAZE_MODE.OBJECT);
             SetCameraLock(false);
+
+
 		}
 
         protected override void HandleCancelOperation()
