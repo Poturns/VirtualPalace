@@ -9,6 +9,7 @@ TagManager:
   - Disposol
   - 2DMoveUI
   - NotUsed
+  - SaveObject
   layers:
   - Default
   - TransparentFX

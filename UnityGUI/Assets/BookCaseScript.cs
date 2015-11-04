@@ -22,7 +22,6 @@ public class BookCaseScript : AbstractBasicObject {
 	private float BasicZ;
 	private float BasicY;
 	private int Cnt;
-	private List<GameObject> BookList;
 
 	public KIND_SOURCE CurrentKind;
 	private void Init()
@@ -30,6 +29,18 @@ public class BookCaseScript : AbstractBasicObject {
 		SourceKind = KIND_SOURCE.BOOK_CASE;
 		ModelKind = OBJ_LIST.NO_MODEL;
 	}
+
+	public override SaveData GetSaveData ()
+	{
+		SaveDataForBookCase sData = new SaveDataForBookCase ();
+		Transform tr = gameObject.transform.parent;
+		sData.InitData(tr.gameObject.name,tr.position , tr.rotation
+		               ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name,null,ZCurrentPos,tr.childCount );
+		return sData;
+	}
+
+
+
 	public void CreateBook()
 	{
 
@@ -46,13 +57,14 @@ public class BookCaseScript : AbstractBasicObject {
 		NewPos.z = BasicZ +ZCurrentPos;
 
 		GameObject NewBook = Instantiate (ObjPrefab , NewPos , ObjPrefab.transform.rotation) as GameObject;
+		NewBook.transform.SetParent (gameObject.transform);
 		GameObject RealData = NewBook.transform.GetChild (0).gameObject;
 		StateManager.GetManager().ObjCount++;
 		NewBook.name = "UserObj" + StateManager.GetManager ().ObjCount;
 		RealData.GetComponent<CombineObject> ().Init( CurrentKind);
 	
 		ZCurrentPos += ZOffset;
-		BookList.Add (NewBook);
+	
 		Cnt++;
 	}
 	public override void OnSelect()
@@ -85,7 +97,7 @@ public class BookCaseScript : AbstractBasicObject {
 		Ymax = transform.localScale.y;
 		ZMax = transform.localScale.z;
 		Cnt = 0;
-		BookList = new List<GameObject> ();
+
 		ZCurrentPos = 0;//0.01f;
 
 	}

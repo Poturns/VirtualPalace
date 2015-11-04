@@ -16,6 +16,14 @@ public class CombineObject : AbstractBasicObject {
 		SetKind (kind);
 
 	}
+
+	public override void UpdateWithSaveData(SaveData sData)
+	{
+		base.UpdateWithSaveData (sData);
+		gameObject.transform.position =  sData.Pos;
+		gameObject.transform.rotation = sData.Rot;
+		gameObject.transform.localScale = sData.Scale;
+	}
 	// Use this for initialization
 	void Start () {
 	
