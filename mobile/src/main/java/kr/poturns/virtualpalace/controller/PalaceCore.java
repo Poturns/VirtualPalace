@@ -2,11 +2,17 @@ package kr.poturns.virtualpalace.controller;
 
 import android.database.Cursor;
 import android.os.Handler;
+import android.text.format.DateFormat;
+
+import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveFolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -80,8 +86,7 @@ abstract class PalaceCore {
 
         // INPUT Part.
         AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
-        mActivatedConnectorSupportFlag = IProcessorCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
-                | IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE ;
+        mActivatedConnectorSupportFlag = IProcessorCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH;
 
         PlayModeListeners = new TreeMap<Long, OnPlayModeListener>();
         PlayModeListeners.put(0L, new OnPlayModeListener() {
@@ -118,7 +123,7 @@ abstract class PalaceCore {
      * @param event 발생시킬 이벤트 명
      * @param contents 이벤트 세부 내용
      */
-    protected abstract void dispatchEvent(String event, Object contents);
+    protected abstract void dispatchEvent(String event, JSONObject contents);
 
 
     // * * * M E T H O D S * * * //
@@ -284,23 +289,31 @@ abstract class PalaceCore {
         return result;
     }
 
-    /**
-     *
-     * @param supportType
-     * @return
-     */
-    boolean requestTextResultByVoiceRecognition(int supportType) {
-        if ((mActivatedConnectorSupportFlag & supportType) == supportType) {
+    boolean requestSpeechDetection(String mode, String action) {
+        if (isActivatedInputType(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE)) {
+            OperationInputConnector connector = AttachedInputConnectorMap.get(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE);
 
-            for (int support : AttachedInputConnectorMap.keySet()) {
-                if ((support & supportType) == supportType) {
-                    OperationInputConnector connector = AttachedInputConnectorMap.get(support);
-                    connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
+            JSONObject returnObject = new JSONObject();
+            try {
+                returnObject.put(IProtocolKeywords.Request.KEY_USE_SPEECH_MODE, mode);
+            } catch (JSONException e) { ; }
 
-                    return true;
-                }
+            if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
+                connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
+                        IProtocolKeywords.Request.KEY_USE_SPEECH_MODE_COMMAND.equalsIgnoreCase(mode) ?
+                                SpeechController.MODE_COMMAND : SpeechController.MODE_TEXT);
+
+                connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_TRUE);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_STARTED, returnObject);
+                return true;
+
+            } else if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_STOP.equalsIgnoreCase(action)) {
+                connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_FALSE);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_ENDED, returnObject);
+                return true;
             }
         }
+
         return false;
     }
 
@@ -325,17 +338,6 @@ abstract class PalaceCore {
         return false;
     }
 
-    @Deprecated
-    // 임시 테스트 코드
-    public void testDrive(final DriveAssistant assistant) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DBCenter.backUp(assistant);
-            }
-        }).start();
-    }
-
     /**
      * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
      *
@@ -351,6 +353,45 @@ abstract class PalaceCore {
                 latestData[LocationSensorAgent.DATA_INDEX_ALTITUDE],
                 radius
         );
+    }
+
+    /**
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryNearAugmentedItems(JSONObject returnObject) {
+        JSONArray returnArray = new JSONArray();
+        try {
+            for (AugmentedItem item : queryNearAugmentedItems()) {
+                JSONObject each = new JSONObject();
+
+                // TODO :
+
+                returnArray.put(each);
+            }
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, returnArray);
+
+        } catch (JSONException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * VR Scene에서 렌더링해야할 모든 Item 목록을 반환한다.
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryVirtualRenderingItems(JSONObject returnObject) {
+        try {
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
+            return true;
+
+        } catch (Exception e) { ; }
+        return false;
     }
 
     /**
@@ -414,29 +455,6 @@ abstract class PalaceCore {
                 .set(VirtualTable.TYPE, "0");
 
         return builder.insert();
-    }
-
-
-
-    /**
-     *
-     * @param command
-     * @param paramObj
-     * @param returnObj
-     * @return
-     */
-    boolean executeConstructedQuery(String command, JSONObject paramObj, JSONObject returnObj) {
-        try {
-            if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
-                returnObj.put(JsonKey.QUERY_RESULT, DBCenter.queryAllVirtualRenderings());
-                return true;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
 
@@ -722,11 +740,21 @@ abstract class PalaceCore {
     }
 
     /**
+     * Google Drive App Folder에 DB 파일을 백업한다.
+     *
      * @return
      */
     boolean executeBackUp() {
-        DBCenter.backUp(AppDriveAssistant);
-        return false;
+        File dbFile = DBCenter.getDatabaseFile();
+        DriveFolder folder = AppDriveAssistant.getAppFolder();
+
+        // Drive Contents 생성
+        DriveContents contents = AppDriveAssistant.newDriveContents();
+        DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
+
+        String fileName = "VirtualPalace-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
+        DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
+        return true;
     }
 
 

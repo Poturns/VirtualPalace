@@ -70,12 +70,13 @@ public class SpeechInputConnector extends OperationInputConnector implements Spe
     }
 
     @Override
-    public void onResult(SpeechResult speechResult) {
-        transferTextData(speechResult.result);
+    public void onResult(SpeechResult speechResult, int mode) {
+        transferTextData(speechResult.result, mode);
     }
 
     @Override
-    public void onError(int cause) {
-        transferTextData(null);
+    public void onError(int cause, int mode) {
+
+        transferTextData(null, mode);
     }
 }

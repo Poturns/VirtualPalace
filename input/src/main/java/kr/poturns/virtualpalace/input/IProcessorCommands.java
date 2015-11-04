@@ -259,15 +259,6 @@ public interface IProcessorCommands {
      */
     // * * * J S O N  C O M M A N D S  K E Y S * * * //
     interface JsonKey {
-        /**
-         * 현재 위치에서 일정 범위 내 존재하는 데이터를 찾는다.
-         */
-        @Deprecated
-        String QUERY_NEAR_ITEMS = "query_near_items";
-        /**
-         * VR 아이템에 렌더링할 아이템 데이터를 찾는다.
-         */
-        String QUERY_ALL_VR_ITEMS = "query_all_vr_items";
 
         /**
          * (응답 반환시) 결과 상태 KEY.
@@ -289,7 +280,7 @@ public interface IProcessorCommands {
          *     ]
          * }
          */
-        String QUERY_RESULT = "query_result";
+        String QUERY_RESULT = "return";
 
         /**
          * AR 데이터 전달

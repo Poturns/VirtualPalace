@@ -145,15 +145,12 @@ public final class AndroidUnityBridge {
      */
     @UnityApi
     public synchronized boolean sendSingleMessageToAndroid(String jsonMessage) {
-        Message.obtain(mMasterF.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
-
-        return true;
-    public void sendSingleMessageToAndroid(String jsonMessage) {
         try {
-            Message.obtain(mMasterF.getRequestHandler(), REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
+            Message.obtain(mMasterF.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return true;
     }
 
     /**

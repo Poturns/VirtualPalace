@@ -144,6 +144,10 @@ public interface IOperationInputFilter<InputUnit> {
     // * * * O P E R A T I O N  C O N S T A N T S * * * //
     interface Operation {
         /**
+         * AR Scene에서 오브젝트를 렌더링하도록 요청을 한다.
+         */
+        int DRAW_AR_ITEM = -1;
+        /**
          * NO - OPERATION
          */
         int NONE = 0x0;

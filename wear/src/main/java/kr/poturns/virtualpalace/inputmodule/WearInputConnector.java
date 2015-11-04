@@ -70,7 +70,7 @@ public class WearInputConnector extends OperationInputConnector {
     }
 
     @Override
-    protected boolean transferTextData(String text) {
+    protected boolean transferTextData(String text, int mode) {
         if (!mWearableCommunicator.isConnected())
             return false;
 

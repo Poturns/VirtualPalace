@@ -223,18 +223,6 @@ public class LocalDatabaseCenter {
         return array;
     }
 
-    public void backUp(DriveAssistant assistant) {
-        File dbFile = getDatabaseFile();
-        DriveFolder folder = assistant.getAppFolder();
-
-        // Drive Contents 생성
-        DriveContents contents = assistant.newDriveContents();
-        DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
-
-        String fileName = NAME + "-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
-        DriveFile file = assistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
-    }
-
     final File getDatabaseFile() {
         File appDirectory = new File(Environment.getDataDirectory(), InContext.getPackageName());
         return new File(appDirectory, ("databases/" + NAME));
@@ -319,21 +307,6 @@ public class LocalDatabaseCenter {
          */
         public long insert() {
             StringBuilder builder = new StringBuilder();
-//            builder.append("INSERT INTO ")
-//                    .append(mTableName)
-//                    .append(" VALUES( ");
-
-//            int length = (TABLE_RESOURCE.equals(mTableName))? ResourceTable.values().length :
-//                    (TABLE_VIRTUAL.equals(mTableName))? VirtualTable.values().length :
-//                    (TABLE_AUGMENTED.equals(mTableName))? AugmentedTable.values().length : 0;
-
-
-//            for (int i=0; i<length; i++) {
-//                Pair<String, String> element = mSetClauseMap.get(i);
-//                builder.append((element == null)? null : element.second).append(",");
-//            }
-//            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
-//            builder.append(" )");
 
             Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
@@ -359,26 +332,10 @@ public class LocalDatabaseCenter {
         public boolean modify() {
             StringBuilder builder = new StringBuilder();
 
-//            builder.append("UPDATE ")
-//                    .append(mTableName)
-//                    .append(" SET ");
-
-            // SET
-//            for (Map.Entry<String, Object> element : mSetClauseValues.valueSet()) {
-//                builder.append(element.getKey())
-//                        .append("=")
-//                        .append(element.getValue())
-//                        .append(",");
-//            }
-//            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
-
-            // WHERE
-//            builder.append(" WHERE ");
             for (String clause : mWhereClauseList) {
                 builder.append("(").append(clause).append("),");
             }
             builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
-
 
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
@@ -405,9 +362,6 @@ public class LocalDatabaseCenter {
          */
         public boolean delete() {
             StringBuilder builder = new StringBuilder();
-//            builder.append("DELETE FROM ")
-//                    .append(mTableName)
-//                    .append(" WHERE ");
 
             for (String clause : mWhereClauseList) {
                 builder.append("(").append(clause).append("),");
