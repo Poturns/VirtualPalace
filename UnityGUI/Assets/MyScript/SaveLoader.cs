@@ -29,11 +29,11 @@ public class SaveLoader : MonoBehaviour
         int TotalObjCnt = 0;
         StateManager manager = StateManager.GetManager();
 
-        for (int i = 0; i < Root.transform.childCount; i++)
+        int N = Root.transform.childCount;
+        for (int i = 0; i < N; i++)
         {
 			BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
 			BookCaseObject bData = BookCase.GetSaveObjectData();
-
            
             DatabaseRequests.UpdateBookCaseObjects(manager, bData, result =>
             {
@@ -56,10 +56,13 @@ public class SaveLoader : MonoBehaviour
 
                     InsertVRObjectsToDatabase(vrObjectList);
 
-                    callback();
+                    if(i + 1 == N)
+                        callback();
                 });
             });
         }
+
+        
     }
 
     private void InsertVRObjectsToDatabase(List<VRObject> list)

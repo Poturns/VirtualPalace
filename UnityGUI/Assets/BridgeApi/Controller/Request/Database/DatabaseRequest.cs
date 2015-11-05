@@ -125,7 +125,7 @@ namespace BridgeApi.Controller.Request.Database
                 writer.WriteArrayEnd();
             }
 
-            private string ConvertItemToJson(T item)
+            private void ConvertItemToJson(T item)
             {
                 KeyValuePair<Enum, string>[] array = item.ConvertToPairs();
                 writer.WriteObjectStart();
@@ -135,7 +135,6 @@ namespace BridgeApi.Controller.Request.Database
                     writer.Write(pair.Value);
                 }
                 writer.WriteObjectEnd();
-                return sb.ToString();
             }
 
             public void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback)

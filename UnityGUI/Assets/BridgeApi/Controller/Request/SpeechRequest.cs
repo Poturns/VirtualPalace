@@ -18,6 +18,8 @@ namespace BridgeApi.Controller.Request
             writer.WriteObjectStart();
             writer.WritePropertyName(SpeechRequestResult.SPEECH_REQUEST_KEY);
 
+            writer.WriteArrayStart();
+
             writer.WriteObjectStart();
             writer.WritePropertyName(SpeechRequestResult.SPEECH_MODE_KEY);
             writer.Write(SpeechRequestResult.SPEECH_MODE_TEXT);
@@ -27,6 +29,8 @@ namespace BridgeApi.Controller.Request
             writer.WritePropertyName("action");
             writer.Write("start");
             writer.WriteObjectEnd();
+
+            writer.WriteArrayEnd();
 
             writer.WriteObjectEnd();
 
