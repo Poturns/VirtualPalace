@@ -1,7 +1,6 @@
 package kr.poturns.virtualpalace.controller;
 
 
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 

@@ -20,8 +20,8 @@ import kr.poturns.virtualpalace.augmented.AugmentedOutput;
 import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
-import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
