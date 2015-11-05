@@ -46,7 +46,31 @@ namespace MyScript.objects
         private VRObject()
         {
         }
-
+		public VRObject(int KeyID, string ObjName, string Parents, int MType, Vector3 Pos , Quaternion Rot , Vector3 Scale, int ResouceKind, string Content, string ConTitle )
+		{
+			ID = KeyID;
+			
+			Name = ObjName;
+			ParentName = Parents;
+			ModelType = MType;
+			
+			PosX = Pos.x;
+			PosY = Pos.y;
+			PosZ = Pos.z;
+			
+			RotateX = Rot.x;
+			RotateY = Rot.y;
+			RotateZ = Rot.z;
+			RotateW = Rot.w;
+			
+			SizeX = Scale.x;
+			SizeY = Scale.y;
+			SizeZ = Scale.z;
+			ResID = ResouceKind;
+			
+			ResContents = Content;
+			ResTitle = ConTitle;
+		}
         public class Builder
         {
             private VRObject vrObject;

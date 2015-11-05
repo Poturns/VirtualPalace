@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using MyScript.Interface;
+using MyScript.objects;
 
 public enum KIND_SOURCE
 {
@@ -46,36 +47,39 @@ namespace MyScript
 		protected string ObjName;
 		//객체의 간단한 설명 (섬네일 에서 보여줄 예정)
 		protected string Discription;
-		protected int ResID;
+		protected int ID;
 
 		public AbstractBasicObject(){}
 
 	
-	
+	/*
 		//파일로 저장
-		public virtual SaveData GetSaveData()
+		public virtual Object GetSaveObjectData()
 		{
-			SaveData ForSave = new SaveData ();
-			//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
+			/*
 			Transform tr = gameObject.transform.parent;
-			ForSave.InitData(tr.name,tr.position , tr.rotation
-			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null,"");
-			ForSave.ResID = ResID;
-			return ForSave;
+			VRObject SaveObj = new VRObject (ID, tr.name, tr.parent.gameObject.name,(int)ModelKind
+			                                 ,tr.position, tr.rotation, transform.localScale, (int)SourceKind
+			                                 ,"","");
+			//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
+
+			return null;
 		}
-		public virtual void UpdateContents(string Con, int resid)
+		public virtual
+		public virtual void UpdateContents(string Con, int id)
 		{
 		}
 		//SaveData 받아서 그 데이터를 바탕으로 속성값 갱신
-		public virtual void UpdateWithSaveData(SaveData sData)
+		public virtual void UpdateWithSaveObjectData(Object sData)
 		{
 			//gameObject.transform.position =  sData.Pos;
 			//gameObject.transform.rotation = sData.Rot;
 			//gameObject.transform.localScale = sData.Scale;
-			gameObject.transform.parent.name = sData.ObjName;
-			SourceKind = sData.Source;
-			ModelKind = sData.ObjKind;
+			//gameObject.transform.parent.name = sData.ObjName;
+			//SourceKind = sData.Source;
+			//ModelKind = sData.ObjKind;
 		}
+		*/
 		//DB로 저장
 		public virtual bool SaveToDB()
 		{
