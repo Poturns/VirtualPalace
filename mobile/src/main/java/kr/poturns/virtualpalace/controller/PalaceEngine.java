@@ -69,7 +69,7 @@ abstract class PalaceEngine extends PalaceCore {
                 } else if (SceneLifeCycle.AR.equalsIgnoreCase(scene)) {
                     // Sensor 데이터 수집 시작
                     App.getInfraDataService().startListeningForAR();
-                    mAugmentedModule = new AugmentedManager(App);
+                    mAugmentedModule = AugmentedManager.getInstance(App);
 
                     DisplayMetrics metrics = App.getResources().getDisplayMetrics();
                     int screenSizeX = metrics.widthPixels;

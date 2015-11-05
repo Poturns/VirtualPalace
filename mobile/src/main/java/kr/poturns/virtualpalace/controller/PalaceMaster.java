@@ -17,12 +17,18 @@ import org.json.JSONObject;
 import java.util.Iterator;
 import java.util.List;
 
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.augmented.AugmentedOutput;
 import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
+import kr.poturns.virtualpalace.controller.data.ResourceItem;
+import kr.poturns.virtualpalace.controller.data.ResourceTable;
 import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.input.IProcessorCommands;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
+import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputDetector;
 import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
@@ -55,7 +61,7 @@ public class PalaceMaster extends PalaceEngine {
 
 
     // * * * F I E L D S * * * //
-    private long mTextResultRequestId = -1;
+    private long mTextResultCallbackId = -1;
 
     // * * * C O N S T R U C T O R S * * * //
     private PalaceMaster(PalaceApplication app) {
@@ -187,14 +193,29 @@ public class PalaceMaster extends PalaceEngine {
                         if (detectedText == null)
                             throw new Exception();
 
-                        result.put(IProtocolKeywords.Request.KEY_CALLBACK_RESULT, detectedText);
+                        result.put(IProtocolKeywords.Request.KEY_SPEECH_RESULT, detectedText);
 
                     } catch (Exception e) {
                     } finally {
                         dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_ENDED, result);
+
+                        if (msg.arg1 == SpeechController.MODE_TEXT && mTextResultCallbackId > -1) {
+                            try {
+                                result.put(IProtocolKeywords.Request.KEY_CALLBACK_RESULT, true);
+
+                                JSONObject callbackResult = new JSONObject();
+                                callbackResult.put(IProtocolKeywords.Request.COMMAND_USE_SPEECH, result);
+
+                                AndroidUnityBridge.getInstance(App).respondCallbackToUnity(mTextResultCallbackId, callbackResult.toString());
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+
+                            } finally {
+                                mTextResultCallbackId = -1;
+                            }
+                        }
                     }
-                    //AndroidUnityBridge.getInstance(App).respondCallbackToUnity(mTextResultRequestId, result);
-                    //mTextResultRequestId = -1;
                     break;
             }
         }
@@ -453,8 +474,8 @@ public class PalaceMaster extends PalaceEngine {
                                 result = process(jsonMessage);
 
                             } catch (WaitForCallbackException e1) {
-                                e1.printStackTrace();
-                                mTextResultRequestId = id;
+                                // Text 음성 인식의 경우, Callback 반환을 지연시킨다.
+                                mTextResultCallbackId = id;
                                 return;
 
                             } catch (Exception e2) {
@@ -525,8 +546,6 @@ public class PalaceMaster extends PalaceEngine {
                         String action = contents.getString(KEY_USE_SPEECH_ACTION);
 
                         result = requestSpeechDetection(mode, action);
-                        //if (result)
-                        //    throw new WaitForCallbackException();
 
                     } else if (COMMAND_QUERY_VR_BOOKCASES.equalsIgnoreCase(command)) {
                         result = queryVRContainerItems(partialReturn);
@@ -540,6 +559,18 @@ public class PalaceMaster extends PalaceEngine {
 
                     } else if (COMMAND_QUERY_NEAR_ITEMS.equalsIgnoreCase(command)) {
                         result = queryNearAugmentedItems(partialReturn);
+
+                    } else if (COMMAND_SAVE_NEW_AR_ITEM.equalsIgnoreCase(command)) {
+                        ResourceItem res = new ResourceItem();
+                        res.title = contents.optString(ResourceTable.TITLE.name());
+                        res.contents = contents.optString(ResourceTable.CONTENTS.name());
+                        res.res_type = 1;   // IMAGE
+
+                        AugmentedItem aug = new AugmentedItem();
+                        aug.screenX = contents.optInt(AugmentedItem.SCREEN_X);
+                        aug.screenY = contents.optInt(AugmentedItem.SCREEN_Y);
+
+                        result = requestNewAugmentedItem(res, aug);
 
                     } else {
                         String table;
@@ -572,14 +603,20 @@ public class PalaceMaster extends PalaceEngine {
                     partialReturn.put(KEY_CALLBACK_RESULT, result ?
                             KEY_CALLBACK_RESULT_SUCCESS : KEY_CALLBACK_RESULT_FAIL);
 
+                } catch (WaitForCallbackException e) {
+                    // 음성인식 콜백이 요청되었을 때,
+                    // 동시에 전달된 다른 명령들에 대한 콜백은 무시되는 문제가 있음.
+                    // but, 음성인식 콜백의 경우 해당 callback ID에 대한 콜백메소드가
+                    // 호출이 되면 안되므로 음성인식 콜백 요청은 단일 명령으로만 동작해야한다.
+                    throw e;
+
                 } catch (Exception e) {
                     try {
                         partialReturn.put(KEY_CALLBACK_RESULT, KEY_CALLBACK_RESULT_ERROR);
                     } catch (JSONException e2) { }
-
-                } finally {
-                    ReturnResult.put(command, partialReturn);
                 }
+
+                ReturnResult.put(command, partialReturn);
                 // while loop END
             }
 
@@ -609,11 +646,6 @@ public class PalaceMaster extends PalaceEngine {
         return RequestProcessHandler.process(json);
     }
 
-    /**
-     * Callback Exception
-     */
-    private class WaitForCallbackException extends Exception {
-    }
 
 
     // * * * G E T T E R  S & S E T T E R S * * * //

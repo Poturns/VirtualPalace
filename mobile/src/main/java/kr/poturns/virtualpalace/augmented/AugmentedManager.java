@@ -11,16 +11,25 @@ import kr.poturns.virtualpalace.controller.PalaceMaster;
 public class AugmentedManager {
 	private static final int TIMER_INTERVAL = 40;
 
+	private static AugmentedManager sInstance;
+
+	public static AugmentedManager getInstance(PalaceApplication app) {
+		if (sInstance == null)
+			sInstance = new AugmentedManager(app);
+
+		return sInstance;
+	}
+
 	private final PalaceApplication mAppF;
 	private final CamTracker mTrackerF;
 	private final AugItemManager mManagerF;
 	//private ARActivity activity;
-	
+
 	private AugThread mThread = new AugThread();
 	private Timer mTimer;
 	private List<int[]> addItemQueue = new ArrayList<int[]>();
-	
-/*
+
+	/*
 	public AugmentedManager(PalaceApplication app, ARActivity activity) {
 		mAppF = app;
 		mTrackerF = new CamTracker();
@@ -28,12 +37,13 @@ public class AugmentedManager {
 		this.activity = activity;
 	}
 	*/
-	public AugmentedManager(PalaceApplication app) {
+
+	private AugmentedManager(PalaceApplication app) {
 		mAppF = app;
 		mTrackerF = new CamTracker();
 		mManagerF = new AugItemManager();
 	}
-	
+
 	/**
 	 * 초기화(필수)
 	 */
@@ -50,11 +60,11 @@ public class AugmentedManager {
 		mTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(mThread==null) {
+				if (mThread == null) {
 					mTimer.cancel();
 					return;
 				}
-					
+
 				mThread.interrupt();
 			}
 		}, 100, TIMER_INTERVAL);
@@ -73,6 +83,7 @@ public class AugmentedManager {
 			return;
 		addItemQueue.add(new int[]{screenX, screenY});
 	}
+
 	
 	private class AugThread extends Thread {
 		volatile boolean bStop = false;
@@ -111,8 +122,8 @@ public class AugmentedManager {
 
 				if(addItemQueue.size()>0) {
 					int[] arr = addItemQueue.remove(0);
-					AugmentedInput added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
-					PalaceMaster.getInstance(mAppF).insertNewAugmentedItem(added, null);
+					AugmentedItem added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
+					PalaceMaster.getInstance(mAppF).insertNewAugmentedItem(added);
 				}
 				List<AugmentedOutput> outputList = mManagerF.getOutputList(mTrackerF);
 				PalaceMaster.getInstance(mAppF).drawAugmentedItems(outputList);
@@ -122,8 +133,8 @@ public class AugmentedManager {
 			//mManagerF.SaveCreated(mAppF);
 			while(addItemQueue.size()>0) {
 				int[] arr = addItemQueue.remove(0);
-				AugmentedInput added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
-				PalaceMaster.getInstance(mAppF).insertNewAugmentedItem(added, null);
+				AugmentedItem added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
+				PalaceMaster.getInstance(mAppF).insertNewAugmentedItem(added);
 			}
 			bRunning = false;
 		}

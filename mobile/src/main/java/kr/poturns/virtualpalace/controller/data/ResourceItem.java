@@ -4,7 +4,7 @@ package kr.poturns.virtualpalace.controller.data;
  *
  */
 public class ResourceItem {
-    public int _id;
+    public long _id;
 
     public String title;
 
