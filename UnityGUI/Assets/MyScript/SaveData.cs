@@ -24,14 +24,18 @@ public class SaveData : ISerializable {
 	protected float Scalex;
 	protected float Scaley;
 	protected float Scalez;
-	
+
+	// DB -> ResourceType
 	protected int Sourcekind;
+	// DB -> ModelType
 	protected int ModelKind;
 
 	public string ObjName;
 	public string ParentName;
 
+
 	public string Contents;
+	public string ContentsTitle;
 
 	public KIND_SOURCE Source
 	{
@@ -62,7 +66,7 @@ public class SaveData : ISerializable {
 		get{return new Vector3(Scalex , Scaley , Scalez);}
 	}
 	public  void InitData(string Name , Vector3 _Pos , Quaternion _Rot , Vector3 _Scale ,
-	                     int _sourcce , int _model  , string _Parent , string ContentsText)
+	                     int _sourcce , int _model  , string _Parent , string ContentsText , string ConTitle)
 	{
 		Posx = _Pos.x;
 		Posy = _Pos.y;
@@ -82,6 +86,7 @@ public class SaveData : ISerializable {
 		ObjName = Name;
 		ParentName = _Parent;
 		Contents = ContentsText;
+		ContentsTitle = ConTitle;
 	}
 	public SaveData(){}
 	public SaveData(SerializationInfo info, StreamingContext ctx)
@@ -106,6 +111,7 @@ public class SaveData : ISerializable {
 		ObjName = (string)info.GetValue ("ObjName", typeof(string));
 		ParentName= (string)info.GetValue ("ParentName", typeof(string));
 		Contents= (string)info.GetValue ("Contents", typeof(string));
+		ContentsTitle = (string)info.GetValue ("ContentsTitle", typeof(string));
 	}
 	public virtual void GetObjectData (SerializationInfo info , StreamingContext ctx)
 	{
@@ -128,6 +134,7 @@ public class SaveData : ISerializable {
 		info.AddValue ("ObjName", ObjName);
 		info.AddValue ("ParentName", ParentName);
 		info.AddValue ("Contents", Contents);
+		info.AddValue ("ContentsTitle", ContentsTitle);
 	}
 	
 }
