@@ -1,21 +1,22 @@
 package kr.poturns.virtualpalace.augmented;
+
+import android.hardware.SensorManager;
+
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
-import android.hardware.SensorManager;
-import android.util.Log;
 
 public class CamTracker {
 	private static final String LOG_TAG = "kr.poturns.virtualpalace.augmented@CamTracker";
 	
 	// screen settings
-	private int iScreenWidth;
-	private int iScreenHeight;
+	public int iScreenWidth;
+	public int iScreenHeight;
 	private double[] pScreenCenter;
 	private double dMaxAzimuthDiff;
 	private double depth;
 	
 	// kalman filter
-	private mKalmanFilter orientationFilter;
+	private KalmanFilter orientationFilter;
 	
 	// Environmental variables
 	private double dAzimuth;
@@ -53,7 +54,7 @@ public class CamTracker {
 			bSuccess = SensorManager.getRotationMatrix(rotationMat, null, accData, magneticData);
 			if(bSuccess) {
 				SensorManager.getOrientation(rotationMat, orientation);
-				filterOrientation(orientation);
+				//filterOrientation(orientation);
 			}
 			
 			resetOrigin();
@@ -124,7 +125,7 @@ public class CamTracker {
 	private void filterOrientation(float[] orientation) {
 		double[] arr = AugUtils.Float2Double(orientation);
 		if(orientationFilter==null)
-			orientationFilter = new mKalmanFilter(arr);
+			orientationFilter = new KalmanFilter(arr);
 		orientationFilter.predict();
 		orientationFilter.update(arr);
 		double[] filtered = orientationFilter.getLatestEstimation();

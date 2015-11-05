@@ -163,7 +163,7 @@ public class SpeechInputHelper implements RecognitionListener {
             ArrayList<String> results = getRecognitionResult(resultsBundle);
             Uri audioUri = data.getData();
 
-            return new SpeechResult(results.get(0), audioUri);
+            return new SpeechResult(results, audioUri);
         }
 
         return null;
@@ -204,7 +204,7 @@ public class SpeechInputHelper implements RecognitionListener {
         Log.e(TAG, "=onError : " + error + "=");
 
         if (listener != null)
-            listener.onError(error);
+            listener.onError(error, -1);
         isInRecognizing = false;
 
         if (isContinueRecognizing)
@@ -232,7 +232,7 @@ public class SpeechInputHelper implements RecognitionListener {
      */
     private void deliverSttResult(Bundle results) {
         if (listener != null)
-            listener.onResult(new SpeechResult(getRecognitionResult(results).get(0),null));
+            listener.onResult(new SpeechResult(getRecognitionResult(results), null), -1);
 
         isInRecognizing = false;
 
@@ -297,7 +297,6 @@ public class SpeechInputHelper implements RecognitionListener {
     static float[] getConfidenceResult(Bundle results) {
         return results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
     }
-
 
 
 }

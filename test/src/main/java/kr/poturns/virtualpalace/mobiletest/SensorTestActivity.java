@@ -76,7 +76,7 @@ public class SensorTestActivity extends Activity {
                         network.setText("");
 
                         data = service.getSensorAgent(ISensorAgent.TYPE_AGENT_BATTERY).getLatestData();
-                        battery.setText("TYPE : " + data[1] + "\nLEVEL : " + data[2] + "\nTEMPERATURE : " + data[3]);
+                        battery.setText("EXPANSION : " + data[1] + "\nLEVEL : " + data[2] + "\nTEMPERATURE : " + data[3]);
                     }
                 });
             }

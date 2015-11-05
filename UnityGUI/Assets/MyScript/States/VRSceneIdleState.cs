@@ -5,9 +5,19 @@ namespace MyScript.States
 {
     public class VRSceneIdleState : AbstractCameraNavigateState, ISceneChangeState
 	{
-		public VRSceneIdleState(StateManager managerRef) : base(managerRef, "VRSceneState")
+        public static VRSceneIdleState CopyFromCurrentState(AbstractGazeInputState otherStateInVRScene)
+        {
+            return new VRSceneIdleState(otherStateInVRScene);
+        }
+
+        public VRSceneIdleState(StateManager managerRef) : base(managerRef, "VRSceneState")
 		{
 		}
+
+        public VRSceneIdleState(AbstractGazeInputState otherStateInVRScene) : base(otherStateInVRScene.Manager, "VRSceneState")
+        {
+        }
+
 
         public UnityScene UnitySceneID { get { return UnityScene.VR; } }
 

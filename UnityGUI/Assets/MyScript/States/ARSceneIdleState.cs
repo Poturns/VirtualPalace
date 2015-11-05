@@ -1,9 +1,10 @@
 using UnityEngine;
 using MyScript.Interface;
+using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-	//ARScene 평상시 모드
+
 	public class ARSceneIdleState : AbstractGazeInputState,ISceneChangeState
 	{
 		private GameObject ARScreenObj;
@@ -12,19 +13,14 @@ namespace MyScript.States
 
 		}
 
-		public UnityScene UnitySceneID { get { return UnityScene.AR; } }
+        public UnityScene UnitySceneID { get { return UnityScene.AR; } }
 
-		public override void StateUpdate()
-		{
-			if (Input.GetKeyUp (KeyCode.K))
-				ReturnToLobbyScene ();
-	
-		}
-		public void OnSceneChanged()
-		{
-			Debug.Log("=============== " + Name + " : Scene changed");
-			Init();
-		}
+	    public void OnSceneChanged()
+        {
+            Debug.Log("=============== " + Name + " : Scene changed");
+            Init();
+        }
+
 
 		protected override void Init()
 		{
@@ -33,14 +29,30 @@ namespace MyScript.States
 			ARScreenObj = GameObject.Find ("ARView");
 		}
 
-		protected override void HandleCancelOperation() 
-		{
-			ReturnToLobbyScene ();
-		}
-		private void ReturnToLobbyScene()
-		{
-			StateManager.SwitchScene(UnityScene.Lobby);
-		}
-	}
+        protected override void HandleCancelOperation()
+        {
+            ReturnToLobbyScene();
+        }
+        private void ReturnToLobbyScene()
+        {
+            StateManager.SwitchScene(UnityScene.Lobby);
+        }
+
+        protected override void HandleOtherOperation(Operation operation)
+        {
+            //base.HandleOtherOperation(operation);
+            switch (operation.Type)
+            {
+                case Operation.AR_RENDERING:
+                    ARrenderItem item = JsonInterpreter.ParseARrenderItem(operation);
+                    Debug.Log("====== AR item : " + item);
+                    break;
+
+                default:
+                    return;
+            }
+
+        }
+    }
 }
 

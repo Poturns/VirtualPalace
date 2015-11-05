@@ -176,7 +176,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
                 break;
 
             case UnityScene.AR:
-				newSceneState = new ARSceneIdleState(manager);
+                newSceneState = new ARSceneIdleState(manager);
                 break;
             default:
                 return;
@@ -191,8 +191,8 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         manager.SwitchState(newSceneState);
 
         //Application.LoadLevel(unityScene.SceneName());
-		//Debug.Log ("SceneName" + (int)unityScene + " : " + unityScene);
-		Application.LoadLevel((int)unityScene);
+        //Debug.Log ("SceneName" + (int)unityScene + " : " + unityScene);
+        Application.LoadLevel((int)unityScene);
 
     }
 
@@ -278,9 +278,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// </summary>
     /// <param name="jsonMessage">전송할 Json 메시지</param>
     /// <returns>메시지가 정상적으로 전송되었을 때, TRUE</returns>
-    public void SendSingleMessageToPlatform(string jsonMessage)
+    public bool SendSingleMessageToPlatform(string jsonMessage)
     {
-        if (bridgeDelegate != null) bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
+        return bridgeDelegate != null && bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
     }
 
     #endregion Base Platform Method (Android, IOS, ....)

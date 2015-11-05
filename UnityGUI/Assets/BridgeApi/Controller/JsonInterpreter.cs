@@ -36,6 +36,21 @@ namespace BridgeApi.Controller
             return operations;
         }
 
+        public static ARrenderItem ParseARrenderItem(Operation op)
+        {
+            if(op.Type != Operation.AR_RENDERING)
+                throw new ArgumentException();
+
+            ARrenderItem item = new ARrenderItem();
+
+            int rawValue = op.Value;
+
+            item.resId = rawValue / (10000 * 10000);
+            item.screenX = rawValue / 10000 % 10000;
+            item.screenY = rawValue % 10000;
+
+            return item;
+        }
 
         /// <summary>
         /// 방향 Operation를 해석해서 방향 정보를 지닌 구조체를 반환한다.
@@ -98,7 +113,7 @@ namespace BridgeApi.Controller
             }
             else
             {
-                dictionary.Add(Direction.DIMENSION_NONE, new Direction() { Amount = amount / 10, Value = direction});
+                dictionary.Add(Direction.DIMENSION_NONE, new Direction() { Amount = amount / 10, Value = direction });
             }
 
             return dictionary;
@@ -146,20 +161,38 @@ namespace BridgeApi.Controller
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
         public static QueryRequestResult ParseQueryFromPlatform(string json, string requestKey)
         {
-            //Debug.Log(json);
+            Debug.Log("====== "+json);
             JsonData jData = JsonMapper.ToObject(json);
+
             List<JsonData> queryResults = new List<JsonData>();
 
             QueryRequestResult result = new QueryRequestResult();
             result.RequestName = requestKey;
-            result.Status = (string)jData[requestKey][RequestResult.RESULT];
+
+            if (JsonDataContainsKey(jData, requestKey))
+            {
+                jData = jData[requestKey];
+                result.Status = (string)jData[RequestResult.RESULT];
+            }
+            else
+            {
+                result.Status = RequestResult.STATUS_ERROR;
+                return result;
+            }
 
             if (JsonDataContainsKey(jData, DatabaseConstants.QUERY_RESULT))
             {
                 JsonData queryResultJson = jData[DatabaseConstants.QUERY_RESULT];
+
                 if (queryResultJson != null && queryResultJson.IsArray)
+                {
                     for (int i = 0; i < queryResultJson.Count; i++)
+                    {
                         queryResults.Add(queryResultJson[i]);
+                    }
+                }
+
+                result.QueryData = queryResults;
             }
             else
             {
@@ -229,6 +262,39 @@ namespace BridgeApi.Controller
 
             writer.WriteObjectEnd();
             return builder.ToString();
+        }
+
+
+        public static List<SaveData> ParseJsonListToSaveData(List<JsonData> jsonList)
+        {
+            List<SaveData> saveDataList = new List<SaveData>();
+            if (jsonList != null)
+            {
+                foreach (JsonData json in jsonList)
+                {
+                    SaveData saveData = SaveData.FromJson(json);
+                    if (saveData != null)
+                        saveDataList.Add(saveData);
+                }
+            }
+
+            return saveDataList;
+        }
+
+        public static List<SaveDataForBookCase> ParseJsonListToBookCaseData(List<JsonData> jsonList)
+        {
+            List<SaveDataForBookCase> saveDataList = new List<SaveDataForBookCase>();
+            if (jsonList != null)
+            {
+                foreach (JsonData json in jsonList)
+                {
+                    SaveDataForBookCase saveData = SaveDataForBookCase.FromJson(json);
+                    if (saveData != null)
+                        saveDataList.Add(saveData);
+                }
+            }
+
+            return saveDataList;
         }
 
     }

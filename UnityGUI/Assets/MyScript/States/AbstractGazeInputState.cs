@@ -12,14 +12,24 @@ namespace MyScript.States
         private GameObject eventSystem;
         private GazeInputModule selectModule;
         private GazeCusor gazecusor;
+        private CardboardHead cameraHead;
+
         public GameObject EventSystem { get { return eventSystem; } }
         public GazeInputModule SelectModule { get { return selectModule; } }
         public GazeCusor GCursor { get { return gazecusor; } }
-        private CardboardHead cameraHead;
+        
 
         public AbstractGazeInputState(StateManager managerRef, string stateName) : base(managerRef, stateName)
         {
             Init();
+        }
+
+        public AbstractGazeInputState(AbstractGazeInputState otherStateInSameScene, string stateName) : this(otherStateInSameScene.Manager, stateName)
+        {
+            eventSystem = otherStateInSameScene.eventSystem;
+            selectModule = otherStateInSameScene.selectModule;
+            gazecusor = otherStateInSameScene.gazecusor;
+            cameraHead = otherStateInSameScene.cameraHead;
         }
 
         /// <summary>

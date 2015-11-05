@@ -1,49 +1,50 @@
 package kr.poturns.virtualpalace.controller;
 
 import android.database.Cursor;
+import android.text.format.DateFormat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
-import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.augmented.AugmentedInput;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
+import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceItem;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VRContainerTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
-import kr.poturns.virtualpalace.input.IControllerCommands;
-import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
 import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.sensor.LocationSensorAgent;
-import kr.poturns.virtualpalace.util.DriveAssistant;
-import kr.poturns.virtualpalace.util.DriveRestAssistant;
 
 
 /**
  * <b> INTERNAL CONTROLLER : 컨트롤러의 관리 기능을 다룬다 </b>
  * <p>데이터 처리 (DB + Archive + Drive)
  * </p>
- *
+ * <p/>
  * <p>Input Connector 관리
  * <ol>
- *  <li>각 Input Connector에서 GlobalApplication을 통해 Controller에 Connector 등록 요청을 한다. {@link #attachInputConnector(int, OperationInputConnector)}</li>
- *  <li>Controller에서 해당 Input Connector를 활성화하여 Input 전달을 처리한다. {@link #activateInputConnector(int)}</li>
- *  <li>연결되었으나 활성화되지 않았을 경우, 해당 Input Connector로부터 발생하는 Input은 처리되지 않는다.</li>
- *  <li>{@link #deactivateInputConnector(int)}를 통해 해당 Input Connector는 비활성화 될 수 있다.</li>
- *  <li>{@link #detachInputConnector(int)}를 통해 해당 Input Connector는 등록해제 될 수 있다.</li>
+ * <li>각 Input Connector에서 GlobalApplication을 통해 Controller에 Connector 등록 요청을 한다. {@link #attachInputConnector(int, OperationInputConnector)}</li>
+ * <li>Controller에서 해당 Input Connector를 활성화하여 Input 전달을 처리한다. {@link #activateInputConnector(int)}</li>
+ * <li>연결되었으나 활성화되지 않았을 경우, 해당 Input Connector로부터 발생하는 Input은 처리되지 않는다.</li>
+ * <li>{@link #deactivateInputConnector(int)}를 통해 해당 Input Connector는 비활성화 될 수 있다.</li>
+ * <li>{@link #detachInputConnector(int)}를 통해 해당 Input Connector는 등록해제 될 수 있다.</li>
  * </ol>
  * </p>
- *
  *
  * @author Yeonho.Kim
  */
@@ -55,8 +56,8 @@ abstract class PalaceCore {
 
     private final LocalArchive Archive;
     protected final LocalDatabaseCenter DBCenter;
-    protected final DriveAssistant AppDriveAssistant;
-    protected final DriveRestAssistant GlobalDriveAssistant;
+   // protected final DriveAssistant AppDriveAssistant;
+    //protected final DriveRestAssistant GlobalDriveAssistant;
     private final TreeMap<Long, OnPlayModeListener> PlayModeListeners;
 
 
@@ -73,13 +74,12 @@ abstract class PalaceCore {
         // DATA Part.
         Archive = LocalArchive.getInstance(application);
         DBCenter = LocalDatabaseCenter.getInstance(application);
-        AppDriveAssistant = new DriveAssistant(application);
-        GlobalDriveAssistant = new DriveRestAssistant(application);
+      //  AppDriveAssistant = new DriveAssistant(application);
+      //  GlobalDriveAssistant = new DriveRestAssistant(application);
 
         // INPUT Part.
         AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
-        mActivatedConnectorSupportFlag = IControllerCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
-                | IControllerCommands.TYPE_INPUT_SUPPORT_VOICE ;
+        mActivatedConnectorSupportFlag = IProcessorCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH;
 
         PlayModeListeners = new TreeMap<Long, OnPlayModeListener>();
         PlayModeListeners.put(0L, new OnPlayModeListener() {
@@ -110,24 +110,25 @@ abstract class PalaceCore {
 
 
     // * * * A B S T R A C T * * * //
+
     /**
      * Unity 에 발생한 이벤트를 전달한다.
      *
-     * @param event 발생시킬 이벤트 명
+     * @param event    발생시킬 이벤트 명
      * @param contents 이벤트 세부 내용
      */
-    protected abstract void dispatchEvent(String event, Object contents);
+    protected abstract void dispatchEvent(String event, JSONObject contents);
 
 
     // * * * M E T H O D S * * * //
+
     /**
-     *
      * @param listener
      */
     @Deprecated
     void attachOnPlayModeChangedListener(OnPlayModeListener listener) {
         if (listener == null)
-            return ;
+            return;
 
         long key = System.currentTimeMillis();
         PlayModeListeners.put(key, listener);
@@ -135,19 +136,17 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @param key
      */
     @Deprecated
     void detachOnPlayModeChangedListener(long key) {
         if (key == 0)
-            return ;
+            return;
 
         PlayModeListeners.remove(key).onDetached();
     }
 
     /**
-     *
      * @param mode
      */
     @Deprecated
@@ -155,20 +154,20 @@ abstract class PalaceCore {
         if (mCurrentMode == mode && isOnCardboard == onCardboard)
             return false;
 
-        for(OnPlayModeListener listener : PlayModeListeners.values()) {
+        for (OnPlayModeListener listener : PlayModeListeners.values()) {
             listener.onPlayModeChanged(mode, onCardboard);
         }
         return true;
     }
 
 
-
     // * * * I N P U T _ P A R T . * * * //
+
     /**
      * {@link OperationInputConnector}를 Controller 에 등록한다.
      * 연결할 경우, 자동으로 활성화 하지 않는다.
      *
-     * @param connector Connector Support Type
+     * @param connector   Connector Support Type
      * @param supportType Connector Instance
      */
     void attachInputConnector(int supportType, OperationInputConnector connector) {
@@ -185,10 +184,10 @@ abstract class PalaceCore {
 
             JSONObject content = new JSONObject();
             try {
-                content.put("type", "success");
-                content.put("message", "입력[" + supportType + "]가 준비되었습니다.");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_TYPE, "success");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_MSG, "입력[" + supportType + "]가 준비되었습니다.");
 
-                dispatchEvent("onToastMessage", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_TOAST_MESSAGE, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -210,21 +209,21 @@ abstract class PalaceCore {
 
             JSONObject content = new JSONObject();
             try {
-                content.put("type", "fail");
-                content.put("message", "입력[" + supportType + "]가 연결 해제되었습니다.");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_TYPE, "fail");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_MSG, "입력[" + supportType + "]가 연결 해제되었습니다.");
 
-                dispatchEvent("onToastMessage", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_TOAST_MESSAGE, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        };
+        }
     }
 
     /**
      * 연결되어 있는 supportType {@link OperationInputConnector}를 활성화한다.
      * 활성화된 Input Connector 에서 전달된 Input 데이터만 처리된다.
-     *
+     * <p/>
      * Major Input 타입에서는 동시에 하나의 Support Type 만 활성화된다.
      * 따라서 기존에 활성화되어 있던 SupportType 은 비활성되고, 새로운 SupportType 이 활성화된다.
      *
@@ -235,8 +234,8 @@ abstract class PalaceCore {
 
         boolean result = (connector != null);
         if (result) {
-            if (supportType < IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
-                int activatedType = mActivatedConnectorSupportFlag % IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
+            if (supportType < IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
+                int activatedType = mActivatedConnectorSupportFlag % IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
                 // 기존 활성화되어 있던 Major Support Type 비활성화.
                 deactivateInputConnector(activatedType);
             }
@@ -247,7 +246,7 @@ abstract class PalaceCore {
             JSONObject content = new JSONObject();
             try {
                 content.put(String.valueOf(supportType), true);
-                dispatchEvent("onInputModeChanged", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_INPUTMODE_CHANGED, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -273,7 +272,7 @@ abstract class PalaceCore {
             JSONObject content = new JSONObject();
             try {
                 content.put(String.valueOf(supportType), false);
-                dispatchEvent("onInputModeChanged", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_INPUTMODE_CHANGED, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -282,27 +281,37 @@ abstract class PalaceCore {
         return result;
     }
 
-    /**
-     *
-     * @param supportType
-     * @return
-     */
-    boolean requestTextResultByVoiceRecognition(int supportType) {
-        if ((mActivatedConnectorSupportFlag & supportType) == supportType) {
+    boolean requestSpeechDetection(String mode, String action) {
+        if (isActivatedInputType(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE)) {
+            OperationInputConnector connector = AttachedInputConnectorMap.get(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE);
 
-            for (int support : AttachedInputConnectorMap.keySet()) {
-                if ((support & supportType) == supportType) {
-                    OperationInputConnector connector = AttachedInputConnectorMap.get(support);
-                    connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
-                    return true;
-                }
+            JSONObject returnObject = new JSONObject();
+            try {
+                returnObject.put(IProtocolKeywords.Request.KEY_USE_SPEECH_MODE, mode);
+            } catch (JSONException e) { ; }
+
+            if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
+                connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
+                        IProtocolKeywords.Request.KEY_USE_SPEECH_MODE_COMMAND.equalsIgnoreCase(mode) ?
+                                SpeechController.MODE_COMMAND : SpeechController.MODE_TEXT);
+
+                connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_TRUE);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_STARTED, returnObject);
+                return true;
+
+            } else if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_STOP.equalsIgnoreCase(action)) {
+                connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_FALSE);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_ENDED, returnObject);
+                return true;
             }
         }
+
         return false;
     }
 
 
     // * * * D A T A _ P A R T . * * * //
+
     /**
      * 로컬저장소 & 로컬 DB & 구글 드라이브 간의 데이터 동기화 상태를 체크한다.
      * (동기적 비동기화)
@@ -322,21 +331,12 @@ abstract class PalaceCore {
         return false;
     }
 
-    public void testDrive(final DriveAssistant assistant) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DBCenter.backUp(assistant);
-            }
-        }).start();
-    }
-
     /**
-     * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
+     * 현 위치 근처에 등록되어 있는 AugmentedInput 목록을 조회한다.
      *
      * @return
      */
-    public ArrayList<AugmentedItem> queryNearAugmentedItems() {
+    public ArrayList<AugmentedInput> queryNearAugmentedItems() {
         double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
         double radius = 0.0000005;
 
@@ -349,6 +349,75 @@ abstract class PalaceCore {
     }
 
     /**
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryNearAugmentedItems(JSONObject returnObject) {
+        JSONArray returnArray = new JSONArray();
+        try {
+            for (AugmentedInput item : queryNearAugmentedItems()) {
+                JSONObject each = new JSONObject();
+
+                // TODO :
+
+                returnArray.put(each);
+            }
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, returnArray);
+
+        } catch (JSONException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * VR Scene에서 렌더링해야할 모든 Item 목록을 반환한다.
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryVirtualRenderingItems(JSONObject returnObject) {
+        try {
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
+            return true;
+
+        } catch (Exception e) { ; }
+        return false;
+    }
+
+    /**
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryVRContainerItems(JSONObject returnObject) {
+        try {
+            // SELECT ALL
+            LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(ITable.TABLE_VR_CONTAINER, new JSONObject());
+
+            JSONArray array = new JSONArray();
+            Cursor cursor = builder.select();
+
+            while (cursor.moveToNext()) {
+                JSONObject bookcase = new JSONObject();
+                bookcase.put(VRContainerTable.NAME.toString(), cursor.getString(VRContainerTable.NAME.ordinal()));
+                bookcase.put(VRContainerTable.Z_OFFSET.toString(), cursor.getString(VRContainerTable.Z_OFFSET.ordinal()));
+                bookcase.put(VRContainerTable.COUNT.toString(), cursor.getString(VRContainerTable.COUNT.ordinal()));
+                array.put(bookcase);
+            }
+            cursor.close();
+
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, array);
+            return true;
+
+        } catch (Exception e) {
+            ;
+        }
+
+        return false;
+    }
+
+    /**
      * 새로운 Augmented Item을 추가한다.
      * 동시에 간략한 Resource Item을 생성한다.
      *
@@ -356,7 +425,7 @@ abstract class PalaceCore {
      * @param resItem
      * @return
      */
-    public long insertNewAugmentedItem(AugmentedItem arItem, ResourceItem resItem) {
+    public long insertNewAugmentedItem(AugmentedInput arItem, ResourceItem resItem) {
         long resID = insertSimpleResourceItem(resItem);
         if (resID <= 0)
             return -1;
@@ -385,8 +454,9 @@ abstract class PalaceCore {
         LocalDatabaseCenter.WriteBuilder<ResourceTable> builder =
                 new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
-        builder.set(ResourceTable.NAME, item.name)
-                .set(ResourceTable.DESCRIPTION, item.description);
+        builder.set(ResourceTable.TITLE, item.name)
+                .set(ResourceTable.RES_TYPE, "0")
+                .set(ResourceTable.CTIME, String.valueOf(System.currentTimeMillis()));
 
         long resID = builder.insert();
         if (resID > 0)
@@ -406,32 +476,9 @@ abstract class PalaceCore {
                 new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
 
         builder.set(VirtualTable.RES_ID, String.valueOf(resID))
-                .set(VirtualTable.TYPE, "0");
+                .set(VirtualTable.MODEL_TYPE, "0");
 
         return builder.insert();
-    }
-
-
-
-    /**
-     *
-     * @param command
-     * @param paramObj
-     * @param returnObj
-     * @return
-     */
-    boolean executeConstructedQuery(String command, JSONObject paramObj, JSONObject returnObj) {
-        try {
-            if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
-                returnObj.put(JsonKey.QUERY_RESULT, DBCenter.queryAllVirtualRenderings());
-                return true;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
 
@@ -444,11 +491,10 @@ abstract class PalaceCore {
      */
     boolean insertNewLocalData(JSONObject insert, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, insert);
-        return (builder == null)? false : (builder.insert() > 0);
+        return (builder == null) ? false : (builder.insert() > 0);
     }
 
     /**
-     *
      * @param select
      * @param table
      * @return
@@ -463,26 +509,38 @@ abstract class PalaceCore {
             while (cursor.moveToNext()) {
                 JSONObject row = new JSONObject();
 
-                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
-                    ResourceTable[] fields = ResourceTable.values();
-                    for (int i=0; i<fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
+                if (builder.mSetClauseValues.size() > 0) {
+                    for (String key : builder.mSetClauseValues.keySet())
+                        row.put(key, cursor.getString(cursor.getColumnIndex(key)));
 
-                } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
-                    AugmentedTable[] fields = AugmentedTable.values();
-                    for (int i=0; i<fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
+                } else {
+                    if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
+                        ResourceTable[] fields = ResourceTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
 
-                } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
-                    VirtualTable[] fields = VirtualTable.values();
-                    for (int i=0; i<fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
+                    } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
+                        AugmentedTable[] fields = AugmentedTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
+
+                    } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
+                        VirtualTable[] fields = VirtualTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
+
+                    } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
+                        VRContainerTable[] fields = VRContainerTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
+                    }
                 }
+
                 array.put(row);
             }
             cursor.close();
 
-            result.put(IControllerCommands.JsonKey.QUERY_RESULT, array);
+            result.put(IProcessorCommands.JsonKey.QUERY_RESULT, array);
             return true;
 
         } catch (Exception e) {
@@ -500,7 +558,7 @@ abstract class PalaceCore {
      */
     boolean updateLocalData(JSONObject update, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, update);
-        return (builder == null)? false : builder.modify();
+        return (builder == null) ? false : builder.modify();
     }
 
     /**
@@ -512,14 +570,14 @@ abstract class PalaceCore {
      */
     boolean deleteLocalData(JSONObject delete, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, delete);
-        return (builder == null)? false : builder.delete();
+        return (builder == null) ? false : builder.delete();
     }
 
     /**
      * JSON 객체를 파싱하여
      * {@link kr.poturns.virtualpalace.controller.LocalDatabaseCenter.ReadBuilder}로 변환한다.
      *
-     * @param table 처리할 Table 명.
+     * @param table    처리할 Table 명.
      * @param elements 명령에 대한 세부내용이 담긴 JSON 객체. (null일 경우, return null)
      * @return
      */
@@ -534,6 +592,9 @@ abstract class PalaceCore {
         else if (ITable.TABLE_RESOURCE.equals(table))
             builder = new LocalDatabaseCenter.ReadBuilder<ResourceTable>(DBCenter);
 
+        else if (ITable.TABLE_VR_CONTAINER.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<VRContainerTable>(DBCenter);
+
         if (builder == null || elements == null)
             return null;
 
@@ -546,7 +607,7 @@ abstract class PalaceCore {
             try {
                 if (JsonKey.SET.equalsIgnoreCase(element)) {
                     JSONArray array = elements.getJSONArray(element);
-                    for (int i=0; i<array.length(); i++) {
+                    for (int i = 0; i < array.length(); i++) {
                         ITable field = getField(table, array.getString(i));
                         builder.set(field, null);
                     }
@@ -566,7 +627,7 @@ abstract class PalaceCore {
                         builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
                 } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
-                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    // IProcessorCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
                 }
                 // OTHER CLAUSES
@@ -610,7 +671,7 @@ abstract class PalaceCore {
      * JSON 객체를 파싱하여
      * {@link kr.poturns.virtualpalace.controller.LocalDatabaseCenter.WriteBuilder}로 변환한다.
      *
-     * @param table 처리할 Table 명.
+     * @param table    처리할 Table 명.
      * @param elements 명령에 대한 세부내용이 담긴 JSON 객체. (null일 경우, return null)
      * @return
      */
@@ -624,6 +685,9 @@ abstract class PalaceCore {
 
         else if (ITable.TABLE_RESOURCE.equals(table))
             builder = new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
+
+        else if (ITable.TABLE_VR_CONTAINER.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<VRContainerTable>(DBCenter);
 
         if (builder == null || elements == null)
             return null;
@@ -647,7 +711,7 @@ abstract class PalaceCore {
                         builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
                 } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
-                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    // IProcessorCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
                 }
 
@@ -717,18 +781,27 @@ abstract class PalaceCore {
     }
 
     /**
+     * Google Drive App Folder에 DB 파일을 백업한다.
+     *
      * @return
      */
     boolean executeBackUp() {
-        DBCenter.backUp(AppDriveAssistant);
-        return false;
+        File dbFile = DBCenter.getDatabaseFile();
+       // DriveFolder folder = AppDriveAssistant.getAppFolder();
+
+        // Drive Contents 생성
+       // DriveContents contents = AppDriveAssistant.newDriveContents();
+        //DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
+
+        String fileName = "VirtualPalace-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
+      //  DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
+        return true;
     }
 
 
-
     // * * * G E T T E R S & S E T T E R S * * * //
+
     /**
-     *
      * @param sensorType
      * @return
      */
@@ -744,7 +817,6 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @return
      */
     public Integer[] getAttachedInputTypeArray() {
@@ -755,7 +827,6 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @param inputType
      * @return
      */

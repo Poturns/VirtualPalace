@@ -83,7 +83,7 @@ public interface SpeechController {
          *
          * @param speechResult 음성인식 결과
          */
-        void onResult(SpeechResult speechResult);
+        void onResult(SpeechResult speechResult, int mode);
 
         /**
          * 음성인식이 실패하였을 때, 호출된다
@@ -91,7 +91,7 @@ public interface SpeechController {
          * @param cause 실패 이유
          * @see SpeechRecognizer
          */
-        void onError(int cause);
+        void onError(int cause, int mode);
     }
 
 }

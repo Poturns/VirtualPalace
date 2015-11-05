@@ -69,6 +69,11 @@ namespace BridgeApi.Controller
         /// (3) 특수 기능 : 종료한다.
         /// </summary>
         public const int TERMINATE = 0x10000;
+
+        /// <summary>
+        /// AR Rendering
+        /// </summary>
+        public const int AR_RENDERING = -1;
         #endregion Constants
 
 
@@ -98,6 +103,17 @@ namespace BridgeApi.Controller
 
     }
 
+    public struct ARrenderItem
+    {
+        public int resId;
+        public int screenX;
+        public int screenY;
+
+        public override string ToString()
+        {
+            return "AR Render Item : { resID : " + resId + ", X : " + screenX + ", Y : " + screenY + " }";
+        }
+    }
 
     /// <summary>
     ///  <b>DIRECTION  CONSTANTS</b> <para />
@@ -348,14 +364,4 @@ namespace BridgeApi.Controller
                 + "\n]";
         }
     }
-}
-
-/// <summary>
-/// VirtualPalace가 동작하는 형태
-/// </summary>
-public enum VirtualPalacePlayMode
-{
-    STANDARD,
-    AR,
-    VR
 }

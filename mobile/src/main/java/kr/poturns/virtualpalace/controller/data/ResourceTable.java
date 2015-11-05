@@ -5,16 +5,17 @@ package kr.poturns.virtualpalace.controller.data;
  */
 public enum ResourceTable implements ITable {
     _ID ("INTEGER PRIMARY KEY AUTOINCREMENT"),
-    NAME ("TEXT NOT NULL"),
-    TYPE ("TEXT NOT NULL"),
-    CATEGORY ("TEXT"),
-    ARCHIVE_PATH ("TEXT"),
-    ARCHIVE_KEY ("TEXT"),
-    DRIVE_PATH ("TEXT"),
-    DRIVE_KEY ("TEXT"),
-    THUMBNAIL_PATH ("TEXT"),
-    DESCRIPTION ("TEXT"),
-    CTIME ("INTEGER NOT NULL"),
+    TITLE("TEXT"),
+    CONTENTS("TEXT"),
+    // TEXT = 0, IMAGE = 1, MOVIE = 2
+    RES_TYPE("INTEGER"),
+    EXPANSION("TEXT"),
+    //ARCHIVE_PATH ("TEXT"),
+    //DRIVE_PATH ("TEXT"),
+    //DRIVE_KEY ("TEXT"),
+    //DESCRIPTION ("TEXT"),
+    //THUMBNAIL_PATH ("TEXT"),
+    CTIME ("INTEGER"),
     MTIME ("INTEGER");
 
     public String attributes;

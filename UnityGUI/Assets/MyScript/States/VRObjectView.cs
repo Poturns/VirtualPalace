@@ -3,80 +3,96 @@ using UnityEngine;
 namespace MyScript.States
 {
     public class VRObjectView : AbstractGazeInputState
-	{
-		private GameObject UIBookMesh;
-		private GameObject UITitleTextObj;
+    {
+        private GameObject UIBookMesh;
+        private GameObject UITitleTextObj;
         private TextMesh TMTitle;
-		private GameObject Target;
+        private GameObject Target;
+        private MeshRenderer meshRenderer;
 
-		public VRObjectView (StateManager managerRef , GameObject TargetObject) : base(managerRef, "VRObjectView")
-		{
-			Target = TargetObject;
+        public VRObjectView(StateManager managerRef, GameObject TargetObject) : base(managerRef, "VRObjectView")
+        {
+            Target = TargetObject;
 
-			GameObject DisposolObj = GameObject.FindGameObjectWithTag ("Disposol");
-			if(DisposolObj)GameObject.Destroy (DisposolObj);
+            DestroyMarkedObject();
 
-			UIBookMesh = GameObject.Find ("UIBook");
+            UIBookMesh = GameObject.Find("UIBook");
+            //터치시 UI Object 초기화
+            if (UIBookMesh == null) Debug.LogWarning("Sel Target is Null");
 
-			//터치시 UI Object 초기화
+            meshRenderer = UIBookMesh.GetComponent<MeshRenderer>();
 
-			if (!UIBookMesh)
-				Debug.Log ("Sel Target is Null");
-            //UIBookMesh.GetComponent<MeshRenderer> ().enabled = true;
             MemoObject memoObject = TargetObject.GetComponent<MemoObject>();
-            GameObject ShowObj = memoObject.UIObject; 
-			GameObject DisposalObj = GameObject.Instantiate (ShowObj, UIBookMesh.transform.position
-				                                     , TargetObject.transform.rotation) as GameObject;
+            GameObject ShowObj = memoObject.UIObject;
+            GameObject DisposalObj = GameObject.Instantiate(ShowObj, UIBookMesh.transform.position
+                                                     , TargetObject.transform.rotation) as GameObject;
 
-			DisposalObj.transform.GetChild(0).tag = DESTROY_MARK;
-			DisposalObj.transform.SetParent (UIBookMesh.transform);
-			UITitleTextObj = GameObject.Find ("UITitleText");
-			if (!UITitleTextObj)
-				Debug.Log ("Sel Text is Null");
+            DisposalObj.transform.GetChild(0).tag = DESTROY_MARK;
+            DisposalObj.transform.SetParent(UIBookMesh.transform);
 
-			//TargetObject.GetComponent<MemoObject>().MemoPrefab;
-			string NewTxt = memoObject.Title;
-			TextMesh T = UITitleTextObj.GetComponent<TextMesh> ();
-            TMTitle = T;
+            UITitleTextObj = GameObject.Find("UITitleText");
+            if (UITitleTextObj == null) Debug.LogWarning("Sel Text is Null");
+
+            //TargetObject.GetComponent<MemoObject>().MemoPrefab;
+
+            string NewTxt = memoObject.Title;
+            TextMesh T = UITitleTextObj.GetComponent<TextMesh>();
             //T.text = NewTxt;
-            Utils.Text.InputTextMesh (T, NewTxt);
+            Utils.Text.InputTextMesh(T, NewTxt);
 
-			//GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
-			SetGazeInputMode (GAZE_MODE.OFF);
-			SetCameraLock (true);
-		}
+            TMTitle = T;
 
-		public override void StateUpdate()
-		{
+            //GameObject.Find ("Head").GetComponent<CardboardHead> ().ViewMoveOn = false;
+            LockCameraAndMesh(true);
+        }
+
+        public override void StateUpdate()
+        {
             //base.StateUpdate();
-			// Input
-		}
+            // Input
+        }
 
         protected override void HandleCancelOperation()
         {
             //base.HandleCancelOperation();
-            //UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+            //SwitchState(new VRSceneIdleState(Manager));
+
+            DestroyMarkedObject();
+
             TMTitle.text = "";
-            SwitchState(new VRSceneIdleState(Manager));
+            LockCameraAndMesh(false);
+
+            SwitchState(VRSceneIdleState.CopyFromCurrentState(this));
         }
 
         protected override void HandleSelectOperation()
         {
-			//base 호출 필요 없음 무조건 메모씬으로 진입 
+            //base 호출 필요 없음 무조건 메모씬으로 진입 
             //base.HandleSelectOperation();
 
-            ChangeMemoScene();
+            EnterMemoState();
         }
-             
-		void ChangeMemoScene()
-		{
-			UIBookMesh.GetComponent<MeshRenderer> ().enabled = false;
+
+        void EnterMemoState()
+        {
+            ChangeMeshState(false);
             TMTitle.text = "";
-			SwitchState (new VRMemoView (Manager, Target));
+            SwitchState(new VRMemoView(Manager, Target));
+        }
 
-		}
+        private void LockCameraAndMesh(bool isLock)
+        {
+           // ChangeMeshState(isLock);
+            SetGazeInputMode(isLock ? GAZE_MODE.OFF : GAZE_MODE.OBJECT);
+            SetCameraLock(isLock);
+        }
 
-	}
+        private void ChangeMeshState(bool enable)
+        {
+            meshRenderer.enabled = enable;
+        }
+
+    }
 
 }
 

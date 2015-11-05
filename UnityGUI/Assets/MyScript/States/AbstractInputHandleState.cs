@@ -15,7 +15,7 @@ namespace MyScript.States
         private readonly string stateName;
         public string Name { get { return stateName; } }
 
-        protected StateManager Manager { get { return manager; } }
+        protected internal StateManager Manager { get { return manager; } }
 
         public const string DESTROY_MARK = "Disposol";
 
