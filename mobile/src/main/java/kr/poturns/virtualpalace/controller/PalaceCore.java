@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
-import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.augmented.AugmentedInput;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
 import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
@@ -224,7 +224,6 @@ abstract class PalaceCore {
                 e.printStackTrace();
             }
         }
-        ;
     }
 
     /**
@@ -295,9 +294,7 @@ abstract class PalaceCore {
             JSONObject returnObject = new JSONObject();
             try {
                 returnObject.put(IProtocolKeywords.Request.KEY_USE_SPEECH_MODE, mode);
-            } catch (JSONException e) {
-                ;
-            }
+            } catch (JSONException e) { ; }
 
             if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
                 connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
@@ -341,11 +338,11 @@ abstract class PalaceCore {
     }
 
     /**
-     * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
+     * 현 위치 근처에 등록되어 있는 AugmentedInput 목록을 조회한다.
      *
      * @return
      */
-    public ArrayList<AugmentedItem> queryNearAugmentedItems() {
+    public ArrayList<AugmentedInput> queryNearAugmentedItems() {
         double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
         double radius = 0.0000005;
 
@@ -364,7 +361,7 @@ abstract class PalaceCore {
     protected boolean queryNearAugmentedItems(JSONObject returnObject) {
         JSONArray returnArray = new JSONArray();
         try {
-            for (AugmentedItem item : queryNearAugmentedItems()) {
+            for (AugmentedInput item : queryNearAugmentedItems()) {
                 JSONObject each = new JSONObject();
 
                 // TODO :
@@ -386,14 +383,12 @@ abstract class PalaceCore {
      * @param returnObject
      * @return
      */
-    public boolean queryVirtualRenderingItems(JSONObject returnObject) {
+    protected boolean queryVirtualRenderingItems(JSONObject returnObject) {
         try {
             returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
             return true;
 
-        } catch (Exception e) {
-            ;
-        }
+        } catch (Exception e) { ; }
         return false;
     }
 
@@ -436,7 +431,7 @@ abstract class PalaceCore {
      * @param resItem
      * @return
      */
-    public long insertNewAugmentedItem(AugmentedItem arItem, ResourceItem resItem) {
+    public long insertNewAugmentedItem(AugmentedInput arItem, ResourceItem resItem) {
         long resID = insertSimpleResourceItem(resItem);
         if (resID <= 0)
             return -1;
@@ -520,29 +515,33 @@ abstract class PalaceCore {
             while (cursor.moveToNext()) {
                 JSONObject row = new JSONObject();
 
-                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
-                    ResourceTable[] fields = ResourceTable.values();
-                    for (int i = 0; i < fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
+                if (builder.mSetClauseValues.size() > 0) {
+                    for (String key : builder.mSetClauseValues.keySet())
+                        row.put(key, cursor.getString(cursor.getColumnIndex(key)));
 
-                } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
-                    AugmentedTable[] fields = AugmentedTable.values();
-                    for (int i = 0; i < fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
+                } else {
+                    if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
+                        ResourceTable[] fields = ResourceTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
 
-                } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
-                    VirtualTable[] fields = VirtualTable.values();
-                    for (int i = 0; i < fields.length; i++) {
-                        String field = fields[i].name();
-                        cursor.getColumnIndex(field);
-                        row.put(fields[i].name(), cursor.getString(cursor.getColumnIndex(field)));
+                    } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
+                        AugmentedTable[] fields = AugmentedTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
+
+                    } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
+                        VirtualTable[] fields = VirtualTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
+
+                    } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
+                        VRContainerTable[] fields = VRContainerTable.values();
+                        for (int i=0; i<fields.length; i++)
+                            row.put(fields[i].name(), cursor.getString(i));
                     }
-
-                } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
-                    VRContainerTable[] fields = VRContainerTable.values();
-                    for (int i = 0; i < fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
                 }
+
                 array.put(row);
             }
             cursor.close();
@@ -780,9 +779,7 @@ abstract class PalaceCore {
                 return ResourceTable.valueOf(NAME);
             }
 
-        } catch (IllegalArgumentException e) {
-            ;
-        }
+        } catch (IllegalArgumentException e) { ; }
         return null;
     }
 

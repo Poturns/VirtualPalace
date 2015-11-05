@@ -1,10 +1,10 @@
 package kr.poturns.virtualpalace.augmented;
 
 /**
- * Created by Yeonho on 2015-10-25.
+ * Controller 에서 전달받는 AR 연산 입력 데이터
  */
-public class AugmentedItem {
-    public AugmentedItem() {
+public class AugmentedInput {
+    public AugmentedInput() {
 
     }
 

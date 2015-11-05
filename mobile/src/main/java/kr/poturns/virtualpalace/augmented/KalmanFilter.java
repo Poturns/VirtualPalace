@@ -1,6 +1,6 @@
 package kr.poturns.virtualpalace.augmented;
 
-public class mKalmanFilter {
+public class KalmanFilter {
 //	private final KalmanFilter mFilterF;
 //
 //	private int pLen;
@@ -10,7 +10,7 @@ public class mKalmanFilter {
 	private double[] lastPredict;
 	private double[] lastEstimated;
 
-	public mKalmanFilter(double[] initData) {
+	public KalmanFilter(double[] initData) {
 //		this.mLen = initData.length;
 //		this.pLen = initData.length*2;
 //		mFilterF = new KalmanFilter(pLen, mLen, 0, CvType.CV_32F);
