@@ -103,23 +103,32 @@ public  class SaveLoader : MonoBehaviour {
 			{
 				SaveData sData = new SaveData();
 				sData = (SaveData)bf.Deserialize(ObjStream);
-				GameObject Obj = GameObject.Find (sData.ObjName);
-
-				//처음부터 존재 하는 오브젝트일때 컨텐츠 내용만 업데이트
-				if(Obj != null)
+				//ARObject 따로 처리(Title  , Contents , ResID)
+				if(sData.ObjKind == OBJ_LIST.AR_OBJ)
 				{
-					AbstractBasicObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-					RealObj.UpdateContents(sData.Contents , sData.ResID);
+					BufferingARObjectData(sData);
 				}
-				// 추가되어야할 오브젝트일때 생성후 초기화
 				else
 				{
-					GameObject PrefabToLoad = PrefabCon.GetPrefab(sData.ObjKind);
-					GameObject LoadObject = Instantiate(PrefabToLoad , sData.Pos , sData.Rot) as GameObject;
-					LoadObject.transform.parent = GameObject.Find(sData.ParentName).transform.GetChild(0);
-					LoadObject.transform.GetChild(0).GetComponent<AbstractBasicObject>().UpdateWithSaveData(sData);
-
+					GameObject Obj = GameObject.Find (sData.ObjName);
+					
+					//처음부터 존재 하는 오브젝트일때 컨텐츠 내용만 업데이트
+					if(Obj != null)
+					{
+						AbstractBasicObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
+						RealObj.UpdateContents(sData.Contents , sData.ResID);
+					}
+					// 추가되어야할 오브젝트일때 생성후 초기화
+					else
+					{
+						GameObject PrefabToLoad = PrefabCon.GetPrefab(sData.ObjKind);
+						GameObject LoadObject = Instantiate(PrefabToLoad , sData.Pos , sData.Rot) as GameObject;
+						LoadObject.transform.parent = GameObject.Find(sData.ParentName).transform.GetChild(0);
+						LoadObject.transform.GetChild(0).GetComponent<AbstractBasicObject>().UpdateWithSaveData(sData);
+						
+					}
 				}
+
 			}
 			ObjStream.Close();
 		
@@ -130,5 +139,13 @@ public  class SaveLoader : MonoBehaviour {
 			return false;
 		}
 
+	}
+
+	private void BufferingARObjectData(SaveData sData)
+	{
+
+		ARObjectList ARObjBuffer = GameObject.Find ("ABBufferObject").GetComponent<ARObjectList>();
+
+		ARObjBuffer.AddARData (sData);
 	}
 }

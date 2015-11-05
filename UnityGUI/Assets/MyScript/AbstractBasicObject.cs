@@ -15,6 +15,7 @@ public enum KIND_SOURCE
 
 public enum OBJ_LIST
 {
+	AR_OBJ = 0,
 	BOOK_GROUP_1 = 1,
 	BOOK_GROUP_2,
 	BOOK_GROUP_3,
