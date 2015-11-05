@@ -384,7 +384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SourceKind: 0
-  ModelKind: 0
+  ModelKind: 11
 --- !u!114 &11468748
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -412,6 +412,7 @@ MonoBehaviour:
   InitTitle: "\uC2B9\uC6D0"
   InitMemo: "\uC2B9\uC6D0\uC774\uB791\uB2EE\uC74C"
   kind: 0
+  Memo: 
   UIObject: {fileID: 178400}
 --- !u!1001 &100100000
 Prefab:
@@ -419,7 +420,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: ModelKind
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 141096}

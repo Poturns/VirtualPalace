@@ -23,12 +23,13 @@ namespace MyScript.States
             meshRenderer = UIBookMesh.GetComponent<MeshRenderer>();
 
             MemoObject memoObject = TargetObject.GetComponent<MemoObject>();
-            GameObject ShowObj = memoObject.UIObject;
-            GameObject DisposalObj = GameObject.Instantiate(ShowObj, UIBookMesh.transform.position
-                                                     , TargetObject.transform.rotation) as GameObject;
-
-            DisposalObj.transform.GetChild(0).tag = DESTROY_MARK;
-            DisposalObj.transform.SetParent(UIBookMesh.transform);
+			GameObject ShowObj = memoObject.UIObject;
+				//GameObject ShowObj = GameObject.Find("PreLoadPrefab").GetComponent<PrefabContainer>().GetPrefab(TargetObject.GetComponent<CombineObject>().ModelKind);
+			GameObject DisposalObj = GameObject.Instantiate(ShowObj, UIBookMesh.transform.position
+                                                     , TargetObject.transform.parent.rotation) as GameObject;
+			DisposalObj.transform.localScale = TargetObject.transform.parent.lossyScale;
+			DisposalObj.transform.GetChild(0).tag = DESTROY_MARK;
+            //DisposalObj.transform.SetParent(UIBookMesh.transform);
 
             UITitleTextObj = GameObject.Find("UITitleText");
             if (UITitleTextObj == null) Debug.LogWarning("Sel Text is Null");
