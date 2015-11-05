@@ -19,6 +19,10 @@ public class AugmentedInput {
     public double supportY;
     public double supportZ;
 
+    public String title;
+    public String contents;
+    public int res_type;
+
 
     public AugmentedOutput extractOutput(int screenX, int screenY) {
         AugmentedOutput output = new AugmentedOutput();

@@ -173,7 +173,7 @@ abstract class PalaceCore {
     // * * * I N P U T _ P A R T . * * * //
     /**
      * {@link OperationInputConnector}를 Controller 에 등록한다.
-     * 연결할 경우, 자동으로 활성화 하지 않는다.
+     * 연결할 경우, 자동으로 활성화 하지 않는다. >> 자동으로 활성화.
      *
      * @param connector Connector Support Type
      * @param supportType Connector Instance
@@ -189,6 +189,9 @@ abstract class PalaceCore {
         if (connector != null) {
             AttachedInputConnectorMap.put(supportType, connector);
             connector.configureFromController(App, OperationInputConnector.KEY_ENABLE, OperationInputConnector.VALUE_TRUE);
+
+            // 자동으로 활성화
+            activateInputConnector(supportType);
 
             JSONObject content = new JSONObject();
             try {
@@ -242,11 +245,11 @@ abstract class PalaceCore {
 
         boolean result = (connector != null);
         if (result) {
-            if (supportType < IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
-                int activatedType = mActivatedConnectorSupportFlag % IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
-                // 기존 활성화되어 있던 Major Support Type 비활성화.
-                deactivateInputConnector(activatedType);
-            }
+//            if (supportType < IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
+//                int activatedType = mActivatedConnectorSupportFlag % IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
+//                // 기존 활성화되어 있던 Major Support Type 비활성화.
+//                deactivateInputConnector(activatedType);
+//            }
 
             mActivatedConnectorSupportFlag |= supportType;
             connector.configureFromController(App, OperationInputConnector.KEY_ACTIVATE, OperationInputConnector.VALUE_TRUE);
@@ -356,6 +359,7 @@ abstract class PalaceCore {
     }
 
     /**
+     * 주변의 가까운 AR Item 데이터를 반환한다.
      *
      * @param returnObject
      * @return
@@ -366,7 +370,17 @@ abstract class PalaceCore {
             for (AugmentedInput item : queryNearAugmentedItems()) {
                 JSONObject each = new JSONObject();
 
-                // TODO :
+                each.put(AugmentedTable._ID.name(), item.augmentedID);
+                each.put(AugmentedTable.RES_ID.name(), item.resID);
+                each.put(AugmentedTable.LATITUDE.name(), item.latitude);
+                each.put(AugmentedTable.LONGITUDE.name(), item.longitude);
+                each.put(AugmentedTable.ALTITUDE.name(), item.altitude);
+                each.put(AugmentedTable.SUPPORT_X.name(), item.supportX);
+                each.put(AugmentedTable.SUPPORT_Y.name(), item.supportY);
+                each.put(AugmentedTable.SUPPORT_Z.name(), item.supportZ);
+                each.put(ResourceTable.TITLE.name(), item.title);
+                each.put(ResourceTable.CONTENTS.name(), item.contents);
+                each.put(ResourceTable.RES_TYPE.name(), item.res_type);
 
                 returnArray.put(each);
             }
@@ -375,7 +389,6 @@ abstract class PalaceCore {
         } catch (JSONException e) {
             return false;
         }
-
         return true;
     }
 
@@ -395,6 +408,52 @@ abstract class PalaceCore {
     }
 
     /**
+     * VR SCENE 으로부터 요청받은 데이터를 저장한다.
+     *
+     * @param array
+     * @return 하나라도 데이터 저장이 성공하지 못했을 때, false 를 반환한다.
+     */
+    protected boolean saveVirtualRenderingItems(JSONArray array) {
+        boolean result = true;
+        for (int i=0; i<array.length(); i++) {
+            try {
+                JSONObject object = array.getJSONObject(i);
+
+                // First, handle Resource Data.
+                LocalDatabaseCenter.WriteBuilder<ResourceTable> resBuilder = new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
+                for (ResourceTable field : ResourceTable.values()) {
+                    if (object.has(field.name()) && (field != ResourceTable._ID))
+                        resBuilder.set(field, object.getString(field.name()));
+                }
+                resBuilder.whereEqual(ResourceTable._ID, object.getString(VirtualTable.RES_ID.name()));
+
+                // do Update, or Insert.
+                boolean resRst = resBuilder.modify()? true : (resBuilder.insert() > 0);
+
+                // Second, do VR Data.
+                LocalDatabaseCenter.WriteBuilder<VirtualTable> vrBuilder = new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
+                for (VirtualTable field : VirtualTable.values()) {
+                    if (object.has(field.name()))
+                        vrBuilder.set(field, object.getString(field.name()));
+                }
+                vrBuilder.whereEqual(VirtualTable._ID, object.getString(VirtualTable._ID.name()));
+
+                // do Update, or Insert.
+                boolean vrRst = vrBuilder.modify()? true : (vrBuilder.insert() > 0);
+
+                result &= (resRst && vrRst);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 모든 Bookcase Item 데이터를 반환한다.
      *
      * @param returnObject
      * @return
@@ -461,9 +520,9 @@ abstract class PalaceCore {
         LocalDatabaseCenter.WriteBuilder<ResourceTable> builder =
                 new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
-        builder.set(ResourceTable.TITLE, item.name)
-                .set(ResourceTable.RES_TYPE, "0")
-                .set(ResourceTable.CTIME, String.valueOf(System.currentTimeMillis()));
+        builder.set(ResourceTable.TITLE, item.title)
+                .set(ResourceTable.CONTENTS, item.contents)
+                .set(ResourceTable.RES_TYPE, "0");
 
         long resID = builder.insert();
         if (resID > 0)
@@ -591,16 +650,16 @@ abstract class PalaceCore {
      */
     private LocalDatabaseCenter.ReadBuilder makeReadBuilder(String table, JSONObject elements) {
         LocalDatabaseCenter.ReadBuilder builder = null;
-        if (ITable.TABLE_VIRTUAL.equals(table))
+        if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table))
             builder = new LocalDatabaseCenter.ReadBuilder<VirtualTable>(DBCenter);
 
-        else if (ITable.TABLE_AUGMENTED.equals(table))
+        else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table))
             builder = new LocalDatabaseCenter.ReadBuilder<AugmentedTable>(DBCenter);
 
-        else if (ITable.TABLE_RESOURCE.equals(table))
+        else if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table))
             builder = new LocalDatabaseCenter.ReadBuilder<ResourceTable>(DBCenter);
 
-        else if (ITable.TABLE_VR_CONTAINER.equals(table))
+        else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table))
             builder = new LocalDatabaseCenter.ReadBuilder<VRContainerTable>(DBCenter);
 
         if (builder == null || elements == null)
@@ -782,6 +841,9 @@ abstract class PalaceCore {
 
             } else if (ITable.TABLE_RESOURCE.equals(table)) {
                 return ResourceTable.valueOf(NAME);
+
+            } else if (ITable.TABLE_VR_CONTAINER.equals(table)) {
+                return VRContainerTable.valueOf(NAME);
             }
 
         } catch (IllegalArgumentException e) { ; }

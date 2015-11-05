@@ -1,10 +1,21 @@
 package kr.poturns.virtualpalace.controller.data;
 
 /**
- * Created by Yeonho on 2015-10-25.
+ *
  */
 public class ResourceItem {
-    public String name;
+    public int _id;
 
-    public String description;
+    public String title;
+
+    public String contents;
+
+    public int res_type;
+
+    public String expansion;
+
+    public long ctime;
+
+    public long mtime;
+
 }

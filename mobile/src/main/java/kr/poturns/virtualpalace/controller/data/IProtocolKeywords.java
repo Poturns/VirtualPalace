@@ -65,6 +65,8 @@ public interface IProtocolKeywords {
          */
         String COMMAND_QUERY_VR_ITEMS = "query_all_vr_items";
 
+        String COMMAND_SAVE_VR_ITEMS = "save_all_vr_items";
+
         String COMMAND_QUERY_VR_BOOKCASES = "query_all_vr_bookcases";
 
         String KEY_CALLBACK_RESULT = "result";

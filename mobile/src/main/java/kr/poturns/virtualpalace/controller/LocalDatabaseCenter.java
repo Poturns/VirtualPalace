@@ -141,8 +141,9 @@ public class LocalDatabaseCenter {
         ArrayList<AugmentedInput> mNearItemList = new ArrayList<AugmentedInput>();
 
         Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
-                "SELECT * FROM augmented " +
-                        "WHERE (latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?) AND (altitude BETWEEN ? AND ?);",
+                "SELECT a.*, r.title, r.contents, r.res_type FROM augmented a, resource r" +
+                        "WHERE (a.latitude BETWEEN ? AND ?) AND (a.longitude BETWEEN ? AND ?) AND (a.altitude BETWEEN ? AND ?)" +
+                        " AND (a.res_id = r._id);",
                 new String[]{
                         String.valueOf(latitude - radius), String.valueOf(latitude + radius),
                         String.valueOf(longitude - radius), String.valueOf(longitude + radius),
@@ -151,6 +152,7 @@ public class LocalDatabaseCenter {
 
         while(cursor.moveToNext()) {
             AugmentedInput item = new AugmentedInput();
+            int length = AugmentedTable.values().length;
 
             item.augmentedID = cursor.getInt(cursor.getColumnIndex(AugmentedTable._ID.name()));
             item.resID = cursor.getInt(cursor.getColumnIndex(AugmentedTable.RES_ID.name()));
@@ -161,6 +163,10 @@ public class LocalDatabaseCenter {
             item.supportY = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.SUPPORT_Y.name()));
             item.supportZ = cursor.getDouble(cursor.getColumnIndex(AugmentedTable.SUPPORT_Z.name()));
 
+            item.title = cursor.getString(cursor.getColumnIndex(ResourceTable.TITLE.name()));
+            item.contents = cursor.getString(cursor.getColumnIndex(ResourceTable.CONTENTS.name()));
+            item.res_type = cursor.getInt(cursor.getColumnIndex(ResourceTable.RES_TYPE.name()));
+
             mNearItemList.add(item);
         }
 
@@ -168,11 +174,12 @@ public class LocalDatabaseCenter {
         return mNearItemList;
     }
 
-    /**
-     * 가상공간 렌더링에 필요한 오브젝트 데이터를 반환한다.
-     *
-     * @return JSON ARRAY
-     */
+
+        /**
+         * 가상공간 렌더링에 필요한 오브젝트 데이터를 반환한다.
+         *
+         * @return JSON ARRAY
+         */
     public synchronized JSONArray queryAllVirtualRenderings() {
         JSONArray array = new JSONArray();
 
@@ -214,6 +221,13 @@ public class LocalDatabaseCenter {
 
         cursor.close();
         return array;
+    }
+
+    public void saveAllVirtualRendering() {
+
+        OpenHelper.getWritableDatabase().execSQL("");
+
+
     }
 
     final File getDatabaseFile() {
@@ -304,7 +318,7 @@ public class LocalDatabaseCenter {
             Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-//                mCenterF.OpenHelper.getWritableDatabase().execSQL(builder.toString());
+                mSetClauseValues.put("CTIME", System.currentTimeMillis());
                 return db.insert(mTableName, null, mSetClauseValues);
 
             } catch (SQLException e) {
@@ -333,7 +347,7 @@ public class LocalDatabaseCenter {
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-//                mCenterF.OpenHelper.getWritableDatabase().execSQL(builder.toString());
+                mSetClauseValues.put("MTIME", System.currentTimeMillis());
                 int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
                 return (affectedRows > 0);
 
@@ -364,7 +378,6 @@ public class LocalDatabaseCenter {
             Log.d("LDB_Delete", "LDB Delete : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-//                mCenterF.OpenHelper.getWritableDatabase().execSQL(builder.toString());
                 int affectedRows = db.delete(mTableName, builder.toString(), null);
                 return (affectedRows > 0);
 

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -211,11 +212,7 @@ public class PalaceMaster extends PalaceEngine {
             // 예상 전송 시간을 넘길 때까지 명령이 생략되었을 경우,
             // 메시지 전송을 예약한다.
             if (singleMessage.length() == 0 || current > mExpectedFlushTime) {
-                // AR 렌더링을 해야할 경우, 메시지 전송 간격을 기존의 1/10로 줄인다.
-                mExpectedFlushTime = current +
-                        (singleMessage.has(String.valueOf(DRAW_AR_ITEM)) || command[0] == DRAW_AR_ITEM?
-                                INTERVAL / 10 : INTERVAL);
-
+                mExpectedFlushTime = current + INTERVAL;
                 sendEmptyMessageDelayed(INPUT_SYNC_COMMAND, INTERVAL);
             }
 
@@ -223,14 +220,17 @@ public class PalaceMaster extends PalaceEngine {
             int value;
 
             switch (command[0]) {
-                // AR 렌더링 명령
+                // 여러 개의 AR Drawing 아이템이 전달될 경우,
+                // 이전 데이터를 무시하지 않기 위하여 AR 렌더링 명령이 전달되면 메시지를 즉시 전송한다.
                 case DRAW_AR_ITEM:
                     try {
-                        JSONObject eachResObj = singleMessage.has(cmdStr)?
-                                singleMessage.getJSONObject(cmdStr) : new JSONObject();
+                        int compressed = command[1];
+                        compressed = compressed * 10000 + command[2];
+                        compressed = compressed * 10000 + command[3];
 
-                        eachResObj.put(String.valueOf(command[1]), command[2] * 10000 + command[3]);
-                        singleMessage.put(cmdStr, eachResObj);
+                        singleMessage.put(cmdStr, compressed);
+                        removeMessages(INPUT_SYNC_COMMAND);
+                        send();
 
                     } catch (JSONException e) { ; }
                     break;
@@ -494,7 +494,7 @@ public class PalaceMaster extends PalaceEngine {
             while (keys.hasNext()) {
                 String command = keys.next();
 
-                JSONObject contents = RequestMessage.getJSONObject(command);
+                JSONObject contents = RequestMessage.optJSONObject(command);
                 JSONObject partialReturn = new JSONObject();
                 boolean result = false;
 
@@ -535,6 +535,10 @@ public class PalaceMaster extends PalaceEngine {
                     } else if (COMMAND_QUERY_VR_ITEMS.equalsIgnoreCase(command)) {
                         result = queryVirtualRenderingItems(partialReturn);
 
+                    } else if (COMMAND_SAVE_VR_ITEMS.equalsIgnoreCase(command)) {
+                        JSONArray contentArray = RequestMessage.getJSONArray(command);
+                        result = saveVirtualRenderingItems(contentArray);
+
                     } else if (COMMAND_QUERY_NEAR_ITEMS.equalsIgnoreCase(command)) {
                         result = queryNearAugmentedItems(partialReturn);
 
@@ -565,6 +569,7 @@ public class PalaceMaster extends PalaceEngine {
                         else if (lowerCaseCommand.startsWith(COMMAND_DB_DELETE))
                             result = deleteLocalData(RequestMessage.getJSONObject(command), table);
                     }
+
                     partialReturn.put(KEY_CALLBACK_RESULT, result ?
                             KEY_CALLBACK_RESULT_SUCCESS : KEY_CALLBACK_RESULT_FAIL);
 
