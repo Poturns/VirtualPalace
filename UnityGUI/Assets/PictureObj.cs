@@ -12,8 +12,20 @@ public class PictureObj : MonoBehaviour{
 	}
 	private Texture2D Tex;
 	public bool TextureUpdateOn = false;
-	private string Path;
+	private string path;
 
+	public string Path
+	{
+		set
+		{
+			path = value;
+			if(TextureUpdateOn) PictureUpdate();
+		}
+		get
+		{
+			return path;
+		}
+	}
 
 	public void OnSelect()
 	{
@@ -23,10 +35,7 @@ public class PictureObj : MonoBehaviour{
 	void Start () {
 		Title = "Image Obj";
 	}
-	public void SetPath(string TexPath)
-	{
-		Path = TexPath;
-	}
+
 	public void PictureUpdate()
 	{
 		if (!TextureUpdateOn)
@@ -38,6 +47,6 @@ public class PictureObj : MonoBehaviour{
 	}
 	// Update is called once per frame
 	void Update () {
-		
+
 	}
 }

@@ -35,13 +35,16 @@ public class BookCaseScript : AbstractBasicObject {
 		SaveDataForBookCase sData = new SaveDataForBookCase ();
 		Transform tr = gameObject.transform.parent;
 		sData.InitData(tr.gameObject.name,tr.position , tr.rotation
-		               ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name,null,ZCurrentPos,tr.childCount );
+		               ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name,"",ZCurrentPos,tr.GetChild(0).childCount );
 		return sData;
 	}
-
-
-
-	public void CreateBook()
+	public override void UpdateWithSaveData(SaveData sData)
+	{
+		SaveDataForBookCase sCaseData = (SaveDataForBookCase)sData;
+		ZCurrentPos = sCaseData.CurZOffest;
+		Cnt = sCaseData.Cnt;
+	}	
+	public GameObject CreateBook()
 	{
 
 		GameObject ObjInstance = ObjPrefab.transform.GetChild (0).gameObject;
@@ -66,6 +69,15 @@ public class BookCaseScript : AbstractBasicObject {
 		ZCurrentPos += ZOffset;
 	
 		Cnt++;
+
+		return RealData;
+	}
+	public void CreateBookForAR(GameObject Prefab , KIND_SOURCE sourcekind , string Title , string Contents)
+	{
+		ObjPrefab = Prefab;
+		CurrentKind = sourcekind;
+		GameObject CreatedRealData = CreateBook ();
+
 	}
 	public override void OnSelect()
 	{

@@ -1,7 +1,9 @@
 package kr.poturns.virtualpalace.augmented;
+
+import android.hardware.SensorManager;
+
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
-import android.hardware.SensorManager;
 
 public class CamTracker {
 	private static final String LOG_TAG = "kr.poturns.virtualpalace.augmented@CamTracker";
@@ -52,7 +54,7 @@ public class CamTracker {
 			bSuccess = SensorManager.getRotationMatrix(rotationMat, null, accData, magneticData);
 			if(bSuccess) {
 				SensorManager.getOrientation(rotationMat, orientation);
-				filterOrientation(orientation);
+				//filterOrientation(orientation);
 			}
 			
 			resetOrigin();

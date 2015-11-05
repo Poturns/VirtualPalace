@@ -2,6 +2,8 @@ package kr.poturns.virtualpalace.inputmodule.speech;
 
 import android.content.Context;
 
+import java.util.List;
+
 import kr.poturns.virtualpalace.input.OperationInputDetector;
 
 /**
@@ -9,7 +11,7 @@ import kr.poturns.virtualpalace.input.OperationInputDetector;
  * <p/>
  * 음성 형태의 입력을 처리하는 InputModule
  */
-public class SpeechInputDetector extends OperationInputDetector<String> implements SpeechController.OnSpeechDataListener, SpeechController {
+public class SpeechInputDetector extends OperationInputDetector<List<String>> implements SpeechController.OnSpeechDataListener, SpeechController {
     //private static final String TAG = "SpeechInputDetector";
     private SpeechInputHelper mSpeechInputHelper;
     private int mRecognitionMode;

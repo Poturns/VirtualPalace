@@ -58,16 +58,11 @@ namespace AndroidApi.Controller
                 javaAndroidUnityBridge.Call("respondCallbackToAndroid", id, jsonResult);
         }
 
-        public void SendSingleMessageToPlatform(string jsonMessage)
+        public bool SendSingleMessageToPlatform(string jsonMessage)
         {
             // InitJavaAndroidUnityBridgeReference();
 
-            if (javaAndroidUnityBridge != null)
-            {
-                // Debug.Log("============== Sending Single Message : " + jsonMessage);
-                javaAndroidUnityBridge.Call("sendSingleMessageToAndroid", jsonMessage);
-            }
-
+            return javaAndroidUnityBridge != null && javaAndroidUnityBridge.Call<bool>("sendSingleMessageToAndroid", jsonMessage);
         }
 
     }

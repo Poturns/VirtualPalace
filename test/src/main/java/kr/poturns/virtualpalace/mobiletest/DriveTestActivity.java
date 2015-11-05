@@ -1,11 +1,8 @@
 package kr.poturns.virtualpalace.mobiletest;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 
-import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
-import kr.poturns.virtualpalace.mobiletest.fragments.DriveRestTestFragment;
 import kr.poturns.virtualpalace.mobiletest.fragments.DriveTestFragment;
 
 /**
@@ -21,7 +18,7 @@ public class DriveTestActivity extends Activity{
         setContentView(R.layout.activity_drive_test);
 
         getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new DriveRestTestFragment())
+                .replace(R.id.fragment_container, new DriveTestFragment())
                 .commit();
 
     }

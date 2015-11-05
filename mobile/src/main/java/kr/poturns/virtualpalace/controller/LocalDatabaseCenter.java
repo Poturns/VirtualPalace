@@ -425,7 +425,7 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        private CrudBuilder check(E field) {
+        private CrudBuilder<E> check(E field) {
             if (field == null)
                 return this;
 
@@ -454,7 +454,7 @@ public class LocalDatabaseCenter {
          * @param value
          * @return
          */
-        public CrudBuilder set(E field, String value) {
+        public CrudBuilder<E> set(E field, String value) {
             if (field == null)
                 return this;
 
@@ -464,7 +464,7 @@ public class LocalDatabaseCenter {
             return check(field);
         }
 
-        public CrudBuilder set(E field) {
+        public CrudBuilder<E> set(E field) {
             return set(field, null);
         }
 
@@ -473,7 +473,7 @@ public class LocalDatabaseCenter {
          *
          * @return
          */
-        public CrudBuilder setClear() {
+        public CrudBuilder<E> setClear() {
             mSetClauseValues.clear();
             //mSetClauseMap.clear();
 
@@ -492,7 +492,7 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        public CrudBuilder whereNotEqual(E field, String value) {
+        public CrudBuilder<E> whereNotEqual(E field, String value) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
@@ -511,7 +511,7 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        public CrudBuilder whereEqual(E field, String value) {
+        public CrudBuilder<E> whereEqual(E field, String value) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
@@ -531,7 +531,7 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        public CrudBuilder whereBetween(E field, String min, String max) {
+        public CrudBuilder<E> whereBetween(E field, String min, String max) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
@@ -553,7 +553,7 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        public CrudBuilder whereGreaterThan(E field, String value, boolean allowEqual) {
+        public CrudBuilder<E> whereGreaterThan(E field, String value, boolean allowEqual) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
@@ -573,7 +573,7 @@ public class LocalDatabaseCenter {
          * @throws {@link InvalidParameterException}
          * @return
          */
-        public CrudBuilder whereSmallerThan(E field, String value, boolean allowEqual) {
+        public CrudBuilder<E> whereSmallerThan(E field, String value, boolean allowEqual) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
@@ -591,7 +591,7 @@ public class LocalDatabaseCenter {
          * @param value
          * @return
          */
-        public CrudBuilder whereLike(E field, String value) {
+        public CrudBuilder<E> whereLike(E field, String value) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
@@ -608,7 +608,7 @@ public class LocalDatabaseCenter {
          *
          * @return
          */
-        public CrudBuilder whereClear() {
+        public CrudBuilder<E> whereClear() {
             mWhereClauseList.clear();
 
             // Set 구문이 아직 등록되지 않았을 경우, 완전 초기화와 같음.

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
 
 namespace Utils
 {
@@ -59,7 +60,14 @@ namespace Utils
             {
                 foreach (Action action in actionQueue)
                 {
-                    action();
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
                 }
                 actionQueue.Clear();
             }
