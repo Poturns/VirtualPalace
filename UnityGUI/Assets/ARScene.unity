@@ -194,6 +194,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InitTitle: 
+  InitMemo: 
+  kind: 0
+  Memo: 
   UIObject: {fileID: 192518, guid: 21668a194f908ff449000e19c69e1cda, type: 2}
 --- !u!1 &425509694
 GameObject:
@@ -685,6 +689,7 @@ GameObject:
   - 4: {fileID: 1187070648}
   - 33: {fileID: 1187070650}
   - 23: {fileID: 1187070649}
+  - 114: {fileID: 1187070651}
   m_Layer: 2
   m_Name: GazePointer
   m_TagString: Untagged
@@ -737,6 +742,25 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1187070647}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1187070651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1187070647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8564465ccdf125d4e895c9f53c8f7d2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GazeTime: 0
+  GazeSelete: 0
+  GazeTimeMax: 5
+  TextTex: {fileID: 2800000, guid: 7d76a6b572d070b4d9ed9f58e42dc944, type: 3}
+  ImageTex: {fileID: 2800000, guid: 30a3070bf955483499e0083f17195689, type: 3}
+  MovieTex: {fileID: 2800000, guid: 5fb7f49993105f5478ded0a131cd7ce8, type: 3}
+  NormalTex: {fileID: 2800000, guid: 2d6e4bc4fcb0b0e41a52cf1027277704, type: 3}
+  Mode: 0
 --- !u!1 &1570391490
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,7 +812,7 @@ MeshCollider:
   m_GameObject: {fileID: 1570391490}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Convex: 0
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
@@ -854,7 +878,7 @@ MonoBehaviour:
   trackPosition: 1
   target: {fileID: 0}
   updateEarly: 0
-  ViewMoveOn: 1
+  ViewMoveOn: 0
 --- !u!4 &1810550978
 Transform:
   m_ObjectHideFlags: 0
@@ -1046,4 +1070,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0afd0657bf0f20a42ac4b8a2ba9b30ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InitTitle: 
+  InitMemo: 
+  kind: 0
+  Memo: 
   UIObject: {fileID: 192518, guid: 21668a194f908ff449000e19c69e1cda, type: 2}

@@ -26,7 +26,7 @@ public class CombineObject : AbstractBasicObject {
 		//Parents >(부모)> 오브젝트 기즈모의 책장인스턴스 >(부모)>책장의 기즈모 이름
 		// 포지션은 기즈모의 포지션 , 회전도 부모?
 		ForSave.InitData(tr.name,tr.position , tr.rotation
-		                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.parent.gameObject.name , ContentStr);
+		                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.parent.gameObject.name , ContentStr ,"");
 
 		Debug.Log ("Contents String :::::" + ForSave.Contents);
 		return ForSave;

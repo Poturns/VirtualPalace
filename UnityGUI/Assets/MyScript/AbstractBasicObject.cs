@@ -44,7 +44,8 @@ namespace MyScript
 		public OBJ_LIST ModelKind;
 		protected string ObjName;
 		//객체의 간단한 설명 (섬네일 에서 보여줄 예정)
-		protected string Discription; 
+		protected string Discription;
+		protected int ResID;
 
 		public AbstractBasicObject(){}
 
@@ -57,7 +58,7 @@ namespace MyScript
 			//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
 			Transform tr = gameObject.transform.parent;
 			ForSave.InitData(tr.name,tr.position , tr.rotation
-			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null);
+			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null,"");
 			return ForSave;
 		}
 		public virtual void UpdateContents(string Con)

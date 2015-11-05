@@ -30,7 +30,7 @@ public class MemoObject : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Memo = InitMemo;
+        
         Title = InitTitle;
     }
 

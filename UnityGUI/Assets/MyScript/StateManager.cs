@@ -107,14 +107,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
             SendLifeCyleMessage(currentSceneState, UnityLifeCycle.onLoaded);
         }
 
-		if (level == 1) 
-		{
-			SaveLoader Saver = GameObject.Find ("_Script").GetComponent<SaveLoader> ();
-			if (Saver == null)
-				Debug.Log ("SaveLoaderFindFail");
-			else
-				Saver.LoadToFile ();
-		}
+
     }
 
     void Start()
@@ -183,8 +176,8 @@ public class StateManager : MonoBehaviour, IPlatformBridge
                 break;
 
             case UnityScene.AR:
-                //GetManager().SwitchState(new AR(manager));
-                return;
+				newSceneState = new ARSceneIdleState(manager);
+                break;
             default:
                 return;
         }
@@ -198,7 +191,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         manager.SwitchState(newSceneState);
 
         //Application.LoadLevel(unityScene.SceneName());
-        Application.LoadLevel((int)unityScene);
+		//Debug.Log ("SceneName" + (int)unityScene + " : " + unityScene);
+		Application.LoadLevel((int)unityScene);
+
     }
 
     internal void SendLifeCyleMessage(ISceneChangeState sceneState, UnityLifeCycle lifeCycle)
