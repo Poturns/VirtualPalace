@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
 using MyScript;
+using MyScript.objects;
 
 
 public class BookCaseScript : AbstractBasicObject {
@@ -29,21 +30,27 @@ public class BookCaseScript : AbstractBasicObject {
 		SourceKind = KIND_SOURCE.BOOK_CASE;
 		ModelKind = OBJ_LIST.NO_MODEL;
 	}
-
-	public override SaveData GetSaveData ()
+	
+	public BookCaseObject GetSaveObjectData()
 	{
-		SaveDataForBookCase sData = new SaveDataForBookCase ();
 		Transform tr = gameObject.transform.parent;
-		sData.InitData(tr.gameObject.name,tr.position , tr.rotation
-		               ,tr.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name,"",ZCurrentPos,tr.GetChild(0).childCount );
-		return sData;
+		BookCaseObject SaveObj = new BookCaseObject (tr.gameObject.name, ZCurrentPos, tr.GetChild (0).childCount);
+		//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
+		
+		return (BookCaseObject)SaveObj;
 	}
-	public override void UpdateWithSaveData(SaveData sData)
+
+
+	public void UpdateWithSaveObjectData(BookCaseObject sData)
 	{
-		SaveDataForBookCase sCaseData = (SaveDataForBookCase)sData;
-		ZCurrentPos = sCaseData.CurZOffest;
-		Cnt = sCaseData.Cnt;
-	}	
+		BookCaseObject BCSaveObj = sData;
+		//일단 이름은 로드 안함 (BookCase 이름은 항상 동일) 
+		//gameObject.transform.parent.name = BCSaveObj.Name;
+		ID = BCSaveObj.ID;
+		Cnt = BCSaveObj.Count;
+		ZCurrentPos = BCSaveObj.Z_Offset;
+
+	}
 	public GameObject CreateBook()
 	{
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
 using MyScript;
+using MyScript.objects;
 
 public class CombineObject : AbstractBasicObject {
 
@@ -16,20 +17,18 @@ public class CombineObject : AbstractBasicObject {
 		SetKind (kind);
 
 	}
-	public override SaveData GetSaveData()
-	{
-		SaveData ForSave = new SaveData ();
-		//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
-		Transform tr = gameObject.transform.parent;
-		string ContentStr = GetContentString (); 
 
-		//Parents >(부모)> 오브젝트 기즈모의 책장인스턴스 >(부모)>책장의 기즈모 이름
-		// 포지션은 기즈모의 포지션 , 회전도 부모?
-		ForSave.InitData(tr.name,tr.position , tr.rotation
-		                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.parent.gameObject.name , ContentStr ,"" );
-		ForSave.ResID = ResID;
-		Debug.Log ("Contents String :::::" + ForSave.Contents);
-		return ForSave;
+	public VRObject GetSaveObjectData()
+	{
+		Transform tr = gameObject.transform.parent;
+
+		string ContentStr = GetContentString (); 
+		VRObject SaveObj = new VRObject (ID, tr.name, tr.parent.gameObject.name,(int)ModelKind
+		                                 ,tr.position, tr.rotation, transform.localScale, (int)SourceKind
+		                                 ,ContentStr,"");
+		//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
+		
+		return SaveObj;
 	}
 	private string GetContentString()
 	{
@@ -66,24 +65,28 @@ public class CombineObject : AbstractBasicObject {
 			break;
 		}
 	}
-	public override void UpdateWithSaveData(SaveData sData)
+
+	public void UpdateWithSaveObjectData(VRObject sData)
 	{
-		base.UpdateWithSaveData (sData);
+		VRObject VRSaveObj = sData;
+		ID = VRSaveObj.ID;
 		//포지션값만 기즈모에 적용 
-		gameObject.transform.parent.position =  sData.Pos;
+		gameObject.transform.position =  VRSaveObj.Position;
 		// 나머지는 이 오브젝트에 적용
-		gameObject.transform.parent.rotation = sData.Rot;
-		gameObject.transform.localScale = sData.Scale;
-		Debug.Log ("Loaded Contents String :::::" + sData.Contents);
-		SetContentString (sData.Contents);
-		ResID = sData.ResID;
+		gameObject.transform.rotation = VRSaveObj.Rotation;
+		gameObject.transform.localScale = VRSaveObj.Scale;
+		gameObject.transform.parent.name = VRSaveObj.Name;
+		SourceKind = VRSaveObj.SourceKind;
+		ModelKind = VRSaveObj.ObjKind;
+		Debug.Log ("Loaded Contents String :::::" + VRSaveObj.ResContents);
+		SetContentString (VRSaveObj.ResContents);
 		Debug.Log ("CombineObject Update : " + GetContentString());
 	}
 
-	public override void UpdateContents(string Con , int resid)
+	public void UpdateContents(string Con , int id)
 	{
 		SetContentString (Con);
-		ResID = resid;
+		ID = id;
 	}
 	// Use this for initialization
 	void Start () {

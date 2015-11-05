@@ -6,6 +6,7 @@ using System.IO;
 
 using MyScript;
 using BridgeApi.Controller.Request.Database;
+using MyScript.objects;
 
 public class SaveLoader : MonoBehaviour
 {
@@ -64,8 +65,8 @@ public class SaveLoader : MonoBehaviour
         int TotalObjCnt = 0;
         for (int i = 0; i < Root.transform.childCount; i++)
         {
-            AbstractBasicObject BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-            SaveDataForBookCase bData = (SaveDataForBookCase)BookCase.GetSaveData();
+			BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
+			BookCaseObject bData = BookCase.GetSaveObjectData();
 
             StateManager manager = StateManager.GetManager();
             DatabaseRequests.VRBookCaseItemUpdate(manager, bData, result =>
@@ -78,9 +79,9 @@ public class SaveLoader : MonoBehaviour
 
                     for (int j = 0; j < BookCase.transform.childCount; j++)
                     {
-                        AbstractBasicObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
+						CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
 
-                        SaveData sData = InteractObj.GetSaveData();
+                        VRObject sData = InteractObj.GetSaveObjectData();
                         InsertSaveDataToDatabase(sData);
                     }
                 });
@@ -96,11 +97,11 @@ public class SaveLoader : MonoBehaviour
         {
             manager.QueueOnMainThread(() =>
             {
-                foreach (SaveDataForBookCase data in results)
+                foreach (BookCaseObject data in results)
                 {
-                    BookCaseScript BookCase = GameObject.Find(data.ObjName).transform.GetChild(0).GetComponent<BookCaseScript>();
+                    BookCaseScript BookCase = GameObject.Find(data.Name).transform.GetChild(0).GetComponent<BookCaseScript>();
                    // ObjCnt += data.Cnt;
-                    BookCase.UpdateWithSaveData(data);
+                    BookCase.UpdateWithSaveObjectData(data);
                 }
 
                 RequestSaveDataFromDatabase();
@@ -125,7 +126,7 @@ public class SaveLoader : MonoBehaviour
 
 
 
-    private void InsertSaveDataToDatabase(SaveData sData)
+    private void InsertSaveDataToDatabase(VRObject sData)
     {
         DatabaseRequests.VRItemInsert(StateManager.GetManager(), sData, result => Debug.Log("query ==== " + result));
     }
@@ -138,32 +139,32 @@ public class SaveLoader : MonoBehaviour
                   {
                       StateManager.GetManager().QueueOnMainThread(() =>
                       {
-                          foreach (SaveData s in result)
+                          foreach (VRObject s in result)
                               UpdataBookDataWithSaveData(s);
                       });
                   });
     }
 
-    private void UpdataBookDataWithSaveData(SaveData sData)
+    private void UpdataBookDataWithSaveData(VRObject sData)
     {
         PrefabContainer PrefabCon = GameObject.Find("PreLoadPrefab").GetComponent<PrefabContainer>();
-        GameObject Obj = GameObject.Find(sData.ObjName);
+        GameObject Obj = GameObject.Find(sData.Name);
         //처음부터 존재 하는 오브젝트일때 컨텐츠 내용만 업데이트
         if (Obj != null)
         {
-            AbstractBasicObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-            RealObj.UpdateContents(sData.Contents , sData.Key);
+			CombineObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<CombineObject>();
+            RealObj.UpdateContents(sData.ResContents , sData.ID);
         }
         // 추가되어야할 오브젝트일때 생성후 초기화
         else
         {
             GameObject PrefabToLoad = PrefabCon.GetPrefab(sData.ObjKind);
-            GameObject LoadObject = Instantiate(PrefabToLoad, sData.Pos, sData.Rot) as GameObject;
+            GameObject LoadObject = Instantiate(PrefabToLoad, sData.Position, sData.Rotation) as GameObject;
             LoadObject.transform.parent = GameObject.Find(sData.ParentName).transform.GetChild(0);
-            LoadObject.transform.GetChild(0).GetComponent<AbstractBasicObject>().UpdateWithSaveData(sData);
+			LoadObject.transform.GetChild(0).GetComponent<CombineObject>().UpdateWithSaveObjectData(sData);
         }
     }
-
+	/*
     // 리턴값은 총 오브젝트가 저장된 갯수 
     private int ReadBookCaseFile(BinaryFormatter bf)
     {
@@ -235,6 +236,7 @@ public class SaveLoader : MonoBehaviour
         }
 
     }
+	*/
 	private void BufferingARObjectData(SaveData sData)
 	{
 		
