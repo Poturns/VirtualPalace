@@ -13,7 +13,9 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
-import kr.poturns.virtualpalace.augmented.AugmentedInput;
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
+import kr.poturns.virtualpalace.augmented.AugmentedManager;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
 import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
@@ -283,7 +285,7 @@ abstract class PalaceCore {
         return result;
     }
 
-    boolean requestSpeechDetection(String mode, String action) {
+    boolean requestSpeechDetection(String mode, String action) throws WaitForCallbackException{
         if (isActivatedInputType(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE)) {
             OperationInputConnector connector = AttachedInputConnectorMap.get(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE);
 
@@ -293,12 +295,16 @@ abstract class PalaceCore {
             } catch (JSONException e) { ; }
 
             if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
-                connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
-                        IProtocolKeywords.Request.KEY_USE_SPEECH_MODE_COMMAND.equalsIgnoreCase(mode) ?
-                                SpeechController.MODE_COMMAND : SpeechController.MODE_TEXT);
+                int modeNum = IProtocolKeywords.Request.KEY_USE_SPEECH_MODE_COMMAND.equalsIgnoreCase(mode) ?
+                        SpeechController.MODE_COMMAND : SpeechController.MODE_TEXT;
 
+                connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE, modeNum);
                 connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_TRUE);
                 dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_STARTED, returnObject);
+
+                if (SpeechController.MODE_TEXT == modeNum)
+                    throw new WaitForCallbackException();
+
                 return true;
 
             } else if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_STOP.equalsIgnoreCase(action)) {
@@ -333,11 +339,11 @@ abstract class PalaceCore {
     }
 
     /**
-     * 현 위치 근처에 등록되어 있는 AugmentedInput 목록을 조회한다.
+     * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
      *
      * @return
      */
-    public ArrayList<AugmentedInput> queryNearAugmentedItems() {
+    public ArrayList<AugmentedItem> queryNearAugmentedItems() {
         double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
         double radius = 0.0000005;
 
@@ -358,7 +364,7 @@ abstract class PalaceCore {
     protected boolean queryNearAugmentedItems(JSONObject returnObject) {
         JSONArray returnArray = new JSONArray();
         try {
-            for (AugmentedInput item : queryNearAugmentedItems()) {
+            for (AugmentedItem item : queryNearAugmentedItems()) {
                 JSONObject each = new JSONObject();
 
                 each.put(AugmentedTable._ID.name(), item.augmentedID);
@@ -482,22 +488,40 @@ abstract class PalaceCore {
     }
 
     /**
-     * 새로운 Augmented Item을 추가한다.
-     * 동시에 간략한 Resource Item을 생성한다.
+     * 준비한 데이터에 맞는 새 AR 데이터 생성을 요청한다. (from Unity AR Scene)
      *
-     * @param arItem
      * @param resItem
+     * @param arItem
      * @return
      */
-    public long insertNewAugmentedItem(AugmentedInput arItem, ResourceItem resItem) {
-        long resID = insertSimpleResourceItem(resItem);
-        if (resID <= 0)
-            return -1;
+    protected boolean requestNewAugmentedItem(ResourceItem resItem, AugmentedItem arItem) {
+        if (resItem == null || arItem == null)
+            return false;
 
+        // 선행작업 : Resource 데이터 저장
+        arItem.resID = insertSimpleResourceItem(resItem);
+
+        // 도출된 RES ID로 AR Item을 완성하여 데이터 저장 유도.
+        if (arItem.resID > 0) {
+            // AR Module에 AugmentedItem 전달,
+            // AR Module은 {@link #insertNewAugmentedItem} 호출을 통해 완성된 데이터를 저장.
+            AugmentedManager.getInstance(App).addItem(arItem.screenX, arItem.screenY);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 새로운 Augmented Item을 추가한다.
+     *
+     * @param arItem
+     * @return
+     */
+    public long insertNewAugmentedItem(AugmentedItem arItem) {
         LocalDatabaseCenter.WriteBuilder<AugmentedTable> builder =
                 new LocalDatabaseCenter.WriteBuilder<AugmentedTable>(DBCenter);
 
-        builder.set(AugmentedTable.RES_ID, String.valueOf(resID))
+        builder.set(AugmentedTable.RES_ID, String.valueOf(arItem.resID))
                 .set(AugmentedTable.LATITUDE, String.valueOf(arItem.latitude))
                 .set(AugmentedTable.LONGITUDE, String.valueOf(arItem.longitude))
                 .set(AugmentedTable.ALTITUDE, String.valueOf(arItem.altitude))
@@ -507,6 +531,7 @@ abstract class PalaceCore {
 
         return builder.insert();
     }
+
 
     /**
      * 간략한 정보만 담은 Resource Item을 추가한다.
@@ -911,4 +936,8 @@ abstract class PalaceCore {
         return (mActivatedConnectorSupportFlag & inputType) > 0;
     }
 
+    /**
+     * Callback Exception
+     */
+    protected class WaitForCallbackException extends Exception { }
 }

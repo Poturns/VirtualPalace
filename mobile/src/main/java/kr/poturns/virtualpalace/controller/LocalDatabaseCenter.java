@@ -17,7 +17,7 @@ import java.io.File;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
-import kr.poturns.virtualpalace.augmented.AugmentedInput;
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
@@ -135,10 +135,10 @@ public class LocalDatabaseCenter {
      * @param longitude 경도
      * @param altitude 고도
      * @param radius 반경
-     * @return {@link AugmentedInput}
+     * @return {@link AugmentedItem}
      */
-    public ArrayList<AugmentedInput> queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
-        ArrayList<AugmentedInput> mNearItemList = new ArrayList<AugmentedInput>();
+    public ArrayList<AugmentedItem> queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
+        ArrayList<AugmentedItem> mNearItemList = new ArrayList<AugmentedItem>();
 
         Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
                 "SELECT a.*, r.title, r.contents, r.res_type FROM augmented a, resource r" +
@@ -151,7 +151,7 @@ public class LocalDatabaseCenter {
         });
 
         while(cursor.moveToNext()) {
-            AugmentedInput item = new AugmentedInput();
+            AugmentedItem item = new AugmentedItem();
             int length = AugmentedTable.values().length;
 
             item.augmentedID = cursor.getInt(cursor.getColumnIndex(AugmentedTable._ID.name()));
@@ -221,13 +221,6 @@ public class LocalDatabaseCenter {
 
         cursor.close();
         return array;
-    }
-
-    public void saveAllVirtualRendering() {
-
-        OpenHelper.getWritableDatabase().execSQL("");
-
-
     }
 
     final File getDatabaseFile() {

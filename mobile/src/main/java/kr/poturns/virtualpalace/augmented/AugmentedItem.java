@@ -3,13 +3,16 @@ package kr.poturns.virtualpalace.augmented;
 /**
  * Controller 에서 전달받는 AR 연산 입력 데이터
  */
-public class AugmentedInput {
-    public AugmentedInput() {
+public class AugmentedItem {
+    public static final String SCREEN_X = "screen_x";
+    public static final String SCREEN_Y = "screen_y";
+
+    public AugmentedItem() {
 
     }
 
-    public int augmentedID;
-    public int resID;
+    public long augmentedID;
+    public long resID;
 
     public double altitude;
     public double latitude;
@@ -22,6 +25,9 @@ public class AugmentedInput {
     public String title;
     public String contents;
     public int res_type;
+
+    public int screenX;
+    public int screenY;
 
 
     public AugmentedOutput extractOutput(int screenX, int screenY) {

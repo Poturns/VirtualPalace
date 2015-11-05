@@ -9,7 +9,7 @@ import kr.poturns.virtualpalace.sensor.ISensorAgent;
 public class AugItemManager {
 	private static final double GPS_UPDATE_THRESHOLD = 0.0005;
 
-	private ArrayList<AugmentedInput> mItemList = new ArrayList<AugmentedInput>();
+	private ArrayList<AugmentedItem> mItemList = new ArrayList<AugmentedItem>();
 	
 	private double[] criteria;
 	private double dLatitude;
@@ -36,7 +36,7 @@ public class AugItemManager {
 	}
 
 	/**
-	 * 현재 좌표를 중심으로 {@link AugmentedInput}을 다시 검색한다.
+	 * 현재 좌표를 중심으로 {@link AugmentedItem}을 다시 검색한다.
 	 */
 	public void reloadAugmentedItem(PalaceApplication app) {
 		mItemList.clear();
@@ -47,10 +47,10 @@ public class AugItemManager {
 	}
 	
 	/**
-	 * 스크린 좌표를 기준으로 {@link AugmentedInput}을 추가한다.
+	 * 스크린 좌표를 기준으로 {@link AugmentedItem}을 추가한다.
 	 */
-	public AugmentedInput addAugmentedItem(CamTracker tracker, int screenX, int screenY) {
-		AugmentedInput newItem = new AugmentedInput();
+	public AugmentedItem addAugmentedItem(CamTracker tracker, int screenX, int screenY) {
+		AugmentedItem newItem = new AugmentedItem();
 		double[] cloud = tracker.reconstruction(screenX, screenY);
 		newItem.augmentedID = 0;			//???
 		newItem.resID = 0;					//???
@@ -70,7 +70,7 @@ public class AugItemManager {
 	 */
 	public ArrayList<AugmentedOutput> getOutputList(CamTracker tracker) {
 		ArrayList<AugmentedOutput> outputList = new ArrayList<AugmentedOutput>();
-		for(AugmentedInput item : mItemList) {
+		for(AugmentedItem item : mItemList) {
 			if(!tracker.isInScreen(item.supportX, item.supportY, item.supportZ))
 				continue;
 			double[] screen = tracker.projection(item.supportX, item.supportY, item.supportZ);
