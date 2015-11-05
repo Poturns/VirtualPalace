@@ -44,7 +44,7 @@ public class BookCaseScript : AbstractBasicObject {
 		ZCurrentPos = sCaseData.CurZOffest;
 		Cnt = sCaseData.Cnt;
 	}	
-	public void CreateBook()
+	public GameObject CreateBook()
 	{
 
 		GameObject ObjInstance = ObjPrefab.transform.GetChild (0).gameObject;
@@ -69,6 +69,15 @@ public class BookCaseScript : AbstractBasicObject {
 		ZCurrentPos += ZOffset;
 	
 		Cnt++;
+
+		return RealData;
+	}
+	public void CreateBookForAR(GameObject Prefab , KIND_SOURCE sourcekind , string Title , string Contents)
+	{
+		ObjPrefab = Prefab;
+		CurrentKind = sourcekind;
+		GameObject CreatedRealData = CreateBook ();
+
 	}
 	public override void OnSelect()
 	{
