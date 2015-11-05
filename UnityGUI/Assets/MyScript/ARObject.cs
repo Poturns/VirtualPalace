@@ -13,7 +13,7 @@ public class ARObject : MonoBehaviour {
 	{
 		Resource = sData.Contents;
 		Title = sData.ContentsTitle;
-		ResID = sData.ResID;
+		ResID = sData.Key;
 	}
 
 }

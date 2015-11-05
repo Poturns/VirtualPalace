@@ -59,7 +59,8 @@ namespace MyScript
 			//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
 			Transform tr = gameObject.transform.parent;
 			ForSave.InitData(tr.name,tr.position , tr.rotation
-			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null,"",ResID);
+			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null,"");
+			ForSave.Key = ResID;
 			return ForSave;
 		}
 		public virtual void UpdateContents(string Con, int resid)

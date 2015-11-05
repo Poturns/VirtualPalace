@@ -21,7 +21,7 @@ public class ARObjectList : AbstractBasicObject
 	{
 		StateManager.GetManager ().SwitchState (new VRRegistARDataState(StateManager.GetManager(), gameObject));
 	}
-	public void AddARData(ARObject aData)
+	public void AddARData(SaveData aData)
 	{
 		ARObject NewARData = new ARObject (aData);
 		ARDataList.Add (NewARData);
