@@ -14,6 +14,12 @@ namespace MyScript.States
 
 		public UnityScene UnitySceneID { get { return UnityScene.AR; } }
 
+		public override void StateUpdate()
+		{
+			if (Input.GetKeyUp (KeyCode.K))
+				ReturnToLobbyScene ();
+	
+		}
 		public void OnSceneChanged()
 		{
 			Debug.Log("=============== " + Name + " : Scene changed");

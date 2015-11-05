@@ -11,7 +11,9 @@ using System.Reflection;
 [Serializable ()]
 public class SaveData : ISerializable {
 
-
+	//DB에서 부여하는 IDSS
+	protected int resID;
+	public int ResID {	get{return resID;}	}
 	protected float Posx;
 	protected float Posy;
 	protected float Posz;
@@ -32,7 +34,6 @@ public class SaveData : ISerializable {
 
 	public string ObjName;
 	public string ParentName;
-
 
 	public string Contents;
 	public string ContentsTitle;
@@ -66,7 +67,8 @@ public class SaveData : ISerializable {
 		get{return new Vector3(Scalex , Scaley , Scalez);}
 	}
 	public  void InitData(string Name , Vector3 _Pos , Quaternion _Rot , Vector3 _Scale ,
-	                     int _sourcce , int _model  , string _Parent , string ContentsText , string ConTitle)
+	                     int _sourcce , int _model  , string _Parent , string ContentsText , string ConTitle
+	                      ,int resid)
 	{
 		Posx = _Pos.x;
 		Posy = _Pos.y;
@@ -85,8 +87,11 @@ public class SaveData : ISerializable {
 		ModelKind = _model;
 		ObjName = Name;
 		ParentName = _Parent;
+
+
 		Contents = ContentsText;
 		ContentsTitle = ConTitle;
+		resID = resid;
 	}
 	public SaveData(){}
 	public SaveData(SerializationInfo info, StreamingContext ctx)
@@ -110,6 +115,8 @@ public class SaveData : ISerializable {
 
 		ObjName = (string)info.GetValue ("ObjName", typeof(string));
 		ParentName= (string)info.GetValue ("ParentName", typeof(string));
+
+		resID = (int)info.GetValue ("resID", typeof(int));
 		Contents= (string)info.GetValue ("Contents", typeof(string));
 		ContentsTitle = (string)info.GetValue ("ContentsTitle", typeof(string));
 	}
@@ -133,6 +140,8 @@ public class SaveData : ISerializable {
 		
 		info.AddValue ("ObjName", ObjName);
 		info.AddValue ("ParentName", ParentName);
+
+		info.AddValue ("resID", resID);
 		info.AddValue ("Contents", Contents);
 		info.AddValue ("ContentsTitle", ContentsTitle);
 	}

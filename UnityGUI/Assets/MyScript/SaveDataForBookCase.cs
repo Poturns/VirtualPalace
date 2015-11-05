@@ -17,7 +17,7 @@ public class SaveDataForBookCase : SaveData
 	public void InitData(string Name , Vector3 _Pos , Quaternion _Rot , Vector3 _Scale ,
 	                     int _sourcce , int _model  , string _Parent ,string ContentsText, float ZOff , int cnt)
 	{
-		base.InitData (Name ,_Pos , _Rot , _Scale , _sourcce , _model , _Parent,ContentsText , "");
+		base.InitData (Name ,_Pos , _Rot , _Scale , _sourcce , _model , _Parent,ContentsText , "" , 0);
 		CurZOffest = ZOff;
 		Cnt = cnt;
 	}
