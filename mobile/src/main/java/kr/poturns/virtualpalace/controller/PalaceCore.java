@@ -56,7 +56,7 @@ abstract class PalaceCore {
 
     private final LocalArchive Archive;
     protected final LocalDatabaseCenter DBCenter;
-   // protected final DriveAssistant AppDriveAssistant;
+    // protected final DriveAssistant AppDriveAssistant;
     //protected final DriveRestAssistant GlobalDriveAssistant;
     private final TreeMap<Long, OnPlayModeListener> PlayModeListeners;
 
@@ -74,8 +74,8 @@ abstract class PalaceCore {
         // DATA Part.
         Archive = LocalArchive.getInstance(application);
         DBCenter = LocalDatabaseCenter.getInstance(application);
-      //  AppDriveAssistant = new DriveAssistant(application);
-      //  GlobalDriveAssistant = new DriveRestAssistant(application);
+        //  AppDriveAssistant = new DriveAssistant(application);
+        //  GlobalDriveAssistant = new DriveRestAssistant(application);
 
         // INPUT Part.
         AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
@@ -288,7 +288,9 @@ abstract class PalaceCore {
             JSONObject returnObject = new JSONObject();
             try {
                 returnObject.put(IProtocolKeywords.Request.KEY_USE_SPEECH_MODE, mode);
-            } catch (JSONException e) { ; }
+            } catch (JSONException e) {
+                ;
+            }
 
             if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
                 connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
@@ -382,7 +384,9 @@ abstract class PalaceCore {
             returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
             return true;
 
-        } catch (Exception e) { ; }
+        } catch (Exception e) {
+            ;
+        }
         return false;
     }
 
@@ -400,7 +404,7 @@ abstract class PalaceCore {
 
             while (cursor.moveToNext()) {
                 JSONObject bookcase = new JSONObject();
-                for (VRContainerTable field : VRContainerTable.values()){
+                for (VRContainerTable field : VRContainerTable.values()) {
                     String name = field.toString();
                     bookcase.put(name, cursor.getString(cursor.getColumnIndex(name)));
                 }
@@ -507,39 +511,43 @@ abstract class PalaceCore {
             JSONArray array = new JSONArray();
 
             Cursor cursor = builder.select();
-            while (cursor.moveToNext()) {
-                JSONObject row = new JSONObject();
 
-                if (builder.mSetClauseValues.size() > 0) {
-                    for (String key : builder.mSetClauseValues.keySet())
-                        row.put(key, cursor.getString(cursor.getColumnIndex(key)));
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    JSONObject row = new JSONObject();
 
-                } else {
-                    if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
-                        ResourceTable[] fields = ResourceTable.values();
-                        for (int i=0; i<fields.length; i++)
-                            row.put(fields[i].name(), cursor.getString(i));
+                    if (builder.mSetClauseValues.size() > 0) {
+                        for (String key : builder.mSetClauseValues.keySet())
+                            row.put(key, cursor.getString(cursor.getColumnIndex(key)));
 
-                    } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
-                        AugmentedTable[] fields = AugmentedTable.values();
-                        for (int i=0; i<fields.length; i++)
-                            row.put(fields[i].name(), cursor.getString(i));
+                    } else {
+                        if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
+                            ResourceTable[] fields = ResourceTable.values();
+                            for (int i = 0; i < fields.length; i++)
+                                row.put(fields[i].name(), cursor.getString(i));
 
-                    } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
-                        VirtualTable[] fields = VirtualTable.values();
-                        for (int i=0; i<fields.length; i++)
-                            row.put(fields[i].name(), cursor.getString(i));
+                        } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
+                            AugmentedTable[] fields = AugmentedTable.values();
+                            for (int i = 0; i < fields.length; i++)
+                                row.put(fields[i].name(), cursor.getString(i));
 
-                    } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
-                        VRContainerTable[] fields = VRContainerTable.values();
-                        for (int i=0; i<fields.length; i++)
-                            row.put(fields[i].name(), cursor.getString(i));
+                        } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
+                            VirtualTable[] fields = VirtualTable.values();
+                            for (int i = 0; i < fields.length; i++)
+                                row.put(fields[i].name(), cursor.getString(i));
+
+                        } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
+                            VRContainerTable[] fields = VRContainerTable.values();
+                            for (int i = 0; i < fields.length; i++)
+                                row.put(fields[i].name(), cursor.getString(i));
+                        }
                     }
+
+                    array.put(row);
                 }
 
-                array.put(row);
+                cursor.close();
             }
-            cursor.close();
 
             result.put(IProcessorCommands.JsonKey.QUERY_RESULT, array);
             return true;
@@ -750,7 +758,8 @@ abstract class PalaceCore {
                 }
 
             } catch (JSONException e) {
-                // JSONException 예외가 발생하는 조건은 처리하지 않는다.
+                // JSONException 예외가 발생하는 조건은 처리하지 않는다.e
+                e.printStackTrace();
             }
         }
 
@@ -776,10 +785,12 @@ abstract class PalaceCore {
             } else if (ITable.TABLE_RESOURCE.equals(table)) {
                 return ResourceTable.valueOf(NAME);
 
-            } else if(ITable.TABLE_VR_CONTAINER.equals(table))
+            } else if (ITable.TABLE_VR_CONTAINER.equals(table))
                 return VRContainerTable.valueOf(NAME);
 
-        } catch (IllegalArgumentException e) { ; }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -790,14 +801,14 @@ abstract class PalaceCore {
      */
     boolean executeBackUp() {
         File dbFile = DBCenter.getDatabaseFile();
-       // DriveFolder folder = AppDriveAssistant.getAppFolder();
+        // DriveFolder folder = AppDriveAssistant.getAppFolder();
 
         // Drive Contents 생성
-       // DriveContents contents = AppDriveAssistant.newDriveContents();
+        // DriveContents contents = AppDriveAssistant.newDriveContents();
         //DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
 
         String fileName = "VirtualPalace-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
-      //  DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
+        //  DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
         return true;
     }
 

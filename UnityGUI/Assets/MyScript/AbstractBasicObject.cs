@@ -60,7 +60,7 @@ namespace MyScript
 			Transform tr = gameObject.transform.parent;
 			ForSave.InitData(tr.name,tr.position , tr.rotation
 			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null,"");
-			ForSave.Key = ResID;
+			ForSave.ResID = ResID;
 			return ForSave;
 		}
 		public virtual void UpdateContents(string Con, int resid)

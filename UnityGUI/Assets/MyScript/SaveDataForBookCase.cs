@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using BridgeApi.Controller.Request.Database;
 
+[Obsolete()]
 [Serializable ()]
 public class SaveDataForBookCase : SaveData 
 {

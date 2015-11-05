@@ -27,7 +27,7 @@ public class CombineObject : AbstractBasicObject {
 		// 포지션은 기즈모의 포지션 , 회전도 부모?
 		ForSave.InitData(tr.name,tr.position , tr.rotation
 		                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.parent.gameObject.name , ContentStr ,"" );
-		ForSave.Key = ResID;
+		ForSave.ResID = ResID;
 		Debug.Log ("Contents String :::::" + ForSave.Contents);
 		return ForSave;
 	}
@@ -76,7 +76,7 @@ public class CombineObject : AbstractBasicObject {
 		gameObject.transform.localScale = sData.Scale;
 		Debug.Log ("Loaded Contents String :::::" + sData.Contents);
 		SetContentString (sData.Contents);
-		ResID = sData.Key;
+		ResID = sData.ResID;
 		Debug.Log ("CombineObject Update : " + GetContentString());
 	}
 

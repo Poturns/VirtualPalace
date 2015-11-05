@@ -5,10 +5,11 @@ using System.Runtime.Serialization;
 using System.Collections.Generic;
 using BridgeApi.Controller.Request.Database;
 
+[Obsolete()]
 [Serializable()]
 public class SaveData : ISerializable
 {
-	protected int resID;
+    public int ResID { get; set; }
 	public int Key { get; set; }
     protected float Posx;
     protected float Posy;
@@ -169,6 +170,7 @@ public class SaveData : ISerializable
         Debug.Log("===== " + jsonData.ToJson());
         saveData.Key = int.Parse((string)jsonData[VIRTUAL_FIELD._ID.ToString()]);
         saveData.Sourcekind = int.Parse((string)jsonData[VIRTUAL_FIELD.RES_ID.ToString()]);
+
         saveData.ObjName = (string)jsonData[VIRTUAL_FIELD.NAME.ToString()];
         saveData.ParentName = (string)jsonData[VIRTUAL_FIELD.PARENT_NAME.ToString()];
         saveData.ModelKind = int.Parse((string)jsonData[VIRTUAL_FIELD.MODEL_TYPE.ToString()]);
