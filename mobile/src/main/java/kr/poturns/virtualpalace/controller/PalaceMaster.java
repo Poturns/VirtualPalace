@@ -201,7 +201,7 @@ public class PalaceMaster extends PalaceEngine {
 
                         if (msg.arg1 == SpeechController.MODE_TEXT && mTextResultCallbackId > -1) {
                             try {
-                                result.put(IProtocolKeywords.Request.KEY_CALLBACK_RESULT, true);
+                                result.put(IProtocolKeywords.Request.KEY_CALLBACK_RESULT, "success");
 
                                 JSONObject callbackResult = new JSONObject();
                                 callbackResult.put(IProtocolKeywords.Request.COMMAND_USE_SPEECH, result);
