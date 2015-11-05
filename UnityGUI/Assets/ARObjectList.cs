@@ -9,35 +9,42 @@ public class ARObjectList : AbstractBasicObject
 {
 	private List<ARObject> ARDataList;
 	public int Index = 0;
-	public int ObjectMAx;
+	public int ObjectMax = 0;
 	// Use this for initialization
 	void Start() 
 	{
 		ARDataList = new List<ARObject>();
-		
+
 	}
 
 	public override void OnSelect()
 	{
 		StateManager.GetManager ().SwitchState (new VRRegistARDataState(StateManager.GetManager(), gameObject));
 	}
-	public void AddARData(ARObject aData)
+	public void AddARData(SaveData aData)
 	{
-
+		ARObject NewARData = new ARObject (aData);
+		ARDataList.Add (NewARData);
+		ObjectMax++;
 	}
 	public void AddARData(int ResID , string Title , string Resource )
 	{
 		
 	}
-	public void CreateARObject()
+	public bool CreateARObject()
 	{
+		if (Index == ObjectMax)
+			return false;
 		string BookCaseName = "BookCaseTrigger9";
 		PrefabContainer PrefabStrore = GameObject.Find ("PreLoadPrefab").GetComponent<PrefabContainer> ();
 
 		BookCaseScript BookCase = GameObject.Find (BookCaseName).GetComponent<BookCaseScript>();
-
-		BookCase.CreateBookForAR (PrefabStrore.GetPrefab (OBJ_LIST.BOOK_GROUP_3), KIND_SOURCE.IMAGE 
+		if (BookCase == null)
+			Debug.Log ("ARBufer ::::BookCase Is Null");
+		else
+			BookCase.CreateBookForAR (PrefabStrore.GetPrefab (OBJ_LIST.BOOK_GROUP_3), KIND_SOURCE.IMAGE 
 		                          , ARDataList[Index].Title , ARDataList[Index].Resource);
+		return true;
 	}
 
 

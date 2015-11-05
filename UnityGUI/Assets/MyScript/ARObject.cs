@@ -7,4 +7,13 @@ public class ARObject : MonoBehaviour {
 	public string Title;
 	public string Resource;
 
+	public ARObject()
+	{}
+	public ARObject(SaveData sData)
+	{
+		Resource = sData.Contents;
+		Title = sData.ContentsTitle;
+		ResID = sData.Key;
+	}
+
 }

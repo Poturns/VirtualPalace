@@ -152,7 +152,7 @@ public class SaveLoader : MonoBehaviour
         if (Obj != null)
         {
             AbstractBasicObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-            RealObj.UpdateContents(sData.Contents);
+            RealObj.UpdateContents(sData.Contents , sData.Key);
         }
         // 추가되어야할 오브젝트일때 생성후 초기화
         else
@@ -213,7 +213,7 @@ public class SaveLoader : MonoBehaviour
                 if (Obj != null)
                 {
                     AbstractBasicObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-                    RealObj.UpdateContents(sData.Contents);
+                    RealObj.UpdateContents(sData.Contents , sData.Key);
                 }
                 // 추가되어야할 오브젝트일때 생성후 초기화
                 else
@@ -235,4 +235,11 @@ public class SaveLoader : MonoBehaviour
         }
 
     }
+	private void BufferingARObjectData(SaveData sData)
+	{
+		
+		ARObjectList ARObjBuffer = GameObject.Find ("ABBufferObject").GetComponent<ARObjectList>();
+		
+		ARObjBuffer.AddARData (sData);
+	}
 }

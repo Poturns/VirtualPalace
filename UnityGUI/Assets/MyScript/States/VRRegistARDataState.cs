@@ -47,11 +47,11 @@ namespace MyScript.States
 		
 		protected override void HandleSelectOperation()
 		{
-			Target.CreateARObject ();
-			// FindImageView();
-			//ImageUI.GetComponent<AbstractBasicObject>().OnSelect();
+			//CreateObject를 실행 Index == MaxCnt 면 상태 종료
+			if (!Target.CreateARObject ())
+				ExitState ();
+		
 		}
-
 		protected override void HandleCancelOperation()
 		{
 			//base.HandleCancelOperation();

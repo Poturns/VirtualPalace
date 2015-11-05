@@ -15,6 +15,7 @@ public enum KIND_SOURCE
 
 public enum OBJ_LIST
 {
+	AR_OBJ = 0,
 	BOOK_GROUP_1 = 1,
 	BOOK_GROUP_2,
 	BOOK_GROUP_3,
@@ -59,9 +60,10 @@ namespace MyScript
 			Transform tr = gameObject.transform.parent;
 			ForSave.InitData(tr.name,tr.position , tr.rotation
 			                 ,transform.localScale ,(int)SourceKind , (int)ModelKind, tr.parent.gameObject.name , null,"");
+			ForSave.Key = ResID;
 			return ForSave;
 		}
-		public virtual void UpdateContents(string Con)
+		public virtual void UpdateContents(string Con, int resid)
 		{
 		}
 		//SaveData 받아서 그 데이터를 바탕으로 속성값 갱신

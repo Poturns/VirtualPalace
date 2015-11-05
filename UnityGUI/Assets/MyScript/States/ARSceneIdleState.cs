@@ -15,11 +15,12 @@ namespace MyScript.States
 
         public UnityScene UnitySceneID { get { return UnityScene.AR; } }
 
-        public void OnSceneChanged()
+	    public void OnSceneChanged()
         {
             Debug.Log("=============== " + Name + " : Scene changed");
             Init();
         }
+
 
 		protected override void Init()
 		{

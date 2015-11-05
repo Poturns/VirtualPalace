@@ -8,8 +8,8 @@ using BridgeApi.Controller.Request.Database;
 [Serializable()]
 public class SaveData : ISerializable
 {
-
-    public int Key { get; set; }
+	protected int resID;
+	public int Key { get; set; }
     protected float Posx;
     protected float Posy;
     protected float Posz;
@@ -215,5 +215,6 @@ public class SaveData : ISerializable
         else
             return 0;
     }
+
 
 }

@@ -9,6 +9,7 @@ public class ARScreen : MonoBehaviour {
 		CamScreen = new WebCamTexture ();
 		GetComponent<Renderer>().material.mainTexture = CamScreen;
 		CamScreen.Play ();
+
 	}
 	
 	// Update is called once per frame
