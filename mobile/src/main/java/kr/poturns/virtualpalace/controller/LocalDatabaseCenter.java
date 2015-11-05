@@ -311,7 +311,7 @@ public class LocalDatabaseCenter {
             Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-                if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(mTableName))
+                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
                     mSetClauseValues.put("CTIME", System.currentTimeMillis());
                 return db.insert(mTableName, null, mSetClauseValues);
 
@@ -341,7 +341,7 @@ public class LocalDatabaseCenter {
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-                if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(mTableName))
+                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
                     mSetClauseValues.put("MTIME", System.currentTimeMillis());
                 int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
                 return (affectedRows > 0);
