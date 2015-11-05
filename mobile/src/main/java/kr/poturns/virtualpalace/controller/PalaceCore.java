@@ -400,9 +400,10 @@ abstract class PalaceCore {
 
             while (cursor.moveToNext()) {
                 JSONObject bookcase = new JSONObject();
-                bookcase.put(VRContainerTable.NAME.toString(), cursor.getString(VRContainerTable.NAME.ordinal()));
-                bookcase.put(VRContainerTable.Z_OFFSET.toString(), cursor.getString(VRContainerTable.Z_OFFSET.ordinal()));
-                bookcase.put(VRContainerTable.COUNT.toString(), cursor.getString(VRContainerTable.COUNT.ordinal()));
+                for (VRContainerTable field : VRContainerTable.values()){
+                    String name = field.toString();
+                    bookcase.put(name, cursor.getString(cursor.getColumnIndex(name)));
+                }
                 array.put(bookcase);
             }
             cursor.close();
@@ -774,7 +775,9 @@ abstract class PalaceCore {
 
             } else if (ITable.TABLE_RESOURCE.equals(table)) {
                 return ResourceTable.valueOf(NAME);
-            }
+
+            } else if(ITable.TABLE_VR_CONTAINER.equals(table))
+                return VRContainerTable.valueOf(NAME);
 
         } catch (IllegalArgumentException e) { ; }
         return null;

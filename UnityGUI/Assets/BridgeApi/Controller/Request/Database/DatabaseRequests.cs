@@ -6,6 +6,7 @@ namespace BridgeApi.Controller.Request.Database
 {
     public sealed class DatabaseRequests
     {
+        /*
         public static void VRBookCaseItemInsert(IPlatformBridge bridge, SaveDataForBookCase saveData, Action<bool> result)
         {
             DatabaseRequestFactory.InsertInto(Table.VR_CONTAINER)
@@ -16,11 +17,12 @@ namespace BridgeApi.Controller.Request.Database
                     result(queryResult.Status.Equals(RequestResult.STATUS_SUCCESS));
                 });
         }
+        */
 
         public static void VRBookCaseItemUpdate(IPlatformBridge bridge, SaveDataForBookCase saveData, Action<bool> result)
         {
             DatabaseRequestFactory.Update(Table.VR_CONTAINER)
-                .WhereEqual(VR_CONTAINER_FIELD._ID, saveData.Key.ToString())
+                .WhereEqual(VR_CONTAINER_FIELD.NAME, saveData.ObjName)
                 .SendRequest(bridge, (queryResult) =>
                 {
                     Debug.Log("=============== VRBookCaseInsert query result : " + queryResult);

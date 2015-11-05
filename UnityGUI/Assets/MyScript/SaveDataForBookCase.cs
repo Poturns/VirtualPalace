@@ -56,6 +56,7 @@ public class SaveDataForBookCase : SaveData
         SaveDataForBookCase data = new SaveDataForBookCase();
 
         data.Key = int.Parse((string)jsonData[VR_CONTAINER_FIELD._ID.ToString()]);
+        data.ObjName = (string)jsonData[VR_CONTAINER_FIELD.NAME.ToString()];
         data.CurZOffest = GetFloatData(jsonData, VR_CONTAINER_FIELD.Z_OFFSET.ToString());
         data.Cnt = int.Parse((string)jsonData[VR_CONTAINER_FIELD.COUNT.ToString()]);
 

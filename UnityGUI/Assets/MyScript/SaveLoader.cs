@@ -68,7 +68,7 @@ public class SaveLoader : MonoBehaviour
             SaveDataForBookCase bData = (SaveDataForBookCase)BookCase.GetSaveData();
 
             StateManager manager = StateManager.GetManager();
-            DatabaseRequests.VRBookCaseItemInsert(manager, bData, result =>
+            DatabaseRequests.VRBookCaseItemUpdate(manager, bData, result =>
             {
                 Debug.Log("query ==== " + result);
 

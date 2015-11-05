@@ -464,10 +464,12 @@ public class PalaceMaster extends PalaceEngine {
                                 result = process(jsonMessage);
 
                             } catch (WaitForCallbackException e1) {
+                                e1.printStackTrace();
                                 mTextResultRequestId = id;
                                 return;
 
                             } catch (Exception e2) {
+                                e2.printStackTrace();
                                 result = new JSONObject();
                             }
 
@@ -502,7 +504,7 @@ public class PalaceMaster extends PalaceEngine {
             while (keys.hasNext()) {
                 String command = keys.next();
 
-                JSONObject contents = RequestMessage.getJSONObject(command);
+                JSONObject contents = RequestMessage.optJSONObject(command);
                 JSONObject partialReturn = new JSONObject();
                 boolean result = false;
 
