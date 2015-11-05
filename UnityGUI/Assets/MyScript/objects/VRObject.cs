@@ -8,30 +8,33 @@ namespace MyScript.objects
         /// <summary>
         /// VR_Table에서의 id
         /// </summary>
-        public int ID { get; set; }
-        public int ResID { get; set; }
+        public int ID { get; protected set; }
 
-        public string Name { get; set; }
-        public string ParentName { get; set; }
 
-        public int ModelType { get; set; }
+        public string Name { get; protected set; }
+        public string ParentName { get; protected set; }
 
-        public float PosX { get; set; }
-        public float PosY { get; set; }
-        public float PosZ { get; set; }
+        public int ModelType { get; protected set; }
 
-        public float RotateX { get; set; }
-        public float RotateY { get; set; }
-        public float RotateZ { get; set; }
-        public float RotateW { get; set; }
+        public float PosX { get; protected set; }
+        public float PosY { get; protected set; }
+        public float PosZ { get; protected set; }
 
-        public float SizeX { get; set; }
-        public float SizeY { get; set; }
-        public float SizeZ { get; set; }
+        public float RotateX { get; protected set; }
+        public float RotateY { get; protected set; }
+        public float RotateZ { get; protected set; }
+        public float RotateW { get; protected set; }
+
+        public float SizeX { get; protected set; }
+        public float SizeY { get; protected set; }
+        public float SizeZ { get; protected set; }
+
+        public int ResID { get; protected set; }
+        public string ResContents { get; protected set; }
+        public string ResTitle { get; protected set; }
 
         public KIND_SOURCE SourceKind { get { return (KIND_SOURCE)ResID; } }
         public OBJ_LIST ObjKind { get { return (OBJ_LIST)ModelType; } }
-
 
         public Vector3 Position { get { return new Vector3(PosX, PosY, PosZ); } }
         public Quaternion Rotation { get { return new Quaternion(RotateX, RotateY, RotateZ, RotateW); } }
@@ -49,8 +52,9 @@ namespace MyScript.objects
             {
                 vrObject = new VRObject();
                 vrObject.Name = name;
-                vrObject.ResID = (int)sourceKind;
                 vrObject.ModelType = (int)objectKind;
+
+                vrObject.ResID = (int)sourceKind;
             }
 
             public Builder SetParentName(string name)
@@ -134,6 +138,19 @@ namespace MyScript.objects
                 return SetSizeX(vector.x)
                     .SetSizeY(vector.y)
                     .SetSizeZ(vector.z);
+            }
+
+
+            public Builder SetResTitle(string s)
+            {
+                vrObject.ResTitle = s;
+                return this;
+            }
+
+            public Builder SetResContents(string s)
+            {
+                vrObject.ResContents = s;
+                return this;
             }
 
             public VRObject Build()
