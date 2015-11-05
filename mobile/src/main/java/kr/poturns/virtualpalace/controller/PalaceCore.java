@@ -385,7 +385,7 @@ abstract class PalaceCore {
      * @param returnObject
      * @return
      */
-    protected boolean queryVirtualRenderingItems(JSONObject returnObject) {
+    public boolean queryVirtualRenderingItems(JSONObject returnObject) {
         try {
             returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
             return true;
@@ -531,6 +531,11 @@ abstract class PalaceCore {
                     VirtualTable[] fields = VirtualTable.values();
                     for (int i=0; i<fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
+
+                } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
+                    VRContainerTable[] fields = VRContainerTable.values();
+                    for (int i=0; i<fields.length; i++)
+                        row.put(fields[i].name(), cursor.getString(i));
                 }
                 array.put(row);
             }
@@ -587,6 +592,9 @@ abstract class PalaceCore {
 
         else if (ITable.TABLE_RESOURCE.equals(table))
             builder = new LocalDatabaseCenter.ReadBuilder<ResourceTable>(DBCenter);
+
+        else if (ITable.TABLE_VR_CONTAINER.equals(table))
+            builder = new LocalDatabaseCenter.ReadBuilder<VRContainerTable>(DBCenter);
 
         if (builder == null || elements == null)
             return null;

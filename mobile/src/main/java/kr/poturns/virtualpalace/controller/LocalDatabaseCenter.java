@@ -57,7 +57,7 @@ public class LocalDatabaseCenter {
     /**
      * 로컬 DB .Version
      */
-    private static final int VERSION = 7;
+    private static final int VERSION = 8;
 
     private final Context InContext;
 

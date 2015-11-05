@@ -12,38 +12,41 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:useDefaultMargins="true"
+        android:useDefaultMargins="false"
         android:columnOrderPreserved="false"
         android:columnCount="3"
-        android:outlineProvider="bounds"
         android:id="@+id/gridLayout">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SELECT AR"
-            android:id="@+id/btn_ar"
-            android:layout_gravity="center_horizontal" />
+            android:id="@+id/btn_ar" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SELECT VR"
-            android:id="@+id/btn_vr"
-            android:layout_gravity="center_horizontal" />
+            android:id="@+id/btn_vr" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SELECT RES"
-            android:id="@+id/btn_res"
+            android:id="@+id/btn_res" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SELECT BOOKCASE"
+            android:id="@+id/btn_vr_bookcase"
             android:layout_gravity="center_horizontal" />
 
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_columnSpan="3">
+            android:layout_columnSpan="2">
 
             <RadioButton
                 android:layout_width="wrap_content"
