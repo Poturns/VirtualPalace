@@ -96,9 +96,7 @@ public class PalaceMaster extends PalaceEngine {
                 event.put(eventName, contents);
 
                 Message.obtain(EventProcessHandler, 0, event).sendToTarget();
-            } catch (JSONException e) {
-                ;
-            }
+            } catch (JSONException e) { ; }
         }
     }
 
@@ -116,14 +114,13 @@ public class PalaceMaster extends PalaceEngine {
         }
 
         int[][] outputs = new int[list.size()][];
-        for (int i = 0; i < list.size(); i++) {
+        for(int i=0; i<list.size(); i++) {
             AugmentedOutput item = list.get(i);
 
             if (outputs[i] == null)
                 outputs[i] = new int[4];
 
             outputs[i][0] = IOperationInputFilter.Operation.DRAW_AR_ITEM;
-            // TODO: 임시 테스트 코드
             outputs[i][1] = 1; //item.resID;
             outputs[i][2] = item.screenX;
             outputs[i][3] = item.screenY;
@@ -230,15 +227,13 @@ public class PalaceMaster extends PalaceEngine {
                 // AR 렌더링 명령
                 case DRAW_AR_ITEM:
                     try {
-                        int compressed = command[1];
-                        compressed = compressed * 10000 + command[2];
-                        compressed = compressed * 10000 + command[3];
+                        JSONObject eachResObj = singleMessage.has(cmdStr)?
+                                singleMessage.getJSONObject(cmdStr) : new JSONObject();
 
-                        singleMessage.put(cmdStr, compressed);
+                        eachResObj.put(String.valueOf(command[1]), command[2] * 10000 + command[3]);
+                        singleMessage.put(cmdStr, eachResObj);
 
-                    } catch (JSONException e) {
-                        ;
-                    }
+                    } catch (JSONException e) { ; }
                     break;
 
                 // 하드웨어 버튼은 안드로이드에서 처리하도록 한다.
@@ -273,11 +268,8 @@ public class PalaceMaster extends PalaceEngine {
 
                             singleMessage.put(cmdStr, value);
 
-                        } catch (JSONException e) {
-                            ;
-                        }
-                    }
-                    break;
+                        } catch (JSONException e) { ; }
+                    } break;
 
                 // 복합 명령 : 명령 호출 외 부가 정보들이 포함됨.
                 case GO:
@@ -324,11 +316,8 @@ public class PalaceMaster extends PalaceEngine {
 
                             singleMessage.put(cmdStr, value);
 
-                        } catch (JSONException e) {
-                            ;
-                        }
-                    }
-                    break;
+                        } catch (JSONException e) { ; }
+                    } break;
 
                 // 단일 명령 : 단위 시간내 여러번 호출되더라도, 한번만 적용된다.
                 case SEARCH:
@@ -338,9 +327,7 @@ public class PalaceMaster extends PalaceEngine {
                         try {
                             singleMessage.put(cmdStr, command[2]);
 
-                        } catch (JSONException e) {
-                            ;
-                        }
+                        } catch (JSONException e) { ; }
                     }
                     break;
             }
@@ -452,12 +439,10 @@ public class PalaceMaster extends PalaceEngine {
                         public void run() {
                             try {
                                 process(jsonMessage);
-                            } catch (Exception e) {
-                            }
+                            } catch (Exception e) { }
                         }
                     };
-                }
-                break;
+                } break;
 
                 case REQUEST_CALLBACK_FROM_UNITY: {
                     Bundle bundle = (Bundle) msg.obj;
@@ -482,8 +467,7 @@ public class PalaceMaster extends PalaceEngine {
                             AndroidUnityBridge.getInstance(App).respondCallbackToUnity(id, result.toString());
                         }
                     };
-                }
-                break;
+                } break;
 
                 default:
                     return;
@@ -588,8 +572,7 @@ public class PalaceMaster extends PalaceEngine {
                 } catch (Exception e) {
                     try {
                         partialReturn.put(KEY_CALLBACK_RESULT, KEY_CALLBACK_RESULT_ERROR);
-                    } catch (JSONException e2) {
-                    }
+                    } catch (JSONException e2) { }
 
                 } finally {
                     ReturnResult.put(command, partialReturn);

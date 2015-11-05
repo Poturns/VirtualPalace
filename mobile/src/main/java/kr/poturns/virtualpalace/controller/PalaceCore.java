@@ -686,6 +686,9 @@ abstract class PalaceCore {
         else if (ITable.TABLE_RESOURCE.equals(table))
             builder = new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
+        else if (ITable.TABLE_VR_CONTAINER.equals(table))
+            builder = new LocalDatabaseCenter.WriteBuilder<VRContainerTable>(DBCenter);
+
         if (builder == null || elements == null)
             return null;
 
