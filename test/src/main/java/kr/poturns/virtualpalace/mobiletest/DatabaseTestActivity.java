@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import kr.poturns.virtualpalace.augmented.AugmentedInput;
+import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
 import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.input.IProcessorCommands;
@@ -52,7 +52,7 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
         app = (PalaceApplication) getApplication();
         master = PalaceMaster.getInstance(app);
 
-        ArrayList<AugmentedInput> list = master.queryNearAugmentedItems();
+        ArrayList<AugmentedItem> list = master.queryNearAugmentedItems();
         Log.d("DatabaseTest", list.toString());
 
         //JSONObject rstObj = new JSONObject();

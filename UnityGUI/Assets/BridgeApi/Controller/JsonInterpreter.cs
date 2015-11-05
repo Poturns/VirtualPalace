@@ -236,9 +236,8 @@ namespace BridgeApi.Controller
             JsonData jData = JsonMapper.ToObject(json);
             SpeechRequestResult result = new SpeechRequestResult();
 
-            // 버그
             result.RequestName = SpeechRequestResult.SPEECH_REQUEST_KEY;
-            result.Status = (string)jData[RequestResult.RESULT];
+            result.Status = (string)jData[SpeechRequestResult.SPEECH_RESULT_KEY];
 
             if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_REQUEST_KEY))
                 result.Speech = (string)jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
@@ -326,7 +325,7 @@ namespace BridgeApi.Controller
             else
                 return 0;
         }
-
+        /*
         public static List<SaveData> ParseJsonListToSaveData(List<JsonData> jsonList)
         {
             List<SaveData> saveDataList = new List<SaveData>();
@@ -358,6 +357,7 @@ namespace BridgeApi.Controller
 
             return saveDataList;
         }
+        */
 
     }
 

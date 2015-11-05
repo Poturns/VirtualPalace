@@ -42,12 +42,6 @@ namespace BridgeApi.Controller.Request.Database
             return new SpecialQueryRequest(DatabaseConstants.QUERY_VR_BOOKCASES);
         }
 
-        public static IDatabaseRequest UpdateBookCaseObjects(List<BookCaseObject> list)
-        {
-            return new DatabaseModifyRequest<BookCaseObject>(DatabaseConstants.QUERY_UPDATE_VR_BOOKCASES, list);
-        }
-
-
         public static IDatabaseRequest InsertVRObjects(List<VRObject> list)
         {
             return new DatabaseModifyRequest<VRObject>(DatabaseConstants.QUERY_INSERT_VR_ITEMS, list);
@@ -125,7 +119,7 @@ namespace BridgeApi.Controller.Request.Database
 
                 foreach (T item in items)
                 {
-                    writer.Write(ConvertItemToJson(item));
+                    ConvertItemToJson(item);
                 }
 
                 writer.WriteArrayEnd();
@@ -133,23 +127,20 @@ namespace BridgeApi.Controller.Request.Database
 
             private string ConvertItemToJson(T item)
             {
-                StringBuilder sb = new StringBuilder();
-                JsonWriter writer = new JsonWriter(sb);
-
-                foreach (KeyValuePair<Enum, string> pair in item.ConvertToPairs())
+                KeyValuePair<Enum, string>[] array = item.ConvertToPairs();
+                writer.WriteObjectStart();
+                foreach (KeyValuePair<Enum, string> pair in array)
                 {
-                    writer.WriteObjectStart();
                     writer.WritePropertyName(pair.Key.ToString());
                     writer.Write(pair.Value);
-                    writer.WriteObjectEnd();
                 }
-
+                writer.WriteObjectEnd();
                 return sb.ToString();
             }
 
             public void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback)
             {
-
+                WriteItemsToJson();
                 writer.WriteObjectEnd();
 
                 Debug.Log("============= DatabaseModifyRequest : " + OPERATION + "\n" + sb.ToString());

@@ -340,7 +340,8 @@ public class LocalDatabaseCenter {
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
-                mSetClauseValues.put("MTIME", System.currentTimeMillis());
+                if (!VRContainerTable.TABLE_VR_CONTAINER.equalsIgnoreCase(mTableName))
+                    mSetClauseValues.put("MTIME", System.currentTimeMillis());
                 int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
                 return (affectedRows > 0);
 

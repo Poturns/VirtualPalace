@@ -7,6 +7,7 @@ using System.IO;
 using MyScript;
 using BridgeApi.Controller.Request.Database;
 using MyScript.objects;
+using System;
 
 public class SaveLoader : MonoBehaviour
 {
@@ -16,60 +17,25 @@ public class SaveLoader : MonoBehaviour
     private readonly object COUNT_LOCK = new object();
 
     // Use this for initialization
-    public void SavetoFile()
+    public void SavetoFile(Action callback)
     {
-        InsertToDatabase();
-        /*
-        //Find Root
-        GameObject Root = GameObject.Find("BookCaseGroup");
-        //Stream Objstream = File.Open(Application.dataPath + ObjFileName , FileMode.Create);
-        //Stream BookCasestream = File.Open(Application.dataPath + BookCaseFileName , FileMode.Create);
-
-        //BinaryFormatter bformatter = new BinaryFormatter();
-        //bformatter.Binder = new Ver
-
-        int TotalObjCnt = 0;
-        //각 객체는 Gizmo 자식으로 Ins
-        for (int i = 0; i < Root.transform.childCount; i++)
-        {
-            //GetChild(0) -> Gizmo;
-            AbstractBasicObject BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-            SaveDataForBookCase bData = (SaveDataForBookCase)BookCase.GetSaveData();
-
-            //bformatter.Serialize (BookCasestream, bData);
-            //	Debug.Log (bData.ObjName +" ChildCnt: " +BookCase.transform.childCount);
-            TotalObjCnt += BookCase.transform.childCount;
-            for (int j = 0; j < BookCase.transform.childCount; j++)
-            {
-                //여기도 각 객체 gizmo;
-                AbstractBasicObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
-
-                if (InteractObj == null) Debug.Log(BookCase.transform.parent.name + "Child" + j + ":null");
-                SaveData sData = InteractObj.GetSaveData();
-                //Debug.Log ("Saved ObjName : "+sData.ObjName);
-                //Debug.Log (sData.ObjName + " ParentsName :" + sData.ParentName);
-                //bformatter.Serialize (Objstream, sData);
-
-            }
-        }
-        //Objstream.Close ();
-        //BookCasestream.Close ();
-        //Debug.Log ("Save Total Obj : " + TotalObjCnt);
-        */
+        InsertToDatabase(callback);
     }
 
 
-    public void InsertToDatabase()
+    public void InsertToDatabase(Action callback)
     {
         GameObject Root = GameObject.Find("BookCaseGroup");
         int TotalObjCnt = 0;
+        StateManager manager = StateManager.GetManager();
+
         for (int i = 0; i < Root.transform.childCount; i++)
         {
 			BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
 			BookCaseObject bData = BookCase.GetSaveObjectData();
 
-            StateManager manager = StateManager.GetManager();
-            DatabaseRequests.VRBookCaseItemUpdate(manager, bData, result =>
+           
+            DatabaseRequests.UpdateBookCaseObjects(manager, bData, result =>
             {
                 Debug.Log("query ==== " + result);
 
@@ -77,23 +43,35 @@ public class SaveLoader : MonoBehaviour
                 {
                     TotalObjCnt += BookCase.transform.childCount;
 
+                    List<VRObject> vrObjectList = new List<VRObject>();
                     for (int j = 0; j < BookCase.transform.childCount; j++)
                     {
-						CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
+                        CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
 
                         VRObject sData = InteractObj.GetSaveObjectData();
-                        InsertSaveDataToDatabase(sData);
+                        if (sData != null)
+                            vrObjectList.Add(sData);
+                        
                     }
+
+                    InsertVRObjectsToDatabase(vrObjectList);
+
+                    callback();
                 });
             });
         }
+    }
+
+    private void InsertVRObjectsToDatabase(List<VRObject> list)
+    {
+        DatabaseRequests.InsertVRObjects(StateManager.GetManager(), list, result => Debug.Log("query ==== " + result));
     }
 
     public void LoadFromDatabase()
     {
        // int ObjCnt = 0;
         StateManager manager = StateManager.GetManager();
-        DatabaseRequests.VRBookCaseItemSelectAll(manager, results =>
+        DatabaseRequests.QueryBookCaseObjects(manager, results =>
         {
             manager.QueueOnMainThread(() =>
             {
@@ -124,17 +102,10 @@ public class SaveLoader : MonoBehaviour
         LoadFromDatabase();
     }
 
-
-
-    private void InsertSaveDataToDatabase(VRObject sData)
-    {
-        DatabaseRequests.VRItemInsert(StateManager.GetManager(), sData, result => Debug.Log("query ==== " + result));
-    }
-
  
     private void RequestSaveDataFromDatabase()
     {
-        DatabaseRequests.VRItemSelect(StateManager.GetManager(),
+        DatabaseRequests.QueryVRObjects(StateManager.GetManager(),
                   result =>
                   {
                       StateManager.GetManager().QueueOnMainThread(() =>

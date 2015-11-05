@@ -42,6 +42,7 @@ public class SpeechInputDetector extends OperationInputDetector<List<String>> im
             // Text 입력 모드의 경우, 지속적인 인식요청은 하지 않고
             // 잠시 후에 음성인식을 시작한다.
             case MODE_TEXT:
+                mSpeechInputHelper.cancelListening();
                 mSpeechInputHelper.setContinueRecognizing(false);
                 mSpeechInputHelper.delayedStartRecognition();
                 break;
@@ -50,6 +51,7 @@ public class SpeechInputDetector extends OperationInputDetector<List<String>> im
             // 잠시 후에 음성인식을 시작한다.
             default:
             case MODE_COMMAND:
+                mSpeechInputHelper.cancelListening();
                 mSpeechInputHelper.setContinueRecognizing(true);
                 mSpeechInputHelper.delayedStartRecognition();
                 break;

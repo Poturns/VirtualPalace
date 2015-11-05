@@ -353,7 +353,8 @@ namespace BridgeApi.Controller
         /// <summary>
         /// 음성인식 정보 key
         /// </summary>
-        public const string SPEECH_REQUEST_KEY = "recognize_text_result";
+        public const string SPEECH_REQUEST_KEY = "use_speech";
+        public const string SPEECH_RESULT_KEY = "speech_result";
         public const string SPEECH_START_KEY = "onSpeechDetectionStarted";
         public const string SPEECH_END_KEY = "onSpeechDetectionEnded";
 

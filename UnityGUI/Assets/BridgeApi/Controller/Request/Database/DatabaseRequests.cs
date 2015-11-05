@@ -17,12 +17,14 @@ namespace BridgeApi.Controller.Request.Database
                 });
         }
 
-        public static void UpdateBookCaseObjects(IPlatformBridge bridge, List<BookCaseObject> dataList, Action<bool> resultCallback)
+        public static void UpdateBookCaseObjects(IPlatformBridge bridge, BookCaseObject data, Action<bool> resultCallback)
         {
-            DatabaseRequestFactory.UpdateBookCaseObjects(dataList)
+            DatabaseRequestFactory.Update(Table.VR_CONTAINER)
+                .Set(data.ConvertToPairs())
+                .WhereEqual(VR_CONTAINER_FIELD.NAME, data.Name)
                 .SendRequest(bridge, (requestResult) =>
                 {
-                    Debug.Log("=============== UpdateBookCaseObjects result : " + requestResult);
+                    Debug.Log("=============== UpdateBookCaseObject result : " + requestResult);
                     resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
                 });
         }
@@ -68,7 +70,7 @@ namespace BridgeApi.Controller.Request.Database
                     result(queryResult.Status.Equals(RequestResult.STATUS_SUCCESS));
                 });
         }
-        */
+        
 
         [Obsolete]
         public static void VRBookCaseItemUpdate(IPlatformBridge bridge, SaveDataForBookCase saveData, Action<bool> result)
@@ -129,5 +131,6 @@ namespace BridgeApi.Controller.Request.Database
                 result(JsonInterpreter.ParseJsonListToSaveData(queryResult.QueryData));
             });
         }
+        */
     }
 }

@@ -28,18 +28,19 @@ namespace MyScript.objects
 
         public KeyValuePair<Enum, string>[] ConvertToPairs()
         {
-            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[3];
+            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[4];
 
-            pairs[0] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD.NAME, Name);
-            pairs[1] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD.Z_OFFSET, Z_Offset.ToString());
-            pairs[2] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD.COUNT, Count.ToString());
+            pairs[0] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD._ID, ID.ToString());
+            pairs[1] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD.NAME, Name);
+            pairs[2] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD.Z_OFFSET, Z_Offset.ToString());
+            pairs[3] = new KeyValuePair<Enum, string>(VR_CONTAINER_FIELD.COUNT, Count.ToString());
 
             return pairs;
         }
         
         public static BookCaseObject FromJSON(LitJson.JsonData jsonData)
         {
-            Debug.Log("===== " + jsonData.ToJson());
+            //Debug.Log("===== " + jsonData.ToJson());
             int id = int.Parse((string)jsonData[VR_CONTAINER_FIELD._ID.ToString()]);
             string name = (string)jsonData[VR_CONTAINER_FIELD.NAME.ToString()];
             float offset = JsonInterpreter.ParseFloatData(jsonData, VR_CONTAINER_FIELD.Z_OFFSET.ToString());

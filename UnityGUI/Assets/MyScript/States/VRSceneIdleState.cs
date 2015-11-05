@@ -61,13 +61,19 @@ namespace MyScript.States
 		
 		private void ReturnToLobbyScene()
 		{
-
 			SaveLoader Saver = GameObject.Find ("_Script").GetComponent<SaveLoader> ();
-			if (Saver == null)
-				Debug.Log ("SaveLoaderFindFail");
-			else
-				Saver.SavetoFile ();
-			StateManager.SwitchScene(UnityScene.Lobby);
+            if (Saver == null)
+            {
+                Debug.Log("SaveLoaderFindFail");
+                StateManager.SwitchScene(UnityScene.Lobby);
+            }
+            else
+            {
+                Saver.SavetoFile(() =>
+                {
+                    StateManager.SwitchScene(UnityScene.Lobby);
+                });
+            }
 
 		}
 

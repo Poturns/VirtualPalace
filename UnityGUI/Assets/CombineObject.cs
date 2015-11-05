@@ -1,8 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using MyScript.States;
-using MyScript.Interface;
 using MyScript;
 using MyScript.objects;
 
@@ -22,10 +18,17 @@ public class CombineObject : AbstractBasicObject {
 	{
 		Transform tr = gameObject.transform.parent;
 
-		string ContentStr = GetContentString (); 
-		VRObject SaveObj = new VRObject (ID, tr.name, tr.parent.gameObject.name,(int)ModelKind
-		                                 ,tr.position, tr.rotation, transform.localScale, (int)SourceKind
-		                                 ,ContentStr,"");
+		string ContentStr = GetContentString ();
+        VRObject SaveObj = new VRObject.Builder(tr.name, SourceKind, ModelKind)
+            .SetID(ID)
+            .SetParentName(tr.parent.gameObject.name)
+            .SetPosition(tr.position)
+            .SetScale(transform.localScale)
+            .SetRotation(tr.rotation)
+            .SetResTitle("")
+            .SetResContents(ContentStr)
+            .Build();
+
 		//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
 		
 		return SaveObj;
