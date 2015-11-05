@@ -3,10 +3,6 @@ package kr.poturns.virtualpalace.controller;
 import android.database.Cursor;
 import android.text.format.DateFormat;
 
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,8 +29,6 @@ import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
 import kr.poturns.virtualpalace.sensor.BaseSensorAgent;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 import kr.poturns.virtualpalace.sensor.LocationSensorAgent;
-import kr.poturns.virtualpalace.util.DriveAssistant;
-import kr.poturns.virtualpalace.util.DriveRestAssistant;
 
 
 /**
@@ -62,8 +56,8 @@ abstract class PalaceCore {
 
     private final LocalArchive Archive;
     protected final LocalDatabaseCenter DBCenter;
-    protected final DriveAssistant AppDriveAssistant;
-    protected final DriveRestAssistant GlobalDriveAssistant;
+   // protected final DriveAssistant AppDriveAssistant;
+    //protected final DriveRestAssistant GlobalDriveAssistant;
     private final TreeMap<Long, OnPlayModeListener> PlayModeListeners;
 
 
@@ -80,8 +74,8 @@ abstract class PalaceCore {
         // DATA Part.
         Archive = LocalArchive.getInstance(application);
         DBCenter = LocalDatabaseCenter.getInstance(application);
-        AppDriveAssistant = new DriveAssistant(application);
-        GlobalDriveAssistant = new DriveRestAssistant(application);
+      //  AppDriveAssistant = new DriveAssistant(application);
+      //  GlobalDriveAssistant = new DriveRestAssistant(application);
 
         // INPUT Part.
         AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
@@ -790,14 +784,14 @@ abstract class PalaceCore {
      */
     boolean executeBackUp() {
         File dbFile = DBCenter.getDatabaseFile();
-        DriveFolder folder = AppDriveAssistant.getAppFolder();
+       // DriveFolder folder = AppDriveAssistant.getAppFolder();
 
         // Drive Contents 생성
-        DriveContents contents = AppDriveAssistant.newDriveContents();
-        DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
+       // DriveContents contents = AppDriveAssistant.newDriveContents();
+        //DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
 
         String fileName = "VirtualPalace-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
-        DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
+      //  DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
         return true;
     }
 

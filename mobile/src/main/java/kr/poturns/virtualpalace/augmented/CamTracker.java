@@ -54,7 +54,7 @@ public class CamTracker {
 			bSuccess = SensorManager.getRotationMatrix(rotationMat, null, accData, magneticData);
 			if(bSuccess) {
 				SensorManager.getOrientation(rotationMat, orientation);
-				filterOrientation(orientation);
+				//filterOrientation(orientation);
 			}
 			
 			resetOrigin();

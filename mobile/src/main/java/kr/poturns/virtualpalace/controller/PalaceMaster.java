@@ -27,10 +27,9 @@ import kr.poturns.virtualpalace.util.ThreadUtils;
 /**
  * <b> EXTERNAL CONTROLLER : 컨트롤러의 중개 기능을 다룬다 </b>
  * <p>
- *     프로토콜 및 통신 작업에 대한 Router 역할을 수행한다.
- *     다른 모듈들과 별도로 프로세싱하기 위하여 별도 Thread 에서 Handler 를 운영한다.
+ * 프로토콜 및 통신 작업에 대한 Router 역할을 수행한다.
+ * 다른 모듈들과 별도로 프로세싱하기 위하여 별도 Thread 에서 Handler 를 운영한다.
  * </p>
- *
  *
  * @author Yeonho.Kim
  */
@@ -97,7 +96,9 @@ public class PalaceMaster extends PalaceEngine {
                 event.put(eventName, contents);
 
                 Message.obtain(EventProcessHandler, 0, event).sendToTarget();
-            } catch (JSONException e) { ; }
+            } catch (JSONException e) {
+                ;
+            }
         }
     }
 
@@ -115,8 +116,11 @@ public class PalaceMaster extends PalaceEngine {
         }
 
         int[][] outputs = new int[list.size()][];
-        for(int i=0; i<list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             AugmentedOutput item = list.get(i);
+
+            if (outputs[i] == null)
+                outputs[i] = new int[4];
 
             outputs[i][0] = IOperationInputFilter.Operation.DRAW_AR_ITEM;
             // TODO: 임시 테스트 코드
@@ -129,8 +133,8 @@ public class PalaceMaster extends PalaceEngine {
     }
 
 
-
     // * * * I N N E R  C L A S S E S * * * //
+
     /**
      * <b><INPUT 명령을 처리하는 핸들러.</b>
      * <p>
@@ -163,7 +167,7 @@ public class PalaceMaster extends PalaceEngine {
             if (from < IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT && (mActivatedConnectorSupportFlag & from) != from)
                 return;
 
-            switch(msg.what) {
+            switch (msg.what) {
                 case INPUT_SYNC_COMMAND:
                     send();
                     break;
@@ -189,7 +193,7 @@ public class PalaceMaster extends PalaceEngine {
                         if (detectedText == null)
                             throw new Exception();
 
-                        result.put(IProtocolKeywords.Request.KEY_CALLBACK_RESULT,  detectedText);
+                        result.put(IProtocolKeywords.Request.KEY_CALLBACK_RESULT, detectedText);
 
                     } catch (Exception e) {
                     } finally {
@@ -202,7 +206,6 @@ public class PalaceMaster extends PalaceEngine {
         }
 
         /**
-         *
          * @param command
          */
         private void accumulate(int[] command) {
@@ -214,7 +217,7 @@ public class PalaceMaster extends PalaceEngine {
             if (singleMessage.length() == 0 || current > mExpectedFlushTime) {
                 // AR 렌더링을 해야할 경우, 메시지 전송 간격을 기존의 1/10로 줄인다.
                 mExpectedFlushTime = current +
-                        (singleMessage.has(String.valueOf(DRAW_AR_ITEM)) || command[0] == DRAW_AR_ITEM?
+                        (singleMessage.has(String.valueOf(DRAW_AR_ITEM)) || command[0] == DRAW_AR_ITEM ?
                                 INTERVAL / 10 : INTERVAL);
 
                 sendEmptyMessageDelayed(INPUT_SYNC_COMMAND, INTERVAL);
@@ -233,7 +236,9 @@ public class PalaceMaster extends PalaceEngine {
 
                         singleMessage.put(cmdStr, compressed);
 
-                    } catch (JSONException e) { ; }
+                    } catch (JSONException e) {
+                        ;
+                    }
                     break;
 
                 // 하드웨어 버튼은 안드로이드에서 처리하도록 한다.
@@ -268,8 +273,11 @@ public class PalaceMaster extends PalaceEngine {
 
                             singleMessage.put(cmdStr, value);
 
-                        } catch (JSONException e) { ; }
-                    } break;
+                        } catch (JSONException e) {
+                            ;
+                        }
+                    }
+                    break;
 
                 // 복합 명령 : 명령 호출 외 부가 정보들이 포함됨.
                 case GO:
@@ -290,7 +298,7 @@ public class PalaceMaster extends PalaceEngine {
                                 if (old_d == curr_d && old_a % 10 > 0) {
                                     // VALUE 에 1의 자리수가 존재할 경우,
                                     // SEPARATION 미만의 수는 해당 명령이 발생한 횟수를 의미한다. (10의 자리수부터 판단)
-                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION+ (old_a + curr_a * 10);
+                                    value = curr_d * IOperationInputFilter.Direction.SEPARATION + (old_a + curr_a * 10);
 
                                 } else {
                                     // VALUE 에 1의 자리수가 존재하지 않을 경우,
@@ -316,8 +324,11 @@ public class PalaceMaster extends PalaceEngine {
 
                             singleMessage.put(cmdStr, value);
 
-                        } catch (JSONException e) { ; }
-                    } break;
+                        } catch (JSONException e) {
+                            ;
+                        }
+                    }
+                    break;
 
                 // 단일 명령 : 단위 시간내 여러번 호출되더라도, 한번만 적용된다.
                 case SEARCH:
@@ -327,7 +338,9 @@ public class PalaceMaster extends PalaceEngine {
                         try {
                             singleMessage.put(cmdStr, command[2]);
 
-                        } catch (JSONException e) { ; }
+                        } catch (JSONException e) {
+                            ;
+                        }
                     }
                     break;
             }
@@ -335,7 +348,7 @@ public class PalaceMaster extends PalaceEngine {
 
         private int filterD(int direction) {
             int mod = direction % 10;
-            return (mod == 0)? 0 : mod - 5;
+            return (mod == 0) ? 0 : mod - 5;
         }
 
         /**
@@ -355,27 +368,27 @@ public class PalaceMaster extends PalaceEngine {
             int absX = Math.abs(axisX);
             while (absX / levelX >= 10)
                 levelX++;
-            levelX *= (axisX > 0? 1 : -1);
+            levelX *= (axisX > 0 ? 1 : -1);
 
             int absY = Math.abs(axisY);
-            while (absY/ levelY >= 10)
+            while (absY / levelY >= 10)
                 levelY++;
-            levelY *= (axisY > 0? 1 : -1);
+            levelY *= (axisY > 0 ? 1 : -1);
 
             int absZ = Math.abs(axisZ);
             while (absZ / levelZ >= 10)
                 levelZ++;
-            levelZ *= (axisZ > 0? 1 : -1);
+            levelZ *= (axisZ > 0 ? 1 : -1);
 
 
             // Direction Level 을 적용한다.
-            int x = (axisX == 0)? 0 : Math.min(9, Math.max(1,levelX + 5));
-            int y = (axisY == 0)? 0 : Math.min(9, Math.max(1,levelY + 5));
-            int z = (axisZ == 0)? 0 : Math.min(9, Math.max(1,levelZ + 5));
+            int x = (axisX == 0) ? 0 : Math.min(9, Math.max(1, levelX + 5));
+            int y = (axisY == 0) ? 0 : Math.min(9, Math.max(1, levelY + 5));
+            int z = (axisZ == 0) ? 0 : Math.min(9, Math.max(1, levelZ + 5));
 
             // 차원 수에 맞는 Direction 값을 만든다.
-            int direction = x + (z == 5? 0 : z * 100);
-            direction += ((y == 5 && direction < 100)? 0 : y * 10);
+            int direction = x + (z == 5 ? 0 : z * 100);
+            direction += ((y == 5 && direction < 100) ? 0 : y * 10);
 
             // 각 축별 Amount 를 계산하기 때문에 1의 자리수는 사용하지 않고,
             // 10의 자리수부터 차례대로 축별 Amount 를 기록한다.
@@ -392,7 +405,7 @@ public class PalaceMaster extends PalaceEngine {
             if (singleMessage.length() == 0)
                 return;
 
-            Log.d("PalaceMast_Input","Input Message : " + singleMessage.length() + " commands transfered.\n" + singleMessage.toString());
+            Log.d("PalaceMast_Input", "Input Message : " + singleMessage.length() + " commands transfered.\n" + singleMessage.toString());
 
             // 동기화를 위한 Thread Blocking으로 인해 Message 처리를 지연시킬 수 있으므로,
             // Thread Pool을 이용한 순차적 전송으로 Input 메시지를 전송한다.
@@ -439,10 +452,12 @@ public class PalaceMaster extends PalaceEngine {
                         public void run() {
                             try {
                                 process(jsonMessage);
-                            } catch (Exception e) { }
+                            } catch (Exception e) {
+                            }
                         }
                     };
-                } break;
+                }
+                break;
 
                 case REQUEST_CALLBACK_FROM_UNITY: {
                     Bundle bundle = (Bundle) msg.obj;
@@ -467,14 +482,15 @@ public class PalaceMaster extends PalaceEngine {
                             AndroidUnityBridge.getInstance(App).respondCallbackToUnity(id, result.toString());
                         }
                     };
-                } break;
+                }
+                break;
 
                 default:
                     return;
             }
 
             // Input이 아닌 기타 Message는 ThreadPool에서 병렬로 메시지를 전송한다.
-            if(runnable != null)
+            if (runnable != null)
                 ThreadUtils.THREAD_POOL_EXECUTOR.execute(runnable);
         }
 
@@ -516,7 +532,7 @@ public class PalaceMaster extends PalaceEngine {
                             String inputName = inputs.next();
 
                             int inputType = Integer.parseInt(inputName);
-                            switched &= contents.getBoolean(inputName)?
+                            switched &= contents.getBoolean(inputName) ?
                                     activateInputConnector(inputType) :
                                     deactivateInputConnector(inputType);
 
@@ -569,10 +585,11 @@ public class PalaceMaster extends PalaceEngine {
                     partialReturn.put(KEY_CALLBACK_RESULT, result ?
                             KEY_CALLBACK_RESULT_SUCCESS : KEY_CALLBACK_RESULT_FAIL);
 
-                } catch (Exception e){
+                } catch (Exception e) {
                     try {
                         partialReturn.put(KEY_CALLBACK_RESULT, KEY_CALLBACK_RESULT_ERROR);
-                    } catch (JSONException e2) { }
+                    } catch (JSONException e2) {
+                    }
 
                 } finally {
                     ReturnResult.put(command, partialReturn);
@@ -609,8 +626,8 @@ public class PalaceMaster extends PalaceEngine {
     /**
      * Callback Exception
      */
-    private class WaitForCallbackException extends Exception {}
-
+    private class WaitForCallbackException extends Exception {
+    }
 
 
     // * * * G E T T E R  S & S E T T E R S * * * //

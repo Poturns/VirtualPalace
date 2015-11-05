@@ -60,7 +60,7 @@ abstract class PalaceEngine extends PalaceCore {
 
                 if (SceneLifeCycle.LOBBY.equalsIgnoreCase(scene)) {
                     // Google App-Drive Connect
-                    AppDriveAssistant.connect();
+                    //AppDriveAssistant.connect();
 
                     // Gaze Input 초기 활성화
                     mGazeInputConnector = new GazeInputConnector(App);
@@ -126,7 +126,7 @@ abstract class PalaceEngine extends PalaceCore {
 
                 if (SceneLifeCycle.LOBBY.equalsIgnoreCase(scene)) {
                     // Google App-Drive Disconnect
-                    AppDriveAssistant.destroy();
+                   // AppDriveAssistant.destroy();
 
                     if (mGazeInputConnector != null)
                         mGazeInputConnector.disconnect();

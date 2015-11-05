@@ -161,15 +161,24 @@ namespace BridgeApi.Controller
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
         public static QueryRequestResult ParseQueryFromPlatform(string json, string requestKey)
         {
-            Debug.Log(json);
-            JsonData jData = JsonMapper.ToObject(json)[requestKey];
+            Debug.Log("====== "+json);
+            JsonData jData = JsonMapper.ToObject(json);
 
             List<JsonData> queryResults = new List<JsonData>();
 
             QueryRequestResult result = new QueryRequestResult();
             result.RequestName = requestKey;
-            result.Status = (string)jData[RequestResult.RESULT];
 
+            if (JsonDataContainsKey(jData, requestKey))
+            {
+                jData = jData[requestKey];
+                result.Status = (string)jData[RequestResult.RESULT];
+            }
+            else
+            {
+                result.Status = RequestResult.STATUS_ERROR;
+                return result;
+            }
 
             if (JsonDataContainsKey(jData, DatabaseConstants.QUERY_RESULT))
             {
