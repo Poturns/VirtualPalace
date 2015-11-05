@@ -135,12 +135,12 @@ namespace MyScript.objects
             }
             public Builder SetSizeY(float f)
             {
-                vrObject.SizeX = f;
+                vrObject.SizeY = f;
                 return this;
             }
             public Builder SetSizeZ(float f)
             {
-                vrObject.SizeX = f;
+                vrObject.SizeZ = f;
                 return this;
             }
 
@@ -172,9 +172,10 @@ namespace MyScript.objects
 
         public KeyValuePair<Enum, string>[] ConvertToPairs()
         {
-            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[16];
+            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[17];
             int i = 0;
 
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD._ID, ID.ToString());
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.NAME, Name);
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.PARENT_NAME, ParentName);
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.MODEL_TYPE, ModelType.ToString());

@@ -3,17 +3,32 @@ package kr.poturns.virtualpalace.mobiletest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
-import com.google.android.gms.drive.Drive;
-
+import kr.poturns.virtualpalace.controller.AndroidUnityBridge;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
-import kr.poturns.virtualpalace.controller.PalaceMaster;
 
 public class MainActivity extends Activity implements View.OnClickListener{
-    @Override
+
+    private AndroidUnityBridge.BridgeDelegate bridgeDelegate;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PalaceApplication app = (PalaceApplication) getApplication();
+        bridgeDelegate  = new AndroidUnityBridge.BaseDelegate(app) {
+
+            @Override
+            public void sendInputMessageToUnity(String json) {
+                Log.i("InputMessage", json);
+            }
+
+            @Override
+            public void sendSingleMessageToUnity(String json) {
+                Log.i("SingleMessage", json);
+            }
+        };
+        AndroidUnityBridge.getInstance((PalaceApplication) getApplication()).changeDelegate(bridgeDelegate);
+
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.btn_sensortest).setOnClickListener(this);
