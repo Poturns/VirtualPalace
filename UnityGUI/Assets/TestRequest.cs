@@ -46,7 +46,7 @@ public class TestRequest
                Debug.Log(queryResults);
            });
 
-        DatabaseRequestFactory.QueryAllVRItems().SendRequest(StateManager.GetManager(), (queryResults) =>
+        DatabaseRequestFactory.QueryAllVRObjects().SendRequest(StateManager.GetManager(), (queryResults) =>
         {
             Debug.Log(queryResults);
         });

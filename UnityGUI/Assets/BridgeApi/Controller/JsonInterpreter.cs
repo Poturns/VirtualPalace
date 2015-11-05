@@ -1,5 +1,6 @@
 ﻿using BridgeApi.Controller.Request.Database;
 using LitJson;
+using MyScript.objects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -235,6 +236,7 @@ namespace BridgeApi.Controller
             JsonData jData = JsonMapper.ToObject(json);
             SpeechRequestResult result = new SpeechRequestResult();
 
+            // 버그
             result.RequestName = SpeechRequestResult.SPEECH_REQUEST_KEY;
             result.Status = (string)jData[RequestResult.RESULT];
 
@@ -264,6 +266,66 @@ namespace BridgeApi.Controller
             return builder.ToString();
         }
 
+        public static List<BookCaseObject> ParseJsonListToBookCaseObject(List<JsonData> jsonList)
+        {
+            List<BookCaseObject> dataList = new List<BookCaseObject>();
+
+            if (jsonList != null)
+            {
+                foreach (JsonData json in jsonList)
+                {
+                    BookCaseObject data = BookCaseObject.FromJSON(json);
+                    if (data != null)
+                        dataList.Add(data);
+                }
+            }
+
+            return dataList;
+        }
+
+        public static List<VRObject> ParseJsonListToVRObject(List<JsonData> jsonList)
+        {
+            List<VRObject> dataList = new List<VRObject>();
+
+            if (jsonList != null)
+            {
+                foreach (JsonData json in jsonList)
+                {
+                    VRObject data = VRObject.FromJSON(json);
+                    if (data != null)
+                        dataList.Add(data);
+                }
+            }
+
+            return dataList;
+        }
+
+        public static float ParseFloatData(JsonData jsonData, string key)
+        {
+            // Debug.Log("==== parsing : { " + key + " : " + jsonData[key].ToJson() + " }");
+            if (jsonData.IsLong)
+            {
+                return (long)jsonData[key];
+            }
+            else if (jsonData.IsInt)
+            {
+                return (int)jsonData[key];
+            }
+            else if (jsonData.IsString)
+            {
+                try
+                {
+                    return float.Parse((string)jsonData[key]);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return 0;
+                }
+            }
+            else
+                return 0;
+        }
 
         public static List<SaveData> ParseJsonListToSaveData(List<JsonData> jsonList)
         {

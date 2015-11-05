@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyScript.objects;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,56 @@ namespace BridgeApi.Controller.Request.Database
 {
     public sealed class DatabaseRequests
     {
+        public static void QueryBookCaseObjects(IPlatformBridge bridge, Action<List<BookCaseObject>> resultCallback)
+        {
+            DatabaseRequestFactory.QueryAllBookCaseObjects()
+                .SendRequest(bridge, (requestResult) =>
+                {
+                    Debug.Log("=============== QueryBookCaseObjects result : " + requestResult);
+                    resultCallback(JsonInterpreter.ParseJsonListToBookCaseObject(requestResult.QueryData));
+                });
+        }
+
+        public static void UpdateBookCaseObjects(IPlatformBridge bridge, List<BookCaseObject> dataList, Action<bool> resultCallback)
+        {
+            DatabaseRequestFactory.UpdateBookCaseObjects(dataList)
+                .SendRequest(bridge, (requestResult) =>
+                {
+                    Debug.Log("=============== UpdateBookCaseObjects result : " + requestResult);
+                    resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
+                });
+        }
+
+        public static void QueryVRObjects(IPlatformBridge bridge, Action<List<VRObject>> resultCallback)
+        {
+            DatabaseRequestFactory.QueryAllVRObjects()
+                .SendRequest(bridge, (requestResult) =>
+                {
+                    Debug.Log("=============== QueryVRObjects result : " + requestResult);
+                    resultCallback(JsonInterpreter.ParseJsonListToVRObject(requestResult.QueryData));
+                });
+        }
+
+        public static void InsertVRObjects(IPlatformBridge bridge, List<VRObject> dataList, Action<bool> resultCallback)
+        {
+            DatabaseRequestFactory.InsertVRObjects(dataList)
+                .SendRequest(bridge, (requestResult) =>
+                {
+                    Debug.Log("=============== UpdateBookCaseObject result : " + requestResult);
+                    resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
+                });
+        }
+
+        public static void UpdateVRObjects(IPlatformBridge bridge, List<VRObject> dataList, Action<bool> resultCallback)
+        {
+            DatabaseRequestFactory.UpdateVRObjects(dataList)
+                .SendRequest(bridge, (requestResult) =>
+                {
+                    Debug.Log("=============== UpdateBookCaseObject result : " + requestResult);
+                    resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
+                });
+        }
+
         /*
         public static void VRBookCaseItemInsert(IPlatformBridge bridge, SaveDataForBookCase saveData, Action<bool> result)
         {
@@ -19,6 +70,7 @@ namespace BridgeApi.Controller.Request.Database
         }
         */
 
+        [Obsolete]
         public static void VRBookCaseItemUpdate(IPlatformBridge bridge, SaveDataForBookCase saveData, Action<bool> result)
         {
             DatabaseRequestFactory.Update(Table.VR_CONTAINER)
@@ -30,9 +82,10 @@ namespace BridgeApi.Controller.Request.Database
                 });
         }
 
+        [Obsolete]
         public static void VRBookCaseItemSelectAll(IPlatformBridge bridge, Action<List<SaveDataForBookCase>> result)
         {
-            DatabaseRequestFactory.QueryBookCaseItems()
+            DatabaseRequestFactory.QueryAllBookCaseObjects()
                 .SendRequest(bridge, (queryResult) =>
                 {
                     Debug.Log("=============== VRBookCaseSelectAll query result : " + queryResult);
@@ -40,6 +93,7 @@ namespace BridgeApi.Controller.Request.Database
                 });
         }
 
+        [Obsolete]
         public static void VRItemInsert(IPlatformBridge bridge, SaveData saveData, Action<bool> result)
         {
             DatabaseRequestFactory.InsertInto(Table.VR)
@@ -51,6 +105,7 @@ namespace BridgeApi.Controller.Request.Database
                 });
         }
 
+        [Obsolete]
         public static void VRItemUpdate(IPlatformBridge bridge, SaveData saveData, Action<bool> result)
         {
             DatabaseRequestFactory.Update(Table.VR)
@@ -63,6 +118,7 @@ namespace BridgeApi.Controller.Request.Database
                 });
         }
 
+        [Obsolete]
         public static void VRItemSelect(IPlatformBridge bridge, Action<List<SaveData>> result)
         {
             DatabaseRequestFactory.Select(Table.VR)

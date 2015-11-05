@@ -1,4 +1,5 @@
 ﻿using LitJson;
+using MyScript.objects;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,7 +17,7 @@ namespace BridgeApi.Controller.Request.Database
         /// 요청을 전송한다.
         /// </summary>
         /// <param name="callback">요청에 대한 응답을 전달받을 Callback</param>
-        void SendRequest(IPlatformBridge bridge,  Action<QueryRequestResult> callback);
+        void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback);
     }
 
     /// <summary>
@@ -26,7 +27,7 @@ namespace BridgeApi.Controller.Request.Database
     {
         #region Factory Method
 
-        public static IDatabaseRequest QueryAllVRItems()
+        public static IDatabaseRequest QueryAllVRObjects()
         {
             return new SpecialQueryRequest(DatabaseConstants.QUERY_ALL_VR_ITEMS);
         }
@@ -36,9 +37,25 @@ namespace BridgeApi.Controller.Request.Database
             return new SpecialQueryRequest(DatabaseConstants.QUERY_NEAR_ITEMS);
         }
 
-        public static IDatabaseRequest QueryBookCaseItems()
+        public static IDatabaseRequest QueryAllBookCaseObjects()
         {
             return new SpecialQueryRequest(DatabaseConstants.QUERY_VR_BOOKCASES);
+        }
+
+        public static IDatabaseRequest UpdateBookCaseObjects(List<BookCaseObject> list)
+        {
+            return new DatabaseModifyRequest<BookCaseObject>(DatabaseConstants.QUERY_UPDATE_VR_BOOKCASES, list);
+        }
+
+
+        public static IDatabaseRequest InsertVRObjects(List<VRObject> list)
+        {
+            return new DatabaseModifyRequest<VRObject>(DatabaseConstants.QUERY_INSERT_VR_ITEMS, list);
+        }
+
+        public static IDatabaseRequest UpdateVRObjects(List<VRObject> list)
+        {
+            return new DatabaseModifyRequest<VRObject>(DatabaseConstants.QUERY_UPDATE_VR_ITEMS, list);
         }
 
         /// <summary>
@@ -83,6 +100,73 @@ namespace BridgeApi.Controller.Request.Database
         #endregion
 
         #region Object Impl
+        private class DatabaseModifyRequest<T> : IDatabaseRequest where T : IDatabaseObject
+        {
+            private readonly string OPERATION;
+
+            private JsonWriter writer;
+            private StringBuilder sb;
+            private List<T> items;
+
+            public DatabaseModifyRequest(string operation, List<T> modifyItems)
+            {
+                OPERATION = operation;
+                items = modifyItems;
+
+                writer = new JsonWriter(sb = new StringBuilder());
+                writer.WriteObjectStart();
+                writer.WritePropertyName(OPERATION);
+
+            }
+
+            private void WriteItemsToJson()
+            {
+                writer.WriteArrayStart();
+
+                foreach (T item in items)
+                {
+                    writer.Write(ConvertItemToJson(item));
+                }
+
+                writer.WriteArrayEnd();
+            }
+
+            private string ConvertItemToJson(T item)
+            {
+                StringBuilder sb = new StringBuilder();
+                JsonWriter writer = new JsonWriter(sb);
+
+                foreach (KeyValuePair<Enum, string> pair in item.ConvertToPairs())
+                {
+                    writer.WriteObjectStart();
+                    writer.WritePropertyName(pair.Key.ToString());
+                    writer.Write(pair.Value);
+                    writer.WriteObjectEnd();
+                }
+
+                return sb.ToString();
+            }
+
+            public void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback)
+            {
+
+                writer.WriteObjectEnd();
+
+                Debug.Log("============= DatabaseModifyRequest : " + OPERATION + "\n" + sb.ToString());
+
+                bridge.RequestToPlatform(this, (requestResult) =>
+                {
+                    callback(JsonInterpreter.ParseQueryFromPlatform(requestResult, OPERATION));
+                });
+            }
+
+            public string ToJson()
+            {
+                return sb.ToString();
+            }
+        }
+
+
         private class SpecialQueryRequest : IDatabaseRequest
         {
             private readonly string OPERATION;
@@ -103,7 +187,7 @@ namespace BridgeApi.Controller.Request.Database
                 bridge.RequestToPlatform(this, (requestResult) =>
                 {
                     callback(JsonInterpreter.ParseQueryFromPlatform(requestResult, OPERATION));
-                });             
+                });
             }
 
             public string ToJson()
@@ -132,7 +216,7 @@ namespace BridgeApi.Controller.Request.Database
                         break;
                     case OPERATION_UPDATE:
                         operation = place.GetDatabaseOperation(DatabaseConstants.UPDATE);
-                       
+
                         break;
                     case OPERATION_INSERT:
                         operation = place.GetDatabaseOperation(DatabaseConstants.INSERT);
@@ -540,5 +624,5 @@ namespace BridgeApi.Controller.Request.Database
         T End();
     }
     #endregion Interface
- 
+
 }

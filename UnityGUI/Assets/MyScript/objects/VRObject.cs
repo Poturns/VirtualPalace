@@ -1,5 +1,8 @@
-﻿using BridgeApi.Controller;
+﻿using System;
+using System.Collections.Generic;
+using BridgeApi.Controller;
 using UnityEngine;
+using BridgeApi.Controller.Request.Database;
 
 namespace MyScript.objects
 {
@@ -159,5 +162,65 @@ namespace MyScript.objects
             }
         }
 
+        public KeyValuePair<Enum, string>[] ConvertToPairs()
+        {
+            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[16];
+            int i = 0;
+
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.NAME, Name);
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.PARENT_NAME, ParentName);
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.MODEL_TYPE, ModelType.ToString());
+
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_X, PosX.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_Y, PosY.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_Z, PosZ.ToString());
+
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_X, RotateX.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Y, RotateY.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Z, RotateZ.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_W, RotateW.ToString());
+
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_X, SizeX.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Y, SizeY.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Z, SizeZ.ToString());
+
+            pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.RES_ID, ResID.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.TITLE, ResTitle);
+            pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.CONTENTS, ResContents);
+
+            return pairs;
+        }
+
+        public static VRObject FromJSON(LitJson.JsonData jsonData)
+        {
+            Debug.Log("===== " + jsonData.ToJson());
+
+            VRObject data = new VRObject();
+
+            data.ID = int.Parse((string)jsonData[VIRTUAL_FIELD._ID.ToString()]);
+
+            data.Name = (string)jsonData[VIRTUAL_FIELD.NAME.ToString()];
+            data.ParentName = (string)jsonData[VIRTUAL_FIELD.PARENT_NAME.ToString()];
+            data.ModelType = int.Parse((string)jsonData[VIRTUAL_FIELD.MODEL_TYPE.ToString()]);
+
+            data.PosX = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_X.ToString());
+            data.PosY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_Y.ToString());
+            data.PosZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_Z.ToString());
+
+            data.RotateX= JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_X.ToString());
+            data.RotateY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_Y.ToString());
+            data.RotateZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_Z.ToString());
+            data.RotateW = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_W.ToString());
+
+            data.SizeX = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_X.ToString());
+            data.SizeY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_Y.ToString());
+            data.SizeZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_Z.ToString());
+
+            data.ResID = int.Parse((string)jsonData[VIRTUAL_FIELD.RES_ID.ToString()]);
+            data.ResTitle = (string)jsonData[RESOURCE_FIELD.TITLE.ToString()];
+            data.ResContents = (string)jsonData[RESOURCE_FIELD.CONTENTS.ToString()];
+
+            return data;
+        }
     }
 }

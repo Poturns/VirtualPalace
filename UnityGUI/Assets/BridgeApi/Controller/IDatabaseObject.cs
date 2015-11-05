@@ -1,4 +1,7 @@
-﻿namespace BridgeApi.Controller
+﻿using System;
+using System.Collections.Generic;
+
+namespace BridgeApi.Controller
 {
     public interface IDatabaseObject
     {
@@ -7,6 +10,11 @@
         /// </summary>
         int ID { get; }
 
-        // 인서트할때 k-v 배열
+        /// <summary>
+        /// K-V 배열로 필드를 반환한다. Database 접근 용도로 사용된다.
+        /// </summary>
+        /// <returns>K-V 배열</returns>
+        KeyValuePair<Enum, string>[] ConvertToPairs();
+        
     }
 }

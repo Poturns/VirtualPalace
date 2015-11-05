@@ -17,6 +17,12 @@ namespace BridgeApi.Controller.Request.Database
         /// </summary>
         public const string QUERY_VR_BOOKCASES = "query_all_vr_bookcases";
 
+        public const string QUERY_INSERT_VR_ITEMS = "save_all_vr_items";
+
+        public const string QUERY_UPDATE_VR_ITEMS = "update_all_vr_items";
+
+        public const string QUERY_UPDATE_VR_BOOKCASES = "update_all_vr_bookcases";
+
         ///<summary>
         /// (응답 반환시) 쿼리 결과 KEY
         ///<para/>
