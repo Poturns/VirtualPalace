@@ -24,7 +24,7 @@ public enum SceneLifeCycle {
 
     public static final String LOBBY = "lobby";
 
-    public static final String AR = "augmented";
+    public static final String AR = "ar";
 
-    public static final String VR = "virtual";
+    public static final String VR = "vr";
 }

@@ -105,8 +105,8 @@ public class AugmentedManager {
 					mManagerF.reloadAugmentedItem(mAppF);
 					// TODO : 테스트
 					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth, mTrackerF.iScreenHeight);
-					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth+200, mTrackerF.iScreenHeight+100);
-					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth-200, mTrackerF.iScreenHeight-100);
+					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth/3*2, mTrackerF.iScreenHeight/3);
+					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth/3, mTrackerF.iScreenHeight/3*2);
 				}
 
 				if(addItemQueue.size()>0) {

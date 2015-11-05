@@ -114,12 +114,11 @@ public class PalaceMaster extends PalaceEngine {
             return;
         }
 
-        int[][] outputs = new int[list.size()][];
+        int[][] outputs = new int[list.size()][4];
         for(int i=0; i<list.size(); i++) {
             AugmentedOutput item = list.get(i);
 
             outputs[i][0] = IOperationInputFilter.Operation.DRAW_AR_ITEM;
-            // TODO: 임시 테스트 코드
             outputs[i][1] = 1; //item.resID;
             outputs[i][2] = item.screenX;
             outputs[i][3] = item.screenY;
@@ -227,11 +226,11 @@ public class PalaceMaster extends PalaceEngine {
                 // AR 렌더링 명령
                 case DRAW_AR_ITEM:
                     try {
-                        int compressed = command[1];
-                        compressed = compressed * 10000 + command[2];
-                        compressed = compressed * 10000 + command[3];
+                        JSONObject eachResObj = singleMessage.has(cmdStr)?
+                                singleMessage.getJSONObject(cmdStr) : new JSONObject();
 
-                        singleMessage.put(cmdStr, compressed);
+                        eachResObj.put(String.valueOf(command[1]), command[2] * 10000 + command[3]);
+                        singleMessage.put(cmdStr, eachResObj);
 
                     } catch (JSONException e) { ; }
                     break;
@@ -572,7 +571,8 @@ public class PalaceMaster extends PalaceEngine {
                 } catch (Exception e){
                     try {
                         partialReturn.put(KEY_CALLBACK_RESULT, KEY_CALLBACK_RESULT_ERROR);
-                    } catch (JSONException e2) { }
+
+                    } catch (JSONException e2) { ; }
 
                 } finally {
                     ReturnResult.put(command, partialReturn);
