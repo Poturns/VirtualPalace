@@ -16,6 +16,10 @@ public interface ITable {
      * AUGMENTED TABLE 명
      */
     String TABLE_AUGMENTED = "augmented";
+    /**
+     * VR-Bookcase Container TABLE 명
+     */
+    String TABLE_VR_CONTAINER = "container";
 
     /**
      * 해당 필드가 소속되어 있는 테이블 명을 반환한다.

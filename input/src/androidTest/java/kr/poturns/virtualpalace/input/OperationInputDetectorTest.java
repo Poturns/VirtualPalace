@@ -196,7 +196,7 @@ public class OperationInputDetectorTest extends AndroidTestCase {
         }
     });
 
-    OperationInputConnector mConnector = new OperationInputConnector(getContext(), IControllerCommands.TYPE_INPUT_SUPPORT_VOICE) {
+    OperationInputConnector mConnector = new OperationInputConnector(getContext(), IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE) {
 
         /**
          * 단일 명령 메시지를 전송한다.

@@ -7,12 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
-import android.text.format.DateFormat;
 import android.util.Log;
-
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +21,8 @@ import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VRContainerTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
-import kr.poturns.virtualpalace.util.DriveAssistant;
 
 /**
  * <b> 로컬 저장소의 DATABASE 를 관리한다. </b>
@@ -62,7 +57,7 @@ public class LocalDatabaseCenter {
     /**
      * 로컬 DB .Version
      */
-    private static final int VERSION = 4;
+    private static final int VERSION = 7;
 
     private final Context InContext;
 
@@ -94,10 +89,27 @@ public class LocalDatabaseCenter {
                     vrBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
                 vrBuilder.deleteCharAt(vrBuilder.length()-1).append(");");
 
+                StringBuilder vrContainerBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_VR_CONTAINER + " (");
+                for (VRContainerTable field : VRContainerTable.values())
+                    vrContainerBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
+                vrContainerBuilder.deleteCharAt(vrContainerBuilder.length()-1).append(");");
+
 
                 db.execSQL(resBuilder.toString());
                 db.execSQL(arBuilder.toString());
                 db.execSQL(vrBuilder.toString());
+                db.execSQL(vrContainerBuilder.toString());
+
+                initVRContainer(db);
+            }
+
+            private void initVRContainer(SQLiteDatabase db) {
+                for (int i=0; i<18; i++) {
+                    ContentValues values = new ContentValues();
+                    values.put(VRContainerTable.NAME.toString(), ("BookCaseTrigger" + i));
+
+                    db.insert(ITable.TABLE_VR_CONTAINER, null, values);
+                }
             }
 
             @Override
@@ -105,6 +117,7 @@ public class LocalDatabaseCenter {
                 db.execSQL("DROP TABLE " + ITable.TABLE_RESOURCE);
                 db.execSQL("DROP TABLE " + ITable.TABLE_AUGMENTED);
                 db.execSQL("DROP TABLE " + ITable.TABLE_VIRTUAL);
+                db.execSQL("DROP TABLE " + ITable.TABLE_VR_CONTAINER);
 
                 onCreate(db);
                 // TODO : DATA 옮기는 과정 필요 or Google Drive 에 백업한 데이터를 새 Local DB에 Insert 하기.
@@ -164,7 +177,7 @@ public class LocalDatabaseCenter {
         JSONArray array = new JSONArray();
 
         Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
-                "SELECT v.*, r.name, r.description, r.thumbnail_path " +
+                "SELECT v.*, r.title, r.contents, r.res_type " +
                         "FROM virtual v, resource r WHERE v.res_id = r._id;", null);
 
         int length = VirtualTable.values().length;
@@ -175,23 +188,22 @@ public class LocalDatabaseCenter {
                 row.put(VirtualTable._ID.toString(), cursor.getInt(VirtualTable._ID.ordinal()));
                 row.put(VirtualTable.RES_ID.toString(), cursor.getInt(VirtualTable.RES_ID.ordinal()));
                 row.put(VirtualTable.NAME.toString(), cursor.getString(VirtualTable.NAME.ordinal()));
-                row.put(VirtualTable.TYPE.toString(), cursor.getInt(VirtualTable.TYPE.ordinal()));
+                row.put(VirtualTable.MODEL_TYPE.toString(), cursor.getInt(VirtualTable.MODEL_TYPE.ordinal()));
                 row.put(VirtualTable.POS_X.toString(), cursor.getDouble(VirtualTable.POS_X.ordinal()));
                 row.put(VirtualTable.POS_Y.toString(), cursor.getDouble(VirtualTable.POS_Y.ordinal()));
                 row.put(VirtualTable.POS_Z.toString(), cursor.getDouble(VirtualTable.POS_Z.ordinal()));
                 row.put(VirtualTable.ROTATE_X.toString(), cursor.getDouble(VirtualTable.ROTATE_X.ordinal()));
                 row.put(VirtualTable.ROTATE_Y.toString(), cursor.getDouble(VirtualTable.ROTATE_Y.ordinal()));
                 row.put(VirtualTable.ROTATE_Z.toString(), cursor.getDouble(VirtualTable.ROTATE_Z.ordinal()));
+                row.put(VirtualTable.ROTATE_W.toString(), cursor.getDouble(VirtualTable.ROTATE_W.ordinal()));
                 row.put(VirtualTable.SIZE_X.toString(), cursor.getDouble(VirtualTable.SIZE_X.ordinal()));
                 row.put(VirtualTable.SIZE_Y.toString(), cursor.getDouble(VirtualTable.SIZE_Y.ordinal()));
                 row.put(VirtualTable.SIZE_Z.toString(), cursor.getDouble(VirtualTable.SIZE_Z.ordinal()));
-                row.put(VirtualTable.CONTAINER.toString(), cursor.getString(VirtualTable.CONTAINER.ordinal()));
-                row.put(VirtualTable.CONT_ORDER.toString(), cursor.getInt(VirtualTable.CONT_ORDER.ordinal()));
-                row.put(VirtualTable.STYLE.toString(), cursor.getString(VirtualTable.STYLE.ordinal()));
+                row.put(VirtualTable.PARENT_NAME.toString(), cursor.getString(VirtualTable.PARENT_NAME.ordinal()));
 
-                row.put(ResourceTable.NAME.toString(), cursor.getString(length+0));
-                row.put(ResourceTable.DESCRIPTION.toString(), cursor.getString(length+1));
-                row.put(ResourceTable.THUMBNAIL_PATH.toString(), cursor.getString(length+2));
+                row.put(ResourceTable.TITLE.toString(), cursor.getString(length+0));
+                row.put(ResourceTable.CONTENTS.toString(), cursor.getString(length+1));
+                row.put(ResourceTable.RES_TYPE.toString(), cursor.getString(length+2));
 
                 array.put(row);
 
@@ -202,18 +214,6 @@ public class LocalDatabaseCenter {
 
         cursor.close();
         return array;
-    }
-
-    public void backUp(DriveAssistant assistant) {
-        File dbFile = getDatabaseFile();
-        DriveFolder folder = assistant.getAppFolder();
-
-        // Drive Contents 생성
-        DriveContents contents = assistant.newDriveContents();
-        DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
-
-        String fileName = NAME + "-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
-        DriveFile file = assistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
     }
 
     final File getDatabaseFile() {
@@ -300,21 +300,6 @@ public class LocalDatabaseCenter {
          */
         public long insert() {
             StringBuilder builder = new StringBuilder();
-//            builder.append("INSERT INTO ")
-//                    .append(mTableName)
-//                    .append(" VALUES( ");
-
-//            int length = (TABLE_RESOURCE.equals(mTableName))? ResourceTable.values().length :
-//                    (TABLE_VIRTUAL.equals(mTableName))? VirtualTable.values().length :
-//                    (TABLE_AUGMENTED.equals(mTableName))? AugmentedTable.values().length : 0;
-
-
-//            for (int i=0; i<length; i++) {
-//                Pair<String, String> element = mSetClauseMap.get(i);
-//                builder.append((element == null)? null : element.second).append(",");
-//            }
-//            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
-//            builder.append(" )");
 
             Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
@@ -340,26 +325,10 @@ public class LocalDatabaseCenter {
         public boolean modify() {
             StringBuilder builder = new StringBuilder();
 
-//            builder.append("UPDATE ")
-//                    .append(mTableName)
-//                    .append(" SET ");
-
-            // SET
-//            for (Map.Entry<String, Object> element : mSetClauseValues.valueSet()) {
-//                builder.append(element.getKey())
-//                        .append("=")
-//                        .append(element.getValue())
-//                        .append(",");
-//            }
-//            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
-
-            // WHERE
-//            builder.append(" WHERE ");
             for (String clause : mWhereClauseList) {
                 builder.append("(").append(clause).append("),");
             }
             builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
-
 
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
@@ -386,9 +355,6 @@ public class LocalDatabaseCenter {
          */
         public boolean delete() {
             StringBuilder builder = new StringBuilder();
-//            builder.append("DELETE FROM ")
-//                    .append(mTableName)
-//                    .append(" WHERE ");
 
             for (String clause : mWhereClauseList) {
                 builder.append("(").append(clause).append("),");

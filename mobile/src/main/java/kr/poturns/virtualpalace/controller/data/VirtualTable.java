@@ -9,27 +9,24 @@ public enum VirtualTable implements ITable{
     // Resource ID
     RES_ID ("INTEGER NOT NULL"),
     // Object Name (Unity Name)
-    NAME ("TEXT"),
+    NAME("TEXT"),
+    // 본 오브젝트를 포함하는 오브젝트 ID
+    PARENT_NAME("TEXT"),
     // 오브젝트 타입
-    TYPE ("INTEGER NOT NULL"),
+    MODEL_TYPE ("INTEGER NOT NULL"),
     // 위치 좌표 값
-    POS_X ("REAL NOT NULL"),
-    POS_Y ("REAL NOT NULL"),
-    POS_Z ("REAL NOT NULL"),
+    POS_X ("REAL"),
+    POS_Y ("REAL"),
+    POS_Z ("REAL"),
     // 회전 값
     ROTATE_X ("REAL"),
     ROTATE_Y ("REAL"),
     ROTATE_Z ("REAL"),
+    ROTATE_W ("REAL"),
     // 크기 값
     SIZE_X ("REAL"),
     SIZE_Y ("REAL"),
-    SIZE_Z ("REAL"),
-    // 본 오브젝트를 포함하는 오브젝트 ID
-    CONTAINER ("TEXT"),
-    // Conatainer에 포함된 순서
-    CONT_ORDER ("INTEGER"),
-    // Customized Style
-    STYLE ("TEXT");
+    SIZE_Z ("REAL");
 
     public String attributes;
     VirtualTable(String attr) {

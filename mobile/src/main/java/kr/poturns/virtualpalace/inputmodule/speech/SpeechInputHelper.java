@@ -204,7 +204,7 @@ public class SpeechInputHelper implements RecognitionListener {
         Log.e(TAG, "=onError : " + error + "=");
 
         if (listener != null)
-            listener.onError(error);
+            listener.onError(error, -1);
         isInRecognizing = false;
 
         if (isContinueRecognizing)
@@ -232,7 +232,7 @@ public class SpeechInputHelper implements RecognitionListener {
      */
     private void deliverSttResult(Bundle results) {
         if (listener != null)
-            listener.onResult(new SpeechResult(getRecognitionResult(results).get(0),null));
+            listener.onResult(new SpeechResult(getRecognitionResult(results).get(0),null), -1);
 
         isInRecognizing = false;
 

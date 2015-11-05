@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import kr.poturns.virtualpalace.communication.WearMessageObject;
 import kr.poturns.virtualpalace.communication.WearableCommunicator;
-import kr.poturns.virtualpalace.input.IControllerCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.util.ThreadUtils;
 
@@ -24,7 +24,7 @@ public class WearInputConnector extends OperationInputConnector implements Messa
     private WearableCommunicator mWearableCommunicator;
 
     public WearInputConnector(Context context) {
-        super(context, IControllerCommands.TYPE_INPUT_SUPPORT_WATCH);
+        super(context, IProcessorCommands.TYPE_INPUT_SUPPORT_WATCH);
         mWearableCommunicator = new WearableCommunicator(context);
     }
 
@@ -61,7 +61,7 @@ public class WearInputConnector extends OperationInputConnector implements Messa
             sendInputMessage(messageEvent.getData());
         } else if (WearableCommunicator.MESSAGE_PATH_STRING_MESSAGE.equals(messagePath)) {
             //TODO 다른 메소드 이용하기 - 현재 이 메소드는 음성인식 전용
-            transferTextData(new String(messageEvent.getData()));
+            transferTextData(new String(messageEvent.getData()), -1);
         }
     }
 

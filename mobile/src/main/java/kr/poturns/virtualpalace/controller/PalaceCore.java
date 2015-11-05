@@ -1,11 +1,17 @@
 package kr.poturns.virtualpalace.controller;
 
 import android.database.Cursor;
+import android.text.format.DateFormat;
+
+import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveFolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -13,12 +19,14 @@ import java.util.TreeMap;
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
+import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceItem;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VRContainerTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
-import kr.poturns.virtualpalace.input.IControllerCommands;
-import kr.poturns.virtualpalace.input.IControllerCommands.JsonKey;
+import kr.poturns.virtualpalace.input.IProcessorCommands;
+import kr.poturns.virtualpalace.input.IProcessorCommands.JsonKey;
 import kr.poturns.virtualpalace.input.OperationInputConnector;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
@@ -78,8 +86,7 @@ abstract class PalaceCore {
 
         // INPUT Part.
         AttachedInputConnectorMap = new TreeMap<Integer, OperationInputConnector>();
-        mActivatedConnectorSupportFlag = IControllerCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH
-                | IControllerCommands.TYPE_INPUT_SUPPORT_VOICE ;
+        mActivatedConnectorSupportFlag = IProcessorCommands.TYPE_INPUT_SUPPORT_SCREENTOUCH;
 
         PlayModeListeners = new TreeMap<Long, OnPlayModeListener>();
         PlayModeListeners.put(0L, new OnPlayModeListener() {
@@ -116,7 +123,7 @@ abstract class PalaceCore {
      * @param event 발생시킬 이벤트 명
      * @param contents 이벤트 세부 내용
      */
-    protected abstract void dispatchEvent(String event, Object contents);
+    protected abstract void dispatchEvent(String event, JSONObject contents);
 
 
     // * * * M E T H O D S * * * //
@@ -185,10 +192,10 @@ abstract class PalaceCore {
 
             JSONObject content = new JSONObject();
             try {
-                content.put("type", "success");
-                content.put("message", "입력[" + supportType + "]가 준비되었습니다.");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_TYPE, "success");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_MSG, "입력[" + supportType + "]가 준비되었습니다.");
 
-                dispatchEvent("onToastMessage", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_TOAST_MESSAGE, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -210,10 +217,10 @@ abstract class PalaceCore {
 
             JSONObject content = new JSONObject();
             try {
-                content.put("type", "fail");
-                content.put("message", "입력[" + supportType + "]가 연결 해제되었습니다.");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_TYPE, "fail");
+                content.put(IProtocolKeywords.Event.KEY_TOAST_MESSAGE_MSG, "입력[" + supportType + "]가 연결 해제되었습니다.");
 
-                dispatchEvent("onToastMessage", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_TOAST_MESSAGE, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -235,8 +242,8 @@ abstract class PalaceCore {
 
         boolean result = (connector != null);
         if (result) {
-            if (supportType < IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
-                int activatedType = mActivatedConnectorSupportFlag % IControllerCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
+            if (supportType < IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT) {
+                int activatedType = mActivatedConnectorSupportFlag % IProcessorCommands.TYPE_INPUT_SUPPORT_MAJOR_LIMIT;
                 // 기존 활성화되어 있던 Major Support Type 비활성화.
                 deactivateInputConnector(activatedType);
             }
@@ -247,7 +254,7 @@ abstract class PalaceCore {
             JSONObject content = new JSONObject();
             try {
                 content.put(String.valueOf(supportType), true);
-                dispatchEvent("onInputModeChanged", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_INPUTMODE_CHANGED, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -273,7 +280,7 @@ abstract class PalaceCore {
             JSONObject content = new JSONObject();
             try {
                 content.put(String.valueOf(supportType), false);
-                dispatchEvent("onInputModeChanged", content);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_INPUTMODE_CHANGED, content);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -282,22 +289,31 @@ abstract class PalaceCore {
         return result;
     }
 
-    /**
-     *
-     * @param supportType
-     * @return
-     */
-    boolean requestTextResultByVoiceRecognition(int supportType) {
-        if ((mActivatedConnectorSupportFlag & supportType) == supportType) {
+    boolean requestSpeechDetection(String mode, String action) {
+        if (isActivatedInputType(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE)) {
+            OperationInputConnector connector = AttachedInputConnectorMap.get(IProcessorCommands.TYPE_INPUT_SUPPORT_VOICE);
 
-            for (int support : AttachedInputConnectorMap.keySet()) {
-                if ((support & supportType) == supportType) {
-                    OperationInputConnector connector = AttachedInputConnectorMap.get(support);
-                    connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE, SpeechController.MODE_TEXT);
-                    return true;
-                }
+            JSONObject returnObject = new JSONObject();
+            try {
+                returnObject.put(IProtocolKeywords.Request.KEY_USE_SPEECH_MODE, mode);
+            } catch (JSONException e) { ; }
+
+            if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
+                connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
+                        IProtocolKeywords.Request.KEY_USE_SPEECH_MODE_COMMAND.equalsIgnoreCase(mode) ?
+                                SpeechController.MODE_COMMAND : SpeechController.MODE_TEXT);
+
+                connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_TRUE);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_STARTED, returnObject);
+                return true;
+
+            } else if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_STOP.equalsIgnoreCase(action)) {
+                connector.configureFromController(App, SpeechInputConnector.KEY_ACTIVE_RECOGNIZE, SpeechInputConnector.VALUE_FALSE);
+                dispatchEvent(IProtocolKeywords.Event.EVENT_SPEECH_ENDED, returnObject);
+                return true;
             }
         }
+
         return false;
     }
 
@@ -322,15 +338,6 @@ abstract class PalaceCore {
         return false;
     }
 
-    public void testDrive(final DriveAssistant assistant) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DBCenter.backUp(assistant);
-            }
-        }).start();
-    }
-
     /**
      * 현 위치 근처에 등록되어 있는 AugmentedItem 목록을 조회한다.
      *
@@ -346,6 +353,75 @@ abstract class PalaceCore {
                 latestData[LocationSensorAgent.DATA_INDEX_ALTITUDE],
                 radius
         );
+    }
+
+    /**
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryNearAugmentedItems(JSONObject returnObject) {
+        JSONArray returnArray = new JSONArray();
+        try {
+            for (AugmentedItem item : queryNearAugmentedItems()) {
+                JSONObject each = new JSONObject();
+
+                // TODO :
+
+                returnArray.put(each);
+            }
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, returnArray);
+
+        } catch (JSONException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * VR Scene에서 렌더링해야할 모든 Item 목록을 반환한다.
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryVirtualRenderingItems(JSONObject returnObject) {
+        try {
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
+            return true;
+
+        } catch (Exception e) { ; }
+        return false;
+    }
+
+    /**
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryVRContainerItems(JSONObject returnObject) {
+       try {
+           // SELECT ALL
+           LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(ITable.TABLE_VR_CONTAINER, new JSONObject() );
+
+           JSONArray array = new JSONArray();
+           Cursor cursor = builder.select();
+
+           while (cursor.moveToNext()) {
+               JSONObject bookcase = new JSONObject();
+               bookcase.put(VRContainerTable.NAME.toString(), cursor.getString(VRContainerTable.NAME.ordinal()));
+               bookcase.put(VRContainerTable.Z_OFFSET.toString(), cursor.getString(VRContainerTable.Z_OFFSET.ordinal()));
+               bookcase.put(VRContainerTable.COUNT.toString(), cursor.getString(VRContainerTable.COUNT.ordinal()));
+               array.put(bookcase);
+           }
+           cursor.close();
+
+           returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, array);
+           return true;
+
+       } catch (Exception e) { ;}
+
+        return false;
     }
 
     /**
@@ -385,8 +461,9 @@ abstract class PalaceCore {
         LocalDatabaseCenter.WriteBuilder<ResourceTable> builder =
                 new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
-        builder.set(ResourceTable.NAME, item.name)
-                .set(ResourceTable.DESCRIPTION, item.description);
+        builder.set(ResourceTable.TITLE, item.name)
+                .set(ResourceTable.RES_TYPE, "0")
+                .set(ResourceTable.CTIME, String.valueOf(System.currentTimeMillis()));
 
         long resID = builder.insert();
         if (resID > 0)
@@ -406,32 +483,9 @@ abstract class PalaceCore {
                 new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
 
         builder.set(VirtualTable.RES_ID, String.valueOf(resID))
-                .set(VirtualTable.TYPE, "0");
+                .set(VirtualTable.MODEL_TYPE, "0");
 
         return builder.insert();
-    }
-
-
-
-    /**
-     *
-     * @param command
-     * @param paramObj
-     * @param returnObj
-     * @return
-     */
-    boolean executeConstructedQuery(String command, JSONObject paramObj, JSONObject returnObj) {
-        try {
-            if (JsonKey.QUERY_ALL_VR_ITEMS.equalsIgnoreCase(command)) {
-                returnObj.put(JsonKey.QUERY_RESULT, DBCenter.queryAllVirtualRenderings());
-                return true;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
 
@@ -482,7 +536,7 @@ abstract class PalaceCore {
             }
             cursor.close();
 
-            result.put(IControllerCommands.JsonKey.QUERY_RESULT, array);
+            result.put(IProcessorCommands.JsonKey.QUERY_RESULT, array);
             return true;
 
         } catch (Exception e) {
@@ -566,7 +620,7 @@ abstract class PalaceCore {
                         builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
                 } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
-                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    // IProcessorCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
                 }
                 // OTHER CLAUSES
@@ -647,7 +701,7 @@ abstract class PalaceCore {
                         builder.whereBetween(getField(table, item), items.getString(item), dest.getString(item));
                     }
                 } else if (JsonKey.WHERE_TO.equalsIgnoreCase(element)) {
-                    // IControllerCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
+                    // IProcessorCommands.JsonKey.WHERE_FROM 에서 한번에 처리.
                     continue;
                 }
 
@@ -717,11 +771,21 @@ abstract class PalaceCore {
     }
 
     /**
+     * Google Drive App Folder에 DB 파일을 백업한다.
+     *
      * @return
      */
     boolean executeBackUp() {
-        DBCenter.backUp(AppDriveAssistant);
-        return false;
+        File dbFile = DBCenter.getDatabaseFile();
+        DriveFolder folder = AppDriveAssistant.getAppFolder();
+
+        // Drive Contents 생성
+        DriveContents contents = AppDriveAssistant.newDriveContents();
+        DriveAssistant.IDriveContentsApi.writeFileContents(contents, dbFile.getAbsolutePath());
+
+        String fileName = "VirtualPalace-" + DateFormat.format("yyMMddhhmmss", System.currentTimeMillis()) + ".dbk";
+        DriveFile file = AppDriveAssistant.DriveFolderApi.createFile(folder, contents, fileName, "db");
+        return true;
     }
 
 

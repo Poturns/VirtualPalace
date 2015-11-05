@@ -79,19 +79,22 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
     }
 
     @Override
-    public void onResult(SpeechResult speechResult) {
+    public void onResult(SpeechResult speechResult, int mode) {
 
         switch (mRecognitionMode) {
             default:
             case MODE_COMMAND:
                 detect(speechResult.result);
-                break;
+
+                // Command 인식 시에도 음성인식이 제대로 됬음을 알려주기 위해서
+                // 인식한 텍스트를 Listener로 전송. >> break 주석처리. - Y H
+                //break;
 
             // Text 입력 모드의 경우, 따로 정의된 리스너에 입력을 전송하고, 지속적인 인식요청은 하지 않고
             // 잠시 후에 음성인식을 시작한다.
             case MODE_TEXT:
                 if (listener != null)
-                    listener.onResult(speechResult);
+                    listener.onResult(speechResult, mRecognitionMode);
 
                 setRecognitionMode(MODE_COMMAND);
 
@@ -101,7 +104,7 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
 
 
     @Override
-    public void onError(int cause) {
+    public void onError(int cause, int mode) {
         switch (mRecognitionMode) {
             default:
             case MODE_COMMAND:
@@ -109,10 +112,9 @@ public class SpeechInputDetector extends OperationInputDetector<String> implemen
 
             case MODE_TEXT:
                 if (listener != null)
-                    listener.onError(cause);
+                    listener.onError(cause, mRecognitionMode);
 
                 setRecognitionMode(MODE_COMMAND);
-
                 break;
         }
     }

@@ -79,7 +79,7 @@ public class OperationInputConnector {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IProcessorCommands.INPUT_SINGLE_COMMAND, mSupportTypeF, 0, inputRst).sendToTarget();
         return true;
     }
 
@@ -93,7 +93,7 @@ public class OperationInputConnector {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IProcessorCommands.INPUT_MULTI_COMMANDS, mSupportTypeF, 0, inputRstArray).sendToTarget();
         return true;
     }
 
@@ -101,13 +101,14 @@ public class OperationInputConnector {
      * 텍스트 결과를 전송한다.
      *
      * @param text 전송할 문자열
+     * @param mode 음성 인식 모드
      * @return 전송 결과
      */
-    protected boolean transferTextData(String text) {
+    protected boolean transferTextData(String text, int mode) {
         if (mControllerInputHandlerF == null || !isEnabled)
             return false;
 
-        Message.obtain(mControllerInputHandlerF, IControllerCommands.INPUT_TEXT_RESULT, text).sendToTarget();
+        Message.obtain(mControllerInputHandlerF, IProcessorCommands.INPUT_TEXT_RESULT, mode, 0, text).sendToTarget();
         return true;
     }
 
