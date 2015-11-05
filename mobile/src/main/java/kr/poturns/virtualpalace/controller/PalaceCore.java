@@ -409,23 +409,27 @@ abstract class PalaceCore {
         for (int i=0; i<array.length(); i++) {
             try {
                 JSONObject object = array.getJSONObject(i);
+                long resID = object.optLong(VirtualTable.RES_ID.name(), -1);
 
                 // First, handle Resource Data.
                 LocalDatabaseCenter.WriteBuilder<ResourceTable> resBuilder = new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
                 for (ResourceTable field : ResourceTable.values()) {
+                    // Res_id 를 제외하고 변경된 데이터들을 Builder에 포함시킨다.
                     if (object.has(field.name()) && (field != ResourceTable._ID))
                         resBuilder.set(field, object.getString(field.name()));
                 }
-                resBuilder.whereEqual(ResourceTable._ID, object.getString(VirtualTable.RES_ID.name()));
+                resBuilder.whereEqual(ResourceTable._ID, String.valueOf(resID));
 
                 // do Update, or Insert.
-                boolean resRst = resBuilder.modify()? true : (resBuilder.insert() > 0);
+                boolean resRst = resBuilder.modify()? true : ((resID = resBuilder.insert()) > 0);
 
                 // Second, do VR Data.
                 LocalDatabaseCenter.WriteBuilder<VirtualTable> vrBuilder = new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
                 for (VirtualTable field : VirtualTable.values()) {
-                    if (object.has(field.name()))
-                        vrBuilder.set(field, object.getString(field.name()));
+                    if (object.has(field.name())) {
+                        vrBuilder.set(field, field == VirtualTable.RES_ID?
+                                String.valueOf(resID) : object.getString(field.name()));
+                    }
                 }
                 vrBuilder.whereEqual(VirtualTable._ID, object.getString(VirtualTable._ID.name()));
 
