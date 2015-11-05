@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import kr.poturns.virtualpalace.controller.PalaceApplication;
+import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.input.IProcessorCommands;
 
 public class DatabaseTestActivity extends Activity implements View.OnClickListener{
@@ -48,7 +49,8 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
         app = (PalaceApplication) getApplication();
         master = PalaceMaster.getInstance(app);
 
-        master.queryNearAugmentedItems();
+        //master.queryNearAugmentedItems();
+
     }
 
     @Override
@@ -76,7 +78,7 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
                     JSONObject rst_obj = master.testProcess(json);
                     adapter.jsonResultList.add("===" + rst_obj.opt("select_ar") + "===");
 
-                    JSONArray array = rst_obj.getJSONArray("query_result");
+                    JSONArray array = rst_obj.getJSONArray("select_ar");
                     for (int i=0; i<array.length(); i++)
                         adapter.jsonResultList.add(array.get(i).toString());
                     adapter.notifyDataSetChanged();
@@ -94,7 +96,7 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
                     JSONObject rst_obj = master.testProcess(json);
                     adapter.jsonResultList.add("===" + rst_obj.opt("select_vr") + "===");
 
-                    JSONArray array = rst_obj.getJSONArray("query_result");
+                    JSONArray array = rst_obj.getJSONArray("select_vr");
                     for (int i=0; i<array.length(); i++)
                         adapter.jsonResultList.add(array.get(i).toString());
                     adapter.notifyDataSetChanged();
@@ -112,7 +114,7 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
                     JSONObject rst_obj = master.testProcess(json);
                     adapter.jsonResultList.add("===" + rst_obj.opt("select_res") + "===");
 
-                    JSONArray array = rst_obj.getJSONArray("query_result");
+                    JSONArray array = rst_obj.getJSONArray("select_res");
                     for (int i=0; i<array.length(); i++)
                         adapter.jsonResultList.add(array.get(i).toString());
                     adapter.notifyDataSetChanged();
@@ -147,23 +149,23 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
 
                    } else if ("vr".equals(currentDB)) {
                         json = "{insert_vr: {set: {" +
-                                "res_id:1, name:'"+ input +"', type:1, " +
+                                "res_id:1, name:'"+ input +"', res_type:1, " +
                                 "pos_x:123, pos_y:456, pos_z:789, " +
-                                "rotate_x:12.3, rotate_y:45.6, rotate_z:78.9," +
-                                "container:'helloContainer', cont_order:0" +
+                                "rotate_x:12.3, rotate_y:45.6, rotate_z:78.9, rotate_w:10.20" +
+                                "parent_name:'helloContainer'"+
                                 "}}}";
 
                    } else {
                        json = "{insert_res: {set: {" +
-                               "res_id:1, name:'" + input + "', type:'text/memo', " +
-                               "category:'temp', archive_path:'/sdcard/VirtualPalace/', description:'Test Data 입니다.', " +
+                               "res_id:1, title:'" + input + "', res_type:1, " +
+                               "contents: This is Contents, expansion: txt" +
                                "ctime:" + System.currentTimeMillis() +
                                "}}}";
                    }
                     try {
                         adapter.jsonResultList.clear();
 
-                        Message.obtain(master.getRequestHandler(), IControllerCommands.REQUEST_MESSAGE_FROM_ANDROID, json).sendToTarget();
+                        Message.obtain(master.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_ANDROID, json).sendToTarget();
 
                         //JSONObject rst_obj = master.testProcess(json);
                         //adapter.jsonResultList.add("=== ===");
@@ -185,15 +187,14 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
 
                     } else if ("vr".equals(currentDB)) {
                         json = "{update_vr: {set: {" +
-                                "container:'changedContainer', cont_order:0}, " +
+                                "parent_name:'changedContainer'}, " +
                                 "where: {res_id:1" +
                                 "}}}";
 
                     } else {
                         json = "{update_res: {set: {" +
-                                "category:'temp', archive_path:'/sdcard/VirtualPalace/', " +
                                 "mtime: " + System.currentTimeMillis() + ", " +
-                                "description:'Changed! name: testResName > testResName2'}, " +
+                                "contents:'Changed! testResName > testResName2'}, " +
                                 "where: {_id:1} }}";
                     }
                     try {

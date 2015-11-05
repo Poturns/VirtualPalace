@@ -1,7 +1,6 @@
 package kr.poturns.virtualpalace.controller;
 
 import android.database.Cursor;
-import android.os.Handler;
 import android.text.format.DateFormat;
 
 import com.google.android.gms.drive.DriveContents;
@@ -24,6 +23,7 @@ import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceItem;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VRContainerTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
 import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.input.IProcessorCommands.JsonKey;
@@ -395,6 +395,36 @@ abstract class PalaceCore {
     }
 
     /**
+     *
+     * @param returnObject
+     * @return
+     */
+    protected boolean queryVRContainerItems(JSONObject returnObject) {
+       try {
+           // SELECT ALL
+           LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(ITable.TABLE_VR_CONTAINER, new JSONObject() );
+
+           JSONArray array = new JSONArray();
+           Cursor cursor = builder.select();
+
+           while (cursor.moveToNext()) {
+               JSONObject bookcase = new JSONObject();
+               bookcase.put(VRContainerTable.NAME.toString(), cursor.getString(VRContainerTable.NAME.ordinal()));
+               bookcase.put(VRContainerTable.Z_OFFSET.toString(), cursor.getString(VRContainerTable.Z_OFFSET.ordinal()));
+               bookcase.put(VRContainerTable.COUNT.toString(), cursor.getString(VRContainerTable.COUNT.ordinal()));
+               array.put(bookcase);
+           }
+           cursor.close();
+
+           returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, array);
+           return true;
+
+       } catch (Exception e) { ;}
+
+        return false;
+    }
+
+    /**
      * 새로운 Augmented Item을 추가한다.
      * 동시에 간략한 Resource Item을 생성한다.
      *
@@ -431,8 +461,9 @@ abstract class PalaceCore {
         LocalDatabaseCenter.WriteBuilder<ResourceTable> builder =
                 new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
 
-        builder.set(ResourceTable.NAME, item.name)
-                .set(ResourceTable.DESCRIPTION, item.description);
+        builder.set(ResourceTable.TITLE, item.name)
+                .set(ResourceTable.RES_TYPE, "0")
+                .set(ResourceTable.CTIME, String.valueOf(System.currentTimeMillis()));
 
         long resID = builder.insert();
         if (resID > 0)
@@ -452,7 +483,7 @@ abstract class PalaceCore {
                 new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
 
         builder.set(VirtualTable.RES_ID, String.valueOf(resID))
-                .set(VirtualTable.TYPE, "0");
+                .set(VirtualTable.MODEL_TYPE, "0");
 
         return builder.insert();
     }

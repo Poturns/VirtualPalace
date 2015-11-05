@@ -7,12 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
-import android.text.format.DateFormat;
 import android.util.Log;
-
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +23,6 @@ import kr.poturns.virtualpalace.controller.data.ITable;
 import kr.poturns.virtualpalace.controller.data.ResourceTable;
 import kr.poturns.virtualpalace.controller.data.VRContainerTable;
 import kr.poturns.virtualpalace.controller.data.VirtualTable;
-import kr.poturns.virtualpalace.util.DriveAssistant;
 
 /**
  * <b> 로컬 저장소의 DATABASE 를 관리한다. </b>
@@ -63,7 +57,7 @@ public class LocalDatabaseCenter {
     /**
      * 로컬 DB .Version
      */
-    private static final int VERSION = 4;
+    private static final int VERSION = 7;
 
     private final Context InContext;
 
@@ -98,7 +92,7 @@ public class LocalDatabaseCenter {
                 StringBuilder vrContainerBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_VR_CONTAINER + " (");
                 for (VRContainerTable field : VRContainerTable.values())
                     vrContainerBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
-                vrContainerBuilder.deleteCharAt(vrBuilder.length()-1).append(");");
+                vrContainerBuilder.deleteCharAt(vrContainerBuilder.length()-1).append(");");
 
 
                 db.execSQL(resBuilder.toString());
@@ -183,7 +177,7 @@ public class LocalDatabaseCenter {
         JSONArray array = new JSONArray();
 
         Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
-                "SELECT v.*, r.name, r.description, r.thumbnail_path " +
+                "SELECT v.*, r.title, r.contents, r.res_type " +
                         "FROM virtual v, resource r WHERE v.res_id = r._id;", null);
 
         int length = VirtualTable.values().length;
@@ -194,23 +188,22 @@ public class LocalDatabaseCenter {
                 row.put(VirtualTable._ID.toString(), cursor.getInt(VirtualTable._ID.ordinal()));
                 row.put(VirtualTable.RES_ID.toString(), cursor.getInt(VirtualTable.RES_ID.ordinal()));
                 row.put(VirtualTable.NAME.toString(), cursor.getString(VirtualTable.NAME.ordinal()));
-                row.put(VirtualTable.TYPE.toString(), cursor.getInt(VirtualTable.TYPE.ordinal()));
+                row.put(VirtualTable.MODEL_TYPE.toString(), cursor.getInt(VirtualTable.MODEL_TYPE.ordinal()));
                 row.put(VirtualTable.POS_X.toString(), cursor.getDouble(VirtualTable.POS_X.ordinal()));
                 row.put(VirtualTable.POS_Y.toString(), cursor.getDouble(VirtualTable.POS_Y.ordinal()));
                 row.put(VirtualTable.POS_Z.toString(), cursor.getDouble(VirtualTable.POS_Z.ordinal()));
                 row.put(VirtualTable.ROTATE_X.toString(), cursor.getDouble(VirtualTable.ROTATE_X.ordinal()));
                 row.put(VirtualTable.ROTATE_Y.toString(), cursor.getDouble(VirtualTable.ROTATE_Y.ordinal()));
                 row.put(VirtualTable.ROTATE_Z.toString(), cursor.getDouble(VirtualTable.ROTATE_Z.ordinal()));
+                row.put(VirtualTable.ROTATE_W.toString(), cursor.getDouble(VirtualTable.ROTATE_W.ordinal()));
                 row.put(VirtualTable.SIZE_X.toString(), cursor.getDouble(VirtualTable.SIZE_X.ordinal()));
                 row.put(VirtualTable.SIZE_Y.toString(), cursor.getDouble(VirtualTable.SIZE_Y.ordinal()));
                 row.put(VirtualTable.SIZE_Z.toString(), cursor.getDouble(VirtualTable.SIZE_Z.ordinal()));
-                row.put(VirtualTable.CONTAINER.toString(), cursor.getString(VirtualTable.CONTAINER.ordinal()));
-                row.put(VirtualTable.CONT_ORDER.toString(), cursor.getInt(VirtualTable.CONT_ORDER.ordinal()));
-                row.put(VirtualTable.STYLE.toString(), cursor.getString(VirtualTable.STYLE.ordinal()));
+                row.put(VirtualTable.PARENT_NAME.toString(), cursor.getString(VirtualTable.PARENT_NAME.ordinal()));
 
-                row.put(ResourceTable.NAME.toString(), cursor.getString(length+0));
-                row.put(ResourceTable.DESCRIPTION.toString(), cursor.getString(length+1));
-                row.put(ResourceTable.THUMBNAIL_PATH.toString(), cursor.getString(length+2));
+                row.put(ResourceTable.TITLE.toString(), cursor.getString(length+0));
+                row.put(ResourceTable.CONTENTS.toString(), cursor.getString(length+1));
+                row.put(ResourceTable.RES_TYPE.toString(), cursor.getString(length+2));
 
                 array.put(row);
 

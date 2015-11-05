@@ -3,9 +3,9 @@ package kr.poturns.virtualpalace.controller.data;
 
 public enum VRContainerTable implements ITable{
     _ID ("INTEGER PRIMARY KEY AUTOINCREMENT"),
-    NAME ("TEXT"),
-    Z_OFFSET ("REAL"),
-    COUNT ("INTEGER");
+    NAME("TEXT"),
+    Z_OFFSET ("REAL DEFAULT 0"),
+    COUNT ("INTEGER DEFAULT 0");
 
     public String attributes;
     VRContainerTable(String attr) {

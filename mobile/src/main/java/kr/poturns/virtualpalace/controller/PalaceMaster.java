@@ -532,6 +532,9 @@ public class PalaceMaster extends PalaceEngine {
                         //if (result)
                         //    throw new WaitForCallbackException();
 
+                    } else if (COMMAND_QUERY_VR_BOOKCASES.equalsIgnoreCase(command)) {
+                        result = queryVRContainerItems(partialReturn);
+
                     } else if (COMMAND_QUERY_VR_ITEMS.equalsIgnoreCase(command)) {
                         result = queryVirtualRenderingItems(partialReturn);
 
