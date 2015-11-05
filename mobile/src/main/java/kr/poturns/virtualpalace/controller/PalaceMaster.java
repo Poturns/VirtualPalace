@@ -227,11 +227,18 @@ public class PalaceMaster extends PalaceEngine {
                 // AR 렌더링 명령
                 case DRAW_AR_ITEM:
                     try {
+                        /*
                         JSONObject eachResObj = singleMessage.has(cmdStr)?
                                 singleMessage.getJSONObject(cmdStr) : new JSONObject();
 
                         eachResObj.put(String.valueOf(command[1]), command[2] * 10000 + command[3]);
                         singleMessage.put(cmdStr, eachResObj);
+                        */
+                        int compressed = command[1];
+                        compressed = compressed * 10000 + command[2];
+                        compressed = compressed * 10000 + command[3];
+
+                        singleMessage.put(cmdStr, compressed);
 
                     } catch (JSONException e) { ; }
                     break;
