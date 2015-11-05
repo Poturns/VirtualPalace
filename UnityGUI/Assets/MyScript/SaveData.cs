@@ -9,7 +9,7 @@ using BridgeApi.Controller.Request.Database;
 public class SaveData : ISerializable
 {
 
-
+    public int Key { get; set; }
     protected float Posx;
     protected float Posy;
     protected float Posz;
@@ -136,15 +136,16 @@ public class SaveData : ISerializable
     }
 
 
-    public KeyValuePair<Enum, string>[] ConvertVRMetadataToPairs()
+    public virtual KeyValuePair<Enum, string>[] ConvertToPairs()
     {
-        KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[15];
+        KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[14];
         int i = 0;
 
         //GetType().GetMembers()
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.RES_ID, Sourcekind.ToString());
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.NAME, ObjName);
-        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.TYPE, ObjKind.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.PARENT_NAME, ParentName);
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.MODEL_TYPE, ModelKind.ToString());
 
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_X, Posx.ToString());
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.POS_Y, Posy.ToString());
@@ -152,15 +153,12 @@ public class SaveData : ISerializable
 
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_X, Rotx.ToString());
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Y, Roty.ToString());
-        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Z, Rotx.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_Z, Rotz.ToString());
+        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.ROTATE_W, Rotw.ToString());
 
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_X, Scalex.ToString());
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Y, Scaley.ToString());
         pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Z, Scalez.ToString());
-
-        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.CONTAINER, "");
-        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.CONT_ORDER, "");
-        pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.STYLE, Contents);
 
         return pairs;
     }
@@ -169,9 +167,11 @@ public class SaveData : ISerializable
     {
         SaveData saveData = new SaveData();
         Debug.Log("===== " + jsonData.ToJson());
+        saveData.Key = int.Parse((string)jsonData[VIRTUAL_FIELD._ID.ToString()]);
         saveData.Sourcekind = int.Parse((string)jsonData[VIRTUAL_FIELD.RES_ID.ToString()]);
         saveData.ObjName = (string)jsonData[VIRTUAL_FIELD.NAME.ToString()];
-        saveData.ModelKind = int.Parse((string)jsonData[VIRTUAL_FIELD.TYPE.ToString()]);
+        saveData.ParentName = (string)jsonData[VIRTUAL_FIELD.PARENT_NAME.ToString()];
+        saveData.ModelKind = int.Parse((string)jsonData[VIRTUAL_FIELD.MODEL_TYPE.ToString()]);
 
         saveData.Posx = GetFloatData(jsonData, VIRTUAL_FIELD.POS_X.ToString());
         saveData.Posy = GetFloatData(jsonData, VIRTUAL_FIELD.POS_Y.ToString());
@@ -180,21 +180,18 @@ public class SaveData : ISerializable
         saveData.Rotx = GetFloatData(jsonData, VIRTUAL_FIELD.ROTATE_X.ToString());
         saveData.Roty = GetFloatData(jsonData, VIRTUAL_FIELD.ROTATE_Y.ToString());
         saveData.Rotz = GetFloatData(jsonData, VIRTUAL_FIELD.ROTATE_Z.ToString());
+        saveData.Rotw = GetFloatData(jsonData, VIRTUAL_FIELD.ROTATE_W.ToString());
 
         saveData.Scalex = GetFloatData(jsonData, VIRTUAL_FIELD.SIZE_X.ToString());
         saveData.Scaley = GetFloatData(jsonData, VIRTUAL_FIELD.SIZE_Y.ToString());
         saveData.Scalez = GetFloatData(jsonData, VIRTUAL_FIELD.SIZE_Z.ToString());
 
-        // pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.CONTAINER, "");
-        //pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.CONT_ORDER, "");
-        saveData.Contents = (string)jsonData[VIRTUAL_FIELD.STYLE.ToString()];
-
         return saveData;
     }
 
-    private static float GetFloatData(LitJson.JsonData jsonData, string key)
+    internal static float GetFloatData(LitJson.JsonData jsonData, string key)
     {
-        Debug.Log("==== parsing : { " + key + " : " + jsonData[key].ToJson() + " }");
+       // Debug.Log("==== parsing : { " + key + " : " + jsonData[key].ToJson() + " }");
         if (jsonData.IsLong)
         {
             return (long)jsonData[key];

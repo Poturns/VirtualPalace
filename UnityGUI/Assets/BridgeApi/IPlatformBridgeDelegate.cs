@@ -25,6 +25,6 @@ namespace BridgeApi.Controller
         /// </summary>
         /// <param name="jsonMessage">전송할 Json 메시지</param>
         /// <returns>메시지가 정상적으로 전송되었을 때, TRUE</returns>
-        void SendSingleMessageToPlatform(string jsonMessage);
+        bool SendSingleMessageToPlatform(string jsonMessage);
     }
 }

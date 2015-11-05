@@ -41,17 +41,16 @@ import kr.poturns.virtualpalace.util.DriveRestAssistant;
  * <b> INTERNAL CONTROLLER : 컨트롤러의 관리 기능을 다룬다 </b>
  * <p>데이터 처리 (DB + Archive + Drive)
  * </p>
- *
+ * <p/>
  * <p>Input Connector 관리
  * <ol>
- *  <li>각 Input Connector에서 GlobalApplication을 통해 Controller에 Connector 등록 요청을 한다. {@link #attachInputConnector(int, OperationInputConnector)}</li>
- *  <li>Controller에서 해당 Input Connector를 활성화하여 Input 전달을 처리한다. {@link #activateInputConnector(int)}</li>
- *  <li>연결되었으나 활성화되지 않았을 경우, 해당 Input Connector로부터 발생하는 Input은 처리되지 않는다.</li>
- *  <li>{@link #deactivateInputConnector(int)}를 통해 해당 Input Connector는 비활성화 될 수 있다.</li>
- *  <li>{@link #detachInputConnector(int)}를 통해 해당 Input Connector는 등록해제 될 수 있다.</li>
+ * <li>각 Input Connector에서 GlobalApplication을 통해 Controller에 Connector 등록 요청을 한다. {@link #attachInputConnector(int, OperationInputConnector)}</li>
+ * <li>Controller에서 해당 Input Connector를 활성화하여 Input 전달을 처리한다. {@link #activateInputConnector(int)}</li>
+ * <li>연결되었으나 활성화되지 않았을 경우, 해당 Input Connector로부터 발생하는 Input은 처리되지 않는다.</li>
+ * <li>{@link #deactivateInputConnector(int)}를 통해 해당 Input Connector는 비활성화 될 수 있다.</li>
+ * <li>{@link #detachInputConnector(int)}를 통해 해당 Input Connector는 등록해제 될 수 있다.</li>
  * </ol>
  * </p>
- *
  *
  * @author Yeonho.Kim
  */
@@ -117,24 +116,25 @@ abstract class PalaceCore {
 
 
     // * * * A B S T R A C T * * * //
+
     /**
      * Unity 에 발생한 이벤트를 전달한다.
      *
-     * @param event 발생시킬 이벤트 명
+     * @param event    발생시킬 이벤트 명
      * @param contents 이벤트 세부 내용
      */
     protected abstract void dispatchEvent(String event, JSONObject contents);
 
 
     // * * * M E T H O D S * * * //
+
     /**
-     *
      * @param listener
      */
     @Deprecated
     void attachOnPlayModeChangedListener(OnPlayModeListener listener) {
         if (listener == null)
-            return ;
+            return;
 
         long key = System.currentTimeMillis();
         PlayModeListeners.put(key, listener);
@@ -142,19 +142,17 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @param key
      */
     @Deprecated
     void detachOnPlayModeChangedListener(long key) {
         if (key == 0)
-            return ;
+            return;
 
         PlayModeListeners.remove(key).onDetached();
     }
 
     /**
-     *
      * @param mode
      */
     @Deprecated
@@ -162,20 +160,20 @@ abstract class PalaceCore {
         if (mCurrentMode == mode && isOnCardboard == onCardboard)
             return false;
 
-        for(OnPlayModeListener listener : PlayModeListeners.values()) {
+        for (OnPlayModeListener listener : PlayModeListeners.values()) {
             listener.onPlayModeChanged(mode, onCardboard);
         }
         return true;
     }
 
 
-
     // * * * I N P U T _ P A R T . * * * //
+
     /**
      * {@link OperationInputConnector}를 Controller 에 등록한다.
      * 연결할 경우, 자동으로 활성화 하지 않는다.
      *
-     * @param connector Connector Support Type
+     * @param connector   Connector Support Type
      * @param supportType Connector Instance
      */
     void attachInputConnector(int supportType, OperationInputConnector connector) {
@@ -225,13 +223,14 @@ abstract class PalaceCore {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        };
+        }
+        ;
     }
 
     /**
      * 연결되어 있는 supportType {@link OperationInputConnector}를 활성화한다.
      * 활성화된 Input Connector 에서 전달된 Input 데이터만 처리된다.
-     *
+     * <p/>
      * Major Input 타입에서는 동시에 하나의 Support Type 만 활성화된다.
      * 따라서 기존에 활성화되어 있던 SupportType 은 비활성되고, 새로운 SupportType 이 활성화된다.
      *
@@ -296,7 +295,9 @@ abstract class PalaceCore {
             JSONObject returnObject = new JSONObject();
             try {
                 returnObject.put(IProtocolKeywords.Request.KEY_USE_SPEECH_MODE, mode);
-            } catch (JSONException e) { ; }
+            } catch (JSONException e) {
+                ;
+            }
 
             if (IProtocolKeywords.Request.KEY_USE_SPEECH_ACTION_START.equalsIgnoreCase(action)) {
                 connector.configureFromController(App, SpeechInputConnector.KEY_SWITCH_MODE,
@@ -319,6 +320,7 @@ abstract class PalaceCore {
 
 
     // * * * D A T A _ P A R T . * * * //
+
     /**
      * 로컬저장소 & 로컬 DB & 구글 드라이브 간의 데이터 동기화 상태를 체크한다.
      * (동기적 비동기화)
@@ -356,7 +358,6 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @param returnObject
      * @return
      */
@@ -390,36 +391,39 @@ abstract class PalaceCore {
             returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, DBCenter.queryAllVirtualRenderings());
             return true;
 
-        } catch (Exception e) { ; }
+        } catch (Exception e) {
+            ;
+        }
         return false;
     }
 
     /**
-     *
      * @param returnObject
      * @return
      */
     protected boolean queryVRContainerItems(JSONObject returnObject) {
-       try {
-           // SELECT ALL
-           LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(ITable.TABLE_VR_CONTAINER, new JSONObject() );
+        try {
+            // SELECT ALL
+            LocalDatabaseCenter.ReadBuilder builder = makeReadBuilder(ITable.TABLE_VR_CONTAINER, new JSONObject());
 
-           JSONArray array = new JSONArray();
-           Cursor cursor = builder.select();
+            JSONArray array = new JSONArray();
+            Cursor cursor = builder.select();
 
-           while (cursor.moveToNext()) {
-               JSONObject bookcase = new JSONObject();
-               bookcase.put(VRContainerTable.NAME.toString(), cursor.getString(VRContainerTable.NAME.ordinal()));
-               bookcase.put(VRContainerTable.Z_OFFSET.toString(), cursor.getString(VRContainerTable.Z_OFFSET.ordinal()));
-               bookcase.put(VRContainerTable.COUNT.toString(), cursor.getString(VRContainerTable.COUNT.ordinal()));
-               array.put(bookcase);
-           }
-           cursor.close();
+            while (cursor.moveToNext()) {
+                JSONObject bookcase = new JSONObject();
+                bookcase.put(VRContainerTable.NAME.toString(), cursor.getString(VRContainerTable.NAME.ordinal()));
+                bookcase.put(VRContainerTable.Z_OFFSET.toString(), cursor.getString(VRContainerTable.Z_OFFSET.ordinal()));
+                bookcase.put(VRContainerTable.COUNT.toString(), cursor.getString(VRContainerTable.COUNT.ordinal()));
+                array.put(bookcase);
+            }
+            cursor.close();
 
-           returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, array);
-           return true;
+            returnObject.put(IProtocolKeywords.Request.KEY_CALLBACK_RETURN, array);
+            return true;
 
-       } catch (Exception e) { ;}
+        } catch (Exception e) {
+            ;
+        }
 
         return false;
     }
@@ -498,11 +502,10 @@ abstract class PalaceCore {
      */
     boolean insertNewLocalData(JSONObject insert, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, insert);
-        return (builder == null)? false : (builder.insert() > 0);
+        return (builder == null) ? false : (builder.insert() > 0);
     }
 
     /**
-     *
      * @param select
      * @param table
      * @return
@@ -519,22 +522,25 @@ abstract class PalaceCore {
 
                 if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
                     ResourceTable[] fields = ResourceTable.values();
-                    for (int i=0; i<fields.length; i++)
+                    for (int i = 0; i < fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
 
                 } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
                     AugmentedTable[] fields = AugmentedTable.values();
-                    for (int i=0; i<fields.length; i++)
+                    for (int i = 0; i < fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
 
                 } else if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
                     VirtualTable[] fields = VirtualTable.values();
-                    for (int i=0; i<fields.length; i++)
-                        row.put(fields[i].name(), cursor.getString(i));
+                    for (int i = 0; i < fields.length; i++) {
+                        String field = fields[i].name();
+                        cursor.getColumnIndex(field);
+                        row.put(fields[i].name(), cursor.getString(cursor.getColumnIndex(field)));
+                    }
 
                 } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table)) {
                     VRContainerTable[] fields = VRContainerTable.values();
-                    for (int i=0; i<fields.length; i++)
+                    for (int i = 0; i < fields.length; i++)
                         row.put(fields[i].name(), cursor.getString(i));
                 }
                 array.put(row);
@@ -559,7 +565,7 @@ abstract class PalaceCore {
      */
     boolean updateLocalData(JSONObject update, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, update);
-        return (builder == null)? false : builder.modify();
+        return (builder == null) ? false : builder.modify();
     }
 
     /**
@@ -571,14 +577,14 @@ abstract class PalaceCore {
      */
     boolean deleteLocalData(JSONObject delete, String table) {
         LocalDatabaseCenter.WriteBuilder builder = makeWriteBuilder(table, delete);
-        return (builder == null)? false : builder.delete();
+        return (builder == null) ? false : builder.delete();
     }
 
     /**
      * JSON 객체를 파싱하여
      * {@link kr.poturns.virtualpalace.controller.LocalDatabaseCenter.ReadBuilder}로 변환한다.
      *
-     * @param table 처리할 Table 명.
+     * @param table    처리할 Table 명.
      * @param elements 명령에 대한 세부내용이 담긴 JSON 객체. (null일 경우, return null)
      * @return
      */
@@ -608,7 +614,7 @@ abstract class PalaceCore {
             try {
                 if (JsonKey.SET.equalsIgnoreCase(element)) {
                     JSONArray array = elements.getJSONArray(element);
-                    for (int i=0; i<array.length(); i++) {
+                    for (int i = 0; i < array.length(); i++) {
                         ITable field = getField(table, array.getString(i));
                         builder.set(field, null);
                     }
@@ -672,7 +678,7 @@ abstract class PalaceCore {
      * JSON 객체를 파싱하여
      * {@link kr.poturns.virtualpalace.controller.LocalDatabaseCenter.WriteBuilder}로 변환한다.
      *
-     * @param table 처리할 Table 명.
+     * @param table    처리할 Table 명.
      * @param elements 명령에 대한 세부내용이 담긴 JSON 객체. (null일 경우, return null)
      * @return
      */
@@ -774,7 +780,9 @@ abstract class PalaceCore {
                 return ResourceTable.valueOf(NAME);
             }
 
-        } catch (IllegalArgumentException e) { ; }
+        } catch (IllegalArgumentException e) {
+            ;
+        }
         return null;
     }
 
@@ -797,10 +805,9 @@ abstract class PalaceCore {
     }
 
 
-
     // * * * G E T T E R S & S E T T E R S * * * //
+
     /**
-     *
      * @param sensorType
      * @return
      */
@@ -816,7 +823,6 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @return
      */
     public Integer[] getAttachedInputTypeArray() {
@@ -827,7 +833,6 @@ abstract class PalaceCore {
     }
 
     /**
-     *
      * @param inputType
      * @return
      */

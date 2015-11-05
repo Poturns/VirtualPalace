@@ -5,16 +5,20 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 using MyScript;
+using BridgeApi.Controller.Request.Database;
 
 public class SaveLoader : MonoBehaviour
 {
 
     public const string ObjFileName = "SceneData.dat";
     public const string BookCaseFileName = "CaseData.dat";
+    private readonly object COUNT_LOCK = new object();
 
     // Use this for initialization
     public void SavetoFile()
     {
+        InsertToDatabase();
+        /*
         //Find Root
         GameObject Root = GameObject.Find("BookCaseGroup");
         //Stream Objstream = File.Open(Application.dataPath + ObjFileName , FileMode.Create);
@@ -30,6 +34,7 @@ public class SaveLoader : MonoBehaviour
             //GetChild(0) -> Gizmo;
             AbstractBasicObject BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
             SaveDataForBookCase bData = (SaveDataForBookCase)BookCase.GetSaveData();
+
             //bformatter.Serialize (BookCasestream, bData);
             //	Debug.Log (bData.ObjName +" ChildCnt: " +BookCase.transform.childCount);
             TotalObjCnt += BookCase.transform.childCount;
@@ -43,12 +48,65 @@ public class SaveLoader : MonoBehaviour
                 //Debug.Log ("Saved ObjName : "+sData.ObjName);
                 //Debug.Log (sData.ObjName + " ParentsName :" + sData.ParentName);
                 //bformatter.Serialize (Objstream, sData);
-                BridgeApi.Controller.Request.Database.DatabaseRequests.VRItemInsert(StateManager.GetManager(), sData, result => Debug.Log("query ==== " + result));
+
             }
         }
         //Objstream.Close ();
         //BookCasestream.Close ();
         //Debug.Log ("Save Total Obj : " + TotalObjCnt);
+        */
+    }
+
+
+    public void InsertToDatabase()
+    {
+        GameObject Root = GameObject.Find("BookCaseGroup");
+        int TotalObjCnt = 0;
+        for (int i = 0; i < Root.transform.childCount; i++)
+        {
+            AbstractBasicObject BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
+            SaveDataForBookCase bData = (SaveDataForBookCase)BookCase.GetSaveData();
+
+            StateManager manager = StateManager.GetManager();
+            DatabaseRequests.VRBookCaseItemInsert(manager, bData, result =>
+            {
+                Debug.Log("query ==== " + result);
+
+                manager.QueueOnMainThread(() =>
+                {
+                    TotalObjCnt += BookCase.transform.childCount;
+
+                    for (int j = 0; j < BookCase.transform.childCount; j++)
+                    {
+                        AbstractBasicObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<AbstractBasicObject>();
+
+                        SaveData sData = InteractObj.GetSaveData();
+                        InsertSaveDataToDatabase(sData);
+                    }
+                });
+            });
+        }
+    }
+
+    public void LoadFromDatabase()
+    {
+       // int ObjCnt = 0;
+        StateManager manager = StateManager.GetManager();
+        DatabaseRequests.VRBookCaseItemSelectAll(manager, results =>
+        {
+            manager.QueueOnMainThread(() =>
+            {
+                foreach (SaveDataForBookCase data in results)
+                {
+                    BookCaseScript BookCase = GameObject.Find(data.ObjName).transform.GetChild(0).GetComponent<BookCaseScript>();
+                   // ObjCnt += data.Cnt;
+                    BookCase.UpdateWithSaveData(data);
+                }
+
+                RequestSaveDataFromDatabase();
+            });
+        });
+       
     }
 
     public void LoadToFile()
@@ -61,15 +119,29 @@ public class SaveLoader : MonoBehaviour
         //	return;
 
         //ReadObjFile (bf, ObjectToLoadCnt);
-        BridgeApi.Controller.Request.Database.DatabaseRequests.VRItemSelect(StateManager.GetManager(),
-                   result =>
-                   {
-                       StateManager.GetManager().QueueOnMainThread(() =>
-                       {
-                           foreach (SaveData s in result)
-                               UpdataBookDataWithSaveData(s);
-                       });
-                   });
+
+        LoadFromDatabase();
+    }
+
+
+
+    private void InsertSaveDataToDatabase(SaveData sData)
+    {
+        DatabaseRequests.VRItemInsert(StateManager.GetManager(), sData, result => Debug.Log("query ==== " + result));
+    }
+
+ 
+    private void RequestSaveDataFromDatabase()
+    {
+        DatabaseRequests.VRItemSelect(StateManager.GetManager(),
+                  result =>
+                  {
+                      StateManager.GetManager().QueueOnMainThread(() =>
+                      {
+                          foreach (SaveData s in result)
+                              UpdataBookDataWithSaveData(s);
+                      });
+                  });
     }
 
     private void UpdataBookDataWithSaveData(SaveData sData)

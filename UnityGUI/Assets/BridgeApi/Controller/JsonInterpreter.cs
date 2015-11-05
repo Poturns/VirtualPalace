@@ -36,6 +36,21 @@ namespace BridgeApi.Controller
             return operations;
         }
 
+        public static ARrenderItem ParseARrenderItem(Operation op)
+        {
+            if(op.Type != Operation.AR_RENDERING)
+                throw new ArgumentException();
+
+            ARrenderItem item = new ARrenderItem();
+
+            int rawValue = op.Value;
+
+            item.resId = rawValue / (10000 * 10000);
+            item.screenX = rawValue / 10000 % 10000;
+            item.screenY = rawValue % 10000;
+
+            return item;
+        }
 
         /// <summary>
         /// 방향 Operation를 해석해서 방향 정보를 지닌 구조체를 반환한다.
@@ -146,14 +161,14 @@ namespace BridgeApi.Controller
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
         public static QueryRequestResult ParseQueryFromPlatform(string json, string requestKey)
         {
-            //Debug.Log(json);
-            JsonData jData = JsonMapper.ToObject(json);
+            Debug.Log(json);
+            JsonData jData = JsonMapper.ToObject(json)[requestKey];
 
             List<JsonData> queryResults = new List<JsonData>();
 
             QueryRequestResult result = new QueryRequestResult();
             result.RequestName = requestKey;
-            result.Status = (string)jData[requestKey][RequestResult.RESULT];
+            result.Status = (string)jData[RequestResult.RESULT];
 
 
             if (JsonDataContainsKey(jData, DatabaseConstants.QUERY_RESULT))
@@ -244,11 +259,30 @@ namespace BridgeApi.Controller
         public static List<SaveData> ParseJsonListToSaveData(List<JsonData> jsonList)
         {
             List<SaveData> saveDataList = new List<SaveData>();
-            foreach (JsonData json in jsonList)
+            if (jsonList != null)
             {
-                SaveData saveData = SaveData.FromJson(json);
-                if (saveData != null)
-                    saveDataList.Add(saveData);
+                foreach (JsonData json in jsonList)
+                {
+                    SaveData saveData = SaveData.FromJson(json);
+                    if (saveData != null)
+                        saveDataList.Add(saveData);
+                }
+            }
+
+            return saveDataList;
+        }
+
+        public static List<SaveDataForBookCase> ParseJsonListToBookCaseData(List<JsonData> jsonList)
+        {
+            List<SaveDataForBookCase> saveDataList = new List<SaveDataForBookCase>();
+            if (jsonList != null)
+            {
+                foreach (JsonData json in jsonList)
+                {
+                    SaveDataForBookCase saveData = SaveDataForBookCase.FromJson(json);
+                    if (saveData != null)
+                        saveDataList.Add(saveData);
+                }
             }
 
             return saveDataList;

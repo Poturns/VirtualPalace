@@ -278,9 +278,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// </summary>
     /// <param name="jsonMessage">전송할 Json 메시지</param>
     /// <returns>메시지가 정상적으로 전송되었을 때, TRUE</returns>
-    public void SendSingleMessageToPlatform(string jsonMessage)
+    public bool SendSingleMessageToPlatform(string jsonMessage)
     {
-        if (bridgeDelegate != null) bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
+        return bridgeDelegate != null && bridgeDelegate.SendSingleMessageToPlatform(jsonMessage);
     }
 
     #endregion Base Platform Method (Android, IOS, ....)

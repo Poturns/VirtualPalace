@@ -1,5 +1,6 @@
 using UnityEngine;
 using MyScript.Interface;
+using BridgeApi.Controller;
 
 namespace MyScript.States
 {
@@ -30,6 +31,22 @@ namespace MyScript.States
         private void ReturnToLobbyScene()
         {
             StateManager.SwitchScene(UnityScene.Lobby);
+        }
+
+        protected override void HandleOtherOperation(Operation operation)
+        {
+            //base.HandleOtherOperation(operation);
+            switch (operation.Type)
+            {
+                case Operation.AR_RENDERING:
+                    ARrenderItem item = JsonInterpreter.ParseARrenderItem(operation);
+                    Debug.Log("====== AR item : " + item);
+                    break;
+
+                default:
+                    return;
+            }
+
         }
     }
 }

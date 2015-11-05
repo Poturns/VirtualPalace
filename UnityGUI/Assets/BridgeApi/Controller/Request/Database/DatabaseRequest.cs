@@ -36,6 +36,11 @@ namespace BridgeApi.Controller.Request.Database
             return new SpecialQueryRequest(DatabaseConstants.QUERY_NEAR_ITEMS);
         }
 
+        public static IDatabaseRequest QueryBookCaseItems()
+        {
+            return new SpecialQueryRequest(DatabaseConstants.QUERY_VR_BOOKCASES);
+        }
+
         /// <summary>
         /// Select 쿼리 요청을 전송할 객체를 생성한다.
         /// </summary>
@@ -123,62 +128,22 @@ namespace BridgeApi.Controller.Request.Database
                 {
                     default:
                     case OPERATION_SELECT:
-                        switch (place)
-                        {
-                            case Table.AR:
-                                operation = DatabaseConstants.SELECT_AR;
-                                break;
-                            case Table.RES:
-                                operation = DatabaseConstants.SELECT_RES;
-                                break;
-                            case Table.VR:
-                                operation = DatabaseConstants.SELECT_VR;
-                                break;
-                        }
+                        operation = place.GetDatabaseOperation(DatabaseConstants.SELECT);
                         break;
                     case OPERATION_UPDATE:
-                        switch (place)
-                        {
-                            case Table.AR:
-                                operation = DatabaseConstants.UPDATE_AR;
-                                break;
-                            case Table.RES:
-                                operation = DatabaseConstants.UPDATE_RES;
-                                break;
-                            case Table.VR:
-                                operation = DatabaseConstants.UPDATE_VR;
-                                break;
-                        }
+                        operation = place.GetDatabaseOperation(DatabaseConstants.UPDATE);
+                       
                         break;
                     case OPERATION_INSERT:
-                        switch (place)
-                        {
-                            case Table.AR:
-                                operation = DatabaseConstants.INSERT_AR;
-                                break;
-                            case Table.RES:
-                                operation = DatabaseConstants.INSERT_RES;
-                                break;
-                            case Table.VR:
-                                operation = DatabaseConstants.INSERT_VR;
-                                break;
-                        }
+                        operation = place.GetDatabaseOperation(DatabaseConstants.INSERT);
                         break;
                     case OPERATION_DELETE:
-                        switch (place)
-                        {
-                            case Table.AR:
-                                operation = DatabaseConstants.DELETE_AR;
-                                break;
-                            case Table.RES:
-                                operation = DatabaseConstants.DELETE_RES;
-                                break;
-                            case Table.VR:
-                                operation = DatabaseConstants.DELETE_VR;
-                                break;
-                        }
+                        operation = place.GetDatabaseOperation(DatabaseConstants.DELETE);
                         break;
                 }
+
+                if (operation == null)
+                    throw new InvalidOperationException("Unknown Table");
 
                 queryBuilder = new QueryBuilder(operation);
                 queryBuilder.StartWrite();
@@ -575,272 +540,5 @@ namespace BridgeApi.Controller.Request.Database
         T End();
     }
     #endregion Interface
-
-    public class DatabaseConstants
-    {
-        ///<summary>
-        /// 현재 위치에서 일정 범위 내 존재하는 데이터를 찾는다.
-        ///</summary>
-        public const string QUERY_NEAR_ITEMS = "query_near_items";
-        ///<summary>
-        /// VR 아이템에 렌더링할 아이템 데이터를 찾는다.
-        ///</summary>
-        public const string QUERY_ALL_VR_ITEMS = "query_all_vr_items";
-
-
-        ///<summary>
-        /// (응답 반환시) 쿼리 결과 KEY
-        ///<para/>
-        /// Ex)<para/>
-        /// {<para/>
-        ///     "query_result" : [<para/>
-        ///          { "_id" : 1, "res_id" : 1, .... },<para/>
-        ///          { "_id" : 2, "res_id" : 2, .... },<para/>
-        ///     ]<para/>
-        /// }<para/>
-        ///</summary>
-        public const string QUERY_RESULT = "query_result";
-
-        ///<summary>
-        /// VR 테이블 조회 명령.
-        ///</summary>
-        public const string SELECT_VR = "select_vr";
-        ///<summary>
-        /// AR 테이블 조회 명령.
-        ///</summary>
-        public const string SELECT_AR = "select_ar";
-        ///<summary>
-        /// Resource 테이블 조회 명령.
-        ///</summary>
-        public const string SELECT_RES = "select_res";
-        ///<summary>
-        /// VR 테이블 데이터 삽입 명령.
-        ///</summary>
-        public const string INSERT_VR = "insert_vr";
-        ///<summary>
-        /// AR 테이블 데이터 삽입 명령.
-        ///</summary>
-        public const string INSERT_AR = "insert_ar";
-        ///<summary>
-        /// Resource 테이블 데이터 삽입 명령.
-        ///</summary>
-        public const string INSERT_RES = "insert_res";
-        ///<summary>
-        /// VR 테이블 데이터 수정 명령.
-        ///</summary>
-        public const string UPDATE_VR = "update_vr";
-        ///<summary>
-        /// AR 테이블 데이터 수정 명령.
-        ///</summary>
-        public const string UPDATE_AR = "update_ar";
-        ///<summary>
-        /// Resource 테이블 데이터 수정 명령.
-        ///</summary>
-        public const string UPDATE_RES = "update_res";
-        ///<summary>
-        /// VR 테이블 데이터 삭제 명령.
-        ///</summary>
-        public const string DELETE_VR = "delete_vr";
-        ///<summary>
-        /// AR 테이블 데이터 삭제 명령.
-        ///</summary>
-        public const string DELETE_AR = "delete_ar";
-        ///<summary>
-        /// Resource 테이블 데이터 삭제 명령.
-        ///</summary>
-        public const string DELETE_RES = "delete_res";
-
-        public const string OPERATION_ALLOW_EQUAL = "allow_equal";
-
-        public const string OPERATION_SET = "set";
-        public const string OPERATION_WHERE = "where";
-        public const string OPERATION_WHERE_NOT = "where_not";
-        public const string OPERATION_WHERE_GREATER = "where_greater";
-        public const string OPERATION_WHERE_SMALLER = "where_smaller";
-        public const string OPERATION_WHERE_FROM = "where_from";
-        public const string OPERATION_WHERE_TO = "where_to";
-        public const string OPERATION_WHERE_LIKE = "where_like";
-
-    }
-    #region Database Property
-
-    /// <summary>
-    /// Database에서 조작할 Table
-    /// </summary>
-    public enum Table
-    {
-        VR, AR, RES
-    }
-
-    /// <summary>
-    /// RESOURCE TABLE 필드 상수 <para/>
-    /// not null : name, type, ctime
-    /// </summary>
-    public enum RESOURCE_FIELD
-    {
-        /// <summary>
-        /// int, pk
-        /// </summary>
-        _ID,
-        /// <summary>
-        /// text, not null
-        /// </summary>
-        NAME,
-        /// <summary>
-        /// text, not null
-        /// </summary>
-        TYPE,
-        /// <summary>
-        /// text
-        /// </summary>
-        CATEGORY,
-        /// <summary>
-        /// text
-        /// </summary>
-        ARCHIVE_PATH,
-        /// <summary>
-        /// text
-        /// </summary>
-        ARCHIVE_KEY,
-        /// <summary>
-        /// text
-        /// </summary>
-        DRIVE_PATH,
-        /// <summary>
-        /// text
-        /// </summary>
-        DRIVE_KEY,
-        /// <summary>
-        /// text
-        /// </summary>
-        THUMBNAIL_PATH,
-        /// <summary>
-        /// text
-        /// </summary>
-        DESCRIPTION,
-        /// <summary>
-        /// int, not null
-        /// </summary>
-        CTIME,
-        /// <summary>
-        /// int
-        /// </summary>
-        MTIME
-
-    }
-
-    /// <summary>
-    /// VIRTUAL TABLE 필드 상수<para/>
-    /// not null : resid, type, pos
-    /// </summary>
-    public enum VIRTUAL_FIELD
-    {
-        /// <summary>
-        /// int, pk
-        /// </summary>
-        _ID,
-        /// <summary>
-        /// int , not null
-        /// </summary>
-        RES_ID,
-        /// <summary>
-        /// text
-        /// </summary>
-        NAME,
-        /// <summary>
-        /// int, not null
-        /// </summary>
-        TYPE,
-        /// <summary>
-        /// real, not null
-        /// </summary>
-        POS_X,
-        /// <summary>
-        /// real, not null
-        /// </summary>
-        POS_Y,
-        /// <summary>
-        /// real, not null
-        /// </summary>
-        POS_Z,
-        /// <summary>
-        /// real
-        /// </summary>
-        ROTATE_X,
-        /// <summary>
-        /// real
-        /// </summary>
-        ROTATE_Y,
-        /// <summary>
-        /// real
-        /// </summary>
-        ROTATE_Z,
-        /// <summary>
-        /// real
-        /// </summary>
-        SIZE_X,
-        /// <summary>
-        /// real
-        /// </summary>
-        SIZE_Y,
-        /// <summary>
-        /// real
-        /// </summary>
-        SIZE_Z,
-        /// <summary>
-        /// text
-        /// </summary>
-        CONTAINER,
-        /// <summary>
-        /// int
-        /// </summary>
-        CONT_ORDER,
-        /// <summary>
-        /// text
-        /// </summary>
-        STYLE
-
-    }
-
-    /// <summary>
-    /// AUGMENTED TABLE 필드 상수<para/>
-    /// not null : resid
-    /// </summary>
-    public enum AUGMENTED_FIELD
-    {
-        /// <summary>
-        /// int, pk
-        /// </summary>
-        _ID,
-        /// <summary>
-        /// int, not null
-        /// </summary>
-        RES_ID,
-        /// <summary>
-        /// real
-        /// </summary>
-        ALTITUDE,
-        /// <summary>
-        /// real
-        /// </summary>
-        LATITUDE,
-        /// <summary>
-        /// real
-        /// </summary>
-        LONGITUDE,
-        /// <summary>
-        /// real
-        /// </summary>
-        SUPPORT_X,
-        /// <summary>
-        /// real
-        /// </summary>
-        SUPPORT_Y,
-        /// <summary>
-        /// real
-        /// </summary>
-        SUPPORT_Z
-    }
-
-    #endregion Database Property
+ 
 }

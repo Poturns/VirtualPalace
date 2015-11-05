@@ -1,5 +1,7 @@
 package kr.poturns.virtualpalace.inputmodule.speech;
 
+import java.util.List;
+
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 
 /**
@@ -7,7 +9,7 @@ import kr.poturns.virtualpalace.input.IOperationInputFilter;
  * <p>
  * STT 를 통해 얻어진 결과를 적절한 방향 / 명령 으로 해석하는 클래스
  */
-public class SpeechInputFilter implements IOperationInputFilter<String> {
+public class SpeechInputFilter implements IOperationInputFilter<List<String>> {
 
     private static final String WORD_OPERATION_KEY_OK = "ok";
     private static final String WORD_OPERATION_KEY_BACK = "뒤로";
@@ -58,33 +60,46 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
     private static final String WORD_DIRECTION_3D_DOWNWARD = "아래로";
 
     @Override
-    public int isGoingTo(String string) {
+    public int isGoingTo(List<String> string) {
         return checkDirection(string);
     }
 
     @Override
-    public int isTurningTo(String string) {
+    public int isTurningTo(List<String> string) {
         return checkDirection(string);
     }
 
     @Override
-    public int isFocusingTo(String string) {
+    public int isFocusingTo(List<String> string) {
         return checkDirection(string);
     }
 
     @Override
-    public int isZoomingTo(String string) {
+    public int isZoomingTo(List<String> string) {
         return checkDirection(string);
     }
 
     @Override
-    public boolean isSelecting(String string) {
-        return WORD_OPERATION_SPECIAL_SELECT.equals(string);
+    public boolean isSelecting(List<String> string) {
+        for (String s : string){
+            if(WORD_OPERATION_SPECIAL_SELECT.equals(s))
+                return true;
+        }
+        return false;
     }
 
     @Override
-    public boolean isCanceling(String string) {
+    public boolean isCanceling(List<String> string) {
         return isCancelWord(string);
+    }
+
+    private static boolean isCancelWord(List<String> strings){
+        for (String s: strings){
+            if(isCancelWord(s))
+                return  true;
+        }
+
+        return false;
     }
 
     private static boolean isCancelWord(String string) {
@@ -95,8 +110,18 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
     }
 
     @Override
-    public int isKeyPressed(String string) {
+    public int isKeyPressed(List<String> string) {
         return checkKeyOperation(string);
+    }
+    private static int checkKeyOperation(List<String> strings) {
+        for (String s: strings){
+            int op = checkKeyOperation(s);
+
+            if(op != Operation.NONE)
+                return op;
+        }
+
+        return Operation.NONE;
     }
 
     private static int checkKeyOperation(String s) {
@@ -119,8 +144,18 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
     }
 
     @Override
-    public int isSpecialOperation(String string) {
+    public int isSpecialOperation(List<String> string) {
         return checkSpecialOperation(string);
+    }
+
+    private static int checkSpecialOperation(List<String> strings) {
+        for (String s: strings){
+            int op = checkSpecialOperation(s);
+            if(op != Operation.NONE)
+                return op;
+        }
+
+        return Operation.NONE;
     }
 
     private static int checkSpecialOperation(String s) {
@@ -153,6 +188,15 @@ public class SpeechInputFilter implements IOperationInputFilter<String> {
         else return Operation.NONE;
     }
 
+    private int checkDirection(List<String> strings) {
+        for (String s: strings){
+            int op = checkDirection(s);
+            if(op != Direction.NONE)
+                return op;
+        }
+
+        return Direction.NONE;
+    }
     private int checkDirection(String s) {
         //2d
         if (WORD_DIRECTION_EAST.equals(s)
