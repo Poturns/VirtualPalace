@@ -27,8 +27,6 @@ import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
 import kr.poturns.virtualpalace.input.IOperationInputFilter;
 import kr.poturns.virtualpalace.input.IProcessorCommands;
 import kr.poturns.virtualpalace.inputmodule.speech.SpeechController;
-import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputConnector;
-import kr.poturns.virtualpalace.inputmodule.speech.SpeechInputDetector;
 import kr.poturns.virtualpalace.util.ThreadUtils;
 
 /**
