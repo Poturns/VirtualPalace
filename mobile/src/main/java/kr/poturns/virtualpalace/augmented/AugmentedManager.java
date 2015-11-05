@@ -2,15 +2,15 @@ package kr.poturns.virtualpalace.augmented;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import kr.poturns.virtualpalace.controller.PalaceApplication;
 import kr.poturns.virtualpalace.controller.PalaceMaster;
 
-public class AugmentedCore {
+public class AugmentedManager {
 	private static final int TIMER_INTERVAL = 40;
+
 	private final PalaceApplication mAppF;
 	private final CamTracker mTrackerF;
 	private final AugItemManager mManagerF;
@@ -21,14 +21,14 @@ public class AugmentedCore {
 	private List<int[]> addItemQueue = new ArrayList<int[]>();
 	
 /*
-	public AugmentedCore(PalaceApplication app, ARActivity activity) {
+	public AugmentedManager(PalaceApplication app, ARActivity activity) {
 		mAppF = app;
 		mTrackerF = new CamTracker();
 		mManagerF = new AugItemManager();
 		this.activity = activity;
 	}
 	*/
-	public AugmentedCore(PalaceApplication app) {
+	public AugmentedManager(PalaceApplication app) {
 		mAppF = app;
 		mTrackerF = new CamTracker();
 		mManagerF = new AugItemManager();
@@ -88,9 +88,8 @@ public class AugmentedCore {
 		
 		@Override
 		public void run() {
-			mAppF.getInfraDataService().startListening();
 			PalaceMaster.getInstance(mAppF).queryNearAugmentedItems();
-			addItemList.clear();
+			addItemQueue.clear();
 			bStop = false;
 			bRunning = true;
 			
@@ -104,21 +103,26 @@ public class AugmentedCore {
 				mTrackerF.updateOrientation(mAppF.getInfraDataService());
 				if(mManagerF.updateLocation(mAppF)) {
 					mManagerF.reloadAugmentedItem(mAppF);
+					// TODO : 테스트
+					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth, mTrackerF.iScreenHeight);
+					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth+200, mTrackerF.iScreenHeight+100);
+					mManagerF.addAugmentedItem(mTrackerF, mTrackerF.iScreenWidth-200, mTrackerF.iScreenHeight-100);
 				}
+
 				if(addItemQueue.size()>0) {
 					int[] arr = addItemQueue.remove(0);
-					AugmentedItem added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
+					AugmentedInput added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
 					PalaceMaster.getInstance(mAppF).insertNewAugmentedItem(added, null);
 				}
 				List<AugmentedOutput> outputList = mManagerF.getOutputList(mTrackerF);
-				PalaceMaster.getInstance(App).drawAugmentedItems(outputList);
+				PalaceMaster.getInstance(mAppF).drawAugmentedItems(outputList);
 				//activity.addOutputItems(outputList);
 			}
-			
-			mAppF.getInfraDataService().stopListening();
+
 			//mManagerF.SaveCreated(mAppF);
-			while(addItemList.size()>0) {
-				AugmentedItemadded = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
+			while(addItemQueue.size()>0) {
+				int[] arr = addItemQueue.remove(0);
+				AugmentedInput added = mManagerF.addAugmentedItem(mTrackerF, arr[0], arr[1]);
 				PalaceMaster.getInstance(mAppF).insertNewAugmentedItem(added, null);
 			}
 			bRunning = false;

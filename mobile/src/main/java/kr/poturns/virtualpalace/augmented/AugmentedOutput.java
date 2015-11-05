@@ -1,7 +1,7 @@
 package kr.poturns.virtualpalace.augmented;
 
 /**
- * Created by Yeonho on 2015-10-25.
+ * AR 연산 결과를 반환하는 출력 데이터
  */
 public class AugmentedOutput {
     public int resID;

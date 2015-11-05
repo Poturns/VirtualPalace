@@ -1,15 +1,14 @@
 package kr.poturns.virtualpalace.controller;
 
 
-import android.location.Location;
-import android.transition.Scene;
+import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Pair;
 
 import java.security.InvalidParameterException;
 import java.util.Stack;
 
-import kr.poturns.virtualpalace.InfraDataService;
-import kr.poturns.virtualpalace.augmented.AugmentedCore;
+import kr.poturns.virtualpalace.augmented.AugmentedManager;
 import kr.poturns.virtualpalace.controller.data.SceneLifeCycle;
 import kr.poturns.virtualpalace.inputmodule.gaze.GazeInputConnector;
 
@@ -25,7 +24,7 @@ abstract class PalaceEngine extends PalaceCore {
 
     protected final Stack<Pair<String, SceneLifeCycle>> UnitySceneStack;
 
-    protected AugmentedCore mAugmentedModule;
+    protected AugmentedManager mAugmentedModule;
 
     private GazeInputConnector mGazeInputConnector;
 
@@ -71,9 +70,12 @@ abstract class PalaceEngine extends PalaceCore {
                 } else if (SceneLifeCycle.AR.equalsIgnoreCase(scene)) {
                     // Sensor 데이터 수집 시작
                     App.getInfraDataService().startListeningForAR();
-                    mAugmentedModule = new AugmentedCore(App);
-                    mAugmentedModule.init(1280, 960);
+                    mAugmentedModule = new AugmentedManager(App);
 
+                    DisplayMetrics metrics = App.getResources().getDisplayMetrics();
+                    int screenSizeX = metrics.widthPixels;
+                    int screenSizeY = metrics.heightPixels;
+                    mAugmentedModule.init(screenSizeX, screenSizeY);
 
                 } else if (SceneLifeCycle.VR.equalsIgnoreCase(scene)) {
 

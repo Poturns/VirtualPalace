@@ -10,15 +10,12 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.augmented.AugmentedOutput;
 import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
 import kr.poturns.virtualpalace.controller.data.ITable;
@@ -122,7 +119,8 @@ public class PalaceMaster extends PalaceEngine {
             AugmentedOutput item = list.get(i);
 
             outputs[i][0] = IOperationInputFilter.Operation.DRAW_AR_ITEM;
-            outputs[i][1] = item.resID;
+            // TODO: 임시 테스트 코드
+            outputs[i][1] = 1; //item.resID;
             outputs[i][2] = item.screenX;
             outputs[i][3] = item.screenY;
         }
