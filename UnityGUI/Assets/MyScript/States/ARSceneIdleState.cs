@@ -4,13 +4,7 @@ using BridgeApi.Controller;
 
 namespace MyScript.States
 {
-    //ARScene 평상시 모드
-    public class ARSceneIdleState : AbstractGazeInputState, ISceneChangeState
-    {
-        public ARSceneIdleState(StateManager managerRef) : base(managerRef, "ARSceneIdleState")
-        {
-        }
-	//ARScene 평상시 모드
+
 	public class ARSceneIdleState : AbstractGazeInputState,ISceneChangeState
 	{
 		private GameObject ARScreenObj;
