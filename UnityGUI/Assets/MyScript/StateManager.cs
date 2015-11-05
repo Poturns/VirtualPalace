@@ -176,7 +176,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
                 break;
 
             case UnityScene.AR:
-				newSceneState = new ARSceneIdleState(manager);
+                newSceneState = new ARSceneIdleState(manager);
                 break;
             default:
                 return;
@@ -191,8 +191,8 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         manager.SwitchState(newSceneState);
 
         //Application.LoadLevel(unityScene.SceneName());
-		//Debug.Log ("SceneName" + (int)unityScene + " : " + unityScene);
-		Application.LoadLevel((int)unityScene);
+        //Debug.Log ("SceneName" + (int)unityScene + " : " + unityScene);
+        Application.LoadLevel((int)unityScene);
 
     }
 
