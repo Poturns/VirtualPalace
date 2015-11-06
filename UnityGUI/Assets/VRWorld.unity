@@ -806,6 +806,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 11481694, guid: 6bf6aca323e766940ae05fd032f5f3e9, type: 2}
+      propertyPath: ModelKind
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6bf6aca323e766940ae05fd032f5f3e9, type: 2}
   m_IsPrefabParent: 0
@@ -1939,6 +1943,10 @@ Prefab:
     - target: {fileID: 163566, guid: c5afd05cb51d1c645876d73febadab47, type: 2}
       propertyPath: m_Name
       value: HumanGizmo (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 11443738, guid: c5afd05cb51d1c645876d73febadab47, type: 2}
+      propertyPath: ModelKind
+      value: 13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c5afd05cb51d1c645876d73febadab47, type: 2}
@@ -6214,6 +6222,10 @@ Prefab:
     - target: {fileID: 465304, guid: c5afd05cb51d1c645876d73febadab47, type: 2}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11443738, guid: c5afd05cb51d1c645876d73febadab47, type: 2}
+      propertyPath: ModelKind
+      value: 13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c5afd05cb51d1c645876d73febadab47, type: 2}
