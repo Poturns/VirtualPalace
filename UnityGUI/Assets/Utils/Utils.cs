@@ -20,6 +20,9 @@ namespace Utils
         /// <returns>해당 경로에 존재하는 이미지 파일</returns>
 		public static Texture2D Load (string filePath)
 		{
+            if (filePath == null)
+                return null;
+
 			Texture2D tex = null;
 			byte[] fileData;
 			

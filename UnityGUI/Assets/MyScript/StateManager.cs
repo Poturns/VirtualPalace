@@ -73,7 +73,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     private IStateBase activeState;
 
     private IPlatformBridgeDelegate bridgeDelegate;
-
+#if UNITY_EDITOR
+    private ComputerApi.Controller.InputGenerator inputGenerator = new ComputerApi.Controller.InputGenerator();
+#endif
 
     public static StateManager GetManager()
     {
@@ -125,6 +127,10 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         Tasker.OnUpdate();
 
         if (activeState != null) activeState.StateUpdate();
+
+#if UNITY_EDITOR
+        inputGenerator.StateUpdate();
+#endif
     }
 
     void OnGUI()
@@ -212,7 +218,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
             bridgeDelegate = new AndroidApi.Controller.AndroidUnityBridge();
             Debug.Log("=============== UnityBridge - AndroidUnityBridge attatched sucessfully.");
         }
-        else if(Application.platform == RuntimePlatform.WindowsEditor)
+        else if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
         {
             bridgeDelegate = new ComputerApi.Controller.ComputerUnityBridge();
             Debug.Log("=============== UnityBridge - ComputerUnityBridge attatched sucessfully.");

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using BridgeApi.Controller;
 using UnityEngine;
 using BridgeApi.Controller.Request.Database;
-using System.Text;
 
 namespace MyScript.Objects
 {
@@ -12,6 +11,9 @@ namespace MyScript.Objects
         /// <summary>
         /// VR_Table에서의 id
         /// </summary>
+#if UNITY_EDITOR
+        [SQLite4Unity3d.PrimaryKey, SQLite4Unity3d.AutoIncrement]
+#endif
         public int ID { get; set; }
 
 

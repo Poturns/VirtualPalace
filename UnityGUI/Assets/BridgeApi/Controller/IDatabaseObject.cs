@@ -1,5 +1,4 @@
 ﻿using LitJson;
-using SQLite4Unity3d;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +10,6 @@ namespace BridgeApi.Controller
         /// <summary>
         /// Database에서의 pk, object를 구분하는 요소
         /// </summary>
-        [PrimaryKey, AutoIncrement]
         int ID { get; }
 
         /// <summary>

@@ -18,7 +18,7 @@ public class ImageControl : AbstractBasicObject
         get { return currentPath; }
     }
 
-    public Texture2D CurrentTexture { get; private set; }
+    //public Texture2D CurrentTexture { get; private set; }
 
     void Start()
     {
@@ -28,6 +28,11 @@ public class ImageControl : AbstractBasicObject
     public override void OnSelect()
     {
         //NextImg ();
+    }
+
+    public void SetDefault()
+    {
+        Index = 0;
     }
 
     public void ShowNextImageThumbnail()
@@ -55,16 +60,13 @@ public class ImageControl : AbstractBasicObject
     {
         currentPath = path;
 
-        if (path == null)
-            return;
-
         if (imageRenderer == null)
             imageRenderer = gameObject.GetComponent<Renderer>();
 
         Texture2D newTexture = Utils.Image.Load(path);
         imageRenderer.material.mainTexture = newTexture;
 
-        CurrentTexture = newTexture;
+        //CurrentTexture = newTexture;
     }
 
     private void CheckIndexValidity()

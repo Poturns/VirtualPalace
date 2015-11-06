@@ -48,13 +48,6 @@ namespace MyScript.States
             LockCameraAndMesh(true);
         }
 
-
-        public override void StateUpdate()
-        {
-            if (Input.GetKeyUp(KeyCode.Q))
-                ExitMemoView();
-        }
-
         // 현재상태에서의 선택은 충돌체크가 아니라 바로 음성인식 실행 
         protected override void HandleSelectOperation()
         {
@@ -87,7 +80,7 @@ namespace MyScript.States
                         MemoObj.Memo = result.Speech;
                         action = () =>
                          {
-                             TMObject.text = MemoObj.Memo;
+                             Utils.Text.InputTextMesh(TMObject, MemoObj.Memo);
                              IconRenderer.enabled = false;
                          };
                         break;

@@ -25,46 +25,42 @@ public class SaveLoader : MonoBehaviour
             BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
             BookCaseObject bData = BookCase.GetSaveObjectData();
 
-            int newIndex = i;
+            bool last = i + 1 == N;
             DatabaseRequests.UpdateBookCaseObjects(manager, bData, result =>
             {
                 Debug.Log("query ==== " + result);
-
-                manager.QueueOnMainThread(() =>
-                {
-                    TotalObjCnt += BookCase.transform.childCount;
-
-                    List<VRObject> vrObjectList = new List<VRObject>();
-                    for (int j = 0; j < BookCase.transform.childCount; j++)
-                    {
-                        CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
-
-                        VRObject sData = InteractObj.GetSaveObjectData();
-                        if (!sData.IsInvalid())
-                            vrObjectList.Add(sData);
-
-                    }
-
-                    if (vrObjectList.Count > 0)
-                        InsertVRObjectsToDatabase(vrObjectList, newIndex + 1 == N, callback);
-
-                });
             });
+
+            TotalObjCnt += BookCase.transform.childCount;
+
+            List<VRObject> vrObjectList = new List<VRObject>();
+            for (int j = 0; j < BookCase.transform.childCount; j++)
+            {
+                CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
+
+                VRObject sData = InteractObj.GetSaveObjectData();
+                if (!sData.IsInvalid())
+                    vrObjectList.Add(sData);
+
+            }
+
+            if (vrObjectList.Count > 0)
+                InsertVRObjectsToDatabase(vrObjectList);
+
+            if (last)
+                callback();
+
+
         }
 
 
     }
 
-    private void InsertVRObjectsToDatabase(List<VRObject> list, bool last, Action callback)
+    private void InsertVRObjectsToDatabase(List<VRObject> list)
     {
         DatabaseRequests.InsertVRObjects(StateManager.GetManager(), list, result =>
         {
             Debug.Log("query InsertVRObjectsToDatabase ==== " + result);
-            if (last)
-            {
-                Debug.Log("query InsertVRObjectsToDatabase ==== end");
-                StateManager.GetManager().QueueOnMainThread(callback);
-            }
         });
     }
 

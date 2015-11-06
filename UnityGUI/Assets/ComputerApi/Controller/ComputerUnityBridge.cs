@@ -7,6 +7,7 @@ using System.Threading;
 using BridgeApi.Controller.Request.Database;
 using System.Collections.Generic;
 using MyScript.Objects;
+using System.Text;
 
 namespace ComputerApi.Controller
 {
@@ -56,15 +57,15 @@ namespace ComputerApi.Controller
                         break;
 
                     case DatabaseConstants.QUERY_UPDATE_VR_BOOKCASES:
-                        callback("{result:error}");
+                        callback("{\"result\":\"error\"}");
                         break;
 
                     case DatabaseConstants.QUERY_INSERT_VR_ITEMS:
-                        callback("{result:error}");
+                        callback("{\"result\":\"error\"}");
                         break;
 
                     case DatabaseConstants.QUERY_ALL_VR_ITEMS:
-                        callback("{" + key + ":{" + sqliteHelper.QueryAllVRObject() + "}}");
+                        callback("{\"" + key + "\":{" + sqliteHelper.QueryAllVRObject() + "}}");
                         break;
 
                     case DatabaseConstants.QUERY_VR_BOOKCASES:
@@ -75,14 +76,14 @@ namespace ComputerApi.Controller
 
                     case DatabaseConstants.UPDATE + DatabaseConstants.TABLE_VR_CONTAINER:
                         if (ExecuteUpdateBookCaseQuery(jsonContents) > 0)
-                            callback("{" + key + ":{result:success}}");
+                            callback("{\"" + key + "\":{\"result\":\"success\"}}");
                         else
-                            callback("{" + key + ":{result:fail}}");
+                            callback("{\"" + key + "\":{\"result\":\"fail\"}}");
                         break;
 
                     case DatabaseConstants.QUERY_NEAR_ITEMS:
                     default:
-                        callback("{" + key + "{result:error}}");
+                        callback("{\"" + key + "\":{\"result\":\"error\"}}");
                         Debug.LogWarning("=== Not Implemented Request, key : " + key);
                         break;
                 }
@@ -91,7 +92,18 @@ namespace ComputerApi.Controller
 
         private void SendDummySpeechResult(Action<string> callback)
         {
-            callback("{" + SpeechRequestResult.SPEECH_REQUEST_KEY + "{mode:'text', result:'Dummy Result Message, Dummy Result Message2'}");
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("{")
+                .AppendFormat("\"{0}\"", SpeechRequestResult.SPEECH_REQUEST_KEY)
+                .Append(":")
+                .Append("{")
+                .AppendFormat("\"{0}\":\"{1}\",", "mode", "text")
+                .AppendFormat("\"{0}\":\"{1}\",", SpeechRequestResult.SPEECH_RESULT_KEY, "Dummy Result Message, Dummy Result Message2")
+                .AppendFormat("\"{0}\":\"{1}\"", RequestResult.RESULT, RequestResult.STATUS_SUCCESS)
+                .Append("}")
+               .Append("}");
+            callback(sb.ToString());
         }
 
         private int ExecuteUpdateBookCaseQuery(JsonData jsonData)
@@ -99,7 +111,6 @@ namespace ComputerApi.Controller
             BookCaseObject bookcase = BookCaseObject.FromJSON(jsonData["set"]);
             return sqliteHelper.UpdateBookCaseObject(new[] { bookcase });
         }
-
 
     }
 }

@@ -5795,7 +5795,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 438080, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
       propertyPath: m_LocalRotation.w
-      value: .707106829
+      value: .707106709
       objectReference: {fileID: 0}
     - target: {fileID: 438080, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
       propertyPath: m_RootOrder
@@ -5804,6 +5804,22 @@ Prefab:
     - target: {fileID: 140954, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
       propertyPath: m_Name
       value: WallPicture (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 489492, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 489492, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: .50000006
+      objectReference: {fileID: 0}
+    - target: {fileID: 489492, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: .50000006
+      objectReference: {fileID: 0}
+    - target: {fileID: 489492, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: .499999851
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3bea5eab19a87cb4f85ab5c3ae5b709e, type: 2}

@@ -9,6 +9,8 @@ namespace MyScript.States
         private GameObject ImageUI;
         private GameObject Target;
 
+        private PictureObj picture;
+
         private ImageControl imageControl;
 
         private MeshCollider imageMeshCollider;
@@ -29,16 +31,11 @@ namespace MyScript.States
 
             LockCameraAndMesh(true);
 
-			//Load? ????? Image UI ?? ?? ?? 
-			PictureObj PicObj = Target.GetComponent<PictureObj> ();
-			if (PicObj != null) 
-			{
-				if(PicObj.Path != null && PicObj.Path == "")
-				{
-					//????? ???? ???
-					imageControl.Path = PicObj.Path;
-				}
-			}
+            picture = Target.GetComponent<PictureObj>();
+            if (picture != null)
+            {
+                imageControl.Path = picture.Path;
+            }
         }
 
         private void FindImageView()
@@ -51,8 +48,8 @@ namespace MyScript.States
             }
         }
 
-		protected override void HandleSelectOperation()
-		{
+        protected override void HandleSelectOperation()
+        {
             // FindImageView();
 
             //ImageUI.GetComponent<AbstractBasicObject>().OnSelect();
@@ -103,19 +100,11 @@ namespace MyScript.States
 
 
             FindImageView();
-            
+
             // Apply Change Texture
-            if (applyImageTexture)
+            if (applyImageTexture && picture != null)
             {
-                Renderer renderer = Target.gameObject.GetComponent<Renderer>();
-
-                if (renderer != null && renderer.materials != null)
-                {
-                    int MatSize = renderer.materials.GetLength(0);
-                    renderer.materials[MatSize - 1].mainTexture = imageControl.CurrentTexture;
-                }
-
-                Target.gameObject.GetComponent<PictureObj>().Path = imageControl.Path;
+                picture.PictureUpdate(imageControl.Path);
 
                 Debug.Log("=============== Apply Image Texture");
             }
@@ -124,16 +113,18 @@ namespace MyScript.States
                 Debug.Log("=============== Discard Image Texture");
             }
 
+            imageControl.SetDefault();
+
             LockCameraAndMesh(false);
 
             SwitchState(VRSceneIdleState.CopyFromCurrentState(this));
-            
+
         }
 
         private void LockCameraAndMesh(bool isLock)
         {
             ChangeMeshState(isLock);
-            SetGazeInputMode(isLock? GAZE_MODE.OFF: GAZE_MODE.OBJECT);
+            SetGazeInputMode(isLock ? GAZE_MODE.OFF : GAZE_MODE.OBJECT);
             SetCameraLock(isLock);
         }
 

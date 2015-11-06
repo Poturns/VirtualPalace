@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using MyScript.States;
-using MyScript.Interface;
 
 public class PictureObj : MonoBehaviour{
 
@@ -10,9 +8,11 @@ public class PictureObj : MonoBehaviour{
 		get;
 		set;
 	}
-	private Texture2D Tex;
 	public bool TextureUpdateOn = false;
-	private string path;
+
+
+    private string path;
+
 
 	public string Path
 	{
@@ -27,22 +27,31 @@ public class PictureObj : MonoBehaviour{
 		}
 	}
 
-	public void OnSelect()
+    private Renderer imageRenderer;
+
+    public void OnSelect()
 	{
 		StateManager.GetManager().SwitchState (new VRImageObjView(StateManager.GetManager(),gameObject));
 	}
 	// Use this for initialization
 	void Start () {
 		Title = "Image Obj";
-	}
+        imageRenderer = GetComponent<Renderer>();
+    }
 
-	public void PictureUpdate()
+    public void PictureUpdate(string path)
+    {
+        this.path = path;
+        PictureUpdate();
+    }
+
+    public void PictureUpdate()
 	{
 		if (!TextureUpdateOn)
 			return;
 
-		int Length = GetComponent<Renderer> ().materials.GetLength (0);
-		GetComponent<Renderer>().materials[Length - 1].mainTexture = Utils.Image.Load (Path);
+		int Length = imageRenderer.materials.GetLength (0);
+        imageRenderer.materials[Length - 1].mainTexture = Utils.Image.Load (Path);
 
 	}
 	// Update is called once per frame

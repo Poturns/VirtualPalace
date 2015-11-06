@@ -456,7 +456,7 @@ namespace BridgeApi.Controller.Request.Database
 
                 writer.WriteArrayStart();
                 foreach (Enum field in fields)
-                    writer.Write(field.ToString().ToLowerInvariant());
+                    writer.Write(field.ToString());
                 writer.WriteArrayEnd();
 
 
@@ -479,7 +479,7 @@ namespace BridgeApi.Controller.Request.Database
                 writer.WriteObjectStart();
                 foreach (KeyValuePair<Enum, string> pair in pairs)
                 {
-                    writer.WritePropertyName(pair.Key.ToString().ToLowerInvariant());
+                    writer.WritePropertyName(pair.Key.ToString());
                     writer.Write(pair.Value);
                 }
                 writer.WriteObjectEnd();

@@ -5,7 +5,6 @@ using BridgeApi.Controller.Request;
 
 namespace AndroidApi.Controller
 {
-
     public class AndroidUnityBridge : IPlatformBridgeDelegate
     {
         /// <summary>

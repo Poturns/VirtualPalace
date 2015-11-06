@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SQLite4Unity3d;
 using UnityEngine;
 using MyScript.Objects;
 using System.Collections;
 using System.Text;
 using System.IO;
-#if !UNITY_EDITOR
-using System.Collections;
-using System.IO;
-#endif
 
 namespace ComputerApi.Controller
 {
+
     public class SQLiteHelper
     {
         private SQLiteConnection _connection;
@@ -20,35 +16,14 @@ namespace ComputerApi.Controller
         public SQLiteHelper(string DatabaseName)
         {
 
-#if UNITY_EDITOR
             var dbPath = string.Format(@"Assets/StreamingAssets/{0}", DatabaseName);
-#else
-        // check if file exists in Application.persistentDataPath
-        var filepath = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
-
-        if (!File.Exists(filepath))
-        {
-            Debug.Log("Database not in Persistent path");
-            // if it doesn't ->
-            // open StreamingAssets directory and load the db ->
-#if UNITY_WINRT
-			var loadDb = Application.dataPath + "/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-			// then save to Application.persistentDataPath
-			File.Copy(loadDb, filepath);
-#endif
-
-            Debug.Log("Database written");
-        }
-
-        var dbPath = filepath;
-#endif
             if (!File.Exists(dbPath))
             {
                 File.Create(dbPath);
             }
-            string dbURI = "URI=file" + dbPath;
+//            string dbURI = "URI=file" + dbPath;
             _connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-            Debug.Log("Final PATH: " + dbPath);
+         //   Debug.Log("Final PATH: " + dbPath);
 
         }
 
@@ -68,6 +43,9 @@ namespace ComputerApi.Controller
 
                 _connection.DropTable<VRObject>();
                 _connection.CreateTable<VRObject>();
+
+                TableMapping map = _connection.GetMapping<VRObject>();
+                Debug.Log(map);
             }
         }
 
@@ -208,4 +186,5 @@ namespace ComputerApi.Controller
 
         */
     }
+
 }

@@ -8,6 +8,9 @@ namespace MyScript.Objects
 {
     public struct BookCaseObject : IDatabaseObject
     {
+#if UNITY_EDITOR
+        [SQLite4Unity3d.PrimaryKey, SQLite4Unity3d.AutoIncrement]
+#endif
         public int ID { get; set; }
         public string Name { get; set; }
         public float Z_Offset { get; set; }

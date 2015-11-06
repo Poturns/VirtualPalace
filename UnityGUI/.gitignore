@@ -24,5 +24,6 @@
 /*.booproj
 
 /Assets/LobbyModel/大堂 sw.max
-/Assets/StreamingAssets/
-/Assets/StreamingAssets.meta
+/Assets/StreamingAssets/tempDatabase.*
+/Assets/StreamingAssets/image/*
+/Assets/StreamingAssets/video/*
