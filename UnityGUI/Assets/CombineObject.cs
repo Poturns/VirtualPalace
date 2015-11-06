@@ -21,7 +21,7 @@ public class CombineObject : AbstractBasicObject {
 		string ContentStr = GetContentString ();
         VRObject SaveObj = new VRObject.Builder(tr.name, SourceKind, ModelKind)
             .SetID(ID)
-            .SetParentName(tr.parent.gameObject.name)
+            .SetParentName(tr.parent.parent.gameObject.name)
             .SetPosition(tr.position)
             .SetScale(transform.localScale)
             .SetRotation(tr.rotation)
