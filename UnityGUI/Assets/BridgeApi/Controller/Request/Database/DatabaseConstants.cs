@@ -36,10 +36,10 @@ namespace BridgeApi.Controller.Request.Database
         ///</summary>
         public const string QUERY_RESULT = "return";
 
-        internal const string TABLE_AR = "ar";
-        internal const string TABLE_VR = "vr";
-        internal const string TABLE_RES = "res";
-        internal const string TABLE_VR_CONTAINER = "bookcase";
+        public const string TABLE_AR = "ar";
+        public const string TABLE_VR = "vr";
+        public const string TABLE_RES = "res";
+        public const string TABLE_VR_CONTAINER = "bookcase";
 
         public const string SELECT = "select_";
         public const string INSERT = "insert_";

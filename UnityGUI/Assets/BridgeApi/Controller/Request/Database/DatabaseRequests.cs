@@ -1,4 +1,4 @@
-﻿using MyScript.objects;
+﻿using MyScript.Objects;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

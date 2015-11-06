@@ -4,19 +4,18 @@ using LitJson;
 
 namespace AndroidApi.Media
 {
-    public class ImageDirInfo : BaseDirInfo<ImageInfo>
+    internal class ImageDirInfo : BridgeApi.Media.ImageDirInfo
     {
-        protected const string ImageDirInfoClassName = "kr.poturns.virtualpalace.media.image.ImageDirInfo";
-
+       
         private ImageDirInfo()
         {
         }
 
-        public static List<ImageDirInfo> GetDirInfoList(AndroidJavaObject activity)
+        public static List<BridgeApi.Media.ImageDirInfo> GetDirInfoList(AndroidJavaObject activity)
         {
-            using (AndroidJavaClass imageBucketInfoClass = new AndroidJavaClass(ImageDirInfoClassName))
+            using (AndroidJavaClass imageBucketInfoClass = new AndroidJavaClass(AndroidMediaConstants.ImageDirInfoClassName))
             {
-                string listJson = imageBucketInfoClass.CallStatic<string>(GetJsonDirListMethodName, activity);
+                string listJson = imageBucketInfoClass.CallStatic<string>(AndroidMediaConstants.GetJsonDirListMethodName, activity);
 
                 //Debug.Log(listJson);
 
@@ -25,7 +24,7 @@ namespace AndroidApi.Media
 
                 int count = jData.Count;
 
-                List<ImageDirInfo> list = new List<ImageDirInfo>(count);
+                List<BridgeApi.Media.ImageDirInfo> list = new List<BridgeApi.Media.ImageDirInfo>(count);
                 for (int i = 0; i < count; i++)
                 {
                     ImageDirInfo info = new ImageDirInfo()
@@ -42,9 +41,9 @@ namespace AndroidApi.Media
             }
         }
 
-        public override List<ImageInfo> GetInfoList(AndroidJavaObject activity)
+        public override List<BridgeApi.Media.ImageInfo> GetInfoList()
         {
-            return ImageInfo.GetImageInfoList(activity, DirName);
+            return ImageInfo.GetImageInfoList(AndroidUtils.GetActivityObject(), DirName);
         }
 
     }

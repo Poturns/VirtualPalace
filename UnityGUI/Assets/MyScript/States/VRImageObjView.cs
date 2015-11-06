@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using BridgeApi.Controller;
 using UnityEngine;
 
@@ -65,7 +65,7 @@ namespace MyScript.States
             foreach (int key in directionDictionary.Keys)
             {
                 //ChooseMovie(directionDictionary[key])
-                // ¸í·ÉÀÌ ¿©·¯¹ø ¿À´Â °æ¿ì ½æ³×ÀÏ ·Îµù ³¶ºñ¸¦ ¸·±â À§ÇÏ¿© ÇÑ¹ø¸¸ ½æ³×ÀÏ º¯°æÀ» ½Ç½ÃÇÑ´Ù.
+                // ëª…ë ¹ì´ ì—¬ëŸ¬ë²ˆ ì˜¤ëŠ” ê²½ìš° ì¸ë„¤ì¼ ë¡œë”© ë‚­ë¹„ë¥¼ ë§‰ê¸° ìœ„í•˜ì—¬ í•œë²ˆë§Œ ì¸ë„¤ì¼ ë³€ê²½ì„ ì‹¤ì‹œí•œë‹¤.
                 if (NavigateImages(directionDictionary[key]))
                     return;
             }
@@ -94,11 +94,6 @@ namespace MyScript.States
             ExitImageState(false);
         }
 
-        private void ApplyImageTexture()
-        {
-
-        }
-
         void ExitImageState(bool applyImageTexture)
         {
             Debug.Log("=============== Exit VRImageObjectView");
@@ -113,15 +108,14 @@ namespace MyScript.States
             if (applyImageTexture)
             {
                 Renderer renderer = Target.gameObject.GetComponent<Renderer>();
-                ImageControl imageControl = ImageUI.GetComponent<ImageControl>();
 
                 if (renderer != null && renderer.materials != null)
                 {
                     int MatSize = renderer.materials.GetLength(0);
-                    renderer.materials[MatSize - 1].mainTexture = imageControl.GetTexture();
+                    renderer.materials[MatSize - 1].mainTexture = imageControl.CurrentTexture;
                 }
 
-                Target.gameObject.GetComponent<PictureObj>().Path = imageControl.GetNowPath();
+                Target.gameObject.GetComponent<PictureObj>().Path = imageControl.Path;
 
                 Debug.Log("=============== Apply Image Texture");
             }

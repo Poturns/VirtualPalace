@@ -4,25 +4,24 @@ using LitJson;
 
 namespace AndroidApi.Media
 {
-    public class VideoDirInfo : BaseDirInfo<VideoInfo>
+    internal class VideoDirInfo : BridgeApi.Media.VideoDirInfo
     {
-        protected const string VideoDirInfoClassName = "kr.poturns.virtualpalace.media.video.VideoDirInfo";
-
+       
         private VideoDirInfo()
         {
         }
 
-        public static List<VideoDirInfo> GetDirInfoList(AndroidJavaObject activity)
+        public static List<BridgeApi.Media.VideoDirInfo> GetDirInfoList(AndroidJavaObject activity)
         {
-            using (AndroidJavaClass videoDirInfoClass = new AndroidJavaClass(VideoDirInfoClassName))
+            using (AndroidJavaClass videoDirInfoClass = new AndroidJavaClass(AndroidMediaConstants.VideoDirInfoClassName))
             {
-                string listJson = videoDirInfoClass.CallStatic<string>(GetJsonDirListMethodName, activity);
+                string listJson = videoDirInfoClass.CallStatic<string>(AndroidMediaConstants.GetJsonDirListMethodName, activity);
 
                 JsonData jData = JsonMapper.ToObject(listJson);
 
                 int count = jData.Count;
 
-                List<VideoDirInfo> list = new List<VideoDirInfo>(count);
+                List<BridgeApi.Media.VideoDirInfo> list = new List<BridgeApi.Media.VideoDirInfo>(count);
                 for (int i = 0; i < count; i++)
                 {
                     VideoDirInfo info = new VideoDirInfo()
@@ -39,9 +38,9 @@ namespace AndroidApi.Media
             }
         }
 
-        public override List<VideoInfo> GetInfoList(AndroidJavaObject activity)
+        public override List<BridgeApi.Media.VideoInfo> GetInfoList()
         {
-            return VideoInfo.GetInfoList(activity, DirName);
+            return VideoInfo.GetInfoList(AndroidUtils.GetActivityObject(), DirName);
         }
     }
 }

@@ -3,45 +3,32 @@ using System.Collections.Generic;
 using MyScript;
 
 
-public class ImageControl : AbstractBasicObject {
+public class ImageControl : AbstractBasicObject
+{
 
-	private List<AndroidApi.Media.ImageDirInfo> imageDirInfo;
-	private int Index = 0;
-	private Texture2D NowTexture;
+    private List<BridgeApi.Media.ImageDirInfo> imageDirInfo;
+    private int Index = 0;
+    
     private Renderer imageRenderer;
-	private string path;
-	public string Path
-	{
-		set
-		{
-			path = value;
-			UpDateImageByCurrentPath();
-		}
-		get
-		{
-			return path;
-		}
-	}
+    private string currentPath;
+
+    public string Path
+    {
+        set { UpdateImageByCurrentPath(value); }
+        get { return currentPath; }
+    }
+
+    public Texture2D CurrentTexture { get; private set; }
+
     void Start()
-	{
+    {
 
-	}
+    }
 
-	public override void OnSelect()
-	{
-		//NextImg ();
-	}
-
-	public Texture2D GetTexture()
-	{
-		Index = 0;
-		return NowTexture;
-	}
-
-	public string GetNowPath()
-	{
-		return imageDirInfo [Index].FirstInfo.Path;
-	}
+    public override void OnSelect()
+    {
+        //NextImg ();
+    }
 
     public void ShowNextImageThumbnail()
     {
@@ -61,34 +48,30 @@ public class ImageControl : AbstractBasicObject {
     {
         CheckIndexValidity();
 
-        string currentThumbPath = imageDirInfo[Index].FirstInfo.Path;
+        UpdateImageByCurrentPath(imageDirInfo[Index].FirstInfo.Path);
+    }
 
-        Texture2D newTexture = Utils.Image.Load(imageDirInfo[Index].FirstInfo.Path);
+    private void UpdateImageByCurrentPath(string path)
+    {
+        currentPath = path;
+
+        if (path == null)
+            return;
 
         if (imageRenderer == null)
             imageRenderer = gameObject.GetComponent<Renderer>();
 
+        Texture2D newTexture = Utils.Image.Load(path);
         imageRenderer.material.mainTexture = newTexture;
-        NowTexture = newTexture;
-    }
-	//가지고 있는 Path를 이용해 텍스쳐만 업데이트
-	//LOAD 된 이미지 객체 초기화용 메소드
-	private void UpDateImageByCurrentPath()
-	{
-		if (path == null)
-			return;
-		if (imageRenderer == null)
-			imageRenderer = gameObject.GetComponent<Renderer>();
 
-		Texture2D newTexture = Utils.Image.Load(path);
-		imageRenderer.material.mainTexture = newTexture;
-		NowTexture = newTexture;
-	}
+        CurrentTexture = newTexture;
+    }
+
     private void CheckIndexValidity()
     {
         if (imageDirInfo == null)
         {
-            imageDirInfo = AndroidApi.Media.ImageDirInfo.GetDirInfoList(AndroidApi.AndroidUtils.GetActivityObject());
+            imageDirInfo = BridgeApi.Media.MediaFactory.GetInstance().GetImageDirInfoList();
         }
 
         if (Index >= imageDirInfo.Count)

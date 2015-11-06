@@ -5,7 +5,8 @@
 /UnityGenerated
 /Library
 /Assets/AssetStoreTools*
-/UnityVS
+/Assets/UnityVS/
+/Assets/UnityVS.meta
 
 /ExportedObj/
 
@@ -22,4 +23,6 @@
 /*.unityproj
 /*.booproj
 
-/Asset/LobbyModel/大堂 sw.max
+/Assets/LobbyModel/大堂 sw.max
+/Assets/StreamingAssets/
+/Assets/StreamingAssets.meta

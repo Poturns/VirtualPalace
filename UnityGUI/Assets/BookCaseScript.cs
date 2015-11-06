@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using MyScript.States;
 using MyScript.Interface;
 using MyScript;
-using MyScript.objects;
+using MyScript.Objects;
 
 
 public class BookCaseScript : AbstractBasicObject {
@@ -34,7 +34,7 @@ public class BookCaseScript : AbstractBasicObject {
 	public BookCaseObject GetSaveObjectData()
 	{
 		Transform tr = gameObject.transform.parent;
-		BookCaseObject SaveObj = new BookCaseObject (ID, tr.gameObject.name, ZCurrentPos, tr.GetChild (0).childCount);
+		BookCaseObject SaveObj = new BookCaseObject (tr.gameObject.name, ZCurrentPos, tr.GetChild (0).childCount, ID);
 		//부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
 		
 		return SaveObj;

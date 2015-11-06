@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using MyScript.Interface;
-using MyScript.objects;
+using MyScript.Objects;
 
 public enum KIND_SOURCE
 {

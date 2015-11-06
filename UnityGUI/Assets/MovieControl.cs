@@ -5,7 +5,7 @@ using MyScript;
 public class MovieControl : AbstractBasicObject
 {
 
-    private List<AndroidApi.Media.VideoDirInfo> VideoDirInfoList;
+    private List<BridgeApi.Media.VideoDirInfo> VideoDirInfoList;
     private int Index = 0;
     private Texture2D ThumnailTex;
     private string ThumnailPath;
@@ -57,7 +57,7 @@ public class MovieControl : AbstractBasicObject
     {
         if (VideoDirInfoList == null)
         {
-            VideoDirInfoList = AndroidApi.Media.VideoDirInfo.GetDirInfoList(AndroidApi.AndroidUtils.GetActivityObject());
+            VideoDirInfoList = BridgeApi.Media.MediaFactory.GetInstance().GetVideoDirInfoList();
         }
 
         if (Index >= VideoDirInfoList.Count)

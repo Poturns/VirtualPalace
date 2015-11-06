@@ -1,31 +1,29 @@
-﻿namespace AndroidApi.Media
+﻿namespace BridgeApi.Media
 {
     public abstract class BaseInfo
     {
-        protected const string GetJsonInfoListMethodName = "getJSONInfoList";
-
         public string DisplayName
         {
             get;
-            protected set;
+            protected internal set;
         }
 
         public string DirName
         {
             get;
-            protected set;
+            protected internal set;
         }
 
         public int ID
         {
             get;
-            protected set;
+            protected internal set;
         }
 
         public string Path
         {
             get;
-            protected set;
+            protected internal set;
         }
 
     }

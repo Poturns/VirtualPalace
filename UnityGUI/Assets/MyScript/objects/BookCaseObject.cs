@@ -4,27 +4,27 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyScript.objects
+namespace MyScript.Objects
 {
-    public class BookCaseObject : IDatabaseObject
+    public struct BookCaseObject : IDatabaseObject
     {
-        public int ID { get; protected set; }
-        public string Name { get; protected set; }
-        public float Z_Offset { get; protected set; }
-        public int Count { get; protected set; }
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public float Z_Offset { get; set; }
+        public int Count { get; set; }
 
-        public BookCaseObject(int id, string name, float zOffset, int count)
+        public BookCaseObject(string name, float zOffset, int count, int id = -1)
         {
             ID = id;
             Name = name;
             Z_Offset = zOffset;
             Count = count;
         }
-
-        public BookCaseObject(string name, float zOffset, int count) : this(-1, name, zOffset, count)
+        /*
+        public BookCaseObject(string name, float zOffset, int count) : this(name, zOffset, count, -1)
         {
         }
-
+        */
 
         public KeyValuePair<Enum, string>[] ConvertToPairs()
         {
@@ -51,13 +51,22 @@ namespace MyScript.objects
             float offset = JsonInterpreter.ParseFloatData(jsonData, VR_CONTAINER_FIELD.Z_OFFSET.ToString());
             int count = JsonInterpreter.ParseIntData(jsonData, VR_CONTAINER_FIELD.COUNT.ToString());
 
-            return new BookCaseObject(id, name, offset, count);
+            return new BookCaseObject(name, offset, count, id);
         }
 
         public override string ToString()
         {
-            return "BookCaseObject : [ id : " + ID + ", name : " + Name + ", zOffset : " + Z_Offset + ", count : " + Count + " ]";
+            return this.StringForm();
         }
 
+        public string ToJSON()
+        {
+            return this.JsonForm();
+        }
+
+        public bool IsInvalid()
+        {
+            return ID < 0;
+        }
     }
 }

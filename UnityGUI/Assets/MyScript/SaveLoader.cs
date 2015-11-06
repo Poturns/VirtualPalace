@@ -1,27 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-
-using MyScript;
 using BridgeApi.Controller.Request.Database;
-using MyScript.objects;
+using MyScript.Objects;
 using System;
 
 public class SaveLoader : MonoBehaviour
 {
 
-    public const string ObjFileName = "SceneData.dat";
-    public const string BookCaseFileName = "CaseData.dat";
-    private readonly object COUNT_LOCK = new object();
 
-    // Use this for initialization
     public void SavetoFile(Action callback)
     {
         InsertToDatabase(callback);
     }
-
 
     public void InsertToDatabase(Action callback)
     {
@@ -50,16 +40,14 @@ public class SaveLoader : MonoBehaviour
                         CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
 
                         VRObject sData = InteractObj.GetSaveObjectData();
-                        if (sData != null)
+                        if (!sData.IsInvalid())
                             vrObjectList.Add(sData);
 
                     }
 
                     if (vrObjectList.Count > 0)
-                        InsertVRObjectsToDatabase(vrObjectList);
+                        InsertVRObjectsToDatabase(vrObjectList, newIndex + 1 == N, callback);
 
-                    if (newIndex + 1 == N)
-                        callback();
                 });
             });
         }
@@ -67,9 +55,17 @@ public class SaveLoader : MonoBehaviour
 
     }
 
-    private void InsertVRObjectsToDatabase(List<VRObject> list)
+    private void InsertVRObjectsToDatabase(List<VRObject> list, bool last, Action callback)
     {
-        DatabaseRequests.InsertVRObjects(StateManager.GetManager(), list, result => Debug.Log("query ==== " + result));
+        DatabaseRequests.InsertVRObjects(StateManager.GetManager(), list, result =>
+        {
+            Debug.Log("query InsertVRObjectsToDatabase ==== " + result);
+            if (last)
+            {
+                Debug.Log("query InsertVRObjectsToDatabase ==== end");
+                StateManager.GetManager().QueueOnMainThread(callback);
+            }
+        });
     }
 
     public void LoadFromDatabase()

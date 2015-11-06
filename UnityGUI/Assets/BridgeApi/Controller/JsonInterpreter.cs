@@ -1,6 +1,6 @@
 ﻿using BridgeApi.Controller.Request.Database;
 using LitJson;
-using MyScript.objects;
+using MyScript.Objects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -280,7 +280,7 @@ namespace BridgeApi.Controller
                 foreach (JsonData json in jsonList)
                 {
                     BookCaseObject data = BookCaseObject.FromJSON(json);
-                    if (data != null)
+                    if (!data.IsInvalid())
                         dataList.Add(data);
                 }
             }
@@ -297,7 +297,7 @@ namespace BridgeApi.Controller
                 foreach (JsonData json in jsonList)
                 {
                     VRObject data = VRObject.FromJSON(json);
-                    if (data != null)
+                    if (!data.IsInvalid())
                         dataList.Add(data);
                 }
             }
@@ -307,92 +307,66 @@ namespace BridgeApi.Controller
 
         public static int ParseIntData(JsonData jsonData, string key)
         {
-            if (jsonData.IsInt)
+            JsonData jsonValue = jsonData[key];
+
+            Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+
+            if (jsonValue.IsInt)
             {
-                return (int)jsonData[key];
+                return (int)jsonValue;
             }
-            else if (jsonData.IsString)
+            else if (jsonValue.IsString)
             {
                 try
                 {
-                    return int.Parse((string)jsonData[key]);
+                    return int.Parse((string)jsonValue);
                 }
                 catch (Exception e)
                 {
                     Debug.LogException(e);
-                    return 0;
+                    return -1;
                 }
             }
             else
             {
-                Debug.Log("unkwon type error, data : " + jsonData[key]);
-                return 0;
+                Debug.Log("unkwon type error, data : " + jsonValue);
+                return -1;
             }
         }
 
         public static float ParseFloatData(JsonData jsonData, string key)
         {
-            // Debug.Log("==== parsing : { " + key + " : " + jsonData[key].ToJson() + " }");
-            if (jsonData.IsLong)
+            JsonData jsonValue = jsonData[key];
+
+            Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+
+            if (jsonValue.IsLong)
             {
-                return (long)jsonData[key];
+                return (long)jsonValue;
             }
-            else if (jsonData.IsInt)
+            else if (jsonValue.IsInt)
             {
-                return (int)jsonData[key];
+                return (int)jsonValue;
             }
-            else if (jsonData.IsString)
+            else if (jsonValue.IsString)
             {
                 try
                 {
-                    return float.Parse((string)jsonData[key]);
+                    return float.Parse((string)jsonValue);
                 }
                 catch (Exception e)
                 {
                     Debug.LogException(e);
-                    return 0;
+                    return -1;
                 }
             }
             else
             {
-                Debug.Log("unknown type error, data : " + jsonData[key]);
-                return 0;
+                Debug.Log("unknown type error, data : " + jsonValue);
+                return -1;
             }
         }
-        /*
-        public static List<SaveData> ParseJsonListToSaveData(List<JsonData> jsonList)
-        {
-            List<SaveData> saveDataList = new List<SaveData>();
-            if (jsonList != null)
-            {
-                foreach (JsonData json in jsonList)
-                {
-                    SaveData saveData = SaveData.FromJson(json);
-                    if (saveData != null)
-                        saveDataList.Add(saveData);
-                }
-            }
-
-            return saveDataList;
-        }
-
-        public static List<SaveDataForBookCase> ParseJsonListToBookCaseData(List<JsonData> jsonList)
-        {
-            List<SaveDataForBookCase> saveDataList = new List<SaveDataForBookCase>();
-            if (jsonList != null)
-            {
-                foreach (JsonData json in jsonList)
-                {
-                    SaveDataForBookCase saveData = SaveDataForBookCase.FromJson(json);
-                    if (saveData != null)
-                        saveDataList.Add(saveData);
-                }
-            }
-
-            return saveDataList;
-        }
-        */
-
+      
     }
 
 }

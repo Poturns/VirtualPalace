@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using MyScript;
-using MyScript.objects;
+using MyScript.Objects;
 
 public class CombineObject : AbstractBasicObject {
 

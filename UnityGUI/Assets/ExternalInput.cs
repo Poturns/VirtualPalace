@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class ExternalInput : MonoBehaviour
 {
 
-	private List<AndroidApi.Media.ImageDirInfo> imageDirInfo;
+	private List<BridgeApi.Media.ImageDirInfo> imageDirInfo;
 	private int count = 0;
 
     void Start()
@@ -17,7 +17,7 @@ public class ExternalInput : MonoBehaviour
 	{
 	
 		if (imageDirInfo == null) {
-			imageDirInfo = AndroidApi.Media.ImageDirInfo.GetDirInfoList (AndroidApi.AndroidUtils.GetActivityObject ());
+            imageDirInfo = BridgeApi.Media.MediaFactory.GetInstance().GetImageDirInfoList();
 		}
 
 		if (count >= imageDirInfo.Count)

@@ -5,24 +5,10 @@ using UnityEngine;
 
 namespace AndroidApi.Media
 {
-    public class VideoInfo : BaseInfo
+    internal class VideoInfo : BridgeApi.Media.VideoInfo
     {
-        protected const string VideoInfoClassName = "kr.poturns.virtualpalace.media.video.VideoInfo";
-
         internal VideoInfo()
         {
-        }
-
-        public long Size
-        {
-            get;
-            protected set;
-        }
-
-        public long Duration
-        {
-            get;
-            protected set;
         }
 
         private static long parseLongJSONData(JsonData jData, string key)
@@ -56,16 +42,16 @@ namespace AndroidApi.Media
             return info;
         }
 
-        internal static List<VideoInfo> GetInfoList(AndroidJavaObject activity, string dirName)
+        internal static List<BridgeApi.Media.VideoInfo> GetInfoList(AndroidJavaObject activity, string dirName)
         {
-            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
+            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(AndroidMediaConstants.VideoInfoClassName))
             {
-                string listJson = videoInfoClass.CallStatic<string>(GetJsonInfoListMethodName, activity, dirName);
+                string listJson = videoInfoClass.CallStatic<string>(AndroidMediaConstants.GetJsonInfoListMethodName, activity, dirName);
 
                 JsonData jData = JsonMapper.ToObject(listJson);
                 int count = jData.Count;
 
-                List<VideoInfo> list = new List<VideoInfo>(count);
+                List<BridgeApi.Media.VideoInfo> list = new List<BridgeApi.Media.VideoInfo>(count);
                 for (int i = 0; i < count; i++)
                 {
                     VideoInfo info = parseJSON(jData[i].ToJson());
@@ -83,21 +69,12 @@ namespace AndroidApi.Media
         /// </summary>
         /// <param name="fileName">비디오의 처음 프레임의 이미지가 저장되는 파일의 이름</param>
         /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
-        public string GetFirstFrameThumbnailPath(string fileName)
+        public override string GetFirstFrameThumbnailPath(string fileName)
         {
-            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(VideoInfoClassName))
+            using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(AndroidMediaConstants.VideoInfoClassName))
             {
                 return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", AndroidUtils.GetActivityObject(), fileName, Path);
             }
-        }
-
-        /// <summary>
-        /// 비디오의 처음 프레임의 이미지를 생성한다.
-        /// </summary>
-        /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
-        public string GetFirstFrameThumbnailPath()
-        {
-            return GetFirstFrameThumbnailPath(DirName + "_" + DisplayName);
         }
 
     }

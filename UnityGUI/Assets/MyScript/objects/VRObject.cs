@@ -3,38 +3,39 @@ using System.Collections.Generic;
 using BridgeApi.Controller;
 using UnityEngine;
 using BridgeApi.Controller.Request.Database;
+using System.Text;
 
-namespace MyScript.objects
+namespace MyScript.Objects
 {
-    public class VRObject : IDatabaseObject
+    public struct VRObject : IDatabaseObject
     {
         /// <summary>
         /// VR_Table에서의 id
         /// </summary>
-        public int ID { get; protected set; }
+        public int ID { get; set; }
 
 
-        public string Name { get; protected set; }
-        public string ParentName { get; protected set; }
+        public string Name { get; set; }
+        public string ParentName { get; set; }
 
-        public int ModelType { get; protected set; }
+        public int ModelType { get; set; }
 
-        public float PosX { get; protected set; }
-        public float PosY { get; protected set; }
-        public float PosZ { get; protected set; }
+        public float PosX { get; set; }
+        public float PosY { get; set; }
+        public float PosZ { get; set; }
 
-        public float RotateX { get; protected set; }
-        public float RotateY { get; protected set; }
-        public float RotateZ { get; protected set; }
-        public float RotateW { get; protected set; }
+        public float RotateX { get; set; }
+        public float RotateY { get; set; }
+        public float RotateZ { get; set; }
+        public float RotateW { get; set; }
 
-        public float SizeX { get; protected set; }
-        public float SizeY { get; protected set; }
-        public float SizeZ { get; protected set; }
+        public float SizeX { get; set; }
+        public float SizeY { get; set; }
+        public float SizeZ { get; set; }
 
-        public int ResID { get; protected set; }
-        public string ResContents { get; protected set; }
-        public string ResTitle { get; protected set; }
+        public int ResID { get; set; }
+        public string ResContents { get; set; }
+        public string ResTitle { get; set; }
 
         public KIND_SOURCE SourceKind { get { return (KIND_SOURCE)ResID; } }
         public OBJ_LIST ObjKind { get { return (OBJ_LIST)ModelType; } }
@@ -43,8 +44,20 @@ namespace MyScript.objects
         public Quaternion Rotation { get { return new Quaternion(RotateX, RotateY, RotateZ, RotateW); } }
         public Vector3 Scale { get { return new Vector3(SizeX, SizeY, SizeZ); } }
 
-        private VRObject()
+        public override string ToString()
         {
+            return this.StringForm();
+        }
+
+        public string ToJSON()
+        {
+            return this.JsonForm();
+        }
+
+
+        public bool IsInvalid()
+        {
+            return ID < 0 || Name.Equals("") || ResID < 0 || ModelType < 0;
         }
 
         public class Builder
@@ -216,7 +229,7 @@ namespace MyScript.objects
             data.PosY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_Y.ToString());
             data.PosZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_Z.ToString());
 
-            data.RotateX= JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_X.ToString());
+            data.RotateX = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_X.ToString());
             data.RotateY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_Y.ToString());
             data.RotateZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_Z.ToString());
             data.RotateW = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.ROTATE_W.ToString());
@@ -231,5 +244,6 @@ namespace MyScript.objects
 
             return data;
         }
+
     }
 }

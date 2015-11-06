@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using MyScript.States;
 using MyScript.Interface;
-using AndroidApi.Controller;
 using System;
 using BridgeApi.Controller;
 using BridgeApi.Controller.Request;
@@ -208,11 +207,15 @@ public class StateManager : MonoBehaviour, IPlatformBridge
 
     private void InitPlatformBridge()
     {
-
         if (Application.platform == RuntimePlatform.Android)
         {
-            bridgeDelegate = new AndroidUnityBridge();
+            bridgeDelegate = new AndroidApi.Controller.AndroidUnityBridge();
             Debug.Log("=============== UnityBridge - AndroidUnityBridge attatched sucessfully.");
+        }
+        else if(Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            bridgeDelegate = new ComputerApi.Controller.ComputerUnityBridge();
+            Debug.Log("=============== UnityBridge - ComputerUnityBridge attatched sucessfully.");
         }
         else
         {
