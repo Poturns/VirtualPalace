@@ -206,11 +206,11 @@ namespace MyScript.objects
 
             VRObject data = new VRObject();
 
-            data.ID = int.Parse((string)jsonData[VIRTUAL_FIELD._ID.ToString()]);
+            data.ID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD._ID.ToString());
 
             data.Name = (string)jsonData[VIRTUAL_FIELD.NAME.ToString()];
             data.ParentName = (string)jsonData[VIRTUAL_FIELD.PARENT_NAME.ToString()];
-            data.ModelType = int.Parse((string)jsonData[VIRTUAL_FIELD.MODEL_TYPE.ToString()]);
+            data.ModelType = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.MODEL_TYPE.ToString());
 
             data.PosX = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_X.ToString());
             data.PosY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_Y.ToString());
@@ -225,7 +225,7 @@ namespace MyScript.objects
             data.SizeY = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_Y.ToString());
             data.SizeZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_Z.ToString());
 
-            data.ResID = int.Parse((string)jsonData[VIRTUAL_FIELD.RES_ID.ToString()]);
+            data.ResID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.RES_ID.ToString());
             data.ResTitle = (string)jsonData[RESOURCE_FIELD.TITLE.ToString()];
             data.ResContents = (string)jsonData[RESOURCE_FIELD.CONTENTS.ToString()];
 

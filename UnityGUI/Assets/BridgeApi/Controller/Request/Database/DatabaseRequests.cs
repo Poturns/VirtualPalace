@@ -44,7 +44,7 @@ namespace BridgeApi.Controller.Request.Database
             DatabaseRequestFactory.InsertVRObjects(dataList)
                 .SendRequest(bridge, (requestResult) =>
                 {
-                    Debug.Log("=============== UpdateBookCaseObject result : " + requestResult);
+                    Debug.Log("=============== InsertVRObjects result : " + requestResult);
                     resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
                 });
         }
@@ -54,7 +54,7 @@ namespace BridgeApi.Controller.Request.Database
             DatabaseRequestFactory.UpdateVRObjects(dataList)
                 .SendRequest(bridge, (requestResult) =>
                 {
-                    Debug.Log("=============== UpdateBookCaseObject result : " + requestResult);
+                    Debug.Log("=============== UpdateVRObjects result : " + requestResult);
                     resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
                 });
         }

@@ -238,8 +238,7 @@ namespace BridgeApi.Controller
 
             result.RequestName = SpeechRequestResult.SPEECH_REQUEST_KEY;
 
-
-            if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_RESULT_KEY))
+            if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_REQUEST_KEY))
             {
                 jData = jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
                 result.Speech = (string)jData[SpeechRequestResult.SPEECH_RESULT_KEY];
@@ -306,6 +305,31 @@ namespace BridgeApi.Controller
             return dataList;
         }
 
+        public static int ParseIntData(JsonData jsonData, string key)
+        {
+            if (jsonData.IsInt)
+            {
+                return (int)jsonData[key];
+            }
+            else if (jsonData.IsString)
+            {
+                try
+                {
+                    return int.Parse((string)jsonData[key]);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    return 0;
+                }
+            }
+            else
+            {
+                Debug.Log("unkwon type error, data : " + jsonData[key]);
+                return 0;
+            }
+        }
+
         public static float ParseFloatData(JsonData jsonData, string key)
         {
             // Debug.Log("==== parsing : { " + key + " : " + jsonData[key].ToJson() + " }");
@@ -330,7 +354,10 @@ namespace BridgeApi.Controller
                 }
             }
             else
+            {
+                Debug.Log("unknown type error, data : " + jsonData[key]);
                 return 0;
+            }
         }
         /*
         public static List<SaveData> ParseJsonListToSaveData(List<JsonData> jsonList)

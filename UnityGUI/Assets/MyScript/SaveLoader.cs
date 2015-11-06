@@ -32,9 +32,10 @@ public class SaveLoader : MonoBehaviour
         int N = Root.transform.childCount;
         for (int i = 0; i < N; i++)
         {
-			BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
-			BookCaseObject bData = BookCase.GetSaveObjectData();
-           
+            BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
+            BookCaseObject bData = BookCase.GetSaveObjectData();
+
+            int newIndex = i;
             DatabaseRequests.UpdateBookCaseObjects(manager, bData, result =>
             {
                 Debug.Log("query ==== " + result);
@@ -51,18 +52,19 @@ public class SaveLoader : MonoBehaviour
                         VRObject sData = InteractObj.GetSaveObjectData();
                         if (sData != null)
                             vrObjectList.Add(sData);
-                        
+
                     }
 
-                    InsertVRObjectsToDatabase(vrObjectList);
+                    if (vrObjectList.Count > 0)
+                        InsertVRObjectsToDatabase(vrObjectList);
 
-                    if(i + 1 == N)
+                    if (newIndex + 1 == N)
                         callback();
                 });
             });
         }
 
-        
+
     }
 
     private void InsertVRObjectsToDatabase(List<VRObject> list)
@@ -72,7 +74,7 @@ public class SaveLoader : MonoBehaviour
 
     public void LoadFromDatabase()
     {
-       // int ObjCnt = 0;
+        // int ObjCnt = 0;
         StateManager manager = StateManager.GetManager();
         DatabaseRequests.QueryBookCaseObjects(manager, results =>
         {
@@ -80,15 +82,16 @@ public class SaveLoader : MonoBehaviour
             {
                 foreach (BookCaseObject data in results)
                 {
+                    Debug.Log("bookcase ===== " + data);
                     BookCaseScript BookCase = GameObject.Find(data.Name).transform.GetChild(0).GetComponent<BookCaseScript>();
-                   // ObjCnt += data.Cnt;
+                    // ObjCnt += data.Cnt;
                     BookCase.UpdateWithSaveObjectData(data);
                 }
 
                 RequestSaveDataFromDatabase();
             });
         });
-       
+
     }
 
     public void LoadToFile()
@@ -105,7 +108,7 @@ public class SaveLoader : MonoBehaviour
         LoadFromDatabase();
     }
 
- 
+
     private void RequestSaveDataFromDatabase()
     {
         DatabaseRequests.QueryVRObjects(StateManager.GetManager(),
@@ -122,12 +125,14 @@ public class SaveLoader : MonoBehaviour
     private void UpdataBookDataWithSaveData(VRObject sData)
     {
         PrefabContainer PrefabCon = GameObject.Find("PreLoadPrefab").GetComponent<PrefabContainer>();
+        Debug.Log("======= Find VR Object : " + sData.Name + " , ModelType : " + sData.ModelType + " , ObjKind : " + sData.ObjKind);
         GameObject Obj = GameObject.Find(sData.Name);
         //처음부터 존재 하는 오브젝트일때 컨텐츠 내용만 업데이트
         if (Obj != null)
         {
-			CombineObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<CombineObject>();
-            RealObj.UpdateContents(sData.ResContents , sData.ID);
+            CombineObject RealObj = Obj.transform.GetChild(0).gameObject.GetComponent<CombineObject>();
+            RealObj.UpdateContents(sData.ResContents, sData.ID);
+            Debug.Log("======= VR Object Updated : " + sData.Name);
         }
         // 추가되어야할 오브젝트일때 생성후 초기화
         else
@@ -135,10 +140,11 @@ public class SaveLoader : MonoBehaviour
             GameObject PrefabToLoad = PrefabCon.GetPrefab(sData.ObjKind);
             GameObject LoadObject = Instantiate(PrefabToLoad, sData.Position, sData.Rotation) as GameObject;
             LoadObject.transform.parent = GameObject.Find(sData.ParentName).transform.GetChild(0);
-			LoadObject.transform.GetChild(0).GetComponent<CombineObject>().UpdateWithSaveObjectData(sData);
+            LoadObject.transform.GetChild(0).GetComponent<CombineObject>().UpdateWithSaveObjectData(sData);
+            Debug.Log("======= VR Object Inseted : " + sData.Name);
         }
     }
-	/*
+    /*
     // 리턴값은 총 오브젝트가 저장된 갯수 
     private int ReadBookCaseFile(BinaryFormatter bf)
     {
@@ -211,11 +217,11 @@ public class SaveLoader : MonoBehaviour
 
     }
 	*/
-	private void BufferingARObjectData(SaveData sData)
-	{
-		
-		ARObjectList ARObjBuffer = GameObject.Find ("ABBufferObject").GetComponent<ARObjectList>();
-		
-		ARObjBuffer.AddARData (sData);
-	}
+    private void BufferingARObjectData(SaveData sData)
+    {
+
+        ARObjectList ARObjBuffer = GameObject.Find("ABBufferObject").GetComponent<ARObjectList>();
+
+        ARObjBuffer.AddARData(sData);
+    }
 }

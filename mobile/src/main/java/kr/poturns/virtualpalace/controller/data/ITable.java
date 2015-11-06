@@ -27,6 +27,8 @@ public interface ITable {
      */
     String getTableName();
 
+    boolean isTextField();
+
     /**
      * toString() + equalsIgnoreCase()
      * @param str

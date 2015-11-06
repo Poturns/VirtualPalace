@@ -18,6 +18,11 @@ public enum VRContainerTable implements ITable{
     }
 
     @Override
+    public boolean isTextField() {
+        return attributes.contains("TEXT");
+    }
+
+    @Override
     public boolean equalString(String str) {
         return this.name().equalsIgnoreCase(str);
     }

@@ -14,7 +14,6 @@ import java.util.TreeMap;
 
 import kr.poturns.virtualpalace.InfraDataService;
 import kr.poturns.virtualpalace.augmented.AugmentedItem;
-import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.augmented.AugmentedManager;
 import kr.poturns.virtualpalace.controller.data.AugmentedTable;
 import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
@@ -410,7 +409,7 @@ abstract class PalaceCore {
      * @param array
      * @return 하나라도 데이터 저장이 성공하지 못했을 때, false 를 반환한다.
      */
-    protected boolean saveVirtualRenderingItems(JSONArray array) {
+    protected synchronized boolean saveVirtualRenderingItems(JSONArray array) {
         boolean result = true;
         for (int i=0; i<array.length(); i++) {
             try {
@@ -432,7 +431,7 @@ abstract class PalaceCore {
                 // Second, do VR Data.
                 LocalDatabaseCenter.WriteBuilder<VirtualTable> vrBuilder = new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
                 for (VirtualTable field : VirtualTable.values()) {
-                    if (object.has(field.name())) {
+                    if (object.has(field.name())  && (field != VirtualTable._ID) ) {
                         vrBuilder.set(field, field == VirtualTable.RES_ID?
                                 String.valueOf(resID) : object.getString(field.name()));
                     }
@@ -471,7 +470,9 @@ abstract class PalaceCore {
                 JSONObject bookcase = new JSONObject();
                 for (VRContainerTable field : VRContainerTable.values()) {
                     String name = field.toString();
-                    bookcase.put(name, cursor.getString(cursor.getColumnIndex(name)));
+                    String value = cursor.getString(cursor.getColumnIndex(name));
+
+                    bookcase.put(name, value);
                 }
                 array.put(bookcase);
             }

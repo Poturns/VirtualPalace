@@ -25,6 +25,8 @@ public class SpeechInputHelper implements RecognitionListener {
     private static final String TAG = "SpeechInputHelper";
     public static final int ACTIVITY_REQUEST_CODE = 9567;
     private static final int HANDLER_MSG_START_LISTENING = 1234;
+    private static final int HANDLER_MSG_STOP_LISTENING = 1238;
+    private static final int HANDLER_MSG_CANCEL_LISTENING = 1242;
 
     private SpeechRecognizer mRecognizer;
     private Intent speechIntent;
@@ -104,21 +106,34 @@ public class SpeechInputHelper implements RecognitionListener {
      * 음성인식 결과는 {@link SpeechController.OnSpeechDataListener}를 통해 전달된다.
      */
     public void startListening() {
-        mRecognizer.startListening(speechIntent);
+        if (checkMainLooper()) {
+            mRecognizer.startListening(speechIntent);
+        } else {
+            delayedStartRecognition();
+        }
+
     }
 
     /**
      * 음성인식을 중지한다.
      */
     public void stopListening() {
-        mRecognizer.stopListening();
+        if (checkMainLooper()) {
+            mRecognizer.stopListening();
+        } else {
+            delayedStopRecognition();
+        }
     }
 
     /**
      * 음성인식을 취소한다.
      */
     public void cancelListening() {
-        mRecognizer.cancel();
+        if (checkMainLooper()) {
+            mRecognizer.cancel();
+        } else {
+            delayedCancelRecognition();
+        }
     }
 
     /**
@@ -244,10 +259,26 @@ public class SpeechInputHelper implements RecognitionListener {
      * 일정시간 대기 후, 음성인식을 시작한다.
      */
     public void delayedStartRecognition() {
-        if (mHandler.hasMessages(HANDLER_MSG_START_LISTENING)) {
-            mHandler.removeMessages(HANDLER_MSG_START_LISTENING);
+        sendHandlerDelayedMessage(HANDLER_MSG_START_LISTENING, delay);
+    }
+
+    public void delayedStopRecognition() {
+        sendHandlerDelayedMessage(HANDLER_MSG_STOP_LISTENING, delay);
+    }
+
+    public void delayedCancelRecognition() {
+        sendHandlerDelayedMessage(HANDLER_MSG_CANCEL_LISTENING, delay);
+    }
+
+    private void sendHandlerDelayedMessage(int msg, long delay) {
+        if (mHandler.hasMessages(msg)) {
+            mHandler.removeMessages(msg);
         }
-        mHandler.sendEmptyMessageDelayed(HANDLER_MSG_START_LISTENING, delay);
+        mHandler.sendEmptyMessageDelayed(msg, delay);
+    }
+
+    private static boolean checkMainLooper() {
+        return Looper.getMainLooper() == Looper.myLooper();
     }
 
     /**
@@ -276,6 +307,14 @@ public class SpeechInputHelper implements RecognitionListener {
                     } else {
                         helper.startListening();
                     }
+                    break;
+
+                case HANDLER_MSG_STOP_LISTENING:
+                    helper.stopListening();
+                    break;
+
+                case HANDLER_MSG_CANCEL_LISTENING:
+                    helper.cancelListening();
                     break;
 
                 default:

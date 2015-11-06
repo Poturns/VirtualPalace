@@ -338,20 +338,23 @@ public class LocalDatabaseCenter {
             }
             builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
+            boolean result = false;
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
                 if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
                     mSetClauseValues.put("MTIME", System.currentTimeMillis());
                 int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
-                return (affectedRows > 0);
+                result = (affectedRows > 0);
+                return result;
 
             } catch (SQLException e) {
                 Log.e("LDB_Modify_Exception", e.getMessage());
                 return false;
 
             } finally {
-                setClear().whereClear();
+                if(result)
+                    setClear().whereClear();
                 db.close();
             }
         }
@@ -442,6 +445,11 @@ public class LocalDatabaseCenter {
             mTableName = tableName;
         }
 
+        //TODO TEXT 데이터에 따옴표를 붙여줌, where 절에서만 사용할 것, 메소드 이름은 리팩토링 권장
+        private String getValue(E field, String value){
+            return field.isTextField() ? ("'" + value + "'") : value;
+        }
+
         /**
          * 다룰 SET 데이터를 추가한다.
          *
@@ -453,7 +461,7 @@ public class LocalDatabaseCenter {
             if (field == null)
                 return this;
 
-            mSetClauseValues.put(field.toString(), value);
+            mSetClauseValues.put(field.toString(),value);
             //mSetClauseMap.put(field.ordinal(), new Pair<String, String>(field.toString(), value));
 
             return check(field);
@@ -492,7 +500,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" != ")
-                            .append(value)
+                            .append(getValue(field,value))
                             .toString()
             );
             return check(field);
@@ -511,7 +519,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" = ")
-                            .append(value)
+                            .append(getValue(field,value))
                             .toString()
             );
             return check(field);
@@ -531,9 +539,9 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" BETWEEN ")
-                            .append(min)
+                            .append(getValue(field,min))
                             .append(" AND ")
-                            .append(max)
+                            .append(getValue(field,max))
                             .toString()
             );
             return check(field);
@@ -553,7 +561,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " >= " : " > ")
-                            .append(value)
+                            .append(getValue(field,value))
                             .toString()
             );
             return check(field);
@@ -573,7 +581,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " <= " : " < ")
-                            .append(value)
+                            .append(getValue(field,value))
                             .toString()
             );
             return check(field);
@@ -591,7 +599,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" LIKE %")
-                            .append(value)
+                            .append(getValue(field,value))
                             .append("% ")
                             .toString()
             );

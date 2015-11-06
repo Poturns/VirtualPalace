@@ -609,6 +609,7 @@ public class PalaceMaster extends PalaceEngine {
                     throw e;
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     try {
                         partialReturn.put(KEY_CALLBACK_RESULT, KEY_CALLBACK_RESULT_ERROR);
                     } catch (JSONException e2) { }
