@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import kr.poturns.virtualpalace.controller.AndroidUnityBridge;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
@@ -36,6 +40,16 @@ public class MainActivity extends Activity implements View.OnClickListener{
         findViewById(R.id.btn_controllertest).setOnClickListener(this);
         findViewById(R.id.btn_drivetest).setOnClickListener(this);
 
+        /*JSONObject obj = new JSONObject();
+        try {
+            obj.put("English", "hello");
+            obj.put("Korean", "안녕");
+
+        } catch (JSONException e) {
+
+        }
+
+        Toast.makeText(this, obj.optString("english", "NO"), Toast.LENGTH_SHORT).show();*/
     }
 
     @Override

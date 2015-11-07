@@ -10,20 +10,28 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import kr.poturns.virtualpalace.augmented.AugmentedItem;
 import kr.poturns.virtualpalace.controller.PalaceApplication;
 import kr.poturns.virtualpalace.controller.PalaceMaster;
+import kr.poturns.virtualpalace.controller.data.AugmentedTable;
+import kr.poturns.virtualpalace.controller.data.IProtocolKeywords;
+import kr.poturns.virtualpalace.controller.data.ITable;
+import kr.poturns.virtualpalace.controller.data.ResourceTable;
+import kr.poturns.virtualpalace.controller.data.VirtualTable;
 import kr.poturns.virtualpalace.input.IProcessorCommands;
 
-public class DatabaseTestActivity extends Activity implements View.OnClickListener{
+public class DatabaseTestActivity extends Activity implements View.OnClickListener, IProtocolKeywords.Request {
 
     PalaceApplication app;
     PalaceMaster master;
@@ -31,17 +39,42 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
 
     EditText edit;
 
-    String currentDB;
+    String currentTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database_test);
 
-        findViewById(R.id.btn_ar).setOnClickListener(this);
-        findViewById(R.id.btn_vr).setOnClickListener(this);
-        findViewById(R.id.btn_res).setOnClickListener(this);
-        findViewById(R.id.btn_vr_bookcase).setOnClickListener(this);
+        RadioGroup group = (RadioGroup) findViewById(R.id.radio_table);
+        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.radioButton:
+                        currentTable = "ar";
+                        break;
+                    case R.id.radioButton2:
+                        currentTable = "vr";
+                        break;
+                    case R.id.radioButton3:
+                        currentTable = "res";
+                        break;
+                    case R.id.radioButton4:
+                        currentTable = "bookcase";
+                        break;
+                }
+            }
+        });
+
+        findViewById(R.id.btn_select).setOnClickListener(this);
+        findViewById(R.id.btn_insert).setOnClickListener(this);
+        findViewById(R.id.btn_update).setOnClickListener(this);
+        findViewById(R.id.btn_delete).setOnClickListener(this);
+        findViewById(R.id.btn_load_vr).setOnClickListener(this);
+        findViewById(R.id.btn_save_vr).setOnClickListener(this);
+        findViewById(R.id.btn_near_ar).setOnClickListener(this);
+        findViewById(R.id.btn_add_ar).setOnClickListener(this);
         findViewById(R.id.btn_commit).setOnClickListener(this);
 
         edit = (EditText) findViewById(R.id.editText);
@@ -51,13 +84,6 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
 
         app = (PalaceApplication) getApplication();
         master = PalaceMaster.getInstance(app);
-
-        ArrayList<AugmentedItem> list = master.queryNearAugmentedItems();
-        Log.d("DatabaseTest", list.toString());
-
-        //JSONObject rstObj = new JSONObject();
-        //boolean result = master.queryVirtualRenderingItems(rstObj);
-        //Log.d("DatabaseTest", result + " :: " + rstObj.toString());
     }
 
     @Override
@@ -77,177 +103,236 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
 
         String json;
         switch(v.getId()) {
-            case R.id.btn_ar:
-                currentDB = "ar";
-                json = "{select_ar: { }}";
+            case R.id.btn_select:
                 try {
-                    adapter.jsonResultList.clear();
-                    JSONObject rst_obj = master.testProcess(json);
-                    JSONObject rst = rst_obj.getJSONObject("select_ar");
-                    adapter.jsonResultList.add("===" + rst.opt("result") + "===");
+                    JSONObject obj = new JSONObject();
+                    // SELECT ALL
 
-                    JSONArray array = rst.getJSONArray("return");
+                    JSONObject command = new JSONObject();
+                    String cmd = COMMAND_DB_SELECT + currentTable;
+                    command.put(cmd, obj);
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(cmd);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    JSONArray array = rst.getJSONArray(KEY_CALLBACK_RETURN);
                     for (int i=0; i<array.length(); i++)
                         adapter.jsonResultList.add(array.get(i).toString());
                     adapter.notifyDataSetChanged();
 
                 } catch (Exception e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 }
                 break;
 
-            case R.id.btn_vr:
-                currentDB = "vr";
-                json = "{select_vr: { }}";
+            case R.id.btn_insert:
                 try {
-                    adapter.jsonResultList.clear();
-                    JSONObject rst_obj = master.testProcess(json);
-                    JSONObject rst = rst_obj.getJSONObject("select_vr");
-                    adapter.jsonResultList.add("===" + rst.opt("result") + "===");
+                    JSONObject obj = new JSONObject();
+                    if (currentTable == "ar") {
+                        for (AugmentedTable field : AugmentedTable.values()) {
+                            obj.put(field.name().toLowerCase(), makeRandomData(field.attributes));
+                        }
 
-                    JSONArray array = rst.getJSONArray("return");
-                    for (int i=0; i<array.length(); i++)
-                        adapter.jsonResultList.add(array.get(i).toString());
-                    adapter.notifyDataSetChanged();
+                    } else if (currentTable == "vr") {
+                        for (VirtualTable field : VirtualTable.values()) {
+                            obj.put(field.name().toLowerCase(), makeRandomData(field.attributes));
+                        }
+
+                    } else if (currentTable == "res") {
+                        for (ResourceTable field : ResourceTable.values()) {
+                            obj.put(field.name().toLowerCase(), makeRandomData(field.attributes));
+                        }
+
+                    } else if (currentTable == "bookcase")
+                        return;
+
+
+                    JSONObject set = new JSONObject();
+                    set.put("set", obj);
+
+                    JSONObject command = new JSONObject();
+                    String cmd = COMMAND_DB_INSERT + currentTable;
+                    command.put(cmd, set);
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(cmd);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    findViewById(R.id.btn_select).performClick();
 
                 } catch (Exception e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 }
                 break;
 
-            case R.id.btn_res:
-                currentDB = "res";
-                json = "{select_res: { }}";
+            case R.id.btn_update:
                 try {
-                    adapter.jsonResultList.clear();
-                    JSONObject rst_obj = master.testProcess(json);
-                    JSONObject rst = rst_obj.getJSONObject("select_res");
-                    adapter.jsonResultList.add("===" + rst.opt("result") + "===");
+                    JSONObject obj = new JSONObject();
 
-                    JSONArray array = rst.getJSONArray("return");
-                    for (int i=0; i<array.length(); i++)
-                        adapter.jsonResultList.add(array.get(i).toString());
-                    adapter.notifyDataSetChanged();
+
+                    JSONObject command = new JSONObject();
+                    String cmd = COMMAND_DB_UPDATE + currentTable;
+                    command.put(cmd, obj);
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(cmd);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    findViewById(R.id.btn_select).performClick();
 
                 } catch (Exception e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 }
                 break;
 
-            case R.id.btn_vr_bookcase:
-                currentDB = "container";
-                json = "{select_bookcase: { }}";
+            case R.id.btn_delete:
                 try {
-                    adapter.jsonResultList.clear();
-                    JSONObject rst_obj = master.testProcess(json);
-                    JSONObject rst = rst_obj.getJSONObject("select_bookcase");
-                    adapter.jsonResultList.add("===" + rst.opt("result") + "===");
+                    JSONObject obj = new JSONObject();
 
-                    JSONArray array = rst.getJSONArray("return");
+                    JSONObject command = new JSONObject();
+                    String cmd = COMMAND_DB_DELETE + currentTable;
+                    command.put(cmd, obj);
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(cmd);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    findViewById(R.id.btn_select).performClick();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btn_load_vr:
+                try {
+                    JSONObject command = new JSONObject();
+                    command.put(COMMAND_QUERY_VR_ITEMS, new JSONObject());
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(COMMAND_QUERY_VR_ITEMS);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    JSONArray array = rst.getJSONArray(KEY_CALLBACK_RETURN);
                     for (int i=0; i<array.length(); i++)
                         adapter.jsonResultList.add(array.get(i).toString());
                     adapter.notifyDataSetChanged();
 
                 } catch (Exception e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btn_save_vr:
+                try {
+                    JSONObject command = new JSONObject();
+                    command.put(COMMAND_QUERY_VR_ITEMS, new JSONObject());
+
+                    JSONObject prev = master.testProcess(command.toString()).getJSONObject(COMMAND_QUERY_VR_ITEMS);
+                    JSONArray array = prev.getJSONArray(KEY_CALLBACK_RETURN);
+
+                    Random random = new Random(System.currentTimeMillis());
+                    int index = Math.abs(random.nextInt()) % array.length();
+
+                    JSONObject obj = array.getJSONObject(index);
+                    obj.remove(VirtualTable.RES_ID.name());
+                    obj.put(ResourceTable.TITLE.name(), makeRandomData(ResourceTable.TITLE.attributes));
+                    obj.put(ResourceTable.CONTENTS.name(), makeRandomData(ResourceTable.CONTENTS.attributes));
+
+                    command.remove(COMMAND_QUERY_VR_ITEMS);
+                    command.put(COMMAND_SAVE_VR_ITEMS, array);
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(COMMAND_SAVE_VR_ITEMS);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    findViewById(R.id.btn_load_vr).performClick();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btn_near_ar:
+                try {
+                    JSONObject command = new JSONObject();
+                    command.put(COMMAND_QUERY_NEAR_ITEMS, new JSONObject());
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(COMMAND_QUERY_NEAR_ITEMS);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    JSONArray array = rst.getJSONArray(KEY_CALLBACK_RETURN);
+                    for (int i=0; i<array.length(); i++)
+                        adapter.jsonResultList.add(array.get(i).toString());
+                    adapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btn_add_ar:
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put(ResourceTable.TITLE.name(), makeRandomData(ResourceTable.TITLE.attributes));
+                    obj.put(ResourceTable.CONTENTS.name(), makeRandomData(ResourceTable.TITLE.attributes));
+                    obj.put("SCREEN_X", makeRandomData("INTEGER"));
+                    obj.put("SCREEN_Y", makeRandomData("INTEGER"));
+
+                    JSONObject command = new JSONObject();
+                    command.put(COMMAND_SAVE_NEW_AR_ITEM, obj);
+
+                    adapter.jsonResultList.clear();
+                    JSONObject rst = master.testProcess(command.toString()).getJSONObject(COMMAND_SAVE_NEW_AR_ITEM);
+                    Toast.makeText(this, rst.optString(KEY_CALLBACK_RESULT), Toast.LENGTH_LONG).show();
+
+                    adapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 break;
 
             case R.id.btn_commit:
-                if (currentDB == null) {
+                if (currentTable == null) {
                     Toast.makeText(this, "Choose DB!", Toast.LENGTH_SHORT).show();
                     edit.setText("");
                     return;
                 }
 
-                CharSequence cs = edit.getText();
-                String input;
-                if (cs.length() == 0)
-                    input = "default";
-                else
-                    input = cs.toString();
-
-                if (((RadioButton) findViewById(R.id.radioButton)).isChecked()) {
-                    Toast.makeText(this, "INSERT", Toast.LENGTH_SHORT).show();
-                   if ("ar".equals(currentDB)) {
-                       json = "{insert_ar: {set: {" +
-                               "res_id:1, altitude:12.3456789, " +
-                               "latitude:123.456789, longitude:123.456789, " +
-                               "support_x:123, support_y:456, support_z:789"+
-                               "}}}";
-
-                   } else if ("vr".equals(currentDB)) {
-                        json = "{insert_vr: {set: {" +
-                                "res_id:1, name:'"+ input +"', model_type:1, " +
-                                "pos_x:123, pos_y:456, pos_z:789, " +
-                                "rotate_x:12.3, rotate_y:45.6, rotate_z:78.9, rotate_w:10.20," +
-                                "parent_name:'helloContainer'"+
-                                "}}}";
-
-                   } else if ("res".equals(currentDB)){
-                       json = "{insert_res: {set: {" +
-                               "title:'" + input + "', res_type:1, " +
-                               "contents: 'This is Contents', expansion: 'txt'," +
-                               "ctime:" + System.currentTimeMillis() +
-                               "}}}";
-                   } else
-                        return;
-                    try {
-                        adapter.jsonResultList.clear();
-
-                        Message.obtain(master.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_ANDROID, json).sendToTarget();
-
-                        //JSONObject rst_obj = master.testProcess(json);
-                        //adapter.jsonResultList.add("=== ===");
-                        //adapter.jsonResultList.add(rst_obj.toString());
-                        //adapter.notifyDataSetChanged();
-
-                    } catch (Exception e) {
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-
-                } else if (((RadioButton) findViewById(R.id.radioButton2)).isChecked()) {
-                    Toast.makeText(this, "MODIFY", Toast.LENGTH_SHORT).show();
-                    if ("ar".equals(currentDB)) {
-                        json = "{update_ar: {set: {" +
-                                "support_x:321, support_y:654, support_z:987}," +
-                                "where: {res_id:1"+
-                                "}}}";
-
-                    } else if ("vr".equals(currentDB)) {
-                        json = "{update_vr: {set: {" +
-                                "parent_name:'changedContainer'}, " +
-                                "where: {res_id:1" +
-                                "}}}";
-
-                    } else {
-                        json = "{update_res: {set: {" +
-                                "mtime: " + System.currentTimeMillis() + ", " +
-                                "contents:'Changed! testResName > testResName2'}, " +
-                                "where: {_id:1} }}";
-                    }
-                    try {
-                        adapter.jsonResultList.clear();
-
-                        Message.obtain(master.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_ANDROID, json).sendToTarget();
-
-//                        JSONObject rst_obj = master.testProcess(json);
-//                        adapter.jsonResultList.add("=== ===");
-//                        adapter.jsonResultList.add(rst_obj.toString());
-//                        adapter.notifyDataSetChanged();
-
-
-                    } catch (Exception e) {
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-
-                }
-
                 adapter.notifyDataSetChanged();
                 break;
         }
+    }
+
+    private Object makeRandomData(String attr) {
+        Random random = new Random(System.currentTimeMillis());
+        if (attr.contains("TEXT")) {
+            String[] texts = new String[]{
+                    "Hello World",
+                    "This is for the test",
+                    "text",
+                    "image",
+                    "video",
+                    "Welcome to Virtual Palace.",
+                    "Database Testing...",
+                    "AHO... STRESS!!"
+            };
+            int i = Math.abs(random.nextInt()) % texts.length;
+            return texts[i];
+
+        } else if (attr.contains("INTEGER")) {
+            int i = Math.abs(random.nextInt() % 5) + 1;
+            return i;
+
+        } else if (attr.contains("REAL")) {
+            float f = 123.45678f;
+            return random.nextBoolean()? f : f * (-1) + random.nextFloat();
+        }
+
+        return "NOTHING";
     }
 
     class DBAdapter extends BaseAdapter {
@@ -275,7 +360,8 @@ public class DatabaseTestActivity extends Activity implements View.OnClickListen
                 convertView = new TextView(getBaseContext());
             }
 
-            ((TextView) convertView).setText(jsonResultList.get(position));
+            String contents = jsonResultList.get(position);
+            ((TextView) convertView).setText(contents.replaceAll(",", "\n"));
             return convertView;
         }
     }
