@@ -29,7 +29,7 @@ public class GazeCusor : MonoBehaviour {
 
 	public float GazeTime = 0.0f;
 	public bool	GazeSelete =false;
-	public float GazeTimeMax = 5.0f;
+	public readonly float GazeTimeMax = 5.0f;
 	public Texture TextTex;
 	public Texture ImageTex;
 	public Texture MovieTex;
@@ -45,11 +45,17 @@ public class GazeCusor : MonoBehaviour {
             return;
 
 
-        Debug.Log ("CursorEnalbe");
+       // Debug.Log ("CursorEnalbe");
 		GazeTime = 0.0f;
 		GazeSelete = false;
 	
 	}
+
+    public void SetGazeTimerZero()
+    {
+        GazeTime = 0.0f;
+    }
+
 	public void SetTextureCursor(KIND_SOURCE kind)
 	{
 
@@ -96,7 +102,7 @@ public class GazeCusor : MonoBehaviour {
 	{
         if (gazeDisable)
             return;
-        Debug.Log ("CursorDisalbe");
+       // Debug.Log ("CursorDisalbe");
 		GazeTime = 0.0f;
 		GazeSelete = false;
 		GazeObject = null;

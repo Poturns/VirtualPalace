@@ -586,6 +586,7 @@ public class PalaceMaster extends PalaceEngine {
                         }
 
                         // DO SQL
+
                         String lowerCaseCommand = command.toLowerCase();
                         if (lowerCaseCommand.startsWith(COMMAND_DB_SELECT))
                             result = selectLocalData(RequestMessage.getJSONObject(command), table, partialReturn);

@@ -39,7 +39,7 @@ namespace BridgeApi.Controller
 
         public static ARrenderItem ParseARrenderItem(Operation op)
         {
-            if(op.Type != Operation.AR_RENDERING)
+            if (op.Type != Operation.AR_RENDERING)
                 throw new ArgumentException();
 
             ARrenderItem item = new ARrenderItem();
@@ -162,7 +162,7 @@ namespace BridgeApi.Controller
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
         public static QueryRequestResult ParseQueryFromPlatform(string json, string requestKey)
         {
-            Debug.Log("====== "+json);
+            //Debug.Log("====== " + json);
             JsonData jData = JsonMapper.ToObject(json);
 
             List<JsonData> queryResults = new List<JsonData>();
@@ -241,8 +241,16 @@ namespace BridgeApi.Controller
             if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_REQUEST_KEY))
             {
                 jData = jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
-                result.Speech = (string)jData[SpeechRequestResult.SPEECH_RESULT_KEY];
-                result.Status = (string)jData[RequestResult.RESULT];
+                if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_RESULT_KEY))
+                {
+                    result.Speech = (string)jData[SpeechRequestResult.SPEECH_RESULT_KEY];
+                    result.Status = (string)jData[RequestResult.RESULT];
+                }
+                else
+                {
+                    result.Speech = "";
+                    result.Status = RequestResult.STATUS_ERROR;
+                }
             }
             else
             {
@@ -309,7 +317,7 @@ namespace BridgeApi.Controller
         {
             JsonData jsonValue = jsonData[key];
 
-           // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+            // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
             if (jsonValue.IsInt)
             {
@@ -342,7 +350,7 @@ namespace BridgeApi.Controller
         {
             JsonData jsonValue = jsonData[key];
 
-           // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+            // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
             if (jsonValue.IsDouble)
             {
@@ -374,7 +382,7 @@ namespace BridgeApi.Controller
                 return -1;
             }
         }
-      
+
     }
 
 }

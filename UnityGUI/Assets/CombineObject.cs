@@ -64,7 +64,7 @@ public class CombineObject : AbstractBasicObject {
 			MovieData.Path = ContentsData;
 			break;
 		default:
-			Debug.Log ("SetContentsString:: Set Kind First");
+			Debug.Log ("SetContentsString:: Set Kind First, kind : " + SourceKind);
 			break;
 		}
 	}

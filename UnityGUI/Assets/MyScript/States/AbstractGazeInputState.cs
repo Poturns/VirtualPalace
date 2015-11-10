@@ -1,4 +1,6 @@
-﻿using MyScript;
+﻿using System.Collections.Generic;
+using BridgeApi.Controller;
+using MyScript;
 using MyScript.Interface;
 using UnityEngine;
 
@@ -17,7 +19,7 @@ namespace MyScript.States
         public GameObject EventSystem { get { return eventSystem; } }
         public GazeInputModule SelectModule { get { return selectModule; } }
         public GazeCusor GCursor { get { return gazecusor; } }
-        
+
 
         public AbstractGazeInputState(StateManager managerRef, string stateName) : base(managerRef, stateName)
         {
@@ -94,6 +96,12 @@ namespace MyScript.States
             if (cameraHead == null)
                 cameraHead = GameObject.Find("Head").GetComponent<CardboardHead>();
 
+        }
+
+        public override void InputHandling(List<Operation> InputOp)
+        {
+            gazecusor.SetGazeTimerZero();
+            base.InputHandling(InputOp);
         }
 
         protected override void HandleSelectOperation()

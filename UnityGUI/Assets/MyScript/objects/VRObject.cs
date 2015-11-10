@@ -35,11 +35,13 @@ namespace MyScript.Objects
         public float SizeY { get; set; }
         public float SizeZ { get; set; }
 
-        public int ResID { get; set; }
+
+        private int ResID { get; set; }
+        public int ResType { get; set; }
         public string ResContents { get; set; }
         public string ResTitle { get; set; }
 
-        public KIND_SOURCE SourceKind { get { return (KIND_SOURCE)ResID; } }
+        public KIND_SOURCE SourceKind { get { return (KIND_SOURCE)ResType; } }
         public OBJ_LIST ObjKind { get { return (OBJ_LIST)ModelType; } }
 
         public Vector3 Position { get { return new Vector3(PosX, PosY, PosZ); } }
@@ -59,7 +61,7 @@ namespace MyScript.Objects
 
         public bool IsInvalid()
         {
-            return ID < 0 || Name.Equals("") || ResID < 0 || ModelType < 0;
+            return ResType < 0 || ModelType < 0;
         }
 
         public class Builder
@@ -70,16 +72,20 @@ namespace MyScript.Objects
             {
                 vrObject = new VRObject();
                 vrObject.ID = -1;
+                vrObject.ResID = -1;
 
                 vrObject.Name = name;
                 vrObject.ModelType = (int)objectKind;
 
-                vrObject.ResID = (int)sourceKind;
+                vrObject.ResType = (int)sourceKind;
             }
 
             public Builder SetID(int id)
             {
-                vrObject.ID = id;
+                if (id == 0)
+                    vrObject.ID = -1;
+                else
+                    vrObject.ID = id;
                 return this;
             }
 
@@ -187,7 +193,7 @@ namespace MyScript.Objects
 
         public KeyValuePair<Enum, string>[] ConvertToPairs()
         {
-            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[17];
+            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[18];
             int i = 0;
 
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD._ID, ID.ToString());
@@ -209,6 +215,7 @@ namespace MyScript.Objects
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Z, SizeZ.ToString());
 
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.RES_ID, ResID.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.RES_TYPE, ResType.ToString());
             pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.TITLE, ResTitle);
             pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.CONTENTS, ResContents);
 
@@ -241,6 +248,7 @@ namespace MyScript.Objects
             data.SizeZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_Z.ToString());
 
             data.ResID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.RES_ID.ToString());
+            data.ResType = JsonInterpreter.ParseIntData(jsonData, RESOURCE_FIELD.RES_TYPE.ToString());
             data.ResTitle = (string)jsonData[RESOURCE_FIELD.TITLE.ToString()];
             data.ResContents = (string)jsonData[RESOURCE_FIELD.CONTENTS.ToString()];
 
