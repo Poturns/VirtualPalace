@@ -315,6 +315,10 @@ namespace BridgeApi.Controller
             {
                 return (int)jsonValue;
             }
+            else if (jsonValue.IsLong)
+            {
+                return (int)(long)jsonValue;
+            }
             else if (jsonValue.IsString)
             {
                 try
@@ -340,13 +344,17 @@ namespace BridgeApi.Controller
 
            // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
-            if (jsonValue.IsLong)
+            if (jsonValue.IsDouble)
             {
-                return (long)jsonValue;
+                return (float)(double)jsonValue;
             }
             else if (jsonValue.IsInt)
             {
                 return (int)jsonValue;
+            }
+            else if (jsonValue.IsLong)
+            {
+                return (int)(long)jsonValue;
             }
             else if (jsonValue.IsString)
             {
