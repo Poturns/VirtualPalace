@@ -119,6 +119,20 @@ namespace MyScript.States
             }
         }
 
+		//Toast Message Test Code
+		protected override void HandleDeepOperation()
+		{
+			Debug.Log ("Catch Deep");
+			MessegeToaster toaster = GameObject.Find ("MessageToaster").GetComponent<MessegeToaster>();
+
+			if (toaster == null)
+				Debug.Log ("!!!!!!!!!!!!!!!!!!!Toaster is Null!!!!!!!!!!!!!!!!!!!!!");
+			else 
+			{
+				toaster.CallMessageToaster("");
+			}
+		}
+
 
     }
 }

@@ -5060,8 +5060,10 @@ GameObject:
   - 64: {fileID: 864614367}
   - 23: {fileID: 864614366}
   - 114: {fileID: 864614370}
+  - 95: {fileID: 864614372}
+  - 111: {fileID: 864614371}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: MessageToaster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5134,6 +5136,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8677166a63302ee4ca5949f0c1900089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ToastingTime: 2
+--- !u!111 &864614371
+Animation:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 864614365}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
+--- !u!95 &864614372
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 864614365}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 71c0a26dcabfca84bac841076c8dbe84, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &866328863
 GameObject:
   m_ObjectHideFlags: 0
