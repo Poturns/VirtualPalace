@@ -67,7 +67,7 @@ public class SaveLoader : MonoBehaviour
     public void LoadFromDatabase()
     {
         // int ObjCnt = 0;
-        StateManager manager = StateManager.GetManager();
+		StateManager manager = StateManager.GetManager();
         DatabaseRequests.QueryBookCaseObjects(manager, results =>
         {
             manager.QueueOnMainThread(() =>
@@ -75,12 +75,12 @@ public class SaveLoader : MonoBehaviour
                 foreach (BookCaseObject data in results)
                 {
                     Debug.Log("bookcase ===== " + data);
+
                     BookCaseScript BookCase = GameObject.Find(data.Name).transform.GetChild(0).GetComponent<BookCaseScript>();
                     // ObjCnt += data.Cnt;
                     BookCase.UpdateWithSaveObjectData(data);
                 }
-
-                RequestSaveDataFromDatabase();
+				 RequestSaveDataFromDatabase();
             });
         });
 
@@ -103,9 +103,10 @@ public class SaveLoader : MonoBehaviour
 
     private void RequestSaveDataFromDatabase()
     {
-        DatabaseRequests.QueryVRObjects(StateManager.GetManager(),
+		DatabaseRequests.QueryVRObjects(StateManager.GetManager(),
                   result =>
                   {
+					  Debug.Log ("Loaded VRObject Cnt : " + result.Count);
                       StateManager.GetManager().QueueOnMainThread(() =>
                       {
                           foreach (VRObject s in result)
@@ -116,6 +117,7 @@ public class SaveLoader : MonoBehaviour
 
     private void UpdataBookDataWithSaveData(VRObject sData)
     {
+		Debug.Log("!@!@!@!@!@!@!@!@!@!@");
         PrefabContainer PrefabCon = GameObject.Find("PreLoadPrefab").GetComponent<PrefabContainer>();
         Debug.Log("======= Find VR Object : " + sData.Name + " , ModelType : " + sData.ModelType + " , ObjKind : " + sData.ObjKind);
         GameObject Obj = GameObject.Find(sData.Name);
