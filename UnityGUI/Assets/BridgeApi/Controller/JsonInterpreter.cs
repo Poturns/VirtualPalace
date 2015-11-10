@@ -309,7 +309,7 @@ namespace BridgeApi.Controller
         {
             JsonData jsonValue = jsonData[key];
 
-            Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+           // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
             if (jsonValue.IsInt)
             {
@@ -338,7 +338,7 @@ namespace BridgeApi.Controller
         {
             JsonData jsonValue = jsonData[key];
 
-            Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+           // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
             if (jsonValue.IsLong)
             {

@@ -1,30 +1,23 @@
 ﻿namespace BridgeApi.Media
 {
-    public abstract class BaseInfo
+    public interface BaseInfo
     {
-        public string DisplayName
-        {
-            get;
-            protected internal set;
-        }
+        /// <summary>
+        /// 이름
+        /// </summary>
+        string DisplayName { get; set; }
 
-        public string DirName
-        {
-            get;
-            protected internal set;
-        }
+        /// <summary>
+        /// 디렉토리 이름
+        /// </summary>
+        string DirName { get; set; }
 
-        public int ID
-        {
-            get;
-            protected internal set;
-        }
+        int ID { get; set; }
 
-        public string Path
-        {
-            get;
-            protected internal set;
-        }
+        /// <summary>
+        /// 파일의 경로
+        /// </summary>
+        string Path { get; set; }
 
     }
 }

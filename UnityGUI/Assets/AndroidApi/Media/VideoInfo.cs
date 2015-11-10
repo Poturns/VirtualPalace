@@ -7,6 +7,18 @@ namespace AndroidApi.Media
 {
     internal class VideoInfo : BridgeApi.Media.VideoInfo
     {
+        public long Size { get; set; }
+
+        public long Duration { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public string DirName { get; set; }
+
+        public int ID { get; set; }
+
+        public string Path { get; set; }
+
         internal VideoInfo()
         {
         }
@@ -69,12 +81,17 @@ namespace AndroidApi.Media
         /// </summary>
         /// <param name="fileName">비디오의 처음 프레임의 이미지가 저장되는 파일의 이름</param>
         /// <returns>비디오의 처음 프레임의 이미지가 저장된 파일 경로</returns>
-        public override string GetFirstFrameThumbnailPath(string fileName)
+        public string GetFirstFrameThumbnailPath(string fileName)
         {
             using (AndroidJavaClass videoInfoClass = new AndroidJavaClass(AndroidMediaConstants.VideoInfoClassName))
             {
                 return videoInfoClass.CallStatic<string>("getFirstFrameThumbnail", AndroidUtils.GetActivityObject(), fileName, Path);
             }
+        }
+
+        public string GetFirstFrameThumbnailPath()
+        {
+            return GetFirstFrameThumbnailPath(DirName + "_" + DisplayName);
         }
 
     }

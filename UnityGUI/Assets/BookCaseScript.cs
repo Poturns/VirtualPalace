@@ -32,24 +32,22 @@ public class BookCaseScript : AbstractBasicObject
         ModelKind = OBJ_LIST.NO_MODEL;
     }
 
-    public BookCaseObject GetSaveObjectData()
+    public BookCaseObject MakeBookCaseObject()
     {
         Transform tr = gameObject.transform.parent;
-        BookCaseObject SaveObj = new BookCaseObject(tr.gameObject.name, ZCurrentPos, tr.GetChild(0).childCount, int.Parse(tr.gameObject.name.Replace("BookCaseTrigger", "")));
-        //부모가 피봇 >> 좌표와 이름은 피봇의 좌표와 이름을 사용함
+        BookCaseObject SaveObj = new BookCaseObject(tr.gameObject.name, ZCurrentPos, tr.GetChild(0).childCount, ID);
 
         return SaveObj;
     }
 
 
-    public void UpdateWithSaveObjectData(BookCaseObject sData)
+    public void UpdateWithBookCaseObject(BookCaseObject sData)
     {
-        BookCaseObject BCSaveObj = sData;
         //일단 이름은 로드 안함 (BookCase 이름은 항상 동일) 
         //gameObject.transform.parent.name = BCSaveObj.Name;
-        ID = BCSaveObj.ID;
-        Cnt = BCSaveObj.Count;
-        ZCurrentPos = BCSaveObj.Z_Offset;
+        ID = sData.ID;
+        Cnt = sData.Count;
+        ZCurrentPos = sData.Z_Offset;
 
     }
     public GameObject CreateBook()
