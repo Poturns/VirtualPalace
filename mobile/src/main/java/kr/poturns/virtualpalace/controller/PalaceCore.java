@@ -344,7 +344,7 @@ abstract class PalaceCore {
      */
     public ArrayList<AugmentedItem> queryNearAugmentedItems() {
         double[] latestData = getSensorData(ISensorAgent.TYPE_AGENT_LOCATION);
-        double radius = 0.0000005;
+        double radius = 0.0005;
 
         return DBCenter.queryNearObjectsOnRealLocation(
                 latestData[LocationSensorAgent.DATA_INDEX_LATITUDE],
@@ -414,30 +414,60 @@ abstract class PalaceCore {
         for (int i=0; i<array.length(); i++) {
             try {
                 JSONObject object = array.getJSONObject(i);
-                long resID = object.optLong(VirtualTable.RES_ID.name(), -1);
+
+                String fieldResID = VirtualTable.RES_ID.name();
+                long resID = object.optLong(fieldResID.toLowerCase(), object.optLong(fieldResID , -1));
 
                 // First, handle Resource Data.
                 LocalDatabaseCenter.WriteBuilder<ResourceTable> resBuilder = new LocalDatabaseCenter.WriteBuilder<ResourceTable>(DBCenter);
-                for (ResourceTable field : ResourceTable.values()) {
-                    // Res_id 를 제외하고 변경된 데이터들을 Builder에 포함시킨다.
-                    if (object.has(field.name()) && (field != ResourceTable._ID))
-                        resBuilder.set(field, object.getString(field.name()));
-                }
-                resBuilder.whereEqual(ResourceTable._ID, String.valueOf(resID));
+                {
+                    Iterator<String> keys = object.keys();
+                    while (keys.hasNext()) {
+                        try {
+                            String key = keys.next();
 
+                            // ITable Field 정의는 모두 대문자로 되어있다.
+                            ResourceTable field = ResourceTable.valueOf(key.toUpperCase());
+                            // _ID 필드는 Virtual Table에서 사용하므로 값을 지우면 안된다.
+                            if (field != ResourceTable._ID) {
+                                resBuilder.set(field, object.getString(key));
+                            }
+                        } catch (IllegalArgumentException e) { }
+                    }
+                    resBuilder.whereEqual(ResourceTable._ID, String.valueOf(resID));
+                }
                 // do Update, or Insert.
                 boolean resRst = resBuilder.modify()? true : ((resID = resBuilder.insert()) > 0);
 
+
                 // Second, do VR Data.
                 LocalDatabaseCenter.WriteBuilder<VirtualTable> vrBuilder = new LocalDatabaseCenter.WriteBuilder<VirtualTable>(DBCenter);
-                for (VirtualTable field : VirtualTable.values()) {
-                    if (object.has(field.name())  && (field != VirtualTable._ID) ) {
-                        vrBuilder.set(field, field == VirtualTable.RES_ID?
-                                String.valueOf(resID) : object.getString(field.name()));
-                    }
-                }
-                vrBuilder.whereEqual(VirtualTable._ID, object.getString(VirtualTable._ID.name()));
+                {
+                    Iterator<String> keys = object.keys();
+                    while (keys.hasNext()) {
+                        try {
+                            String key = keys.next();
 
+                            // ITable Field 정의는 모두 대문자로 되어있다.
+                            VirtualTable field = VirtualTable.valueOf(key.toUpperCase());
+                            switch (field) {
+                                case _ID:
+                                case RES_ID:
+                                    continue;
+
+                                default:
+                                    vrBuilder.set(field, object.getString(key));
+                            }
+
+                        } catch (IllegalArgumentException e) { }
+                    }
+                    // 새로운 RES 객체를 생성했던 경우,
+                    vrBuilder.set(VirtualTable.RES_ID, String.valueOf(resID));
+
+                    String fieldID = VirtualTable._ID.name();
+                    String _id = object.optString(fieldID.toLowerCase(), object.optString(fieldID, "-1"));
+                    vrBuilder.whereEqual(VirtualTable._ID, _id);
+                }
                 // do Update, or Insert.
                 boolean vrRst = vrBuilder.modify()? true : (vrBuilder.insert() > 0);
 
@@ -597,7 +627,6 @@ abstract class PalaceCore {
             JSONArray array = new JSONArray();
 
             Cursor cursor = builder.select();
-
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     JSONObject row = new JSONObject();
@@ -787,6 +816,7 @@ abstract class PalaceCore {
         if (builder == null || elements == null)
             return null;
 
+        builder.setTable(table);
 
         Iterator<String> elementIterator = elements.keys();
         while (elementIterator.hasNext()) {
@@ -862,16 +892,16 @@ abstract class PalaceCore {
     private ITable getField(String table, String name) {
         final String NAME = name.toUpperCase();
         try {
-            if (ITable.TABLE_VIRTUAL.equals(table)) {
+            if (ITable.TABLE_VIRTUAL.equalsIgnoreCase(table)) {
                 return VirtualTable.valueOf(NAME);
 
-            } else if (ITable.TABLE_AUGMENTED.equals(table)) {
+            } else if (ITable.TABLE_AUGMENTED.equalsIgnoreCase(table)) {
                 return AugmentedTable.valueOf(NAME);
 
-            } else if (ITable.TABLE_RESOURCE.equals(table)) {
+            } else if (ITable.TABLE_RESOURCE.equalsIgnoreCase(table)) {
                 return ResourceTable.valueOf(NAME);
-            
-            } else if (ITable.TABLE_VR_CONTAINER.equals(table))
+
+            } else if (ITable.TABLE_VR_CONTAINER.equalsIgnoreCase(table))
                 return VRContainerTable.valueOf(NAME);
 
         } catch (IllegalArgumentException e) {

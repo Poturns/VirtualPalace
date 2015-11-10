@@ -7,7 +7,7 @@ public enum ResourceTable implements ITable {
     _ID ("INTEGER PRIMARY KEY AUTOINCREMENT"),
     TITLE("TEXT"),
     CONTENTS("TEXT"),
-    // TEXT = 0, IMAGE = 1, MOVIE = 2
+    // TEXT = 0, IMAGE = 1, VIDEO = 2
     RES_TYPE("INTEGER"),
     EXPANSION("TEXT"),
     //ARCHIVE_PATH ("TEXT"),

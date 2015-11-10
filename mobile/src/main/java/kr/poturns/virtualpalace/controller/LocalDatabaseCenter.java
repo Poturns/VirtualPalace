@@ -142,7 +142,7 @@ public class LocalDatabaseCenter {
 
         Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
                 "SELECT a.*, r.title, r.contents, r.res_type FROM augmented a, resource r" +
-                        "WHERE (a.latitude BETWEEN ? AND ?) AND (a.longitude BETWEEN ? AND ?) AND (a.altitude BETWEEN ? AND ?)" +
+                        " WHERE (a.latitude BETWEEN ? AND ?) AND (a.longitude BETWEEN ? AND ?) AND (a.altitude BETWEEN ? AND ?)" +
                         " AND (a.res_id = r._id);",
                 new String[]{
                         String.valueOf(latitude - radius), String.valueOf(latitude + radius),
@@ -248,12 +248,9 @@ public class LocalDatabaseCenter {
             StringBuilder builder = new StringBuilder("SELECT ");
 
             if (mSetClauseValues.size() == 0)
-//            if (mSetClauseMap.isEmpty())
                 builder.append("*");
 
             else {
-//                for (Pair<String, String> pair : mSetClauseMap.values())
-//                    builder.append(pair.first).append(",");
                 for (String key : mSetClauseValues.keySet())
                     builder.append(key).append(",");
                 builder.deleteCharAt(builder.length()-1);   // 마지막 ' , ' 지우기
@@ -262,16 +259,17 @@ public class LocalDatabaseCenter {
 
             if (! mWhereClauseList.isEmpty()) {
                 builder.append(" WHERE ");
-                for (String clause : mWhereClauseList) {
-                    builder.append("(").append(clause).append("),");
+                for (int i=0; i<mWhereClauseList.size(); i++) {
+                    String clause = mWhereClauseList.get(i);
+
+                    builder.append("(").append(clause).append(")");
+                    if (i+1 < mWhereClauseList.size())
+                        builder.append("AND");
                 }
-                builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
             }
 
             Log.d("LDB_Select", "LDB Select : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getReadableDatabase();
-
-
             try {
                 return db.rawQuery(builder.toString(), null);
 
@@ -312,12 +310,13 @@ public class LocalDatabaseCenter {
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
                 if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
-                    mSetClauseValues.put("CTIME", System.currentTimeMillis());
+                    mSetClauseValues.put(ResourceTable.CTIME.name(), System.currentTimeMillis());
+
                 return db.insert(mTableName, null, mSetClauseValues);
 
             } catch (SQLException e) {
                 Log.e("LDB_Insert_Exception", e.getMessage());
-                return 0;
+                return -1;
 
             } finally {
                 setClear().whereClear();
@@ -333,17 +332,21 @@ public class LocalDatabaseCenter {
         public boolean modify() {
             StringBuilder builder = new StringBuilder();
 
-            for (String clause : mWhereClauseList) {
-                builder.append("(").append(clause).append("),");
+            for (int i=0; i<mWhereClauseList.size(); i++) {
+                String clause = mWhereClauseList.get(i);
+
+                builder.append("(").append(clause).append(")");
+                if (i+1 != mWhereClauseList.size())
+                    builder.append("AND");
             }
-            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
             boolean result = false;
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
             try {
                 if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
-                    mSetClauseValues.put("MTIME", System.currentTimeMillis());
+                    mSetClauseValues.put(ResourceTable.MTIME.name(), System.currentTimeMillis());
+
                 int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
                 result = (affectedRows > 0);
                 return result;
@@ -359,6 +362,7 @@ public class LocalDatabaseCenter {
             }
         }
 
+
         /**
          * 추가된 WHERE 조건에 해당하는 데이터를 Local DB 에서 삭제한다.
          * ( SET 구문은 사용하지 않는다. )
@@ -368,10 +372,13 @@ public class LocalDatabaseCenter {
         public boolean delete() {
             StringBuilder builder = new StringBuilder();
 
-            for (String clause : mWhereClauseList) {
-                builder.append("(").append(clause).append("),");
+            for (int i=0; i<mWhereClauseList.size(); i++) {
+                String clause = mWhereClauseList.get(i);
+
+                builder.append("(").append(clause).append(")");
+                if (i+1 != mWhereClauseList.size())
+                    builder.append("AND");
             }
-            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
             Log.d("LDB_Delete", "LDB Delete : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
@@ -445,8 +452,7 @@ public class LocalDatabaseCenter {
             mTableName = tableName;
         }
 
-        //TODO TEXT 데이터에 따옴표를 붙여줌, where 절에서만 사용할 것, 메소드 이름은 리팩토링 권장
-        private String getValue(E field, String value){
+        private String handleTextValue(E field, String value){
             return field.isTextField() ? ("'" + value + "'") : value;
         }
 
@@ -458,11 +464,10 @@ public class LocalDatabaseCenter {
          * @return
          */
         public CrudBuilder<E> set(E field, String value) {
-            if (field == null)
+            if (field == null || ResourceTable._ID.name().equalsIgnoreCase(field.toString()))
                 return this;
 
             mSetClauseValues.put(field.toString(),value);
-            //mSetClauseMap.put(field.ordinal(), new Pair<String, String>(field.toString(), value));
 
             return check(field);
         }
@@ -500,7 +505,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" != ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -519,7 +524,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" = ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -539,9 +544,9 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(" BETWEEN ")
-                            .append(getValue(field,min))
+                            .append(handleTextValue(field, min))
                             .append(" AND ")
-                            .append(getValue(field,max))
+                            .append(handleTextValue(field, max))
                             .toString()
             );
             return check(field);
@@ -561,7 +566,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " >= " : " > ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -581,7 +586,7 @@ public class LocalDatabaseCenter {
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " <= " : " < ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -595,12 +600,15 @@ public class LocalDatabaseCenter {
          * @return
          */
         public CrudBuilder<E> whereLike(E field, String value) {
+            if (!field.isTextField() || value == null)
+                return this;
+
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
-                            .append(" LIKE %")
-                            .append(getValue(field,value))
-                            .append("% ")
+                            .append(" LIKE '%")
+                            .append(value)
+                            .append("%' ")
                             .toString()
             );
             return check(field);
