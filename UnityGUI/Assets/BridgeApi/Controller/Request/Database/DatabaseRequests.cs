@@ -39,6 +39,18 @@ namespace BridgeApi.Controller.Request.Database
                 });
         }
 
+
+        public static void InsertOrUpdateVRObjects(IPlatformBridge bridge, List<VRObject> dataList, Action<bool> resultCallback)
+        {
+            DatabaseRequestFactory.InsertOrUpdateVRObjects(dataList)
+                .SendRequest(bridge, (requestResult) =>
+                {
+                    Debug.Log("=============== InsertOrUpdateVRObjects result : " + requestResult);
+                    resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
+                });
+        }
+
+        /*
         public static void InsertVRObjects(IPlatformBridge bridge, List<VRObject> dataList, Action<bool> resultCallback)
         {
             DatabaseRequestFactory.InsertVRObjects(dataList)
@@ -58,6 +70,7 @@ namespace BridgeApi.Controller.Request.Database
                     resultCallback(requestResult.Status.Equals(RequestResult.STATUS_SUCCESS));
                 });
         }
+        */
 
         /*
         public static void VRBookCaseItemInsert(IPlatformBridge bridge, SaveDataForBookCase saveData, Action<bool> result)

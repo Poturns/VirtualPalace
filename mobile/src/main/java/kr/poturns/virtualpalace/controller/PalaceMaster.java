@@ -580,8 +580,10 @@ public class PalaceMaster extends PalaceEngine {
                             table = ITable.TABLE_VIRTUAL;
                         else if (command.endsWith("_bookcase") || command.endsWith("_BOOKCASE"))
                             table = ITable.TABLE_VR_CONTAINER;
-                        else // 잘못된 명령일 경우, PASS !
+                        else { // 잘못된 명령일 경우, PASS !
+                            Log.w("RequestProcessor", "Unknown command. : " + command);
                             continue;
+                        }
 
                         // DO SQL
                         String lowerCaseCommand = command.toLowerCase();

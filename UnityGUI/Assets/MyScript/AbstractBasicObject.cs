@@ -47,7 +47,7 @@ namespace MyScript
 		protected string ObjName;
 		//객체의 간단한 설명 (섬네일 에서 보여줄 예정)
 		protected string Discription;
-		protected int ID;
+		public int ID;
 
 		public AbstractBasicObject(){}
 

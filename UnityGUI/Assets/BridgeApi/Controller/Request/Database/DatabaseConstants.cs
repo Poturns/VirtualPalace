@@ -15,11 +15,11 @@ namespace BridgeApi.Controller.Request.Database
         /// <summary>
         /// BookCase 데이터를 모두 찾는다.
         /// </summary>
-        public const string QUERY_VR_BOOKCASES = "query_all_vr_bookcases";
+        public const string QUERY_ALL_VR_BOOKCASES = "query_all_vr_bookcases";
 
-        public const string QUERY_INSERT_VR_ITEMS = "save_all_vr_items";
+        public const string QUERY_SAVE_ALL_VR_ITEMS = "save_all_vr_items";
 
-        public const string QUERY_UPDATE_VR_ITEMS = "update_all_vr_items";
+        //public const string QUERY_UPDATE_VR_ITEMS = "update_all_vr_items";
 
         public const string QUERY_UPDATE_VR_BOOKCASES = "update_all_vr_bookcases";
 

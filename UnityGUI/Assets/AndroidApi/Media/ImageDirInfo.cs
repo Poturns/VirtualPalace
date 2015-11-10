@@ -6,7 +6,12 @@ namespace AndroidApi.Media
 {
     internal class ImageDirInfo : BridgeApi.Media.ImageDirInfo
     {
-       
+
+        public string DirName { get; set; }
+
+        public BridgeApi.Media.ImageInfo FirstInfo { get; set; }
+
+
         private ImageDirInfo()
         {
         }
@@ -41,7 +46,7 @@ namespace AndroidApi.Media
             }
         }
 
-        public override List<BridgeApi.Media.ImageInfo> GetInfoList()
+        public List<BridgeApi.Media.ImageInfo> GetInfoListInDirectory()
         {
             return ImageInfo.GetImageInfoList(AndroidUtils.GetActivityObject(), DirName);
         }

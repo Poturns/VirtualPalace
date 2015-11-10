@@ -23,7 +23,7 @@ public class SaveLoader : MonoBehaviour
         for (int i = 0; i < N; i++)
         {
             BookCaseScript BookCase = Root.transform.GetChild(i).GetChild(0).gameObject.GetComponent<BookCaseScript>();
-            BookCaseObject bData = BookCase.GetSaveObjectData();
+            BookCaseObject bData = BookCase.MakeBookCaseObject();
 
             bool last = i + 1 == N;
             DatabaseRequests.UpdateBookCaseObjects(manager, bData, result =>
@@ -38,7 +38,7 @@ public class SaveLoader : MonoBehaviour
             {
                 CombineObject InteractObj = BookCase.transform.GetChild(j).GetChild(0).gameObject.GetComponent<CombineObject>();
 
-                VRObject sData = InteractObj.GetSaveObjectData();
+                VRObject sData = InteractObj.MakeVRObjectFromBookcase();
                 if (!sData.IsInvalid())
                     vrObjectList.Add(sData);
 
@@ -58,7 +58,7 @@ public class SaveLoader : MonoBehaviour
 
     private void InsertVRObjectsToDatabase(List<VRObject> list)
     {
-        DatabaseRequests.InsertVRObjects(StateManager.GetManager(), list, result =>
+        DatabaseRequests.InsertOrUpdateVRObjects(StateManager.GetManager(), list, result =>
         {
             Debug.Log("query InsertVRObjectsToDatabase ==== " + result);
         });
@@ -74,11 +74,10 @@ public class SaveLoader : MonoBehaviour
             {
                 foreach (BookCaseObject data in results)
                 {
-                    Debug.Log("bookcase ===== " + data);
 
                     BookCaseScript BookCase = GameObject.Find(data.Name).transform.GetChild(0).GetComponent<BookCaseScript>();
                     // ObjCnt += data.Cnt;
-                    BookCase.UpdateWithSaveObjectData(data);
+                    BookCase.UpdateWithBookCaseObject(data);
                 }
 				 RequestSaveDataFromDatabase();
             });
@@ -119,7 +118,7 @@ public class SaveLoader : MonoBehaviour
     {
 		Debug.Log("!@!@!@!@!@!@!@!@!@!@");
         PrefabContainer PrefabCon = GameObject.Find("PreLoadPrefab").GetComponent<PrefabContainer>();
-        Debug.Log("======= Find VR Object : " + sData.Name + " , ModelType : " + sData.ModelType + " , ObjKind : " + sData.ObjKind);
+        //Debug.Log("======= Find VR Object : " + sData.Name + " , ModelType : " + sData.ModelType + " , ObjKind : " + sData.ObjKind);
         GameObject Obj = GameObject.Find(sData.Name);
         //처음부터 존재 하는 오브젝트일때 컨텐츠 내용만 업데이트
         if (Obj != null)

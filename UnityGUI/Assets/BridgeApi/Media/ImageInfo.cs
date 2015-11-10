@@ -1,11 +1,7 @@
 namespace BridgeApi.Media
 {
-    public abstract class ImageInfo : BaseInfo
+    public interface ImageInfo : BaseInfo
     {
-        protected internal ImageInfo()
-        {
-        }
-
     }
 }
 

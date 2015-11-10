@@ -47,11 +47,10 @@ public class LocalDatabaseCenter {
     }
 
 
-
     // * * * C O N S T A N T S * * * //
     /**
      * DB 저장 위치 : Local App 디렉토리에 위치하여, App 삭제시 DB도 자동으로 삭제될 수 있도록 한다.
-     *      /data/data/kr.poturns.virtualpalace/databases/LocalDB
+     * /data/data/kr.poturns.virtualpalace/databases/LocalDB
      */
     private static final String NAME = "LocalDB";
     /**
@@ -59,13 +58,14 @@ public class LocalDatabaseCenter {
      */
     private static final int VERSION = 8;
 
+    static final Object DATABASE_WRITE_LOCK = new Object();
+
     private final Context InContext;
 
     private final SQLiteOpenHelper OpenHelper;
 
 
     // * * * F I E L D S * * * //
-
 
 
     // * * * C O N S T R U C T O R S * * * //
@@ -82,17 +82,17 @@ public class LocalDatabaseCenter {
                 StringBuilder arBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_AUGMENTED + " (");
                 for (AugmentedTable field : AugmentedTable.values())
                     arBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
-                arBuilder.deleteCharAt(arBuilder.length()-1).append(");");
+                arBuilder.deleteCharAt(arBuilder.length() - 1).append(");");
 
                 StringBuilder vrBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_VIRTUAL + " (");
                 for (VirtualTable field : VirtualTable.values())
                     vrBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
-                vrBuilder.deleteCharAt(vrBuilder.length()-1).append(");");
+                vrBuilder.deleteCharAt(vrBuilder.length() - 1).append(");");
 
                 StringBuilder vrContainerBuilder = new StringBuilder("CREATE TABLE " + ITable.TABLE_VR_CONTAINER + " (");
                 for (VRContainerTable field : VRContainerTable.values())
                     vrContainerBuilder.append(field.name()).append(" ").append(field.attributes).append(",");
-                vrContainerBuilder.deleteCharAt(vrContainerBuilder.length()-1).append(");");
+                vrContainerBuilder.deleteCharAt(vrContainerBuilder.length() - 1).append(");");
 
 
                 db.execSQL(resBuilder.toString());
@@ -104,7 +104,7 @@ public class LocalDatabaseCenter {
             }
 
             private void initVRContainer(SQLiteDatabase db) {
-                for (int i=0; i<18; i++) {
+                for (int i = 0; i < 18; i++) {
                     ContentValues values = new ContentValues();
                     values.put(VRContainerTable.NAME.toString(), ("BookCaseTrigger" + i));
 
@@ -126,15 +126,15 @@ public class LocalDatabaseCenter {
     }
 
 
-
     // * * * M E T H O D S * * * //
+
     /**
      * 주어진 현실 위치 좌표로 부터 일정 반경범위 내에 위치한 오브젝트를 찾는다.
      *
-     * @param latitude 위도
+     * @param latitude  위도
      * @param longitude 경도
-     * @param altitude 고도
-     * @param radius 반경
+     * @param altitude  고도
+     * @param radius    반경
      * @return {@link AugmentedItem}
      */
     public ArrayList<AugmentedItem> queryNearObjectsOnRealLocation(double latitude, double longitude, double altitude, double radius) {
@@ -142,15 +142,15 @@ public class LocalDatabaseCenter {
 
         Cursor cursor = OpenHelper.getReadableDatabase().rawQuery(
                 "SELECT a.*, r.title, r.contents, r.res_type FROM augmented a, resource r" +
-                        "WHERE (a.latitude BETWEEN ? AND ?) AND (a.longitude BETWEEN ? AND ?) AND (a.altitude BETWEEN ? AND ?)" +
+                        " WHERE (a.latitude BETWEEN ? AND ?) AND (a.longitude BETWEEN ? AND ?) AND (a.altitude BETWEEN ? AND ?)" +
                         " AND (a.res_id = r._id);",
                 new String[]{
                         String.valueOf(latitude - radius), String.valueOf(latitude + radius),
                         String.valueOf(longitude - radius), String.valueOf(longitude + radius),
                         String.valueOf(altitude - radius), String.valueOf(altitude + radius)
-        });
+                });
 
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             AugmentedItem item = new AugmentedItem();
             int length = AugmentedTable.values().length;
 
@@ -175,11 +175,11 @@ public class LocalDatabaseCenter {
     }
 
 
-        /**
-         * 가상공간 렌더링에 필요한 오브젝트 데이터를 반환한다.
-         *
-         * @return JSON ARRAY
-         */
+    /**
+     * 가상공간 렌더링에 필요한 오브젝트 데이터를 반환한다.
+     *
+     * @return JSON ARRAY
+     */
     public synchronized JSONArray queryAllVirtualRenderings() {
         JSONArray array = new JSONArray();
 
@@ -188,7 +188,7 @@ public class LocalDatabaseCenter {
                         "FROM virtual v, resource r WHERE v.res_id = r._id;", null);
 
         int length = VirtualTable.values().length;
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             try {
                 JSONObject row = new JSONObject();
 
@@ -208,9 +208,9 @@ public class LocalDatabaseCenter {
                 row.put(VirtualTable.SIZE_Z.toString(), cursor.getDouble(VirtualTable.SIZE_Z.ordinal()));
                 row.put(VirtualTable.PARENT_NAME.toString(), cursor.getString(VirtualTable.PARENT_NAME.ordinal()));
 
-                row.put(ResourceTable.TITLE.toString(), cursor.getString(length+0));
-                row.put(ResourceTable.CONTENTS.toString(), cursor.getString(length+1));
-                row.put(ResourceTable.RES_TYPE.toString(), cursor.getString(length+2));
+                row.put(ResourceTable.TITLE.toString(), cursor.getString(length + 0));
+                row.put(ResourceTable.CONTENTS.toString(), cursor.getString(length + 1));
+                row.put(ResourceTable.RES_TYPE.toString(), cursor.getString(length + 2));
 
                 array.put(row);
 
@@ -227,7 +227,6 @@ public class LocalDatabaseCenter {
         File appDirectory = new File(Environment.getDataDirectory(), InContext.getPackageName());
         return new File(appDirectory, ("databases/" + NAME));
     }
-
 
 
     // * * * I N N E R  C L A S S E S * * * //
@@ -248,30 +247,28 @@ public class LocalDatabaseCenter {
             StringBuilder builder = new StringBuilder("SELECT ");
 
             if (mSetClauseValues.size() == 0)
-//            if (mSetClauseMap.isEmpty())
                 builder.append("*");
 
             else {
-//                for (Pair<String, String> pair : mSetClauseMap.values())
-//                    builder.append(pair.first).append(",");
                 for (String key : mSetClauseValues.keySet())
                     builder.append(key).append(",");
-                builder.deleteCharAt(builder.length()-1);   // 마지막 ' , ' 지우기
+                builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
             }
             builder.append(" FROM ").append(mTableName);
 
-            if (! mWhereClauseList.isEmpty()) {
+            if (!mWhereClauseList.isEmpty()) {
                 builder.append(" WHERE ");
-                for (String clause : mWhereClauseList) {
-                    builder.append("(").append(clause).append("),");
+                for (int i = 0; i < mWhereClauseList.size(); i++) {
+                    String clause = mWhereClauseList.get(i);
+
+                    builder.append("(").append(clause).append(")");
+                    if (i + 1 < mWhereClauseList.size())
+                        builder.append("AND");
                 }
-                builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
             }
 
             Log.d("LDB_Select", "LDB Select : " + builder.toString());
             SQLiteDatabase db = mCenterF.OpenHelper.getReadableDatabase();
-
-
             try {
                 return db.rawQuery(builder.toString(), null);
 
@@ -309,19 +306,23 @@ public class LocalDatabaseCenter {
             StringBuilder builder = new StringBuilder();
 
             Log.d("LDB_Insert", "LDB Insert : " + builder.toString());
-            SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
-            try {
-                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
-                    mSetClauseValues.put("CTIME", System.currentTimeMillis());
-                return db.insert(mTableName, null, mSetClauseValues);
 
-            } catch (SQLException e) {
-                Log.e("LDB_Insert_Exception", e.getMessage());
-                return 0;
+            synchronized (DATABASE_WRITE_LOCK) {
+                SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
+                try {
+                    if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
+                        mSetClauseValues.put(ResourceTable.CTIME.name(), System.currentTimeMillis());
 
-            } finally {
-                setClear().whereClear();
-                db.close();
+                    return db.insert(mTableName, null, mSetClauseValues);
+
+                } catch (SQLException e) {
+                    Log.e("LDB_Insert_Exception", e.getMessage());
+                    return -1;
+
+                } finally {
+                    setClear().whereClear();
+                    db.close();
+                }
             }
         }
 
@@ -333,31 +334,39 @@ public class LocalDatabaseCenter {
         public boolean modify() {
             StringBuilder builder = new StringBuilder();
 
-            for (String clause : mWhereClauseList) {
-                builder.append("(").append(clause).append("),");
+            for (int i = 0; i < mWhereClauseList.size(); i++) {
+                String clause = mWhereClauseList.get(i);
+
+                builder.append("(").append(clause).append(")");
+                if (i + 1 != mWhereClauseList.size())
+                    builder.append("AND");
             }
-            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
             boolean result = false;
             Log.d("LDB_Update", "LDB Update : " + builder.toString());
-            SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
-            try {
-                if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
-                    mSetClauseValues.put("MTIME", System.currentTimeMillis());
-                int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
-                result = (affectedRows > 0);
-                return result;
 
-            } catch (SQLException e) {
-                Log.e("LDB_Modify_Exception", e.getMessage());
-                return false;
+            synchronized (DATABASE_WRITE_LOCK) {
+                SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
+                try {
+                    if (ITable.TABLE_RESOURCE.equalsIgnoreCase(mTableName))
+                        mSetClauseValues.put(ResourceTable.MTIME.name(), System.currentTimeMillis());
 
-            } finally {
-                if(result)
-                    setClear().whereClear();
-                db.close();
+                    int affectedRows = db.update(mTableName, mSetClauseValues, builder.toString(), null);
+                    result = (affectedRows > 0);
+                    return result;
+
+                } catch (SQLException e) {
+                    Log.e("LDB_Modify_Exception", e.getMessage());
+                    return false;
+
+                } finally {
+                    if (result)
+                        setClear().whereClear();
+                    db.close();
+                }
             }
         }
+
 
         /**
          * 추가된 WHERE 조건에 해당하는 데이터를 Local DB 에서 삭제한다.
@@ -368,24 +377,30 @@ public class LocalDatabaseCenter {
         public boolean delete() {
             StringBuilder builder = new StringBuilder();
 
-            for (String clause : mWhereClauseList) {
-                builder.append("(").append(clause).append("),");
+            for (int i = 0; i < mWhereClauseList.size(); i++) {
+                String clause = mWhereClauseList.get(i);
+
+                builder.append("(").append(clause).append(")");
+                if (i + 1 != mWhereClauseList.size())
+                    builder.append("AND");
             }
-            builder.deleteCharAt(builder.length() - 1);   // 마지막 ' , ' 지우기
 
             Log.d("LDB_Delete", "LDB Delete : " + builder.toString());
-            SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
-            try {
-                int affectedRows = db.delete(mTableName, builder.toString(), null);
-                return (affectedRows > 0);
 
-            } catch (SQLException e) {
-                Log.e("LDB_Delete_Exception", e.getMessage());
-                return false;
+            synchronized (DATABASE_WRITE_LOCK) {
+                SQLiteDatabase db = mCenterF.OpenHelper.getWritableDatabase();
+                try {
+                    int affectedRows = db.delete(mTableName, builder.toString(), null);
+                    return (affectedRows > 0);
 
-            } finally {
-                setClear().whereClear();
-                db.close();
+                } catch (SQLException e) {
+                    Log.e("LDB_Delete_Exception", e.getMessage());
+                    return false;
+
+                } finally {
+                    setClear().whereClear();
+                    db.close();
+                }
             }
         }
     }
@@ -420,8 +435,8 @@ public class LocalDatabaseCenter {
          * 테이블 내 유효한 필드가 맞는지 확인한다.
          *
          * @param field
-         * @throws {@link InvalidParameterException}
          * @return
+         * @throws {@link InvalidParameterException}
          */
         private CrudBuilder<E> check(E field) {
             if (field == null)
@@ -445,8 +460,7 @@ public class LocalDatabaseCenter {
             mTableName = tableName;
         }
 
-        //TODO TEXT 데이터에 따옴표를 붙여줌, where 절에서만 사용할 것, 메소드 이름은 리팩토링 권장
-        private String getValue(E field, String value){
+        private String handleTextValue(E field, String value) {
             return field.isTextField() ? ("'" + value + "'") : value;
         }
 
@@ -458,11 +472,10 @@ public class LocalDatabaseCenter {
          * @return
          */
         public CrudBuilder<E> set(E field, String value) {
-            if (field == null)
+            if (field == null || ResourceTable._ID.name().equalsIgnoreCase(field.toString()))
                 return this;
 
-            mSetClauseValues.put(field.toString(),value);
-            //mSetClauseMap.put(field.ordinal(), new Pair<String, String>(field.toString(), value));
+            mSetClauseValues.put(field.toString(), value);
 
             return check(field);
         }
@@ -492,15 +505,15 @@ public class LocalDatabaseCenter {
          *
          * @param field
          * @param value
-         * @throws {@link InvalidParameterException}
          * @return
+         * @throws {@link InvalidParameterException}
          */
         public CrudBuilder<E> whereNotEqual(E field, String value) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
                             .append(" != ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -511,15 +524,15 @@ public class LocalDatabaseCenter {
          *
          * @param field
          * @param value
-         * @throws {@link InvalidParameterException}
          * @return
+         * @throws {@link InvalidParameterException}
          */
         public CrudBuilder<E> whereEqual(E field, String value) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
                             .append(" = ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -531,17 +544,17 @@ public class LocalDatabaseCenter {
          * @param field
          * @param min
          * @param max
-         * @throws {@link InvalidParameterException}
          * @return
+         * @throws {@link InvalidParameterException}
          */
         public CrudBuilder<E> whereBetween(E field, String min, String max) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
                             .append(" BETWEEN ")
-                            .append(getValue(field,min))
+                            .append(handleTextValue(field, min))
                             .append(" AND ")
-                            .append(getValue(field,max))
+                            .append(handleTextValue(field, max))
                             .toString()
             );
             return check(field);
@@ -553,15 +566,15 @@ public class LocalDatabaseCenter {
          * @param field
          * @param value
          * @param allowEqual true = 이상, false = 초과
-         * @throws {@link InvalidParameterException}
          * @return
+         * @throws {@link InvalidParameterException}
          */
         public CrudBuilder<E> whereGreaterThan(E field, String value, boolean allowEqual) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " >= " : " > ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -573,15 +586,15 @@ public class LocalDatabaseCenter {
          * @param field
          * @param value
          * @param allowEqual true = 이하, false = 미만
-         * @throws {@link InvalidParameterException}
          * @return
+         * @throws {@link InvalidParameterException}
          */
         public CrudBuilder<E> whereSmallerThan(E field, String value, boolean allowEqual) {
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
                             .append(allowEqual ? " <= " : " < ")
-                            .append(getValue(field,value))
+                            .append(handleTextValue(field, value))
                             .toString()
             );
             return check(field);
@@ -595,12 +608,15 @@ public class LocalDatabaseCenter {
          * @return
          */
         public CrudBuilder<E> whereLike(E field, String value) {
+            if (!field.isTextField() || value == null)
+                return this;
+
             mWhereClauseList.add(
                     new StringBuilder()
                             .append(field.toString())
-                            .append(" LIKE %")
-                            .append(getValue(field,value))
-                            .append("% ")
+                            .append(" LIKE '%")
+                            .append(value)
+                            .append("%' ")
                             .toString()
             );
             return check(field);
@@ -616,7 +632,7 @@ public class LocalDatabaseCenter {
 
             // Set 구문이 아직 등록되지 않았을 경우, 완전 초기화와 같음.
             if (mSetClauseValues.size() > 0)
-            //if (mSetClauseMap.isEmpty())
+                //if (mSetClauseMap.isEmpty())
                 mTableName = null;
 
             return this;

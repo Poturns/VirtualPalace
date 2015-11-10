@@ -21,9 +21,9 @@ namespace ComputerApi.Controller
             {
                 File.Create(dbPath);
             }
-//            string dbURI = "URI=file" + dbPath;
+            //            string dbURI = "URI=file" + dbPath;
             _connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-         //   Debug.Log("Final PATH: " + dbPath);
+            //   Debug.Log("Final PATH: " + dbPath);
 
         }
 
@@ -44,8 +44,8 @@ namespace ComputerApi.Controller
                 _connection.DropTable<VRObject>();
                 _connection.CreateTable<VRObject>();
 
-                TableMapping map = _connection.GetMapping<VRObject>();
-                Debug.Log(map);
+                // TableMapping map = _connection.GetMapping<VRObject>();
+                // Debug.Log(map);
             }
         }
 
@@ -67,10 +67,12 @@ namespace ComputerApi.Controller
             return Insert(enumerable);
         }
 
+        /*
         public int InsertVRObject(IEnumerable<VRObject> enumerable)
         {
             return Insert(enumerable);
         }
+        */
 
         private int Insert(IEnumerable enumerable)
         {
@@ -135,7 +137,7 @@ namespace ComputerApi.Controller
             StringBuilder sb = new StringBuilder();
             foreach (VRObject obj in enumerable)
             {
-                sb.Append("{" + obj.ToJSON() + "},");
+                sb.Append(obj.ToJSON() + ",");
             }
             sb.Remove(sb.Length - 1, 1);
 
@@ -149,7 +151,7 @@ namespace ComputerApi.Controller
             StringBuilder sb = new StringBuilder();
             foreach (BookCaseObject obj in enumerable)
             {
-                sb.Append("{" + obj.ToJSON() + "},");
+                sb.Append(obj.ToJSON() + ",");
             }
             sb.Remove(sb.Length - 1, 1);
 
