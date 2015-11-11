@@ -50,12 +50,14 @@ public class GazeCusor : MonoBehaviour {
 		GazeSelete = false;
 	
 	}
-
-    public void SetGazeTimerZero()
-    {
-        GazeTime = 0.0f;
-    }
-
+	/// <summary>
+	/// Reset(Init) Gazing Time
+	/// </summary>
+	public void ResetGazingTime()
+	{
+		GazeTime = 0.0f;
+		Debug.Log ("--Reset Gazing Time-- GazeTime : " + GazeTime);
+	}
 	public void SetTextureCursor(KIND_SOURCE kind)
 	{
 
