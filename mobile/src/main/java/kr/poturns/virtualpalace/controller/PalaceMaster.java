@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
@@ -564,9 +565,18 @@ public class PalaceMaster extends PalaceEngine {
                         res.contents = contents.optString(ResourceTable.CONTENTS.name());
                         res.res_type = 1;   // IMAGE
 
+                        // temp init (폰 스크린 픽셀 중간값)
+                        DisplayMetrics metrics = App.getResources().getDisplayMetrics();
+                        int screenSizeX = metrics.widthPixels;
+                        int screenSizeY = metrics.heightPixels;
+
+
                         AugmentedItem aug = new AugmentedItem();
-                        aug.screenX = contents.optInt(AugmentedItem.SCREEN_X);
-                        aug.screenY = contents.optInt(AugmentedItem.SCREEN_Y);
+                       // aug.screenX = contents.optInt(AugmentedItem.SCREEN_X, screenSizeX / 2);
+                        //aug.screenY = contents.optInt(AugmentedItem.SCREEN_Y, screenSizeY / 2);
+
+                        aug.screenX = screenSizeX / 2;
+                        aug.screenY = screenSizeY / 2;
 
                         result = requestNewAugmentedItem(res, aug);
 
