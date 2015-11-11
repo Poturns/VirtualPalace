@@ -129,6 +129,10 @@ namespace MyScript.States
         /// </summary>
         /// <param name="operation">Cancel, Select, Direction, Deep 이외의 다른 명령</param>
         protected virtual void HandleOtherOperation(Operation operation) { }
+
+        public virtual void ToastHandling(ToastMessage toast)
+        {
+        }
     }
 
 }

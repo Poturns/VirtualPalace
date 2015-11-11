@@ -53,6 +53,22 @@ namespace BridgeApi.Controller
             return item;
         }
 
+        public static List<ControllerEvent> ParseSingleMessage(string json)
+        {
+            JsonData jsonData = JsonMapper.ToObject(json);
+
+            ICollection<string> keys = jsonData.Keys;
+
+            List<ControllerEvent> eventList = new List<ControllerEvent>(keys.Count);
+
+            foreach (string key in keys)
+            {
+                eventList.Add(new ControllerEvent() { Type = key, JsonContent = jsonData[key] });
+            }
+
+            return eventList;
+        }
+
         /// <summary>
         /// 방향 Operation를 해석해서 방향 정보를 지닌 구조체를 반환한다.
         /// </summary>
@@ -312,6 +328,19 @@ namespace BridgeApi.Controller
 
             return dataList;
         }
+
+        public static string ParseStringData(JsonData jsonData, string key)
+        {
+            if (JsonDataContainsKey(jsonData, key))
+            {
+                return jsonData[key].ToString();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
 
         public static int ParseIntData(JsonData jsonData, string key)
         {

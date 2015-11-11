@@ -78,6 +78,11 @@ namespace MyScript.Objects
                 vrObject.ModelType = (int)objectKind;
 
                 vrObject.ResType = (int)sourceKind;
+
+                vrObject.ParentName = "";
+                vrObject.ResTitle = "";
+                vrObject.ResContents = "";
+
             }
 
             public Builder SetID(int id)
@@ -91,7 +96,7 @@ namespace MyScript.Objects
 
             public Builder SetParentName(string name)
             {
-                vrObject.ParentName = name;
+                vrObject.ParentName = name == null ? "" : name;
                 return this;
             }
 
@@ -175,13 +180,13 @@ namespace MyScript.Objects
 
             public Builder SetResTitle(string s)
             {
-                vrObject.ResTitle = s;
+                vrObject.ResTitle = s == null ? "" : s;
                 return this;
             }
 
             public Builder SetResContents(string s)
             {
-                vrObject.ResContents = s;
+                vrObject.ResContents = s == null ? "" : s;
                 return this;
             }
 
@@ -230,8 +235,8 @@ namespace MyScript.Objects
 
             data.ID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD._ID.ToString());
 
-            data.Name = (string)jsonData[VIRTUAL_FIELD.NAME.ToString()];
-            data.ParentName = (string)jsonData[VIRTUAL_FIELD.PARENT_NAME.ToString()];
+            data.Name = JsonInterpreter.ParseStringData(jsonData, VIRTUAL_FIELD.NAME.ToString());
+            data.ParentName = JsonInterpreter.ParseStringData(jsonData, VIRTUAL_FIELD.PARENT_NAME.ToString());
             data.ModelType = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.MODEL_TYPE.ToString());
 
             data.PosX = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_X.ToString());
@@ -249,8 +254,8 @@ namespace MyScript.Objects
 
             data.ResID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.RES_ID.ToString());
             data.ResType = JsonInterpreter.ParseIntData(jsonData, RESOURCE_FIELD.RES_TYPE.ToString());
-            data.ResTitle = (string)jsonData[RESOURCE_FIELD.TITLE.ToString()];
-            data.ResContents = (string)jsonData[RESOURCE_FIELD.CONTENTS.ToString()];
+            data.ResTitle = JsonInterpreter.ParseStringData(jsonData, RESOURCE_FIELD.TITLE.ToString());
+            data.ResContents = JsonInterpreter.ParseStringData(jsonData, RESOURCE_FIELD.CONTENTS.ToString());
 
             return data;
         }

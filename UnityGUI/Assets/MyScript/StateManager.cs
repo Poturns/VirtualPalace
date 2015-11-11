@@ -4,6 +4,7 @@ using MyScript.Interface;
 using System;
 using BridgeApi.Controller;
 using BridgeApi.Controller.Request;
+using System.Collections.Generic;
 
 public enum UnityLifeCycle
 {
@@ -84,7 +85,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     public int ObjCount;
     void Awake()
     {
-        Debug.Log("=== Awake ===");
+        //Debug.Log("=== Awake ===");
         if (instanceRef == null)
         {
             InitPlatformBridge();
@@ -204,7 +205,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     internal void SendLifeCyleMessage(ISceneChangeState sceneState, UnityLifeCycle lifeCycle)
     {
         string json = JsonInterpreter.MakeUnityLifeCycleMessage(sceneState.UnitySceneID, lifeCycle);
-        Debug.Log("=============== LifeCycle : " + json);
+        //Debug.Log("=============== LifeCycle : " + json);
         SendSingleMessageToPlatform(json);
     }
 
@@ -237,7 +238,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// <param name="json">Controller에서 전달된 Input Message json</param>
     public void HandleInputsFromController(string json)
     {
-        Debug.Log("=============== " + json);
+        // Debug.Log("=============== HandleInputsFromController : " + json);
         if (activeState != null)
         {
             Debug.Log("=============== Current ActiveState : " + activeState);
@@ -255,12 +256,30 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// <param name="json">Controller에서 전달된 일반 Message json</param>
     public void HandleMessageFromController(string json)
     {
-        Debug.Log("=============== " + json);
+        // Debug.Log("=============== " + json);
+        List<ControllerEvent> eventList = JsonInterpreter.ParseSingleMessage(json);
 
-        //TODO handle message
+        foreach (ControllerEvent _event in eventList)
+        {
+            switch (_event.Type)
+            {
+                case ControllerEvent.EVENT_DATA_UPDATED:
+                    break;
+                case ControllerEvent.EVENT_INPUTMODE_CHANGED:
+                    break;
+                case ControllerEvent.EVENT_SPEECH_ENDED:
+                    break;
+                case ControllerEvent.EVENT_SPEECH_STARTED:
+                    break;
+                case ControllerEvent.EVENT_TOAST_MESSAGE:
+                    activeState.ToastHandling(ToastMessage.FromJson(_event.JsonContent));
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
-    //TODO 이하 메소드는 Delegate 객체로 처리하기
     /// <summary>
     /// UNITY에서 기저 Platform에 요청을 보낸다.
     /// </summary>

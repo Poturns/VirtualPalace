@@ -15,6 +15,7 @@ namespace MyScript.States
         private GazeInputModule selectModule;
         private GazeCusor gazecusor;
         private CardboardHead cameraHead;
+        private MessegeToaster toaster;
 
         public GameObject EventSystem { get { return eventSystem; } }
         public GazeInputModule SelectModule { get { return selectModule; } }
@@ -32,6 +33,7 @@ namespace MyScript.States
             selectModule = otherStateInSameScene.selectModule;
             gazecusor = otherStateInSameScene.gazecusor;
             cameraHead = otherStateInSameScene.cameraHead;
+            toaster = otherStateInSameScene.toaster;
         }
 
         /// <summary>
@@ -96,6 +98,12 @@ namespace MyScript.States
             if (cameraHead == null)
                 cameraHead = GameObject.Find("Head").GetComponent<CardboardHead>();
 
+            if (toaster == null)
+            {
+                GameObject toasterGameobject = GameObject.Find("MessageToaster");
+                if (toasterGameobject != null)
+                    toaster = toasterGameobject.GetComponent<MessegeToaster>();
+            }
         }
 
         public override void InputHandling(List<Operation> InputOp)
@@ -127,20 +135,16 @@ namespace MyScript.States
             }
         }
 
-		//Toast Message Test Code
-		protected override void HandleDeepOperation()
-		{
-			Debug.Log ("Catch Deep");
-			MessegeToaster toaster = GameObject.Find ("MessageToaster").GetComponent<MessegeToaster>();
-
-			if (toaster == null)
-				Debug.Log ("!!!!!!!!!!!!!!!!!!!Toaster is Null!!!!!!!!!!!!!!!!!!!!!");
-			else 
-			{
-				toaster.CallMessageToaster("");
-			}
-		}
-
+        public override void ToastHandling(ToastMessage toast)
+        {
+            //base.ToastHandling(message);
+            if (toaster == null)
+                Debug.Log("!!!!!!!!!!!!!!!!!!!Toaster is Null!!!!!!!!!!!!!!!!!!!!!");
+            else
+            {
+                toaster.CallMessageToaster(toast.Message);
+            }
+        }
 
     }
 }

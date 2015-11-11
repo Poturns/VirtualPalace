@@ -116,7 +116,6 @@ public class SaveLoader : MonoBehaviour
 
     private void UpdataBookDataWithSaveData(VRObject sData)
     {
-		Debug.Log("!@!@!@!@!@!@!@!@!@!@");
         PrefabContainer PrefabCon = GameObject.Find("PreLoadPrefab").GetComponent<PrefabContainer>();
         //Debug.Log("======= Find VR Object : " + sData.Name + " , ModelType : " + sData.ModelType + " , ObjKind : " + sData.ObjKind);
         GameObject Obj = GameObject.Find(sData.Name);
