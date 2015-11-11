@@ -263,18 +263,15 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         {
             switch (_event.Type)
             {
-                case ControllerEvent.EVENT_DATA_UPDATED:
-                    break;
-                case ControllerEvent.EVENT_INPUTMODE_CHANGED:
-                    break;
-                case ControllerEvent.EVENT_SPEECH_ENDED:
-                    break;
-                case ControllerEvent.EVENT_SPEECH_STARTED:
-                    break;
                 case ControllerEvent.EVENT_TOAST_MESSAGE:
                     activeState.ToastHandling(ToastMessage.FromJson(_event.JsonContent));
                     break;
+                case ControllerEvent.EVENT_DATA_UPDATED:
+                case ControllerEvent.EVENT_INPUTMODE_CHANGED:
+                case ControllerEvent.EVENT_SPEECH_ENDED:
+                case ControllerEvent.EVENT_SPEECH_STARTED:
                 default:
+                    Debug.LogWarning("=== not implement event : " + _event.Type + " , msg : " + _event.JsonContent.ToJson());
                     break;
             }
         }
