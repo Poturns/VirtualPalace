@@ -42,7 +42,7 @@ public class MessegeToaster : MonoBehaviour {
 		else 
 		{
 			ToasterText.text = Msg;
-			ToastingTime = 0;
+			TimeCounter = 0;
 		}
 
 	}
