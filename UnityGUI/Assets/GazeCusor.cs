@@ -56,7 +56,7 @@ public class GazeCusor : MonoBehaviour {
 	public void ResetGazingTime()
 	{
 		GazeTime = 0.0f;
-		Debug.Log ("--Reset Gazing Time-- GazeTime : " + GazeTime);
+		//Debug.Log ("--Reset Gazing Time-- GazeTime : " + GazeTime);
 	}
 	public void SetTextureCursor(KIND_SOURCE kind)
 	{

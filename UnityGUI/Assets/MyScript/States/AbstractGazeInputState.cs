@@ -100,7 +100,7 @@ namespace MyScript.States
 
         public override void InputHandling(List<Operation> InputOp)
         {
-            gazecusor.SetGazeTimerZero();
+            gazecusor.ResetGazingTime();
             base.InputHandling(InputOp);
         }
 
