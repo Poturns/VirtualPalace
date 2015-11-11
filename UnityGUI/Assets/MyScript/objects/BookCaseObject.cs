@@ -45,7 +45,8 @@ namespace MyScript.Objects
         {
             //Debug.Log("===== " + jsonData.ToJson());
             int id = JsonInterpreter.ParseIntData(jsonData, VR_CONTAINER_FIELD._ID.ToString());
-            string name = (string)jsonData[VR_CONTAINER_FIELD.NAME.ToString()];
+
+            string name = JsonInterpreter.ParseStringData(jsonData, VR_CONTAINER_FIELD.NAME.ToString());
             if (name[0] == '\'')
                 name = name.Remove(0);
             if (name[name.Length - 1] == '\'')

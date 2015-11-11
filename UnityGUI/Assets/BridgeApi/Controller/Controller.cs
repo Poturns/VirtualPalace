@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BridgeApi.Controller
 {
-   
+
     /// <summary>
     /// Input Module을 통해 전송되는 명령
     /// </summary>
@@ -370,6 +370,38 @@ namespace BridgeApi.Controller
                 + "\nStatus : " + Status
                 + "\nData : " + Speech
                 + "\n]";
+        }
+    }
+
+    public struct ControllerEvent
+    {
+        public const string EVENT_INPUTMODE_CHANGED = "onInputModeChanged";
+
+        public const string EVENT_SPEECH_STARTED = "onSpeechDetectionStarted";
+
+        public const string EVENT_SPEECH_ENDED = "onSpeechDetectionEnded";
+
+        public const string EVENT_TOAST_MESSAGE = "onToastMessage";
+
+        public const string EVENT_DATA_UPDATED = "onDataUpdated";
+
+        public string Type;
+        public JsonData JsonContent;
+
+    }
+
+    public struct ToastMessage
+    {
+        public const string KEY_TOAST_MESSAGE_TYPE = "type";
+
+        public const string KEY_TOAST_MESSAGE_MSG = "message";
+
+        public string Type;
+        public string Message;
+
+        public static ToastMessage FromJson(JsonData json)
+        {
+            return new ToastMessage() { Type = (string)json[KEY_TOAST_MESSAGE_TYPE], Message = (string)json[KEY_TOAST_MESSAGE_MSG] };
         }
     }
 }
