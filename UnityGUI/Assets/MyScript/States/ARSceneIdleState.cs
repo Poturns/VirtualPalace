@@ -34,8 +34,7 @@ namespace MyScript.States
                 ARScreenObj = GameObject.Find("ARView");
 
 			ObjList = new List<ARRenderingObject> ();
-			ARObjPrefab = GameObject.Find ("PrefabStore").GetComponent<ARPrefabload> ().ARPrefab;
-			if(ARObjPrefab) Debug.Log ("AR Prefab is Null");
+		
 
         }
 
@@ -60,9 +59,7 @@ namespace MyScript.States
 					//Update 리턴값이 false 면 생성
 					if(!ARItemUpdate(item))
 					{
-						GameObject NewObj = GameObject.Instantiate(ARObjPrefab) as GameObject;
-						ARRenderingObject NewAR = ARObjPrefab.GetComponent<ARRenderingObject>();
-						ObjList.Add(NewAR);
+						CreateARItem(item);
 					}
                     break;
 
@@ -90,6 +87,18 @@ namespace MyScript.States
 			}
 
 			return false;
+		}
+		private void CreateARItem(ARrenderItem item)
+		{
+			if(ARObjPrefab == null) 
+				ARObjPrefab = GameObject.Find ("PrefabStore").GetComponent<ARPrefabload> ().ARPrefab;
+			
+			GameObject NewObj = GameObject.Instantiate(ARObjPrefab) as GameObject;
+			NewObj.transform.SetParent( ARScreenObj.transform.GetChild (0));
+			ARRenderingObject NewAR = NewObj.GetComponent<ARRenderingObject>();
+			NewAR.SetARItem(item);
+			NewAR.SetARPosition(item);
+			ObjList.Add(NewAR);
 		}
     }
 }

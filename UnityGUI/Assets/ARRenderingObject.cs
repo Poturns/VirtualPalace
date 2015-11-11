@@ -9,7 +9,13 @@ public class ARRenderingObject : MonoBehaviour {
 	public ARrenderItem ARItem;
 	void Start () 
 	{
-		zOffset = GameObject.Find ("ARView").transform.position.z / 2;
+		zOffset = GameObject.Find ("ARView").transform.position.z;
+	}
+	public void SetARItem(ARrenderItem item)
+	{
+		ARItem.screenX = item.screenX;
+		ARItem.screenY= item.screenY;
+		ARItem.resId = item.resId;
 	}
 	public void SetARPosition(ARrenderItem item)
 	{
