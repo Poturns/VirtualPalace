@@ -45,6 +45,7 @@ namespace MyScript.States
 
         private void ReturnToLobbyScene()
         {
+			ARScreenObj.GetComponent<ARScreen> ().EndCamera ();
             StateManager.SwitchScene(UnityScene.Lobby);
         }
 

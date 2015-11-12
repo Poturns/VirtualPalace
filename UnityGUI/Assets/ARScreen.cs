@@ -15,10 +15,14 @@ public class ARScreen : MonoBehaviour
         try
         {
             CamScreen.Play();
+		
         }
         catch (Exception) { }
     }
-
+	public void EndCamera()
+	{
+		CamScreen.Stop();
+	}
     // Update is called once per frame
     void Update()
     {
