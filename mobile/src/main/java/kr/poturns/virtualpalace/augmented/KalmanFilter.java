@@ -1,84 +1,41 @@
 package kr.poturns.virtualpalace.augmented;
 
 public class KalmanFilter {
-//	private final KalmanFilter mFilterF;
-//
-//	private int pLen;
-//	private int mLen;
-//
-	private double[] lastMeasurement;
-	private double[] lastPredict;
-	private double[] lastEstimated;
+	
+	private double[] Q;		// ProcessNoise
+	private double[] R;		// measurementNoise
+	private double[] P;		// errorCov
+	private double[] K;		// KalmanGain
 
-	public KalmanFilter(double[] initData) {
-//		this.mLen = initData.length;
-//		this.pLen = initData.length*2;
-//		mFilterF = new KalmanFilter(pLen, mLen, 0, CvType.CV_32F);
-//
-//		lastMeasurement = new double[mLen];
-//		lastPredict = new double[pLen];
-//		lastEstimated = new double[mLen];
-//
-//		// 전환행렬(p*p): x'+=x+v, v'+=v
-//		Mat transitionMat = new Mat(pLen, pLen, CvType.CV_32F, new Scalar(0));
-//		float[] tM_val = new float[pLen*pLen];
-//		for(int i=0;i<pLen;i++) {
-//			tM_val[i*pLen+i] = 1;
-//			if(i<mLen)
-//				tM_val[i*pLen+i+mLen] = 1;
-//		}
-//		transitionMat.put(0, 0, tM_val);
-//		mFilterF.set_transitionMatrix(transitionMat);
-//
-//		//초기값(m*1): input
-//		Mat measurement = toMat(initData);
-//		mFilterF.set_statePre(measurement);
-//
-//		//측정행렬(m*p): p-square diagonal 1
-//		Mat measurementMat = Mat.eye(mLen, pLen, CvType.CV_32F);
-//		mFilterF.set_measurementMatrix(measurementMat);
-//
-//		//프로세스 잡음 공분산(p*p): p-square diagonal 10^-5
-//		Mat pNoiseCov = Mat.eye(pLen, pLen, CvType.CV_32F);
-//		pNoiseCov = pNoiseCov.mul(pNoiseCov, 1e-5);
-//		mFilterF.set_processNoiseCov(pNoiseCov);
-//
-//		//측정 잡음 공분산(m*m): m-square diagonal 10^-1
-//		Mat mNoiseCov = Mat.eye(mLen, mLen, CvType.CV_32F);
-//		mNoiseCov = mNoiseCov.mul(mNoiseCov, 1e-1);
-//		mFilterF.set_measurementNoiseCov(mNoiseCov);
-//
-//		//차후오차 공분산(p*p): p-square diagonal 1
-//		Mat postErrorCov = Mat.eye(pLen, pLen, CvType.CV_32F);
-//		mFilterF.set_errorCovPost(postErrorCov);
+	public int dim;
+	public double[] X;
+	
+	public KalmanFilter(double[] initX) {
+		dim = initX.length;
+		X = new double[dim];
+		System.arraycopy(initX, 0, X, 0, dim);
+		Q = new double[dim];
+		R = new double[dim];
+		P = new double[dim];
+		K = new double[dim];
+		
+		for(int i=0;i<dim;i++) {
+			Q[i] = 1e-5;
+			R[i] = 0.001;
+			P[i] = 1;
+		}
 	}
-
-	public double[] predict() {
-//		Mat prediction = mFilterF.predict();
-//		for(int i=0;i<pLen;i++) {
-//			lastPredict[i] = prediction.get(i,0)[0];
-//		}
-		return lastPredict;
+	
+	public void predict() {
+		for(int i=0;i<dim;i++) {
+			K[i] = (P[i]+Q[i])/(P[i]+Q[i]+R[i]);
+			P[i] = R[i]*(P[i]+Q[i])/(R[i]+P[i]+Q[i]);
+		}
 	}
-
-	public double[] update(double[] data) {
-//		Mat measurement = toMat(data);
-//		Mat estimated = mFilterF.correct(measurement);
-//		for(int i=0;i<mLen;i++) {
-//			lastEstimated[i] = estimated.get(i, 0)[0];
-//		}
-		return lastEstimated;
+	
+	public void update(double[] measurement) {
+		for(int i=0;i<dim;i++) {
+			X[i] = X[i] + (measurement[i] - X[i])*K[i];
+		}
 	}
-
-	public double[] getLatestMeasurement(){return lastMeasurement;}
-	public double[] getLatestPrediction(){return lastPredict;}
-	public double[] getLatestEstimation(){return lastEstimated;}
-
-//	private Mat toMat(double[] data) {
-//		Mat mat = new Mat(mLen, 1, CvType.CV_32F, new Scalar(0));
-//		for(int i=0;i<mLen;i++) {
-//			mat.put(i, 0, data[i]);
-//		}
-//		return mat;
-//	}
 }
