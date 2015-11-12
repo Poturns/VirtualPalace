@@ -22,7 +22,8 @@ public class ARRenderingObject : AbstractBasicObject {
 		ARItem.resId = item.resId;
 	}
 	public override void OnSelect()
-	{
+	{	
+		arView.GetComponent<ARScreen> ().EndCamera ();
 		StateManager.SwitchScene (UnityScene.VR);
 	}
 	//비율을 구한다음 PosDummy(parent)로부터의 상대 위치를 구해서 위치 변경
