@@ -1,11 +1,7 @@
 namespace BridgeApi.Media
 {
-    public abstract class VideoDirInfo : BaseDirInfo<VideoInfo>
+    public interface VideoDirInfo : BaseDirInfo<VideoInfo>
     {
-        protected internal VideoDirInfo()
-        {
-        }
-       
     }
 }
 

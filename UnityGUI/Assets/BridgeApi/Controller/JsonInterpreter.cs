@@ -39,7 +39,7 @@ namespace BridgeApi.Controller
 
         public static ARrenderItem ParseARrenderItem(Operation op)
         {
-            if(op.Type != Operation.AR_RENDERING)
+            if (op.Type != Operation.AR_RENDERING)
                 throw new ArgumentException();
 
             ARrenderItem item = new ARrenderItem();
@@ -51,6 +51,22 @@ namespace BridgeApi.Controller
             item.screenY = rawValue % 10000;
 
             return item;
+        }
+
+        public static List<ControllerEvent> ParseSingleMessage(string json)
+        {
+            JsonData jsonData = JsonMapper.ToObject(json);
+
+            ICollection<string> keys = jsonData.Keys;
+
+            List<ControllerEvent> eventList = new List<ControllerEvent>(keys.Count);
+
+            foreach (string key in keys)
+            {
+                eventList.Add(new ControllerEvent() { Type = key, JsonContent = jsonData[key] });
+            }
+
+            return eventList;
         }
 
         /// <summary>
@@ -162,7 +178,7 @@ namespace BridgeApi.Controller
         /// <returns>Field-Value로 구성된 Json 리스트</returns>
         public static QueryRequestResult ParseQueryFromPlatform(string json, string requestKey)
         {
-            Debug.Log("====== "+json);
+            //Debug.Log("====== " + json);
             JsonData jData = JsonMapper.ToObject(json);
 
             List<JsonData> queryResults = new List<JsonData>();
@@ -241,8 +257,16 @@ namespace BridgeApi.Controller
             if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_REQUEST_KEY))
             {
                 jData = jData[SpeechRequestResult.SPEECH_REQUEST_KEY];
-                result.Speech = (string)jData[SpeechRequestResult.SPEECH_RESULT_KEY];
-                result.Status = (string)jData[RequestResult.RESULT];
+                if (JsonDataContainsKey(jData, SpeechRequestResult.SPEECH_RESULT_KEY))
+                {
+                    result.Speech = (string)jData[SpeechRequestResult.SPEECH_RESULT_KEY];
+                    result.Status = (string)jData[RequestResult.RESULT];
+                }
+                else
+                {
+                    result.Speech = "";
+                    result.Status = RequestResult.STATUS_ERROR;
+                }
             }
             else
             {
@@ -305,15 +329,32 @@ namespace BridgeApi.Controller
             return dataList;
         }
 
+        public static string ParseStringData(JsonData jsonData, string key)
+        {
+            if (JsonDataContainsKey(jsonData, key))
+            {
+                return jsonData[key].ToString();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+
         public static int ParseIntData(JsonData jsonData, string key)
         {
             JsonData jsonValue = jsonData[key];
 
-            Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+            // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
             if (jsonValue.IsInt)
             {
                 return (int)jsonValue;
+            }
+            else if (jsonValue.IsLong)
+            {
+                return (int)(long)jsonValue;
             }
             else if (jsonValue.IsString)
             {
@@ -338,15 +379,19 @@ namespace BridgeApi.Controller
         {
             JsonData jsonValue = jsonData[key];
 
-            Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
+            // Debug.Log("==== " + jsonValue.ToJson() + ", type : " + jsonValue.GetJsonType());
 
-            if (jsonValue.IsLong)
+            if (jsonValue.IsDouble)
             {
-                return (long)jsonValue;
+                return (float)(double)jsonValue;
             }
             else if (jsonValue.IsInt)
             {
                 return (int)jsonValue;
+            }
+            else if (jsonValue.IsLong)
+            {
+                return (int)(long)jsonValue;
             }
             else if (jsonValue.IsString)
             {
@@ -366,7 +411,7 @@ namespace BridgeApi.Controller
                 return -1;
             }
         }
-      
+
     }
 
 }

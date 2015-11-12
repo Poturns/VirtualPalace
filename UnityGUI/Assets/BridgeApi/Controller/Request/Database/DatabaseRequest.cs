@@ -39,9 +39,15 @@ namespace BridgeApi.Controller.Request.Database
 
         public static IDatabaseRequest QueryAllBookCaseObjects()
         {
-            return new SpecialQueryRequest(DatabaseConstants.QUERY_VR_BOOKCASES);
+            return new SpecialQueryRequest(DatabaseConstants.QUERY_ALL_VR_BOOKCASES);
         }
 
+        public static IDatabaseRequest InsertOrUpdateVRObjects(List<VRObject> list)
+        {
+            return new DatabaseModifyRequest<VRObject>(DatabaseConstants.QUERY_SAVE_ALL_VR_ITEMS, list);
+        }
+
+        /*
         public static IDatabaseRequest InsertVRObjects(List<VRObject> list)
         {
             return new DatabaseModifyRequest<VRObject>(DatabaseConstants.QUERY_INSERT_VR_ITEMS, list);
@@ -51,6 +57,7 @@ namespace BridgeApi.Controller.Request.Database
         {
             return new DatabaseModifyRequest<VRObject>(DatabaseConstants.QUERY_UPDATE_VR_ITEMS, list);
         }
+        */
 
         /// <summary>
         /// Select 쿼리 요청을 전송할 객체를 생성한다.
@@ -142,7 +149,7 @@ namespace BridgeApi.Controller.Request.Database
                 WriteItemsToJson();
                 writer.WriteObjectEnd();
 
-                Debug.Log("============= DatabaseModifyRequest : " + OPERATION + "\n" + sb.ToString());
+               // Debug.Log("============= DatabaseModifyRequest : " + OPERATION + "\n" + sb.ToString());
 
                 bridge.RequestToPlatform(this, (requestResult) =>
                 {

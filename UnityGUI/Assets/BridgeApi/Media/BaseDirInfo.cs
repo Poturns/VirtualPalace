@@ -2,21 +2,23 @@ using System.Collections.Generic;
 
 namespace BridgeApi.Media
 {
-    public abstract class BaseDirInfo<T> where T : BaseInfo
+    public interface BaseDirInfo<T> where T : BaseInfo
     {
-        public string DirName
-        {
-            get;
-            protected internal set;
-        }
+        /// <summary>
+        /// 디렉토리 이름
+        /// </summary>
+        string DirName { get; set; }
 
-        public T FirstInfo
-        {
-            get;
-            protected internal set;
-        }
+        /// <summary>
+        /// 디렉토리에 존재하는 Info중 첫번째 Info
+        /// </summary>
+        T FirstInfo { get; set; }
 
-        public abstract List<T> GetInfoList();
+        /// <summary>
+        /// 디렉토리에 존재하는 모든 Info의 리스트를 반환한다.
+        /// </summary>
+        /// <returns>디렉토리에 존재하는 모든 Info의 리스트</returns>
+        List<T> GetInfoListInDirectory();
 
     }
 }

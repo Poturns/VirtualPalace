@@ -6,10 +6,15 @@ namespace AndroidApi.Media
 {
     internal class VideoDirInfo : BridgeApi.Media.VideoDirInfo
     {
-       
+
+        public string DirName { get; set; }
+
+        public BridgeApi.Media.VideoInfo FirstInfo { get; set; }
+
         private VideoDirInfo()
         {
         }
+
 
         public static List<BridgeApi.Media.VideoDirInfo> GetDirInfoList(AndroidJavaObject activity)
         {
@@ -38,10 +43,11 @@ namespace AndroidApi.Media
             }
         }
 
-        public override List<BridgeApi.Media.VideoInfo> GetInfoList()
+        public List<BridgeApi.Media.VideoInfo> GetInfoListInDirectory()
         {
             return VideoInfo.GetInfoList(AndroidUtils.GetActivityObject(), DirName);
         }
+
     }
 }
 

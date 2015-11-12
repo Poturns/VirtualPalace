@@ -27,8 +27,11 @@ namespace MyScript.States
 			Init();
 		}
 
-		
-		protected override void Init()
+        public void SetAdditionalParameter(object param)
+        {
+        }
+
+        protected override void Init()
 		{
 			base.Init();
             DestroyMarkedObject();

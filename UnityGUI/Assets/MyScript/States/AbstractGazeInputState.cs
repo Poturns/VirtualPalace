@@ -1,4 +1,6 @@
-﻿using MyScript;
+﻿using System.Collections.Generic;
+using BridgeApi.Controller;
+using MyScript;
 using MyScript.Interface;
 using UnityEngine;
 
@@ -13,11 +15,12 @@ namespace MyScript.States
         private GazeInputModule selectModule;
         private GazeCusor gazecusor;
         private CardboardHead cameraHead;
+        private MessegeToaster toaster;
 
         public GameObject EventSystem { get { return eventSystem; } }
         public GazeInputModule SelectModule { get { return selectModule; } }
         public GazeCusor GCursor { get { return gazecusor; } }
-        
+
 
         public AbstractGazeInputState(StateManager managerRef, string stateName) : base(managerRef, stateName)
         {
@@ -30,6 +33,7 @@ namespace MyScript.States
             selectModule = otherStateInSameScene.selectModule;
             gazecusor = otherStateInSameScene.gazecusor;
             cameraHead = otherStateInSameScene.cameraHead;
+            toaster = otherStateInSameScene.toaster;
         }
 
         /// <summary>
@@ -94,6 +98,18 @@ namespace MyScript.States
             if (cameraHead == null)
                 cameraHead = GameObject.Find("Head").GetComponent<CardboardHead>();
 
+            if (toaster == null)
+            {
+                GameObject toasterGameobject = GameObject.Find("MessageToaster");
+                if (toasterGameobject != null)
+                    toaster = toasterGameobject.GetComponent<MessegeToaster>();
+            }
+        }
+
+        public override void InputHandling(List<Operation> InputOp)
+        {
+            gazecusor.ResetGazingTime();
+            base.InputHandling(InputOp);
         }
 
         protected override void HandleSelectOperation()
@@ -119,6 +135,16 @@ namespace MyScript.States
             }
         }
 
+        public override void ToastHandling(ToastMessage toast)
+        {
+            //base.ToastHandling(message);
+            if (toaster == null)
+                Debug.Log("!!!!!!!!!!!!!!!!!!!Toaster is Null!!!!!!!!!!!!!!!!!!!!!");
+            else
+            {
+                toaster.CallMessageToaster(toast.Message);
+            }
+        }
 
     }
 }

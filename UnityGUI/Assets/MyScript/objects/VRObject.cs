@@ -35,11 +35,13 @@ namespace MyScript.Objects
         public float SizeY { get; set; }
         public float SizeZ { get; set; }
 
-        public int ResID { get; set; }
+
+        private int ResID { get; set; }
+        public int ResType { get; set; }
         public string ResContents { get; set; }
         public string ResTitle { get; set; }
 
-        public KIND_SOURCE SourceKind { get { return (KIND_SOURCE)ResID; } }
+        public KIND_SOURCE SourceKind { get { return (KIND_SOURCE)ResType; } }
         public OBJ_LIST ObjKind { get { return (OBJ_LIST)ModelType; } }
 
         public Vector3 Position { get { return new Vector3(PosX, PosY, PosZ); } }
@@ -59,7 +61,7 @@ namespace MyScript.Objects
 
         public bool IsInvalid()
         {
-            return ID < 0 || Name.Equals("") || ResID < 0 || ModelType < 0;
+            return ResType < 0 || ModelType < 0;
         }
 
         public class Builder
@@ -70,22 +72,31 @@ namespace MyScript.Objects
             {
                 vrObject = new VRObject();
                 vrObject.ID = -1;
+                vrObject.ResID = -1;
 
                 vrObject.Name = name;
                 vrObject.ModelType = (int)objectKind;
 
-                vrObject.ResID = (int)sourceKind;
+                vrObject.ResType = (int)sourceKind;
+
+                vrObject.ParentName = "";
+                vrObject.ResTitle = "";
+                vrObject.ResContents = "";
+
             }
 
             public Builder SetID(int id)
             {
-                vrObject.ID = id;
+                if (id == 0)
+                    vrObject.ID = -1;
+                else
+                    vrObject.ID = id;
                 return this;
             }
 
             public Builder SetParentName(string name)
             {
-                vrObject.ParentName = name;
+                vrObject.ParentName = name == null ? "" : name;
                 return this;
             }
 
@@ -169,13 +180,13 @@ namespace MyScript.Objects
 
             public Builder SetResTitle(string s)
             {
-                vrObject.ResTitle = s;
+                vrObject.ResTitle = s == null ? "" : s;
                 return this;
             }
 
             public Builder SetResContents(string s)
             {
-                vrObject.ResContents = s;
+                vrObject.ResContents = s == null ? "" : s;
                 return this;
             }
 
@@ -187,7 +198,7 @@ namespace MyScript.Objects
 
         public KeyValuePair<Enum, string>[] ConvertToPairs()
         {
-            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[17];
+            KeyValuePair<Enum, string>[] pairs = new KeyValuePair<Enum, string>[18];
             int i = 0;
 
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD._ID, ID.ToString());
@@ -209,6 +220,7 @@ namespace MyScript.Objects
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.SIZE_Z, SizeZ.ToString());
 
             pairs[i++] = new KeyValuePair<Enum, string>(VIRTUAL_FIELD.RES_ID, ResID.ToString());
+            pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.RES_TYPE, ResType.ToString());
             pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.TITLE, ResTitle);
             pairs[i++] = new KeyValuePair<Enum, string>(RESOURCE_FIELD.CONTENTS, ResContents);
 
@@ -223,8 +235,8 @@ namespace MyScript.Objects
 
             data.ID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD._ID.ToString());
 
-            data.Name = (string)jsonData[VIRTUAL_FIELD.NAME.ToString()];
-            data.ParentName = (string)jsonData[VIRTUAL_FIELD.PARENT_NAME.ToString()];
+            data.Name = JsonInterpreter.ParseStringData(jsonData, VIRTUAL_FIELD.NAME.ToString());
+            data.ParentName = JsonInterpreter.ParseStringData(jsonData, VIRTUAL_FIELD.PARENT_NAME.ToString());
             data.ModelType = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.MODEL_TYPE.ToString());
 
             data.PosX = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.POS_X.ToString());
@@ -241,8 +253,9 @@ namespace MyScript.Objects
             data.SizeZ = JsonInterpreter.ParseFloatData(jsonData, VIRTUAL_FIELD.SIZE_Z.ToString());
 
             data.ResID = JsonInterpreter.ParseIntData(jsonData, VIRTUAL_FIELD.RES_ID.ToString());
-            data.ResTitle = (string)jsonData[RESOURCE_FIELD.TITLE.ToString()];
-            data.ResContents = (string)jsonData[RESOURCE_FIELD.CONTENTS.ToString()];
+            data.ResType = JsonInterpreter.ParseIntData(jsonData, RESOURCE_FIELD.RES_TYPE.ToString());
+            data.ResTitle = JsonInterpreter.ParseStringData(jsonData, RESOURCE_FIELD.TITLE.ToString());
+            data.ResContents = JsonInterpreter.ParseStringData(jsonData, RESOURCE_FIELD.CONTENTS.ToString());
 
             return data;
         }

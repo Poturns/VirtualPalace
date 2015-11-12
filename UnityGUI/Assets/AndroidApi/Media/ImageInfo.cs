@@ -6,6 +6,14 @@ namespace AndroidApi.Media
 {
     internal class ImageInfo : BridgeApi.Media.ImageInfo
     {
+        public string DisplayName { get; set; }
+
+        public string DirName { get; set; }
+
+        public int ID { get; set; }
+
+        public string Path { get; set; }
+
         internal ImageInfo()
         {
         }

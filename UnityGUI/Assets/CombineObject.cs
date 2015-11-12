@@ -14,7 +14,7 @@ public class CombineObject : AbstractBasicObject {
 
 	}
 
-	public VRObject GetSaveObjectData()
+	public VRObject MakeVRObjectFromBookcase()
 	{
 		Transform tr = gameObject.transform.parent;
 
@@ -64,26 +64,25 @@ public class CombineObject : AbstractBasicObject {
 			MovieData.Path = ContentsData;
 			break;
 		default:
-			Debug.Log ("SetContentsString:: Set Kind First");
+			Debug.Log ("SetContentsString:: Set Kind First, kind : " + SourceKind);
 			break;
 		}
 	}
 
-	public void UpdateWithSaveObjectData(VRObject sData)
+	public void UpdateWithSaveObjectData(VRObject vrObject)
 	{
-		VRObject VRSaveObj = sData;
-		ID = VRSaveObj.ID;
-		//포지션값만 기즈모에 적용 
-		gameObject.transform.position =  VRSaveObj.Position;
+		ID = vrObject.ID;
+		//포지션값만 기즈모에 적용 x
+		gameObject.transform.parent.position =  vrObject.Position;
 		// 나머지는 이 오브젝트에 적용
-		gameObject.transform.rotation = VRSaveObj.Rotation;
-		gameObject.transform.localScale = VRSaveObj.Scale;
-		gameObject.transform.parent.name = VRSaveObj.Name;
-		SourceKind = VRSaveObj.SourceKind;
-		ModelKind = VRSaveObj.ObjKind;
-		Debug.Log ("Loaded Contents String :::::" + VRSaveObj.ResContents);
-		SetContentString (VRSaveObj.ResContents);
-		Debug.Log ("CombineObject Update : " + GetContentString());
+		gameObject.transform.parent.rotation = vrObject.Rotation;
+		gameObject.transform.localScale = vrObject.Scale;
+		gameObject.transform.parent.name = vrObject.Name;
+		SourceKind = vrObject.SourceKind;
+		ModelKind = vrObject.ObjKind;
+		//Debug.Log ("Loaded Contents String :::::" + vrObject.ResContents);
+		SetContentString (vrObject.ResContents);
+		//Debug.Log ("CombineObject Update : " + GetContentString());
 	}
 
 	public void UpdateContents(string Con , int id)

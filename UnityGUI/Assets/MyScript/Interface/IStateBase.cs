@@ -23,6 +23,8 @@ namespace MyScript.Interface
         /// </summary>
         /// <param name="InputOp">InputModule에서 전달 된 Input 리스트</param>
 		void InputHandling(List<Operation> InputOp);
+
+        void ToastHandling(ToastMessage toast);
 	}
 
 }

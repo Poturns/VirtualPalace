@@ -11,6 +11,10 @@ namespace MyScript.States
 
         public UnityScene UnitySceneID { get { return UnityScene.Lobby; } }
 
+        public void SetAdditionalParameter(object param)
+        {
+        }
+
         public void OnSceneChanged()
         {
             Debug.Log("=============== " + Name + " : Scene changed");
