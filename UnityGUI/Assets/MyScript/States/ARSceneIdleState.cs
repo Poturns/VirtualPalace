@@ -3,6 +3,7 @@ using MyScript.Interface;
 using BridgeApi.Controller;
 using System.Collections.Generic;
 using BridgeApi.Controller.Request;
+using System;
 
 namespace MyScript.States
 {
@@ -20,6 +21,7 @@ namespace MyScript.States
 
         }
 
+
         public UnityScene UnitySceneID { get { return UnityScene.AR; } }
 
         public void OnSceneChanged()
@@ -28,6 +30,9 @@ namespace MyScript.States
             Init();
         }
 
+        public void SetAdditionalParameter(object param)
+        {
+        }
 
         protected override void Init()
         {
@@ -36,7 +41,7 @@ namespace MyScript.States
             if (ARScreenObj == null)
             {
                 ARScreenObj = GameObject.Find("ARView");
-                if (ARScreenObj == null && arScreen == null)
+                if (ARScreenObj != null && arScreen == null)
                 {
                     arScreen = ARScreenObj.GetComponent<ARScreen>();
                 }
@@ -122,6 +127,7 @@ namespace MyScript.States
             NewAR.SetARPosition(item);
             ObjList.Add(NewAR);
         }
+
     }
 }
 

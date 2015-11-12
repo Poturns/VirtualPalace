@@ -167,7 +167,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         Tasker.QueueOnMainThread(a);
     }
 
-    public static void SwitchScene(UnityScene unityScene)
+    public static void SwitchScene(UnityScene unityScene, object additionalParameter = null)
     {
         StateManager manager = GetManager();
         ISceneChangeState newSceneState;
@@ -187,6 +187,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
             default:
                 return;
         }
+
+        if (additionalParameter != null)
+            newSceneState.SetAdditionalParameter(additionalParameter);
 
 
         ISceneChangeState currentState = manager.activeState as ISceneChangeState;

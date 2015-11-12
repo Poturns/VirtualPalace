@@ -30,7 +30,12 @@ namespace BridgeApi.Controller.Request
 
             writer.WriteObjectStart();
             writer.WritePropertyName("save_new_ar_item");
-            writer.Write("save_new_ar_item");
+
+            writer.WriteObjectStart();
+            writer.WritePropertyName("title");
+            writer.Write("");
+            writer.WriteObjectEnd();
+
             writer.WriteObjectEnd();
 
             return sb.ToString();

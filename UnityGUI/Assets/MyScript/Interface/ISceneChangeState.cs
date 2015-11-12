@@ -17,5 +17,7 @@ namespace MyScript.Interface
         /// Scene이 변경 완료되었을 때 호출된다.
         /// </summary>
         void OnSceneChanged();
+
+        void SetAdditionalParameter(object param);
     }
 }
