@@ -56,14 +56,15 @@ public class ARRenderingObject : AbstractBasicObject {
 	
 		//HeadVector.Normalize ();
 		Transform Parent = transform.parent;
-		Debug.Log (" z :::::::::::" + Parent.position.z);
+		//Debug.Log (" z :::::::::::" + Parent.position.z);
 		//위치를 Screen좌표기준으로 변경
 		transform.position =new Vector3 (Parent.position.x+RelativeX,
 		                                 Parent.position.y+RelativeY, 
 		                                 Parent.position.z);
-		Vector3 Local = transform.localPosition;
-		Local.z = -0.01f;
-		transform.localPosition = Local;
+
+		Vector3 NewLoc = transform.localPosition;
+		NewLoc.z = -0.01f;
+		transform.localPosition = NewLoc;
 		//transform.localPosition = new Vector3 (RelativeX*transform.lossyScale.x, RelativeY*transform.lossyScale.y, -0.01f);
 
 	}
