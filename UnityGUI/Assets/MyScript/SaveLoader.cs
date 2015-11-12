@@ -130,10 +130,17 @@ public class SaveLoader : MonoBehaviour
         else
         {
             GameObject PrefabToLoad = PrefabCon.GetPrefab(sData.ObjKind);
+
+            if (PrefabToLoad == null)
+            {
+                Debug.Log("======= VR Object Invalid : " + sData.Name + ", id : " + sData.ID + ", type : " + sData.ObjKind);
+                return;
+            }
+
             GameObject LoadObject = Instantiate(PrefabToLoad, sData.Position, sData.Rotation) as GameObject;
             LoadObject.transform.parent = GameObject.Find(sData.ParentName).transform.GetChild(0);
             LoadObject.transform.GetChild(0).GetComponent<CombineObject>().UpdateWithSaveObjectData(sData);
-            Debug.Log("======= VR Object Inseted : " + sData.Name);
+            Debug.Log("======= VR Object Inserted : " + sData.Name);
         }
     }
     /*

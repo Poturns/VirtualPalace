@@ -76,7 +76,7 @@ public class PrefabContainer : MonoBehaviour
 			return AnimalObj;
 
 		default:
-			Debug.Log ("Error : GetPrefab : Can't Find Prefab");
+			Debug.Log ("Error : GetPrefab : Can't Find Prefab - kind : " + ObjName);
 			return null;
 		}
 	}

@@ -238,7 +238,7 @@ namespace BridgeApi.Controller.Request.Database
             public void SendRequest(IPlatformBridge bridge, Action<QueryRequestResult> callback)
             {
                 queryBuilder.EndWrite();
-                Debug.Log(queryBuilder.ToJsonString());
+                //Debug.Log(queryBuilder.ToJsonString());
 
                 try
                 {
