@@ -54,17 +54,17 @@ public class ARRenderingObject : AbstractBasicObject {
 		float RelativeY = YRatio * arView.transform.lossyScale.y;
 
 	
-		Vector3 HeadVector = ARHead.transform.forward;
-		Vector3 MoveHeadVector = ARHead.transform.position + 0.01f*HeadVector;
-
 		//HeadVector.Normalize ();
 		Transform Parent = transform.parent;
 		Debug.Log (" z :::::::::::" + Parent.position.z);
 		//위치를 Screen좌표기준으로 변경
-		transform.position =new Vector3 (Parent.position.x,
-                                         Parent.position.y, 
+		transform.position =new Vector3 (Parent.position.x+RelativeX,
+		                                 Parent.position.y+RelativeY, 
 		                                 Parent.position.z);
-		transform.localPosition = new Vector3 (RelativeX*transform.lossyScale.x, RelativeY*transform.lossyScale.y, -0.01f);
+		Vector3 Local = transform.localPosition;
+		Local.z = -0.01f;
+		transform.localPosition = Local;
+		//transform.localPosition = new Vector3 (RelativeX*transform.lossyScale.x, RelativeY*transform.lossyScale.y, -0.01f);
 
 	}
 
