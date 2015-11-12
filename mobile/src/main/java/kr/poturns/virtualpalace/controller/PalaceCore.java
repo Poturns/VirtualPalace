@@ -536,8 +536,9 @@ abstract class PalaceCore {
         if (arItem.resID > 0) {
             // AR Module에 AugmentedItem 전달,
             // AR Module은 {@link #insertNewAugmentedItem} 호출을 통해 완성된 데이터를 저장.
-            AugmentedManager.getInstance(App).addItem(arItem.screenX, arItem.screenY);
-            return true;
+            AugmentedManager.getInstance(App).addItem(arItem);
+            long id = insertNewAugmentedItem(arItem);
+            return id > 0;
         }
         return false;
     }
