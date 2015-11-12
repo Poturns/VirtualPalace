@@ -54,7 +54,7 @@ public class CamTracker {
 			bSuccess = SensorManager.getRotationMatrix(rotationMat, null, accData, magneticData);
 			if(bSuccess) {
 				SensorManager.getOrientation(rotationMat, orientation);
-				//filterOrientation(orientation);
+				filterOrientation(orientation);
 			}
 			
 			resetOrigin();
@@ -126,12 +126,13 @@ public class CamTracker {
 		double[] arr = AugUtils.Float2Double(orientation);
 		if(orientationFilter==null)
 			orientationFilter = new KalmanFilter(arr);
-		orientationFilter.predict();
-		orientationFilter.update(arr);
-		double[] filtered = orientationFilter.getLatestEstimation();
+		else {
+			orientationFilter.predict();
+			orientationFilter.update(arr);
+		}
 		
-		dAzimuth = filtered[0];
-		dRoll = -Math.PI/2 - filtered[2];
+		dAzimuth = orientationFilter.X[0];
+		dRoll = -Math.PI/2 - orientationFilter.X[2];
 	}
 	
 	private void resetOrigin() {

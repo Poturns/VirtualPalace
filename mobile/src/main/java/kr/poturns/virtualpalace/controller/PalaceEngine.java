@@ -83,7 +83,7 @@ abstract class PalaceEngine extends PalaceCore {
 
             case onLoaded:
                 String topScene = UnitySceneStack.peek().first;
-                if (!SceneLifeCycle.LOBBY.equalsIgnoreCase(topScene) && topScene != scene) {
+                if ((!SceneLifeCycle.LOBBY.equalsIgnoreCase(topScene)) && (topScene != scene)) {
                     // onDestroy LifeCycle 메시지를 수신하지 못하였을 때,
                     // 이전 Scene의 onDestroy를 처리한다.
                     onLifeCycle(topScene, SceneLifeCycle.onDestroy);

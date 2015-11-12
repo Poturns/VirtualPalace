@@ -6,7 +6,7 @@ import kr.poturns.virtualpalace.controller.PalaceApplication;
 import kr.poturns.virtualpalace.controller.PalaceMaster;
 import kr.poturns.virtualpalace.sensor.ISensorAgent;
 
-public class AugItemManager {
+public class ItemKeeper {
 	private static final double GPS_UPDATE_THRESHOLD = 0.0005;
 
 	private ArrayList<AugmentedItem> mItemList = new ArrayList<AugmentedItem>();
@@ -16,7 +16,7 @@ public class AugItemManager {
 	private double dLongitude;
 	private double dAltitude;
 	
-	public AugItemManager() {
+	public ItemKeeper() {
 		criteria = new double[3];
 	}
 	
@@ -41,6 +41,7 @@ public class AugItemManager {
 	public void reloadAugmentedItem(PalaceApplication app) {
 		mItemList.clear();
 		mItemList.addAll(PalaceMaster.getInstance(app).queryNearAugmentedItems());
+
 		criteria[0] = dLatitude;
 		criteria[1] = dLongitude;
 		criteria[2] = dAltitude;
@@ -49,20 +50,21 @@ public class AugItemManager {
 	/**
 	 * 스크린 좌표를 기준으로 {@link AugmentedItem}을 추가한다.
 	 */
-	public AugmentedItem addAugmentedItem(CamTracker tracker, int screenX, int screenY) {
-		AugmentedItem newItem = new AugmentedItem();
-		double[] cloud = tracker.reconstruction(screenX, screenY);
+	public void addAugmentedItem(CamTracker tracker, AugmentedItem newItem) {
+		double[] cloud = tracker.reconstruction(newItem.screenX, newItem.screenY);
 		newItem.augmentedID = 0;			//???
-		newItem.resID = 0;					//???
+
 		newItem.supportX = cloud[0];
 		newItem.supportY = cloud[1];
 		newItem.supportZ = cloud[2];
 		newItem.latitude = dLatitude;
 		newItem.longitude = dLongitude;
 		newItem.altitude = dAltitude;
-		
+		//TODO: 임시코드
+		newItem.resID = mItemList.size()+1;
+
+
 		mItemList.add(newItem);
-		return newItem;
 	}
 	
 	/**

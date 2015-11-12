@@ -11,6 +11,11 @@ public class AugmentedItem {
 
     }
 
+    public AugmentedItem(int screenX, int screenY) {
+        this.screenX = screenX;
+        this.screenY = screenY;
+    }
+
     public long augmentedID;
     public long resID;
 
