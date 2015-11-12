@@ -244,7 +244,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
         // Debug.Log("=============== HandleInputsFromController : " + json);
         if (activeState != null)
         {
-            Debug.Log("=============== Current ActiveState : " + activeState);
+            //Debug.Log("=============== Current ActiveState : " + activeState);
             activeState.InputHandling(JsonInterpreter.ParseInputCommands(json));
         }
         else

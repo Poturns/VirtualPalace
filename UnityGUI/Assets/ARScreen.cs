@@ -20,7 +20,10 @@ public class ARScreen : MonoBehaviour
             {
                 CamScreen.Play();
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
     }
 
@@ -38,13 +41,11 @@ public class ARScreen : MonoBehaviour
             {
                 CamScreen.Stop();
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
-    }
-
-    void OnDisable()
-    {
-        EndCamera();
     }
 
 }

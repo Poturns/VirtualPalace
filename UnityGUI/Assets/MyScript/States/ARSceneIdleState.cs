@@ -58,7 +58,8 @@ namespace MyScript.States
 
         private void ReturnToLobbyScene()
         {
-            arScreen.EndCamera();
+            if (arScreen != null)
+                arScreen.EndCamera();
             StateManager.SwitchScene(UnityScene.Lobby);
         }
 
