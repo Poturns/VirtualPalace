@@ -408,7 +408,7 @@ public class PalaceMaster extends PalaceEngine {
             if (singleMessage.length() == 0)
                 return;
 
-            Log.d("PalaceMast_Input", "Input Message : " + singleMessage.length() + " commands transfered.\n" + singleMessage.toString());
+           // Log.d("PalaceMast_Input", "Input Message : " + singleMessage.length() + " commands transfered.\n" + singleMessage.toString());
 
             // 동기화를 위한 Thread Blocking으로 인해 Message 처리를 지연시킬 수 있으므로,
             // Thread Pool을 이용한 순차적 전송으로 Input 메시지를 전송한다.
@@ -455,7 +455,7 @@ public class PalaceMaster extends PalaceEngine {
                         public void run() {
                             try {
                                 process(jsonMessage);
-                            } catch (Exception e) { }
+                            } catch (Exception e) {e.printStackTrace(); }
                         }
                     };
                 } break;

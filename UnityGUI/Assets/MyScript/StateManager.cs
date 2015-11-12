@@ -208,7 +208,7 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     internal void SendLifeCyleMessage(ISceneChangeState sceneState, UnityLifeCycle lifeCycle)
     {
         string json = JsonInterpreter.MakeUnityLifeCycleMessage(sceneState.UnitySceneID, lifeCycle);
-        //Debug.Log("=============== LifeCycle : " + json);
+        Debug.Log("=============== LifeCycle : " + json);
         SendSingleMessageToPlatform(json);
     }
 

@@ -98,7 +98,7 @@ public final class AndroidUnityBridge {
      * @param id         콜백의 id
      * @param jsonResult 요청에 대한 결과값이 Json형태로 기술된 문자열
      */
-    public synchronized void respondCallbackToUnity(long id, String jsonResult) {
+    public void respondCallbackToUnity(long id, String jsonResult) {
         mCurrentDelegate.respondCallbackToUnity(id, jsonResult);
     }
 
@@ -130,7 +130,7 @@ public final class AndroidUnityBridge {
      * @param jsonMessage 전송할 Json 메시지
      */
     @UnityApi
-    public synchronized boolean sendSingleMessageToAndroid(String jsonMessage) {
+    public boolean sendSingleMessageToAndroid(String jsonMessage) {
         return mCurrentDelegate.sendSingleMessageToAndroid(jsonMessage);
     }
 
@@ -139,7 +139,7 @@ public final class AndroidUnityBridge {
      *
      * @param json 전송할 메시지
      */
-    public synchronized void sendSingleMessageToUnity(String json) {
+    public void sendSingleMessageToUnity(String json) {
         mCurrentDelegate.sendSingleMessageToUnity(json);
     }
 
@@ -148,7 +148,7 @@ public final class AndroidUnityBridge {
      *
      * @param json 전송할 메시지
      */
-    public synchronized void sendInputMessageToUnity(String json) {
+    public void sendInputMessageToUnity(String json) {
         mCurrentDelegate.sendInputMessageToUnity(json);
     }
 
@@ -261,7 +261,7 @@ public final class AndroidUnityBridge {
         }
 
         @Override
-        public synchronized void respondCallbackToUnity(long id, String jsonResult) {
+        public void respondCallbackToUnity(long id, String jsonResult) {
             IAndroidUnityCallback callback = mCallbackMapF.get(id);
             if (callback != null) {
                 callback.onCallback(jsonResult);
@@ -294,7 +294,7 @@ public final class AndroidUnityBridge {
         }
 
         @Override
-        public synchronized boolean sendSingleMessageToAndroid(String jsonMessage) {
+        public boolean sendSingleMessageToAndroid(String jsonMessage) {
             Message.obtain(mMasterF.getRequestHandler(), IProcessorCommands.REQUEST_MESSAGE_FROM_UNITY, jsonMessage).sendToTarget();
             return true;
         }
@@ -308,12 +308,12 @@ public final class AndroidUnityBridge {
         }
 
         @Override
-        public synchronized void sendSingleMessageToUnity(String json) {
+        public void sendSingleMessageToUnity(String json) {
             UnityPlayer.UnitySendMessage("StateScript", "HandleMessageFromController", json);
         }
 
         @Override
-        public synchronized void sendInputMessageToUnity(String json) {
+        public void sendInputMessageToUnity(String json) {
             UnityPlayer.UnitySendMessage("StateScript", "HandleInputsFromController", json);
         }
     }

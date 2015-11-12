@@ -51,6 +51,14 @@ namespace MyScript.States
 
         }
 
+        protected override void HandleSelectOperation()
+        {
+            //base.HandleSelectOperation();
+            if (arScreen != null)
+                arScreen.EndCamera();
+            StateManager.SwitchScene(UnityScene.VR);
+        }
+
         protected override void HandleCancelOperation()
         {
             ReturnToLobbyScene();
@@ -63,9 +71,9 @@ namespace MyScript.States
             StateManager.SwitchScene(UnityScene.Lobby);
         }
 
-        protected override void HandleSelectOperation()
+        protected override void HandleDeepOperation()
         {
-            //base.HandleSelectOperation();
+            //base.HandleDeepOperation();
 
             ARAddRequest.NewRequest().SendRequest(Manager, result => Debug.Log("===== ARAddRequest : " + result));
         }
