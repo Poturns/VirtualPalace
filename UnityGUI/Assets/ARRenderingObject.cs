@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MyScript.Interface;
 using BridgeApi.Controller;
+using MyScript;
 
 
-public class ARRenderingObject : MonoBehaviour {
+public class ARRenderingObject : AbstractBasicObject {
 	//카메라 근평면 으로 부터의 거리
 	public float zOffset;
 	public ARrenderItem ARItem;
@@ -18,6 +20,11 @@ public class ARRenderingObject : MonoBehaviour {
 		ARItem.screenX = item.screenX;
 		ARItem.screenY= item.screenY;
 		ARItem.resId = item.resId;
+	}
+	public override void OnSelect()
+	{	
+		arView.GetComponent<ARScreen> ().EndCamera ();
+		StateManager.SwitchScene (UnityScene.VR);
 	}
 	//비율을 구한다음 PosDummy(parent)로부터의 상대 위치를 구해서 위치 변경
 	public void SetARPosition(ARrenderItem item)
