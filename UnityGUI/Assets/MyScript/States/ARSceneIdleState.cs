@@ -1,6 +1,8 @@
 using UnityEngine;
 using MyScript.Interface;
 using BridgeApi.Controller;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace MyScript.States
 {
@@ -8,6 +10,8 @@ namespace MyScript.States
     public class ARSceneIdleState : AbstractGazeInputState, ISceneChangeState
     {
         private GameObject ARScreenObj;
+		private List<ARRenderingObject> ObjList;
+		private GameObject ARObjPrefab;
         public ARSceneIdleState(StateManager managerRef) : base(managerRef, "ARSceneIdleState")
         {
 
@@ -28,6 +32,10 @@ namespace MyScript.States
             // 스크린의 게임오브젝트를 가져온다
             if (ARScreenObj == null)
                 ARScreenObj = GameObject.Find("ARView");
+
+			ObjList = new List<ARRenderingObject> ();
+		
+
         }
 
         protected override void HandleCancelOperation()
@@ -48,6 +56,11 @@ namespace MyScript.States
                 case Operation.AR_RENDERING:
                     ARrenderItem item = JsonInterpreter.ParseARrenderItem(operation);
                     Debug.Log("====== AR item : " + item);
+					//Update 리턴값이 false 면 생성
+					if(!ARItemUpdate(item))
+					{
+						CreateARItem(item);
+					}
                     break;
 
                 default:
@@ -55,6 +68,38 @@ namespace MyScript.States
             }
 
         }
+		//item을 받아서 List를 검사한뒤 있으면 업데이트하고 ture반환
+		//없으면 false 반환
+		private bool ARItemUpdate(ARrenderItem item)
+		{
+			if (ObjList == null || ObjList.Count == 0) 
+				return false;
+
+			foreach (ARRenderingObject obj in ObjList) 
+			{
+				if(obj.ARItem.resId == item.resId)
+				{
+					obj.ARItem.screenX = item.screenX;
+					obj.ARItem.screenY= item.screenY;
+					obj.SetARPosition(item);
+					return true;
+				}
+			}
+
+			return false;
+		}
+		private void CreateARItem(ARrenderItem item)
+		{
+			if(ARObjPrefab == null) 
+				ARObjPrefab = GameObject.Find ("PrefabStore").GetComponent<ARPrefabload> ().ARPrefab;
+			
+			GameObject NewObj = GameObject.Instantiate(ARObjPrefab) as GameObject;
+			NewObj.transform.SetParent( ARScreenObj.transform.GetChild (0));
+			ARRenderingObject NewAR = NewObj.GetComponent<ARRenderingObject>();
+			NewAR.SetARItem(item);
+			NewAR.SetARPosition(item);
+			ObjList.Add(NewAR);
+		}
     }
 }
 

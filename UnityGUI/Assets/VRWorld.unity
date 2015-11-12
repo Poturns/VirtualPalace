@@ -7109,8 +7109,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1127163081}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -.180000007, y: -.870000005, z: -.156000003}
-  m_LocalScale: {x: .680179179, y: 11.1304111, z: 1}
+  m_LocalPosition: {x: -.152999997, y: -.870000005, z: -.156000003}
+  m_LocalScale: {x: .589250028, y: 11.1304111, z: 1}
   m_Children: []
   m_Father: {fileID: 864614369}
   m_RootOrder: 0
@@ -11924,7 +11924,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GazeTime: 0
   GazeSelete: 0
-  GazeTimeMax: 5
   TextTex: {fileID: 2800000, guid: 7d76a6b572d070b4d9ed9f58e42dc944, type: 3}
   ImageTex: {fileID: 2800000, guid: 30a3070bf955483499e0083f17195689, type: 3}
   MovieTex: {fileID: 2800000, guid: 5fb7f49993105f5478ded0a131cd7ce8, type: 3}
