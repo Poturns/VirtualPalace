@@ -88,6 +88,10 @@ namespace ComputerApi.Controller
                             callback("{\"" + key + "\":{\"result\":\"fail\"}}");
                         break;
 
+                    case "save_new_ar_item":
+                        callback("{\"" + key + "\":{\"result\":\"success\"}}");
+                        break;
+
 
                     case DatabaseConstants.QUERY_NEAR_ITEMS:
                     default:

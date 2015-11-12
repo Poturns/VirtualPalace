@@ -3,6 +3,7 @@ using MyScript.Interface;
 using BridgeApi.Controller;
 using System.Collections;
 using System.Collections.Generic;
+using BridgeApi.Controller.Request;
 
 namespace MyScript.States
 {
@@ -12,6 +13,7 @@ namespace MyScript.States
         private GameObject ARScreenObj;
 		private List<ARRenderingObject> ObjList;
 		private GameObject ARObjPrefab;
+
         public ARSceneIdleState(StateManager managerRef) : base(managerRef, "ARSceneIdleState")
         {
 
@@ -45,7 +47,15 @@ namespace MyScript.States
 
         private void ReturnToLobbyScene()
         {
+
             StateManager.SwitchScene(UnityScene.Lobby);
+        }
+
+        protected override void HandleSelectOperation()
+        {
+            //base.HandleSelectOperation();
+
+            ARAddRequest.NewRequest().SendRequest(Manager, result => Debug.Log("===== ARAddRequest : " + result));
         }
 
         protected override void HandleOtherOperation(Operation operation)
@@ -55,12 +65,8 @@ namespace MyScript.States
             {
                 case Operation.AR_RENDERING:
                     ARrenderItem item = JsonInterpreter.ParseARrenderItem(operation);
-                    Debug.Log("====== AR item : " + item);
-					//Update 리턴값이 false 면 생성
-					if(!ARItemUpdate(item))
-					{
-						CreateARItem(item);
-					}
+                    HandleARItemInput(item);
+                    //Debug.Log("====== AR item : " + item);
                     break;
 
                 default:
@@ -68,6 +74,16 @@ namespace MyScript.States
             }
 
         }
+
+        private void HandleARItemInput(ARrenderItem item)
+        {
+            //Update 리턴값이 false 면 생성
+            if (!ARItemUpdate(item))
+            {
+                CreateARItem(item);
+            }
+        }
+
 		//item을 받아서 List를 검사한뒤 있으면 업데이트하고 ture반환
 		//없으면 false 반환
 		private bool ARItemUpdate(ARrenderItem item)

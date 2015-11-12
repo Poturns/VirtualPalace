@@ -7,16 +7,21 @@ public class ARScreen : MonoBehaviour
 
     // Use this for initialization
     WebCamTexture CamScreen;
+
     void Start()
     {
-        CamScreen = new WebCamTexture();
+        if (CamScreen == null)
+            CamScreen = new WebCamTexture();
         GetComponent<Renderer>().material.mainTexture = CamScreen;
 
-        try
+        if (CamScreen != null && !CamScreen.isPlaying)
         {
-            CamScreen.Play();
+            try
+            {
+                CamScreen.Play();
+            }
+            catch (Exception) { }
         }
-        catch (Exception) { }
     }
 
     // Update is called once per frame
@@ -24,4 +29,22 @@ public class ARScreen : MonoBehaviour
     {
 
     }
+
+    public void EndCamera()
+    {
+        if (CamScreen != null && CamScreen.isPlaying)
+        {
+            try
+            {
+                CamScreen.Stop();
+            }
+            catch (Exception) { }
+        }
+    }
+
+    void OnDisable()
+    {
+        EndCamera();
+    }
+
 }
