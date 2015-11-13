@@ -28,7 +28,7 @@ Look into this [webpage](http://www.wikihow.com/Build-a-Memory-Palace) to try th
 - Unity 5.1
 
 ## Demonstration
-[![VirtualPalace](http://blog.artofmemory.com/files/2011/03/Emma-Willard-1846-temple.jpg)](http://youtu.be/ "Go into the VirtualPalace!")
+[![VirtualPalace](http://img.youtube.com/vi/XVE7H87_sfw/0.jpg)](https://youtu.be/XVE7H87_sfw "Go into the VirtualPalace!")
 - Click the upper image if you want to watch a demo video!
 
 ## Getting Started
