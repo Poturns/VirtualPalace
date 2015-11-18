@@ -130,9 +130,10 @@ public class CamTracker {
 			orientationFilter.predict();
 			orientationFilter.update(arr);
 		}
+		double[] filtered = orientationFilter.getLastState();
 		
-		dAzimuth = orientationFilter.X[0];
-		dRoll = -Math.PI/2 - orientationFilter.X[2];
+		dAzimuth = filtered[0];
+		dRoll = -Math.PI/2 - filtered[2];
 	}
 	
 	private void resetOrigin() {
