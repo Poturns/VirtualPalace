@@ -152,19 +152,9 @@ public class StateManager : MonoBehaviour, IPlatformBridge
     /// </summary>
     /// <param name="a">Unity MainThread에서 실행시킬 작업</param>
     /// <param name="runImmediatelyIfMainThread">이 메소드를 호출한 Thread가 MainThread이면 즉각적으로 실행시킬지 여부</param>
-    public void QueueOnMainThread(Action a, bool runImmediatelyIfMainThread)
+    public void QueueOnMainThread(Action a, bool runImmediatelyIfMainThread = true)
     {
         Tasker.QueueOnMainThread(a, runImmediatelyIfMainThread);
-    }
-
-    /// <summary>
-    /// 작업을 Unity의 MainThread에서 수행한다.<para/>
-    /// 이 메소드를 호출한 Thread가 MainThread라면 그대로 실행시킨다.
-    /// </summary>
-    /// <param name="a">Unity MainThread에서 실행시킬 작업</param>
-    public void QueueOnMainThread(Action a)
-    {
-        Tasker.QueueOnMainThread(a);
     }
 
     public static void SwitchScene(UnityScene unityScene, object additionalParameter = null)
@@ -269,9 +259,11 @@ public class StateManager : MonoBehaviour, IPlatformBridge
                 case ControllerEvent.EVENT_TOAST_MESSAGE:
                     activeState.ToastHandling(ToastMessage.FromJson(_event.JsonContent));
                     break;
+                case ControllerEvent.EVENT_SPEECH_ENDED:
+                    Debug.LogWarning("=== EVENT_SPEECH_ENDED : , mode : " + _event.JsonContent["mode"] + ", speech : " + _event.JsonContent["speech_result"]);
+                    break;
                 case ControllerEvent.EVENT_DATA_UPDATED:
                 case ControllerEvent.EVENT_INPUTMODE_CHANGED:
-                case ControllerEvent.EVENT_SPEECH_ENDED:
                 case ControllerEvent.EVENT_SPEECH_STARTED:
                 default:
                     Debug.LogWarning("=== not implement event : " + _event.Type + " , msg : " + _event.JsonContent.ToJson());
